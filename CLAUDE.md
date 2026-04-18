@@ -2,14 +2,46 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Repository status
+## Repository layout
 
-This repository is currently a stub. As of the latest commit, it contains only a `README.md` with the project title ("Teller statt Tonne" — German for "Plate instead of Bin"). There is no source code, build tooling, dependency manifest, test suite, CI configuration, or documented architecture yet.
+Monorepo with two independent applications:
 
-As a result, there are no project-specific build, lint, test, or run commands to document. Update this file once a language/framework is chosen and initial scaffolding lands (e.g. `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, etc.).
+- `frontend/` — Angular 21 application (scaffolded via `@angular/cli@21`, standalone components, Vitest test runner).
+- `backend/` — Spring Boot 4.0.5 application on Java 21, Maven build (`spring-boot-starter-webmvc`).
 
-## When extending this repo
+There is no shared tooling (no root `package.json`, no Gradle multi-project). Each folder is built, tested, and run on its own.
 
-- Before assuming a stack, check what files exist — the project may have been scaffolded since this note was written.
-- The project name suggests a food-waste / food-sharing domain ("plate instead of bin"), but no requirements or architecture decisions have been committed. Do not infer product scope; ask the user.
-- When adding the first real code, replace this section with concrete guidance: the chosen stack, entry points, the commands needed to build/test/run, and the high-level module boundaries that span multiple files.
+## Frontend (`frontend/`)
+
+Install once: `npm install` (scaffold was created with `--skip-install`).
+
+Common commands (run inside `frontend/`):
+
+- `npm start` — dev server on http://localhost:4200 (`ng serve`).
+- `npm run build` — production build (`ng build`).
+- `npm run watch` — incremental development build.
+- `npm test` — Vitest test run (configured via `@angular/build`).
+
+Notes:
+
+- Entry points: `src/main.ts` bootstraps `src/app/app.ts` with config from `src/app/app.config.ts` and routes from `src/app/app.routes.ts`.
+- Prettier config is inlined in `package.json` (100 cols, single quotes, Angular HTML parser).
+
+## Backend (`backend/`)
+
+Common commands (run inside `backend/`, the Maven wrapper is checked in):
+
+- `./mvnw spring-boot:run` — start the application.
+- `./mvnw test` — run tests.
+- `./mvnw -Dtest=ClassName#method test` — run a single test.
+- `./mvnw package` — build the runnable jar into `target/`.
+
+Notes:
+
+- Base package: `de.tellerstatttonne.backend`. Main class: `BackendApplication`.
+- Currently only `spring-boot-starter-webmvc` (+ its test starter) is on the classpath — add further starters to `pom.xml` as features grow.
+
+## Conventions
+
+- Keep frontend and backend decoupled; don't introduce shared tooling at the repo root without a clear reason.
+- Project name "Teller statt Tonne" (German: "plate instead of bin") suggests a food-waste / food-sharing domain, but product scope is not yet defined — ask the user before assuming requirements.
