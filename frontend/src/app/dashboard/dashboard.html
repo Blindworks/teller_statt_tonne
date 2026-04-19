@@ -9,15 +9,25 @@
 
   <nav class="flex-1 space-y-2">
     <a
-      href="#"
-      class="flex items-center gap-4 bg-gradient-to-r from-primary to-primary-container text-white rounded-full px-6 py-3 shadow-lg shadow-green-900/20 font-headline font-medium text-sm transition-all duration-300"
+      routerLink="/dashboard"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #dashLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!dashLink.isActive"
+      [class.hover:bg-surface-container]="!dashLink.isActive"
+      [class.hover:translate-x-1]="!dashLink.isActive"
     >
       <span class="material-symbols-outlined">dashboard</span>
       Dashboard
     </a>
     <a
-      href="#"
-      class="flex items-center gap-4 text-on-surface px-6 py-3 rounded-full hover:bg-surface-container font-headline font-medium text-sm hover:translate-x-1 transition-all duration-300"
+      routerLink="/stores"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #storesLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!storesLink.isActive"
+      [class.hover:bg-surface-container]="!storesLink.isActive"
+      [class.hover:translate-x-1]="!storesLink.isActive"
     >
       <span class="material-symbols-outlined">storefront</span>
       Stores
@@ -261,11 +271,23 @@
 <nav
   class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-lg flex justify-around items-center py-3 px-6 z-50 border-t border-outline-variant/10"
 >
-  <a href="#" class="flex flex-col items-center gap-1 text-primary font-bold">
+  <a
+    routerLink="/dashboard"
+    routerLinkActive="text-primary font-bold"
+    #dashMob="routerLinkActive"
+    class="flex flex-col items-center gap-1"
+    [class.text-on-surface-variant]="!dashMob.isActive"
+  >
     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">dashboard</span>
     <span class="text-[10px]">Home</span>
   </a>
-  <a href="#" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  <a
+    routerLink="/stores"
+    routerLinkActive="text-primary font-bold"
+    #storesMob="routerLinkActive"
+    class="flex flex-col items-center gap-1"
+    [class.text-on-surface-variant]="!storesMob.isActive"
+  >
     <span class="material-symbols-outlined">storefront</span>
     <span class="text-[10px]">Stores</span>
   </a>
