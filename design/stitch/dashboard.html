@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-dim": "#006117",
+                    "on-tertiary-fixed": "#382400",
+                    "on-error": "#fff7f6",
+                    "surface": "#fafaef",
+                    "surface-tint": "#116e20",
+                    "surface-container": "#eeefe1",
+                    "on-secondary-fixed": "#673000",
+                    "secondary-container": "#ffdcc6",
+                    "tertiary": "#7f5700",
+                    "secondary-dim": "#854000",
+                    "secondary-fixed": "#ffdcc6",
+                    "inverse-primary": "#9df898",
+                    "tertiary-fixed-dim": "#eda600",
+                    "tertiary-fixed": "#feb300",
+                    "tertiary-container": "#feb300",
+                    "on-background": "#303428",
+                    "surface-variant": "#e1e4d3",
+                    "surface-container-highest": "#e1e4d3",
+                    "on-primary-fixed-variant": "#0a6a1d",
+                    "inverse-on-surface": "#9d9e94",
+                    "background": "#fafaef",
+                    "secondary": "#974a00",
+                    "on-error-container": "#671200",
+                    "error-container": "#fa7150",
+                    "on-primary": "#eaffe2",
+                    "primary-fixed-dim": "#90e98b",
+                    "secondary-fixed-dim": "#ffc9a7",
+                    "on-secondary-container": "#823f00",
+                    "outline": "#797c6e",
+                    "on-tertiary-container": "#523700",
+                    "primary": "#116e20",
+                    "primary-container": "#9df898",
+                    "inverse-surface": "#0d0f09",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed": "#9df898",
+                    "error-dim": "#821a01",
+                    "on-surface-variant": "#5d6153",
+                    "tertiary-dim": "#704c00",
+                    "on-tertiary": "#fff8f2",
+                    "surface-container-high": "#e7eada",
+                    "on-primary-container": "#006016",
+                    "on-secondary-fixed-variant": "#914700",
+                    "error": "#aa371c",
+                    "outline-variant": "#b0b4a3",
+                    "surface-container-low": "#f4f4e8",
+                    "surface-bright": "#fafaef",
+                    "on-primary-fixed": "#004b0f",
+                    "on-surface": "#303428",
+                    "on-tertiary-fixed-variant": "#5e4000",
+                    "surface-dim": "#d8dcc9",
+                    "on-secondary": "#fff7f4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        h1, h2, h3, .brand-font { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container">
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full p-6 pt-12 bg-[#fafaef] dark:bg-stone-950 h-screen w-72 rounded-r-[3rem] no-border space-y-4 shadow-[40px_0_60px_-15px_rgba(48,52,40,0.06)] z-40">
+<div class="mb-8">
+<h1 class="text-xl font-extrabold text-[#116e20] mb-1">Teller statt Tonne</h1>
+<p class="text-xs font-medium text-on-surface-variant opacity-70">The Living Pantry</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-4 bg-gradient-to-r from-[#116e20] to-[#9df898] text-white rounded-full px-6 py-3 shadow-lg shadow-green-900/20 font-['Plus_Jakarta_Sans'] font-medium text-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-4 text-[#303428] dark:text-stone-400 px-6 py-3 rounded-full hover:bg-stone-100 dark:hover:bg-stone-900 font-['Plus_Jakarta_Sans'] font-medium text-sm hover:translate-x-1 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+                Stores
+            </a>
+<a class="flex items-center gap-4 text-[#303428] dark:text-stone-400 px-6 py-3 rounded-full hover:bg-stone-100 dark:hover:bg-stone-900 font-['Plus_Jakarta_Sans'] font-medium text-sm hover:translate-x-1 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+                Pickups
+            </a>
+<a class="flex items-center gap-4 text-[#303428] dark:text-stone-400 px-6 py-3 rounded-full hover:bg-stone-100 dark:hover:bg-stone-900 font-['Plus_Jakarta_Sans'] font-medium text-sm hover:translate-x-1 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                Members
+            </a>
+</nav>
+<button class="mt-auto bg-secondary text-on-secondary py-4 px-6 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-secondary-dim transition-colors active:scale-95 shadow-md shadow-secondary/20">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+            Add Pickup
+        </button>
+</aside>
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-30 flex justify-between items-center px-8 py-4 w-full bg-[#fafaef]/70 dark:bg-stone-950/70 backdrop-blur-xl no-border bg-stone-100/50 dark:bg-stone-900/50 md:pl-80">
+<div class="flex items-center gap-4">
+<span class="md:hidden text-2xl font-black text-[#116e20]">Teller statt Tonne</span>
+<div class="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full w-96">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-on-surface-variant/50" placeholder="Search saved items..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-green-50 transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-primary-container overflow-hidden border-2 border-white">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="portrait of a smiling young volunteer in a green t-shirt with soft natural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlnI7Jvlz_ItVX5RMs8c1rQ2KnMKp8akokDrB8ge2wAaZPKWb0ZDKUztGT9bQkumnREcvOTokVb7yTetcJwvZJIctkI5SOdI3iYH6EcWu-6h6KRX4XNypVJaFdgZglXJMWHELSUGH_u0Lvqx7Yy0AEwqDJ5KHcNMqF8eTxPtwdDcRpjpv75EulDc28zDPv0eIEFRMS9w0I8Yw0rbYWBF4HU9IFqaNxK5ICJ83u0UqpC-UhY4-fq1vwPvtT02JkgJhBJhKB8gWkHaQu"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-12 px-6 md:pl-80 md:pr-12 min-h-screen">
+<!-- Hero Welcome -->
+<section class="mb-12">
+<h2 class="text-5xl font-extrabold tracking-tight text-primary mb-4">Hello, Harvest Keeper.</h2>
+<p class="text-on-surface-variant max-w-xl text-lg leading-relaxed indent-8">
+                Your community has rescued <span class="text-primary font-bold">128kg</span> of food this week. That's enough to feed 20 families for three days.
+            </p>
+</section>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<!-- Impact Card -->
+<div class="md:col-span-2 bg-secondary-container rounded-xl p-8 relative overflow-hidden group">
+<div class="relative z-10">
+<h3 class="text-on-secondary-container font-semibold uppercase tracking-widest text-xs mb-8">Community Impact</h3>
+<div class="flex items-end gap-2 mb-2">
+<span class="text-7xl font-black text-on-secondary-container leading-none">2,481</span>
+<span class="text-xl font-bold text-on-secondary-container opacity-60 pb-2">KG</span>
+</div>
+<p class="text-on-secondary-container/80 font-medium">Total food saved since January</p>
+</div>
+<div class="absolute -right-12 -bottom-12 w-64 h-64 bg-secondary opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-500"></div>
+<div class="absolute right-8 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none">
+<span class="material-symbols-outlined text-[120px]" data-icon="eco" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+</div>
+<!-- Mini Stats Column -->
+<div class="grid grid-rows-2 gap-6">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="p-3 bg-primary-container text-on-primary-container rounded-full">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</span>
+<span class="text-primary text-xs font-bold">+12%</span>
+</div>
+<div>
+<p class="text-4xl font-black text-on-surface">42</p>
+<p class="text-on-surface-variant text-sm font-medium">Active Members</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="p-3 bg-tertiary-container text-on-tertiary-container rounded-full">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+</span>
+<span class="text-tertiary text-xs font-bold">Today</span>
+</div>
+<div>
+<p class="text-4xl font-black text-on-surface">8</p>
+<p class="text-on-surface-variant text-sm font-medium">Pickups Scheduled</p>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+<!-- Next Pickups Column -->
+<div class="lg:col-span-2">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-2xl font-extrabold text-on-surface tracking-tight">Next Pickups</h3>
+<button class="text-primary font-bold text-sm hover:underline">View All</button>
+</div>
+<div class="space-y-4">
+<!-- Pickup Card 1 -->
+<div class="bg-surface-container-low rounded-lg p-6 flex items-center gap-6 group hover:bg-surface-container-high transition-all">
+<div class="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
+<img alt="Store" class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="fresh organic vegetables and fruits in a wooden crate with warm market lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFdlvUh2maaucolzmM0IEm6P7OaO1Y5vMbi-7fklrk4_ts9JK8EybW3NtLMdh_ZYr8L_fBU_DFGUK9TGMvVFt9WMFjStAFX1h9k-PZa19qLxXJRDWGO1oj8clGPc3CghIM2oaNkshkkr-UVnX1f42bKhFzTVs3ljNPRaUbEAtKLzc2uZka2OUacWyAzaSRSP9StLkNyzn-Dauj8D08jmuQ7tTyH5zK77aBSLtkQ_m6zg9d2cWl78JWiOfb9D-hW6uZviwpxekplUiU"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-error-container text-[10px] font-bold text-on-error-container uppercase tracking-tight">Expiring Soon</span>
+<h4 class="font-bold text-lg text-on-surface">Bio-Markt Sonnenblume</h4>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant text-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                    Kreuzberg Str. 12
+                                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="alarm">alarm</span>
+                                    18:30 Today
+                                </span>
+</div>
+</div>
+<button class="w-12 h-12 rounded-full border border-outline-variant/30 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Pickup Card 2 -->
+<div class="bg-surface-container-low rounded-lg p-6 flex items-center gap-6 group hover:bg-surface-container-high transition-all">
+<div class="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
+<img alt="Bakery" class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="rows of freshly baked sourdough loaves on a cooling rack in a rustic bakery" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmeaEMwerRoADJITY1FS7PH3cHygjsou5NeqG_DuHG5vEpRvurSXHmNO8fd8Babx-n4qIO8cviaYCKTTG5FHg1GfnmhHhAzaZA1Gu3J_-zjfpXk3Hnj-IOSB_iMIERKQVIXpMDJQzO3FEDxaIa5eSM5jXkq5jNnU5vRH1NcUE3E8Jfd_Qh2MGPG7mQziuGSQ8Obw2BO7FS0Daip2RhGcP0FzzZSCeirrGTERE6_aXAZuj2_a4mRptqF73f_izqtwwdEeslTUJgLsLz"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-[10px] font-bold text-on-primary-container uppercase tracking-tight">Standard</span>
+<h4 class="font-bold text-lg text-on-surface">Bäckerei Schmidt</h4>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant text-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                    Hauptstraße 45
+                                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="alarm">alarm</span>
+                                    20:00 Today
+                                </span>
+</div>
+</div>
+<button class="w-12 h-12 rounded-full border border-outline-variant/30 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Pickup Card 3 -->
+<div class="bg-surface-container-low rounded-lg p-6 flex items-center gap-6 group hover:bg-surface-container-high transition-all">
+<div class="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
+<img alt="Market" class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="vibrant colorful supermarket produce section with clean shelves and soft overhead light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoJwFrlTuO6HjRyqhK32GGmLfAZ4hkVfm3ouk35R_2oJ74b7ckJOvWy_pZQySZJTxSbybmVfkPFJXTqIT4QnetM1so2lPh1dxo7jUjlA-jDV_nktIuGQlBMRuPqTlfGfxp0xmFUQ8iFlBxVQiG4rPYhq2NHXfJxqYa0TDbeWRzLE5PA4_OFlTrxKVsKKI54_w4pswhrXQC0RTmXPxxsxhKdfiofrBdiFGx7j1svFGyMZqZIzcW0-CkgbKBYGgSxyXnS6Fu4c2Rlr9W"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-[10px] font-bold text-on-primary-container uppercase tracking-tight">Standard</span>
+<h4 class="font-bold text-lg text-on-surface">Regio-Supermarkt</h4>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant text-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                    Am Anger 2
+                                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="alarm">alarm</span>
+                                    09:00 Tomorrow
+                                </span>
+</div>
+</div>
+<button class="w-12 h-12 rounded-full border border-outline-variant/30 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- News Feed Column -->
+<div class="space-y-6">
+<h3 class="text-2xl font-extrabold text-on-surface tracking-tight mb-2">Community News</h3>
+<div class="bg-surface-container-high/50 p-6 rounded-lg space-y-6">
+<!-- News Item 1 -->
+<div class="relative pl-8 before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-primary before:rounded-full">
+<p class="text-xs font-bold text-primary mb-1 uppercase">Event • 2h ago</p>
+<h5 class="font-bold text-on-surface mb-2 leading-snug">Summer Potluck at the Park next Sunday!</h5>
+<p class="text-sm text-on-surface-variant line-clamp-2">Bring your saved recipes and join us for a sunset feast at Park West.</p>
+</div>
+<!-- News Item 2 -->
+<div class="relative pl-8 before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-secondary before:rounded-full">
+<p class="text-xs font-bold text-secondary mb-1 uppercase">Milestone • 5h ago</p>
+<h5 class="font-bold text-on-surface mb-2 leading-snug">New Store: 'Veggie Bliss' joins the network</h5>
+<p class="text-sm text-on-surface-variant line-clamp-2">Our first dedicated vegan store is now available for pickups starting Monday.</p>
+</div>
+<!-- News Item 3 -->
+<div class="relative pl-8 before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-tertiary before:rounded-full">
+<p class="text-xs font-bold text-tertiary mb-1 uppercase">Maintenance • 1d ago</p>
+<h5 class="font-bold text-on-surface mb-2 leading-snug">Updated Pickup Guidelines</h5>
+<p class="text-sm text-on-surface-variant line-clamp-2">Please read the new hygiene protocols for fresh produce handling.</p>
+</div>
+</div>
+<!-- Small Community Stat Card -->
+<div class="bg-primary p-6 rounded-xl text-on-primary">
+<div class="flex items-center gap-4 mb-4">
+<div class="flex -space-x-3">
+<img class="w-8 h-8 rounded-full border-2 border-primary" data-alt="professional male portrait with soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj6LwGbCnoAgLSby3-xuN-scl2xdK_DTFQt9q8Drz_z8prWDKyT1JXVSxEqyyyzJDpxiW9JkNKltRKp3eGiXpq_WIoN2HHDH_9iOgxdm3BhLm3jP67pv0YnW2ymTptqItwj3xEByWSykcXg4InUHfIfxr38XTmy32GjifNC0xbPzUerRNqIFWof173glFhogMofDKcO9eXfeypu82yrJ63edO4d3oKWMJm8HyHOuDj6-bCbJGQIszfUQIektOC1ZQEu42COdRVwRwG"/>
+<img class="w-8 h-8 rounded-full border-2 border-primary" data-alt="vibrant female portrait with warm natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_3J34nPEsvIbRVjvTvSDxgTa2IcrdzEjS7tNnTxPJDD5Scxn_dUaftO_gRjQ-hossMhGBgvp4nox5d7imb1SRLHWudLrr_MDljL6RAy9lvGp_k-naMIlv2QuRWJM_OZ9Dpq4ziMESnHfB7637e7hfARifhKh4Y9FDdv_LKCaCgy6smBckJLyog9N3bN4I15Y2DyS44f47RvJ33flmk-BEfZ97ctsVjfpz62RTbr-S5l5Dyq5mPyx7reYmJK8x-4MtzuTKFRmaXhRJ"/>
+<img class="w-8 h-8 rounded-full border-2 border-primary" data-alt="young man smiling with neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZJaxHkkwsCXL9rBAbuiAcW4iWoQ114YgVUxRN4drIebkX-JSEhchHq1EskpN75EeV1bRWwyYGiKYTsz8ZRRVCqte7AXnuGaax7qZipzTiOmjDIZ40_gUsP3rRm5Pgc6Zgo5XJemn7fCHdr90wl91CLhamT0XbEcugTFsR6Hav8gCRVt81omhT7zkqbWdP86ns3gmJ1yUa447BEEKU83IkTMUNA_1LeZ2NFVLamHOpZ8jii4Toq0xzEzOdnY5FPMTugrji8ZyF_OjV"/>
+</div>
+<span class="text-xs font-bold">+12 online</span>
+</div>
+<p class="text-sm font-medium opacity-90 leading-tight">Your community is active right now. Help someone with a pickup?</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#fafaef]/90 backdrop-blur-lg flex justify-around items-center py-3 px-6 z-50 border-t border-outline-variant/10">
+<a class="flex flex-col items-center gap-1 text-[#116e20] font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="text-[10px]">Stores</span>
+</a>
+<div class="bg-primary -mt-10 p-4 rounded-full shadow-lg shadow-primary/30 text-white">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="text-[10px]">Pickups</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[10px]">Social</span>
+</a>
+</nav>
+</body></html>
