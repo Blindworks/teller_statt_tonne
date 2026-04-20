@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { PartnerService } from '../partners/partner.service';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Partner } from '../partners/partner.model';
 
 @Component({
   selector: 'app-stores',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink],
   templateUrl: './stores.html',
   styleUrl: './stores.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

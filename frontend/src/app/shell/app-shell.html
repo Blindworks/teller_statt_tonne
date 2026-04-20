@@ -1,0 +1,122 @@
+<!-- Sidebar (Desktop) -->
+<aside
+  class="hidden md:flex flex-col fixed left-0 top-0 h-screen w-72 p-6 pt-12 bg-surface rounded-r-[3rem] space-y-4 shadow-[40px_0_60px_-15px_rgba(48,52,40,0.06)] z-40"
+>
+  <div class="mb-8">
+    <h1 class="text-xl font-extrabold text-primary mb-1">Teller statt Tonne</h1>
+    <p class="text-xs font-medium text-on-surface-variant opacity-70 tracking-widest uppercase">
+      The Living Pantry
+    </p>
+  </div>
+
+  <nav class="flex-1 space-y-2">
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #dashLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!dashLink.isActive"
+      [class.hover:bg-surface-container]="!dashLink.isActive"
+      [class.hover:translate-x-1]="!dashLink.isActive"
+    >
+      <span class="material-symbols-outlined">dashboard</span>
+      Dashboard
+    </a>
+    <a
+      routerLink="/stores"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #storesLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!storesLink.isActive"
+      [class.hover:bg-surface-container]="!storesLink.isActive"
+      [class.hover:translate-x-1]="!storesLink.isActive"
+    >
+      <span class="material-symbols-outlined">storefront</span>
+      Stores
+    </a>
+    <a
+      href="#"
+      class="flex items-center gap-4 text-on-surface px-6 py-3 rounded-full hover:bg-surface-container font-headline font-medium text-sm hover:translate-x-1 transition-all duration-300"
+    >
+      <span class="material-symbols-outlined">calendar_today</span>
+      Pickups
+    </a>
+    <a
+      routerLink="/members"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #membersLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!membersLink.isActive"
+      [class.hover:bg-surface-container]="!membersLink.isActive"
+      [class.hover:translate-x-1]="!membersLink.isActive"
+    >
+      <span class="material-symbols-outlined">group</span>
+      Members
+    </a>
+  </nav>
+</aside>
+
+<!-- Top App Bar -->
+<header
+  class="fixed top-0 w-full z-30 flex justify-between items-center px-8 py-4 bg-surface/70 backdrop-blur-xl md:pl-80"
+>
+  <div class="flex items-center gap-4">
+    <span class="md:hidden text-2xl font-black text-primary">Teller statt Tonne</span>
+  </div>
+  <div class="flex items-center gap-4">
+    <button
+      type="button"
+      class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-green-50 transition-colors relative"
+    >
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+    </button>
+    <div
+      class="h-10 w-10 rounded-full bg-primary-container overflow-hidden border-2 border-white ring-2 ring-primary-container"
+    >
+      <img [src]="profileImage" alt="User Profile" class="w-full h-full object-cover" />
+    </div>
+  </div>
+</header>
+
+<router-outlet />
+
+<!-- Bottom Navigation (Mobile) -->
+<nav
+  class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-lg flex justify-around items-center py-3 px-6 z-50 border-t border-outline-variant/10"
+>
+  <a
+    routerLink="/dashboard"
+    routerLinkActive="text-primary font-bold"
+    #dashMob="routerLinkActive"
+    class="flex flex-col items-center gap-1"
+    [class.text-on-surface-variant]="!dashMob.isActive"
+  >
+    <span class="material-symbols-outlined">dashboard</span>
+    <span class="text-[10px]">Home</span>
+  </a>
+  <a
+    routerLink="/stores"
+    routerLinkActive="text-primary font-bold"
+    #storesMob="routerLinkActive"
+    class="flex flex-col items-center gap-1"
+    [class.text-on-surface-variant]="!storesMob.isActive"
+  >
+    <span class="material-symbols-outlined">storefront</span>
+    <span class="text-[10px]">Stores</span>
+  </a>
+  <a href="#" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">calendar_today</span>
+    <span class="text-[10px]">Pickups</span>
+  </a>
+  <a
+    routerLink="/members"
+    routerLinkActive="text-primary font-bold"
+    #membersMob="routerLinkActive"
+    class="flex flex-col items-center gap-1"
+    [class.text-on-surface-variant]="!membersMob.isActive"
+  >
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">group</span>
+    <span class="text-[10px]">Members</span>
+  </a>
+</nav>

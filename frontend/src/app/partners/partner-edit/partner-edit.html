@@ -1,66 +1,22 @@
-<!-- Sidebar (Desktop) -->
-<aside
-  class="hidden md:flex flex-col fixed left-0 top-0 h-screen w-72 p-6 pt-12 bg-surface rounded-r-[3rem] space-y-4 shadow-[40px_0_60px_-15px_rgba(48,52,40,0.06)] z-40"
->
-  <div class="mb-8">
-    <h1 class="text-xl font-extrabold text-primary mb-1">Teller statt Tonne</h1>
-    <p class="text-xs font-medium text-on-surface-variant opacity-70">The Living Pantry</p>
-  </div>
-
-  <nav class="flex-1 space-y-2">
-    <a
-      routerLink="/dashboard"
-      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
-      #dashLink="routerLinkActive"
-      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
-      [class.text-on-surface]="!dashLink.isActive"
-      [class.hover:bg-surface-container]="!dashLink.isActive"
-    >
-      <span class="material-symbols-outlined">dashboard</span>
-      Dashboard
-    </a>
-    <a
-      routerLink="/stores"
-      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
-      #storesLink="routerLinkActive"
-      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
-      [class.text-on-surface]="!storesLink.isActive"
-      [class.hover:bg-surface-container]="!storesLink.isActive"
-    >
-      <span class="material-symbols-outlined">storefront</span>
-      Stores
-    </a>
-  </nav>
-</aside>
-
-<!-- Top App Bar -->
-<header
-  class="fixed top-0 w-full z-30 flex justify-between items-center px-8 py-4 bg-surface/70 backdrop-blur-xl md:pl-80"
->
-  <div class="flex items-center gap-4">
-    <h2 class="hidden md:block text-2xl font-extrabold tracking-tight text-primary">
-      {{ isEdit ? 'Partner bearbeiten' : 'Partner anlegen' }}
-    </h2>
-  </div>
-  <a
-    routerLink="/stores"
-    class="text-sm font-semibold text-on-surface-variant hover:text-primary flex items-center gap-1"
-  >
-    <span class="material-symbols-outlined text-base">arrow_back</span>
-    Zurück zur Übersicht
-  </a>
-</header>
-
 <!-- Main Canvas -->
 <main class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
-  <section class="mb-8">
-    <h3 class="text-4xl font-extrabold text-on-surface leading-tight">
-      {{ isEdit ? 'Partner bearbeiten' : 'Neuen Partner anlegen' }}
-    </h3>
-    <p class="text-on-surface-variant mt-1 max-w-2xl">
-      Verwalten Sie Ihre Partnerschaften mit lokalen Betrieben, um gemeinsam
-      Lebensmittelverschwendung zu reduzieren.
-    </p>
+  <section class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div>
+      <h3 class="text-4xl font-extrabold text-on-surface leading-tight">
+        {{ isEdit ? 'Partner bearbeiten' : 'Neuen Partner anlegen' }}
+      </h3>
+      <p class="text-on-surface-variant mt-1 max-w-2xl">
+        Verwalten Sie Ihre Partnerschaften mit lokalen Betrieben, um gemeinsam
+        Lebensmittelverschwendung zu reduzieren.
+      </p>
+    </div>
+    <a
+      routerLink="/stores"
+      class="text-sm font-semibold text-on-surface-variant hover:text-primary flex items-center gap-1"
+    >
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Zurück zur Übersicht
+    </a>
   </section>
 
   @if (errorMessage()) {

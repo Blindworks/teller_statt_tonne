@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PartnerService } from '../partner.service';
 import {
   CATEGORY_LABELS,
@@ -45,7 +45,7 @@ type PartnerForm = FormGroup<{
 
 @Component({
   selector: 'app-partner-edit',
-  imports: [ReactiveFormsModule, RouterLink, RouterLinkActive],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './partner-edit.html',
   styleUrl: './partner-edit.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

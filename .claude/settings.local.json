@@ -3,7 +3,8 @@
     "allow": [
       "Read(//c/Users/bened/.claude/**)",
       "Read(//c/Users/bened/.claude/plugins/**)",
-      "Bash(npx ng *)"
+      "Bash(npx ng *)",
+      "Bash(./mvnw -q -DskipTests compile)"
     ]
   }
 }
