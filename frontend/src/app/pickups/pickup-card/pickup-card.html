@@ -1,0 +1,83 @@
+@let p = pickup();
+@let v = variant();
+
+<a
+  [routerLink]="p.id ? ['/pickups/edit', p.id] : null"
+  class="block bg-surface-container-lowest p-4 rounded-xl shadow-sm transition-all group"
+  [class.shadow-md]="today() && v !== 'COMPLETED' && v !== 'CANCELLED'"
+  [class.border-t-4]="today() && v !== 'COMPLETED' && v !== 'CANCELLED'"
+  [class.border-primary]="today() && v !== 'COMPLETED' && v !== 'CANCELLED'"
+  [class.border-2]="v === 'OPEN'"
+  [class.border-dashed]="v === 'OPEN'"
+  [class.border-outline-variant]="v === 'OPEN'"
+  [class.cursor-pointer]="v === 'OPEN'"
+  [class.hover:shadow-md]="v === 'FILLED'"
+  [class.opacity-60]="v === 'COMPLETED' || v === 'CANCELLED'"
+>
+  <div class="flex justify-between items-start mb-3">
+    <span
+      class="text-[10px] font-bold uppercase tracking-tighter px-2 py-0.5 rounded-full"
+      [class]="chipClasses()"
+    >
+      {{ chipLabel() }}
+    </span>
+    @if (v === 'FILLED' || v === 'OPEN') {
+      <span
+        class="material-symbols-outlined text-on-surface-variant text-sm group-hover:text-primary transition-colors"
+      >
+        more_horiz
+      </span>
+    }
+  </div>
+
+  <h5
+    class="text-sm font-bold mb-1"
+    [class.line-through]="v === 'COMPLETED' || v === 'CANCELLED'"
+  >
+    {{ p.partnerName ?? 'Unbekannt' }}
+  </h5>
+
+  @if (v === 'COMPLETED') {
+    <p class="text-xs text-on-surface-variant">Completed</p>
+  } @else if (v === 'CANCELLED') {
+    <p class="text-xs text-on-surface-variant">Cancelled</p>
+  } @else {
+    <p class="text-xs text-on-surface-variant mb-4">{{ p.startTime }} — {{ p.endTime }}</p>
+
+    <div class="flex items-center justify-between">
+      @if (v === 'FILLED') {
+        <div class="flex -space-x-2">
+          @for (a of p.assignments; track a.memberId) {
+            @if (a.memberAvatarUrl) {
+              <img
+                [src]="a.memberAvatarUrl"
+                [alt]="a.memberName ?? 'Mitglied'"
+                class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest object-cover"
+              />
+            } @else {
+              <div
+                class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest bg-primary-container text-on-primary-container text-[9px] font-bold flex items-center justify-center"
+              >
+                {{ (a.memberName ?? '?').charAt(0) }}
+              </div>
+            }
+          }
+        </div>
+        <span class="text-[10px] font-bold text-on-surface-variant">FULL</span>
+      } @else {
+        <div class="flex items-center gap-1">
+          <div
+            class="w-6 h-6 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined text-[12px]">add</span>
+          </div>
+          <span class="text-[10px] font-bold text-primary group-hover:underline">JOIN SLOT</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+          <span class="text-[10px] font-bold text-error">{{ remaining() }} LEFT</span>
+        </div>
+      }
+    </div>
+  }
+</a>

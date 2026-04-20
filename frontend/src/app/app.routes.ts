@@ -22,6 +22,21 @@ export const routes: Routes = [
           import('./partners/partner-edit/partner-edit').then((m) => m.PartnerEditComponent),
       },
       {
+        path: 'pickups',
+        loadComponent: () =>
+          import('./pickups/pickups/pickups').then((m) => m.PickupsComponent),
+      },
+      {
+        path: 'pickups/new',
+        loadComponent: () =>
+          import('./pickups/pickup-edit/pickup-edit').then((m) => m.PickupEditComponent),
+      },
+      {
+        path: 'pickups/edit/:id',
+        loadComponent: () =>
+          import('./pickups/pickup-edit/pickup-edit').then((m) => m.PickupEditComponent),
+      },
+      {
         path: 'members',
         loadComponent: () =>
           import('./members/members-list/members-list').then((m) => m.MembersListComponent),

@@ -35,8 +35,13 @@
       Stores
     </a>
     <a
-      href="#"
-      class="flex items-center gap-4 text-on-surface px-6 py-3 rounded-full hover:bg-surface-container font-headline font-medium text-sm hover:translate-x-1 transition-all duration-300"
+      routerLink="/pickups"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #pickupsLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!pickupsLink.isActive"
+      [class.hover:bg-surface-container]="!pickupsLink.isActive"
+      [class.hover:translate-x-1]="!pickupsLink.isActive"
     >
       <span class="material-symbols-outlined">calendar_today</span>
       Pickups
@@ -105,7 +110,13 @@
     <span class="material-symbols-outlined">storefront</span>
     <span class="text-[10px]">Stores</span>
   </a>
-  <a href="#" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  <a
+    routerLink="/pickups"
+    routerLinkActive="text-primary font-bold"
+    #pickupsMob="routerLinkActive"
+    class="flex flex-col items-center gap-1"
+    [class.text-on-surface-variant]="!pickupsMob.isActive"
+  >
     <span class="material-symbols-outlined">calendar_today</span>
     <span class="text-[10px]">Pickups</span>
   </a>
