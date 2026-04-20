@@ -1,18 +1,25 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-
-interface Pickup {
-  store: string;
-  image: string;
-  location: string;
-  time: string;
-  status: 'expiring' | 'standard';
-}
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
+import { Pickup } from '../pickups/pickup.model';
+import { PickupService } from '../pickups/pickup.service';
 
 interface NewsItem {
   type: 'event' | 'milestone' | 'maintenance';
   timeAgo: string;
   title: string;
   description: string;
+}
+
+interface DisplayPickup {
+  id: string;
+  store: string;
+  image: string | null;
+  location: string;
+  time: string;
+  badgeLabel: string;
+  isExpiring: boolean;
+  categoryIcon: string;
 }
 
 @Component({
@@ -23,32 +30,17 @@ interface NewsItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
-  readonly pickups: Pickup[] = [
-    {
-      store: 'Bio-Markt Sonnenblume',
-      image:
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuAFdlvUh2maaucolzmM0IEm6P7OaO1Y5vMbi-7fklrk4_ts9JK8EybW3NtLMdh_ZYr8L_fBU_DFGUK9TGMvVFt9WMFjStAFX1h9k-PZa19qLxXJRDWGO1oj8clGPc3CghIM2oaNkshkkr-UVnX1f42bKhFzTVs3ljNPRaUbEAtKLzc2uZka2OUacWyAzaSRSP9StLkNyzn-Dauj8D08jmuQ7tTyH5zK77aBSLtkQ_m6zg9d2cWl78JWiOfb9D-hW6uZviwpxekplUiU',
-      location: 'Kreuzberg Str. 12',
-      time: '18:30 Today',
-      status: 'expiring',
-    },
-    {
-      store: 'Bäckerei Schmidt',
-      image:
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuBmeaEMwerRoADJITY1FS7PH3cHygjsou5NeqG_DuHG5vEpRvurSXHmNO8fd8Babx-n4qIO8cviaYCKTTG5FHg1GfnmhHhAzaZA1Gu3J_-zjfpXk3Hnj-IOSB_iMIERKQVIXpMDJQzO3FEDxaIa5eSM5jXkq5jNnU5vRH1NcUE3E8Jfd_Qh2MGPG7mQziuGSQ8Obw2BO7FS0Daip2RhGcP0FzzZSCeirrGTERE6_aXAZuj2_a4mRptqF73f_izqtwwdEeslTUJgLsLz',
-      location: 'Hauptstraße 45',
-      time: '20:00 Today',
-      status: 'standard',
-    },
-    {
-      store: 'Regio-Supermarkt',
-      image:
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuCoJwFrlTuO6HjRyqhK32GGmLfAZ4hkVfm3ouk35R_2oJ74b7ckJOvWy_pZQySZJTxSbybmVfkPFJXTqIT4QnetM1so2lPh1dxo7jUjlA-jDV_nktIuGQlBMRuPqTlfGfxp0xmFUQ8iFlBxVQiG4rPYhq2NHXfJxqYa0TDbeWRzLE5PA4_OFlTrxKVsKKI54_w4pswhrXQC0RTmXPxxsxhKdfiofrBdiFGx7j1svFGyMZqZIzcW0-CkgbKBYGgSxyXnS6Fu4c2Rlr9W',
-      location: 'Am Anger 2',
-      time: '09:00 Tomorrow',
-      status: 'standard',
-    },
-  ];
+  private readonly pickupService = inject(PickupService);
+
+  private readonly upcomingPickups = toSignal(this.pickupService.upcoming(3), {
+    initialValue: [] as Pickup[],
+  });
+
+  private readonly now = signal(new Date());
+
+  readonly displayPickups = computed<DisplayPickup[]>(() =>
+    this.upcomingPickups().map((p) => this.toDisplay(p, this.now())),
+  );
 
   readonly news: NewsItem[] = [
     {
@@ -79,4 +71,57 @@ export class DashboardComponent {
 
   readonly profileImage =
     'https://lh3.googleusercontent.com/aida-public/AB6AXuAlnI7Jvlz_ItVX5RMs8c1rQ2KnMKp8akokDrB8ge2wAaZPKWb0ZDKUztGT9bQkumnREcvOTokVb7yTetcJwvZJIctkI5SOdI3iYH6EcWu-6h6KRX4XNypVJaFdgZglXJMWHELSUGH_u0Lvqx7Yy0AEwqDJ5KHcNMqF8eTxPtwdDcRpjpv75EulDc28zDPv0eIEFRMS9w0I8Yw0rbYWBF4HU9IFqaNxK5ICJ83u0UqpC-UhY4-fq1vwPvtT02JkgJhBJhKB8gWkHaQu';
+
+  private toDisplay(p: Pickup, now: Date): DisplayPickup {
+    const category: Category | null = p.partnerCategory;
+    const categoryIcon = category ? CATEGORY_ICONS[category] : 'storefront';
+    const categoryLabel = category ? CATEGORY_LABELS[category] : 'Pickup';
+
+    const location = [p.partnerStreet, p.partnerCity].filter((s) => !!s).join(', ');
+
+    const isExpiring = this.isStartingSoon(p, now);
+
+    return {
+      id: p.id ?? '',
+      store: p.partnerName ?? 'Unbekannter Partner',
+      image: p.partnerLogoUrl,
+      location: location || '—',
+      time: this.formatTime(p, now),
+      badgeLabel: isExpiring ? 'Expiring Soon' : categoryLabel,
+      isExpiring,
+      categoryIcon,
+    };
+  }
+
+  private isStartingSoon(p: Pickup, now: Date): boolean {
+    const start = this.parseDateTime(p.date, p.startTime);
+    if (!start) return false;
+    const diffMs = start.getTime() - now.getTime();
+    const twoHoursMs = 2 * 60 * 60 * 1000;
+    return diffMs >= 0 && diffMs <= twoHoursMs;
+  }
+
+  private formatTime(p: Pickup, now: Date): string {
+    const today = this.toDateKey(now);
+    const tomorrow = this.toDateKey(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+    if (p.date === today) return `${p.startTime} Heute`;
+    if (p.date === tomorrow) return `${p.startTime} Morgen`;
+    const [y, m, d] = p.date.split('-');
+    return `${p.startTime}, ${d}.${m}.${y}`;
+  }
+
+  private toDateKey(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  private parseDateTime(date: string, time: string): Date | null {
+    if (!date || !time) return null;
+    const [y, mo, d] = date.split('-').map(Number);
+    const [h, mi] = time.split(':').map(Number);
+    if ([y, mo, d, h, mi].some((n) => Number.isNaN(n))) return null;
+    return new Date(y, mo - 1, d, h, mi);
+  }
 }

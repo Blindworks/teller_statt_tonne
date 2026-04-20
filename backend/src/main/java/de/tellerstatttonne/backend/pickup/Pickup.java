@@ -9,6 +9,9 @@ public record Pickup(
     String partnerId,
     String partnerName,
     Partner.Category partnerCategory,
+    String partnerStreet,
+    String partnerCity,
+    String partnerLogoUrl,
     LocalDate date,
     String startTime,
     String endTime,
@@ -22,7 +25,8 @@ public record Pickup(
     public record Assignment(String memberId, String memberName, String memberAvatarUrl) {}
 
     public Pickup withId(String newId) {
-        return new Pickup(newId, partnerId, partnerName, partnerCategory, date,
+        return new Pickup(newId, partnerId, partnerName, partnerCategory,
+            partnerStreet, partnerCity, partnerLogoUrl, date,
             startTime, endTime, status, capacity, assignments, notes);
     }
 }

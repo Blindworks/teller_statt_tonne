@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,13 @@ public class PickupService {
     @Transactional(readOnly = true)
     public List<Pickup> findRecent() {
         return mapAll(repository.findTop10ByOrderByDateDescStartTimeDesc());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Pickup> findUpcoming(int limit) {
+        int capped = Math.max(1, Math.min(limit, 50));
+        return mapAll(repository.findByStatusAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
+            Pickup.Status.SCHEDULED, LocalDate.now(), PageRequest.of(0, capped)));
     }
 
     @Transactional(readOnly = true)

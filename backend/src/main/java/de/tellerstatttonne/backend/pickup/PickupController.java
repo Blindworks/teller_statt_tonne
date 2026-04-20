@@ -38,6 +38,11 @@ public class PickupController {
         return service.findRecent();
     }
 
+    @GetMapping("/upcoming")
+    public List<Pickup> upcoming(@RequestParam(defaultValue = "3") int limit) {
+        return service.findUpcoming(limit);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Pickup> get(@PathVariable String id) {
         return service.findById(id)

@@ -13,6 +13,9 @@ export interface Pickup {
   partnerId: string;
   partnerName: string | null;
   partnerCategory: Category | null;
+  partnerStreet: string | null;
+  partnerCity: string | null;
+  partnerLogoUrl: string | null;
   date: string;
   startTime: string;
   endTime: string;
@@ -34,6 +37,9 @@ export function emptyPickup(): Pickup {
     partnerId: '',
     partnerName: null,
     partnerCategory: null,
+    partnerStreet: null,
+    partnerCity: null,
+    partnerLogoUrl: null,
     date: new Date().toISOString().slice(0, 10),
     startTime: '18:00',
     endTime: '18:30',

@@ -49,7 +49,7 @@ class PickupControllerTest {
     @Test
     void createListUpdateDeleteRoundTrip() {
         Pickup payload = new Pickup(
-            null, partnerId, null, null,
+            null, partnerId, null, null, null, null, null,
             LocalDate.of(2026, 4, 21), "19:30", "20:00",
             Pickup.Status.SCHEDULED, 2,
             List.of(new Pickup.Assignment(memberId, null, null)),
@@ -71,7 +71,7 @@ class PickupControllerTest {
         assertThat(recent).hasSize(1);
 
         Pickup updatedPayload = new Pickup(
-            created.id(), partnerId, null, null,
+            created.id(), partnerId, null, null, null, null, null,
             created.date(), "19:30", "20:00",
             Pickup.Status.COMPLETED, 2, created.assignments(), "done"
         );
@@ -87,7 +87,7 @@ class PickupControllerTest {
     @Test
     void rejectsEndBeforeStart() {
         Pickup bad = new Pickup(
-            null, partnerId, null, null,
+            null, partnerId, null, null, null, null, null,
             LocalDate.of(2026, 4, 21), "20:00", "19:00",
             Pickup.Status.SCHEDULED, 1, List.of(), null
         );
@@ -98,7 +98,7 @@ class PickupControllerTest {
     @Test
     void rejectsCapacityBelowAssignments() {
         Pickup bad = new Pickup(
-            null, partnerId, null, null,
+            null, partnerId, null, null, null, null, null,
             LocalDate.of(2026, 4, 21), "10:00", "10:30",
             Pickup.Status.SCHEDULED, 1,
             List.of(
@@ -114,7 +114,7 @@ class PickupControllerTest {
     @Test
     void updateMissingReturns404() {
         Pickup payload = new Pickup(
-            "nope", partnerId, null, null,
+            "nope", partnerId, null, null, null, null, null,
             LocalDate.of(2026, 4, 21), "10:00", "10:30",
             Pickup.Status.SCHEDULED, 1, List.of(), null
         );

@@ -18,6 +18,11 @@ export class PickupService {
     return this.http.get<Pickup[]>(`${this.baseUrl}/recent`);
   }
 
+  upcoming(limit = 3): Observable<Pickup[]> {
+    const params = new HttpParams().set('limit', String(limit));
+    return this.http.get<Pickup[]>(`${this.baseUrl}/upcoming`, { params });
+  }
+
   get(id: string): Observable<Pickup> {
     return this.http.get<Pickup>(`${this.baseUrl}/${id}`);
   }
