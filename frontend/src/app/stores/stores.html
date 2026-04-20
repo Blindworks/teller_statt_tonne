@@ -48,13 +48,13 @@
     </a>
   </nav>
 
-  <button
-    type="button"
+  <a
+    routerLink="/stores/new"
     class="mt-auto bg-secondary text-on-secondary py-4 px-6 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-secondary-dim transition-colors active:scale-95 shadow-md shadow-secondary/20"
   >
     <span class="material-symbols-outlined">add</span>
-    Add Pickup
-  </button>
+    Partner anlegen
+  </a>
 </aside>
 
 <!-- Top App Bar -->
@@ -66,186 +66,136 @@
     <h2 class="hidden md:block text-2xl font-extrabold tracking-tight text-primary">Stores</h2>
   </div>
   <div class="flex items-center gap-4">
-    <div class="relative hidden sm:block">
-      <input
-        type="text"
-        placeholder="Search stores..."
-        class="bg-surface-container-high border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary w-64 transition-all outline-none"
-      />
-      <span
-        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm"
-        >search</span
-      >
-    </div>
-    <button
-      type="button"
-      class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-green-50 transition-colors"
+    <a
+      routerLink="/stores/new"
+      class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-primary-dim transition-colors shadow-md shadow-primary/20"
     >
-      <span class="material-symbols-outlined">notifications</span>
-    </button>
-    <button
-      type="button"
-      class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-green-50 transition-colors"
-    >
-      <span class="material-symbols-outlined">account_circle</span>
-    </button>
+      <span class="material-symbols-outlined text-base">add</span>
+      Partner hinzufügen
+    </a>
   </div>
 </header>
 
 <!-- Main Canvas -->
 <main class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
-  <!-- Header & View Toggle -->
+  <!-- Header -->
   <section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
     <div>
       <h3 class="text-4xl font-extrabold text-on-surface leading-tight">Partner Network</h3>
       <p class="text-on-surface-variant mt-1">
-        Managing {{ totalLocations }} active pickup locations across {{ city }}.
+        {{ partners().length }} Partnerbetriebe in {{ city }}.
       </p>
-    </div>
-    <div class="flex items-center p-1 bg-surface-container-high rounded-full shadow-inner">
-      <button
-        type="button"
-        class="px-6 py-2 rounded-full text-sm font-bold bg-surface-container-lowest shadow-sm text-primary flex items-center gap-2"
-      >
-        <span class="material-symbols-outlined text-sm">list</span>
-        List View
-      </button>
-      <button
-        type="button"
-        class="px-6 py-2 rounded-full text-sm font-bold text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2"
-      >
-        <span class="material-symbols-outlined text-sm">map</span>
-        Map View
-      </button>
     </div>
   </section>
 
-  <!-- Bento Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-    <!-- Featured Store -->
+  @if (loadError()) {
     <div
-      class="lg:col-span-4 bg-secondary-container rounded-xl p-8 flex flex-col justify-between relative overflow-hidden group min-h-[400px]"
+      class="mb-6 px-6 py-4 rounded-xl bg-error-container text-on-error-container text-sm font-semibold"
     >
-      <div class="relative z-10">
-        <span
-          class="bg-on-secondary-container text-white text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full"
-          >{{ featured.badge }}</span
-        >
-        <h4 class="text-4xl font-black text-on-secondary-container mt-6 mb-2">
-          {{ featured.name }}
-        </h4>
-        <p class="text-on-secondary-fixed-variant leading-relaxed opacity-80">
-          {{ featured.description }}
-        </p>
-      </div>
-      <div class="mt-8 relative z-10">
-        <div class="flex items-center gap-4 mb-4">
-          <div
-            class="w-12 h-12 rounded-full overflow-hidden bg-primary-container border-2 border-surface"
-          >
-            <img
-              [src]="featured.managerImage"
-              [alt]="featured.managerName"
-              class="w-full h-full object-cover"
-            />
-          </div>
-          <div>
-            <p class="text-xs text-on-secondary-container font-bold">{{ featured.managerRole }}</p>
-            <p class="text-sm font-medium text-on-secondary-container">
-              {{ featured.managerName }}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          class="bg-on-secondary-container text-white px-6 py-3 rounded-full text-sm font-bold w-full transition-transform group-hover:scale-105 active:scale-95"
-        >
-          View Details
-        </button>
-      </div>
-      <div
-        class="absolute -bottom-20 -right-20 w-64 h-64 bg-primary-container rounded-full opacity-20 blur-3xl"
-      ></div>
+      {{ loadError() }}
     </div>
+  }
 
-    <!-- Store Cards -->
-    <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-      @for (store of stores; track store.name) {
-        <div
-          class="bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-6 flex flex-col justify-between group"
-        >
-          <div class="flex justify-between items-start mb-6">
-            <div
-              class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center text-primary"
-            >
-              <span class="material-symbols-outlined text-3xl">{{ store.icon }}</span>
-            </div>
-            @if (store.status === 'active') {
-              <div
-                class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary-container"
-              >
-                Active
-              </div>
+  @if (partners().length === 0 && !loadError()) {
+    <div
+      class="bg-surface-container-low rounded-xl p-12 text-center text-on-surface-variant"
+    >
+      <span class="material-symbols-outlined text-5xl text-primary mb-4">storefront</span>
+      <p class="text-lg font-bold text-on-surface">Noch keine Partner angelegt</p>
+      <p class="mt-1 mb-6">Legen Sie den ersten Partnerbetrieb an.</p>
+      <a
+        routerLink="/stores/new"
+        class="inline-flex bg-primary text-on-primary px-6 py-3 rounded-full font-bold items-center gap-2"
+      >
+        <span class="material-symbols-outlined">add</span>
+        Partner anlegen
+      </a>
+    </div>
+  }
+
+  <!-- Store Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (partner of partners(); track partner.id) {
+      <div
+        class="bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-6 flex flex-col justify-between group"
+      >
+        <div class="flex justify-between items-start mb-6">
+          <div
+            class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center text-primary overflow-hidden"
+          >
+            @if (partner.logoUrl) {
+              <img [src]="partner.logoUrl" [alt]="partner.name" class="w-full h-full object-cover" />
             } @else {
-              <div
-                class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-surface-container-high text-on-surface-variant"
-              >
-                Inactive
-              </div>
+              <span class="material-symbols-outlined text-3xl">{{
+                categoryIcons[partner.category]
+              }}</span>
             }
           </div>
-          <div>
-            <h5 class="text-xl font-bold text-on-surface mb-1">{{ store.name }}</h5>
-            <p class="text-sm text-on-surface-variant flex items-center gap-2">
-              <span class="material-symbols-outlined text-xs">location_on</span>
-              {{ store.address }}
-            </p>
-          </div>
-          <div
-            class="mt-8 pt-6 border-t border-outline-variant/10 flex justify-between items-center"
-          >
-            <div class="flex -space-x-2">
-              @for (initial of store.memberInitials; track initial) {
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-low bg-surface-container-high flex items-center justify-center text-[10px] font-bold"
-                >
-                  {{ initial }}
-                </div>
-              }
-            </div>
-            <p class="text-xs font-medium text-on-surface-variant">{{ store.managerName }}</p>
+          <div class="flex items-center gap-2">
+            @if (partner.status === 'ACTIVE') {
+              <span
+                class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary-container"
+                >Aktiv</span
+              >
+            } @else {
+              <span
+                class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-surface-container-high text-on-surface-variant"
+                >Inaktiv</span
+              >
+            }
+            <a
+              [routerLink]="['/stores/edit', partner.id]"
+              class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-primary-container text-on-surface-variant hover:text-on-primary-container transition-colors"
+              aria-label="Partner bearbeiten"
+            >
+              <span class="material-symbols-outlined text-base">edit</span>
+            </a>
           </div>
         </div>
-      }
-    </div>
+        <div>
+          <h5 class="text-xl font-bold text-on-surface mb-1">{{ partner.name }}</h5>
+          <p class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mb-2">
+            {{ categoryLabels[partner.category] }}
+          </p>
+          <p class="text-sm text-on-surface-variant flex items-center gap-2">
+            <span class="material-symbols-outlined text-xs">location_on</span>
+            {{ partner.street }}, {{ partner.postalCode }} {{ partner.city }}
+          </p>
+        </div>
+        <div
+          class="mt-6 pt-6 border-t border-outline-variant/10 flex justify-between items-center text-xs text-on-surface-variant"
+        >
+          <span class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs">schedule</span>
+            {{ activeSlotsCount(partner) }} Abholzeiten
+          </span>
+          <span class="font-medium">{{ partner.contact.name }}</span>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- Map Preview -->
-  <section class="mt-12 hidden lg:block">
-    <div class="bg-surface-container-high rounded-xl overflow-hidden relative h-64 group">
-      <div
-        class="absolute inset-0 grayscale contrast-125 opacity-40 mix-blend-multiply group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"
-      >
-        <img [src]="mapImage" alt="Map View" class="w-full h-full object-cover" />
-      </div>
-      <div
-        class="absolute inset-0 bg-gradient-to-r from-surface-container-high via-transparent to-transparent"
-      ></div>
-      <div class="relative z-10 h-full flex flex-col justify-center p-12 max-w-md">
-        <h4 class="text-2xl font-extrabold text-on-surface">Interactive Map</h4>
-        <p class="text-on-surface-variant mt-2 mb-6">
-          Locate partners across your district and find the most efficient pickup routes.
-        </p>
-        <button
-          type="button"
-          class="bg-surface-container-lowest text-primary px-8 py-3 rounded-full text-sm font-bold w-fit shadow-lg shadow-on-background/5 flex items-center gap-2"
+  @if (partners().length > 0) {
+    <section class="mt-12 hidden lg:block">
+      <div class="bg-surface-container-high rounded-xl overflow-hidden relative h-64 group">
+        <div
+          class="absolute inset-0 grayscale contrast-125 opacity-40 mix-blend-multiply group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"
         >
-          <span class="material-symbols-outlined">explore</span>
-          Open Full Map
-        </button>
+          <img [src]="mapImage" alt="Map View" class="w-full h-full object-cover" />
+        </div>
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-surface-container-high via-transparent to-transparent"
+        ></div>
+        <div class="relative z-10 h-full flex flex-col justify-center p-12 max-w-md">
+          <h4 class="text-2xl font-extrabold text-on-surface">Interactive Map</h4>
+          <p class="text-on-surface-variant mt-2 mb-6">
+            Locate partners across your district and find the most efficient pickup routes.
+          </p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  }
 </main>
 
 <!-- Bottom Navigation (Mobile) -->
@@ -269,14 +219,15 @@
     class="flex flex-col items-center gap-1"
     [class.text-on-surface-variant]="!storesMob.isActive"
   >
-    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1"
-      >storefront</span
-    >
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">storefront</span>
     <span class="text-[10px]">Stores</span>
   </a>
-  <div class="bg-primary -mt-10 p-4 rounded-full shadow-lg shadow-primary/30 text-white">
+  <a
+    routerLink="/stores/new"
+    class="bg-primary -mt-10 p-4 rounded-full shadow-lg shadow-primary/30 text-white"
+  >
     <span class="material-symbols-outlined">add</span>
-  </div>
+  </a>
   <a href="#" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">calendar_today</span>
     <span class="text-[10px]">Pickups</span>
