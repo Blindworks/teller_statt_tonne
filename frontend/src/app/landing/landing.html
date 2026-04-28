@@ -1,0 +1,281 @@
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" routerLink="/">
+      <img src="/assets/landing/logo-icon.png" alt="" />
+      <div>
+        <div class="brand-name">Teller statt Tonne</div>
+        <div class="brand-sub">Bad Vilbel e.V.</div>
+      </div>
+    </a>
+    <nav class="nav">
+      <a href="#wer">Wer wir sind</a>
+      <a href="#was">Was wir tun</a>
+      <a href="#suchen">Was wir suchen</a>
+      <a class="btn" routerLink="/register">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"
+          />
+        </svg>
+        Retter:in werden
+      </a>
+    </nav>
+  </div>
+</header>
+
+<section class="poster" id="top">
+  <div class="poster-grid">
+    <aside class="col-side">
+      <div class="panel" id="wer">
+        <h2>Wer wir sind</h2>
+        <p>
+          Wir sind <strong>Teller statt Tonne Bad Vilbel e.V.</strong> – ein gemeinnütziger Verein
+          aus engagierten Lebensmittelretter:innen, viele von uns mit Erfahrung aus dem
+          Foodsharing.
+        </p>
+        <p>
+          Uns verbindet ein klares Ziel: Wir wollen nicht länger zusehen, wie wertvolle
+          Lebensmittel im Müll landen.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h2>Unsere Ziele</h2>
+        <ul class="goals">
+          @for (z of ziele; track z.text) {
+            <li class="goal">
+              <span class="goal-ico">
+                @switch (z.id) {
+                  @case ('leaf') {
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M4 20c0-9 7-15 16-15 0 9-6 16-15 16-1 0-1-1-1-1Z" />
+                      <path d="M4 20 14 10" />
+                    </svg>
+                  }
+                  @case ('hands') {
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M7 11V6a2 2 0 0 1 4 0v6" />
+                      <path d="M11 9V4a2 2 0 0 1 4 0v8" />
+                      <path d="M15 10V6a2 2 0 0 1 4 0v9a6 6 0 0 1-6 6h-1.5a4.5 4.5 0 0 1-4.5-4.5V13" />
+                    </svg>
+                  }
+                  @case ('heart') {
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path
+                        d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"
+                      />
+                    </svg>
+                  }
+                  @case ('group') {
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="9" cy="8" r="3" />
+                      <circle cx="17" cy="9" r="2.4" />
+                      <path d="M3 20a6 6 0 0 1 12 0" />
+                      <path d="M14 20a5 5 0 0 1 7-4" />
+                    </svg>
+                  }
+                }
+              </span>
+              <span>{{ z.text }}</span>
+            </li>
+          }
+        </ul>
+        <div class="closing">
+          Für einen besseren Umgang mit Lebensmitteln – hier in Bad Vilbel und Umgebung.
+          <span class="heart">♥</span>
+        </div>
+      </div>
+
+      <a class="social-card ig" [href]="instagramUrl" target="_blank" rel="noopener noreferrer"
+         aria-label="Folge uns auf Instagram">
+        <span class="ic">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+          </svg>
+        </span>
+        <div>
+          <span class="small">Folge uns auf</span>
+          <span class="big">Instagram!</span>
+        </div>
+      </a>
+    </aside>
+
+    <div class="col-center">
+      <div class="logo-block">
+        <img src="/assets/landing/logo-icon.png" alt="" />
+        <div class="logo-text">
+          <div class="name">Teller statt Tonne</div>
+          <div class="ev">Bad Vilbel e.V.</div>
+        </div>
+      </div>
+      <div class="tagline">
+        Für einen besseren Umgang mit Lebensmitteln. <span class="heart">♥</span>
+      </div>
+
+      <h1 class="hero-headline">
+        <span>WIR</span>
+        <span>SUCHEN</span>
+        <span>DICH!</span>
+      </h1>
+
+      <div class="ribbon">RETTER GESUCHT!</div>
+
+      <a class="hero-cta" routerLink="/register" aria-label="Hier kommst du zu uns">
+        <img src="/assets/landing/hero-cta.png" alt="Hier kommst du zu uns!" />
+      </a>
+
+      <div class="du-willst">DU WILLST MITMACHEN?</div>
+      <div class="signoff">Hier geht's weiter — wir freuen uns auf dich!</div>
+    </div>
+
+    <aside class="col-side">
+      <div class="panel" id="was">
+        <h2>Was wir tun</h2>
+        <ul class="goals">
+          @for (d of taten; track d.text) {
+            <li class="goal">
+              <span class="goal-ico">
+                @switch (d.id) {
+                  @case ('basket') {
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M3 7h18l-2 12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L3 7Z" />
+                      <path d="M8 7 12 3l4 4" />
+                    </svg>
+                  }
+                  @case ('truck') {
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z" />
+                      <circle cx="7" cy="18" r="2" />
+                      <circle cx="17" cy="18" r="2" />
+                    </svg>
+                  }
+                  @case ('bulb') {
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.4 1 2.3v1h6v-1c0-.9.3-1.7 1-2.3A7 7 0 0 0 12 2Z" />
+                    </svg>
+                  }
+                  @case ('heart') {
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path
+                        d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"
+                      />
+                    </svg>
+                  }
+                }
+              </span>
+              <span>{{ d.text }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="panel" id="suchen">
+        <h2>Was wir suchen</h2>
+        <p>
+          Menschen, die <strong>mit anpacken</strong> und etwas bewegen wollen. Egal ob regelmäßig
+          oder gelegentlich – jede Unterstützung hilft!
+        </p>
+        <ul class="seek-list">
+          @for (r of rollen; track r) {
+            <li>{{ r }}</li>
+          }
+        </ul>
+        <a class="seek-cta" routerLink="/register">Mach mit – und bewirke etwas. →</a>
+      </div>
+
+      <a class="social-card fb" [href]="facebookUrl" target="_blank" rel="noopener noreferrer"
+         aria-label="Besuche uns auf Facebook">
+        <span class="ic">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M14 9h3V6h-3c-2 0-3 1-3 3v2H8v3h3v7h3v-7h3l1-3h-4V9.5c0-.3.2-.5.5-.5H14Z"
+            />
+          </svg>
+        </span>
+        <div>
+          <span class="small">Besuche uns auf</span>
+          <span class="big">Facebook!</span>
+        </div>
+      </a>
+    </aside>
+  </div>
+</section>
+
+<footer>
+  <div class="foot">
+    <div>
+      <div class="foot-brand">
+        <img src="/assets/landing/logo-icon.png" alt="" />
+        <div>
+          <div class="n">Teller statt Tonne</div>
+          <div class="s">Bad Vilbel e.V.</div>
+        </div>
+      </div>
+      <p class="foot-about">
+        Gemeinnütziger Verein, der Lebensmittel rettet und in Bad Vilbel und Umgebung weitergibt.
+      </p>
+    </div>
+    <div>
+      <h4>Verein</h4>
+      <a href="#wer">Wer wir sind</a>
+      <a href="#was">Was wir tun</a>
+      <a href="#suchen">Was wir suchen</a>
+      <a routerLink="/register">Retter:in werden</a>
+    </div>
+    <div>
+      <h4>Kontakt</h4>
+      <a href="mailto:info@teller-statt-tonne-bv.de">info&#64;teller-statt-tonne-bv.de</a>
+      <a href="#">Bad Vilbel, Hessen</a>
+      <a href="#">Impressum</a>
+      <a href="#">Datenschutz</a>
+    </div>
+  </div>
+  <div class="copy">
+    © {{ currentYear }} Teller statt Tonne Bad Vilbel e.V. — Für einen besseren Umgang mit
+    Lebensmitteln. ♥
+  </div>
+</footer>

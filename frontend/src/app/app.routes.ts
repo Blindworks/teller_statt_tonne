@@ -3,8 +3,15 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { StoresComponent } from './stores/stores';
 import { AppShellComponent } from './shell/app-shell';
 import { authGuard } from './auth/auth.guard';
+import { landingGuard } from './landing/landing.guard';
 
 export const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    canActivate: [landingGuard],
+    loadComponent: () => import('./landing/landing').then((m) => m.LandingComponent),
+  },
   {
     path: 'login',
     loadComponent: () => import('./auth/login/login').then((m) => m.LoginComponent),
@@ -22,7 +29,6 @@ export const routes: Routes = [
     component: AppShellComponent,
     canActivate: [authGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'stores', component: StoresComponent },
       {
