@@ -14,6 +14,10 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/register/register').then((m) => m.RegisterComponent),
   },
   {
+    path: 'quiz',
+    loadComponent: () => import('./quiz/quiz').then((m) => m.QuizComponent),
+  },
+  {
     path: '',
     component: AppShellComponent,
     canActivate: [authGuard],
@@ -64,6 +68,31 @@ export const routes: Routes = [
         path: 'members/edit/:id',
         loadComponent: () =>
           import('./members/member-edit/member-edit').then((m) => m.MemberEditComponent),
+      },
+      {
+        path: 'admin/quiz/questions',
+        loadComponent: () =>
+          import('./quiz/admin/quiz-questions').then((m) => m.QuizQuestionsComponent),
+      },
+      {
+        path: 'admin/quiz/questions/new',
+        loadComponent: () =>
+          import('./quiz/admin/question-edit').then((m) => m.QuestionEditComponent),
+      },
+      {
+        path: 'admin/quiz/questions/edit/:id',
+        loadComponent: () =>
+          import('./quiz/admin/question-edit').then((m) => m.QuestionEditComponent),
+      },
+      {
+        path: 'admin/quiz/categories',
+        loadComponent: () =>
+          import('./quiz/admin/quiz-categories').then((m) => m.QuizCategoriesComponent),
+      },
+      {
+        path: 'admin/quiz/attempts',
+        loadComponent: () =>
+          import('./quiz/admin/quiz-attempts').then((m) => m.QuizAttemptsComponent),
       },
     ],
   },

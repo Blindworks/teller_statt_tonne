@@ -1,0 +1,59 @@
+<div class="px-8 py-6 md:pl-80 pt-24">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-extrabold text-primary">Quiz &mdash; Fragen</h1>
+    <div class="flex gap-2">
+      <a
+        routerLink="/admin/quiz/categories"
+        class="rounded-full border border-primary text-primary px-4 py-2 text-sm"
+      >
+        Kategorien
+      </a>
+      <a
+        routerLink="/admin/quiz/attempts"
+        class="rounded-full border border-primary text-primary px-4 py-2 text-sm"
+      >
+        Versuche
+      </a>
+      <a
+        routerLink="/admin/quiz/questions/new"
+        class="rounded-full bg-primary text-white px-4 py-2 text-sm font-medium"
+      >
+        + Neue Frage
+      </a>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="text-error mb-4">{{ errorMessage() }}</p>
+  }
+
+  <div class="space-y-3">
+    @for (q of questions(); track q.id) {
+      <article class="bg-surface-container rounded-2xl p-5 shadow-sm flex items-start gap-4">
+        <div class="flex-1">
+          <p class="font-medium text-on-surface mb-1">{{ q.text }}</p>
+          <p class="text-xs text-on-surface-variant">
+            Gewichtung: {{ q.weight }} &middot; {{ q.answers.length }} Antworten ({{
+              correctCount(q)
+            }}× richtig, {{ knockoutCount(q) }}× K.O.)
+          </p>
+        </div>
+        <a
+          [routerLink]="['/admin/quiz/questions/edit', q.id]"
+          class="rounded-full border border-outline-variant px-3 py-1 text-xs"
+        >
+          Bearbeiten
+        </a>
+        <button
+          type="button"
+          (click)="delete(q.id!)"
+          class="rounded-full border border-error text-error px-3 py-1 text-xs"
+        >
+          Löschen
+        </button>
+      </article>
+    } @empty {
+      <p class="text-on-surface-variant">Noch keine Fragen angelegt.</p>
+    }
+  </div>
+</div>

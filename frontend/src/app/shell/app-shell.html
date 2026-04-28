@@ -70,6 +70,18 @@
       <span class="material-symbols-outlined">group</span>
       Members
     </a>
+    <a
+      routerLink="/admin/quiz/questions"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #quizLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!quizLink.isActive"
+      [class.hover:bg-surface-container]="!quizLink.isActive"
+      [class.hover:translate-x-1]="!quizLink.isActive"
+    >
+      <span class="material-symbols-outlined">quiz</span>
+      Quiz
+    </a>
   </nav>
 </aside>
 

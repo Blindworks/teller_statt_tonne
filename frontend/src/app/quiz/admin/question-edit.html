@@ -1,0 +1,97 @@
+<div class="px-8 py-6 md:pl-80 pt-24">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-extrabold text-primary">
+      {{ isEdit ? 'Frage bearbeiten' : 'Neue Frage' }}
+    </h1>
+    <a
+      routerLink="/admin/quiz/questions"
+      class="rounded-full border border-outline-variant px-4 py-2 text-sm"
+    >
+      Zurück
+    </a>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6 max-w-3xl">
+    <div class="bg-surface-container rounded-2xl p-5 shadow-sm space-y-4">
+      <label class="block">
+        <span class="text-sm font-medium">Fragetext</span>
+        <textarea
+          formControlName="text"
+          rows="3"
+          class="mt-1 w-full rounded-xl border border-outline-variant bg-surface px-4 py-2"
+        ></textarea>
+      </label>
+      <label class="block">
+        <span class="text-sm font-medium">Gewichtung</span>
+        <select
+          formControlName="weight"
+          class="mt-1 w-full rounded-xl border border-outline-variant bg-surface px-4 py-2"
+        >
+          @for (w of weights; track w) {
+            <option [ngValue]="w">{{ w }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="bg-surface-container rounded-2xl p-5 shadow-sm space-y-3">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-semibold">Antworten</h2>
+        <button
+          type="button"
+          (click)="addAnswer()"
+          class="rounded-full bg-primary text-white px-3 py-1 text-xs"
+        >
+          + Antwort
+        </button>
+      </div>
+      <div formArrayName="answers" class="space-y-3">
+        @for (group of answers.controls; track $index) {
+          <div [formGroupName]="$index" class="rounded-xl border border-outline-variant p-3">
+            <input
+              type="text"
+              formControlName="text"
+              placeholder="Antworttext"
+              class="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2 mb-2"
+            />
+            <div class="flex flex-wrap items-center gap-4 text-sm">
+              <label class="flex items-center gap-1">
+                <input type="checkbox" formControlName="isCorrect" /> richtig
+              </label>
+              <label class="flex items-center gap-1">
+                <input type="checkbox" formControlName="isKnockout" /> K.O.
+              </label>
+              <button
+                type="button"
+                (click)="removeAnswer($index)"
+                class="ml-auto text-error text-xs"
+              >
+                Entfernen
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="text-error">{{ errorMessage() }}</p>
+    }
+
+    <div class="flex gap-3">
+      <button
+        type="submit"
+        [disabled]="saving()"
+        class="rounded-full bg-primary text-white px-6 py-2 font-medium disabled:opacity-50"
+      >
+        {{ saving() ? 'Speichere ...' : 'Speichern' }}
+      </button>
+      <a
+        routerLink="/admin/quiz/questions"
+        class="rounded-full border border-outline-variant px-6 py-2"
+      >
+        Abbrechen
+      </a>
+    </div>
+  </form>
+</div>

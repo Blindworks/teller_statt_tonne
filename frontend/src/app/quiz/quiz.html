@@ -1,0 +1,136 @@
+<div class="min-h-screen bg-surface flex items-start justify-center py-10 px-4">
+  <div class="w-full max-w-2xl">
+    <header class="mb-8 text-center">
+      <h1 class="text-3xl font-extrabold text-primary mb-2">Mitglieder-Quiz</h1>
+      <p class="text-on-surface-variant text-sm">
+        Teller statt Tonne &mdash; Aufnahmequiz für neue Mitglieder
+      </p>
+    </header>
+
+    @if (step() === 'intro') {
+      <section class="bg-surface-container rounded-3xl p-8 shadow-md space-y-5">
+        <p class="text-on-surface">
+          Schön, dass du dich für eine Mitgliedschaft interessierst! Bitte beantworte die folgenden
+          Fragen ehrlich. Bei einigen Fragen können auch mehrere Antworten richtig sein.
+        </p>
+        <div class="space-y-3">
+          <label class="block">
+            <span class="text-sm font-medium text-on-surface">Name</span>
+            <input
+              type="text"
+              [ngModel]="applicantName()"
+              (ngModelChange)="applicantName.set($event)"
+              name="name"
+              class="mt-1 w-full rounded-xl border border-outline-variant bg-surface px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </label>
+          <label class="block">
+            <span class="text-sm font-medium text-on-surface">E-Mail</span>
+            <input
+              type="email"
+              [ngModel]="applicantEmail()"
+              (ngModelChange)="applicantEmail.set($event)"
+              name="email"
+              class="mt-1 w-full rounded-xl border border-outline-variant bg-surface px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </label>
+        </div>
+        @if (errorMessage()) {
+          <p class="text-error text-sm">{{ errorMessage() }}</p>
+        }
+        <button
+          type="button"
+          (click)="start()"
+          [disabled]="loading() || !canSubmit()"
+          class="w-full rounded-full bg-primary text-white font-medium py-3 disabled:opacity-50"
+        >
+          {{ loading() ? 'Lade ...' : 'Quiz starten' }}
+        </button>
+      </section>
+    }
+
+    @if (step() === 'questions') {
+      <section class="space-y-6">
+        @for (q of questions(); track q.id; let i = $index) {
+          <article class="bg-surface-container rounded-3xl p-6 shadow-md">
+            <h2 class="font-semibold text-on-surface mb-4">
+              {{ i + 1 }}. {{ q.text }}
+            </h2>
+            <div class="space-y-2">
+              @for (a of q.answers; track a.id) {
+                <label
+                  class="flex items-start gap-3 rounded-xl border border-outline-variant bg-surface px-4 py-3 cursor-pointer hover:bg-green-50"
+                >
+                  <input
+                    type="checkbox"
+                    [checked]="isSelected(q.id!, a.id!)"
+                    (change)="toggle(q.id!, a.id!)"
+                    class="mt-1"
+                  />
+                  <span class="text-on-surface">{{ a.text }}</span>
+                </label>
+              }
+            </div>
+          </article>
+        }
+        @if (errorMessage()) {
+          <p class="text-error text-sm">{{ errorMessage() }}</p>
+        }
+        <button
+          type="button"
+          (click)="submit()"
+          [disabled]="loading()"
+          class="w-full rounded-full bg-primary text-white font-medium py-3 disabled:opacity-50"
+        >
+          {{ loading() ? 'Werte aus ...' : 'Quiz abschicken' }}
+        </button>
+      </section>
+    }
+
+    @if (step() === 'result' && result(); as r) {
+      <section
+        class="rounded-3xl p-8 shadow-md text-center space-y-4"
+        [class.bg-green-50]="r.color === 'GREEN'"
+        [class.bg-yellow-50]="r.color === 'YELLOW'"
+        [class.bg-red-50]="r.color === 'RED'"
+      >
+        <div class="text-6xl">{{ colorEmoji[r.color] }}</div>
+        <h2 class="text-2xl font-bold text-on-surface">
+          {{ r.resultLabel ?? 'Ergebnis' }}
+        </h2>
+        <p class="text-on-surface-variant">
+          Fehlerpunkte: <strong>{{ r.score }}</strong>
+        </p>
+        @if (r.knockoutTriggered) {
+          <p class="text-error font-medium">
+            Eine K.O.-Antwort wurde gewählt &mdash; das Ergebnis ist unabhängig vom Score „nicht
+            geeignet".
+          </p>
+        }
+        <p class="text-sm text-on-surface-variant">
+          Wir melden uns in den nächsten Tagen mit den weiteren Schritten bei dir.
+        </p>
+        <button
+          type="button"
+          (click)="restart()"
+          class="rounded-full border border-primary text-primary font-medium px-6 py-2"
+        >
+          Quiz neu starten
+        </button>
+      </section>
+    }
+
+    @if (step() === 'error') {
+      <section class="bg-surface-container rounded-3xl p-8 shadow-md text-center space-y-4">
+        <p class="text-error">{{ errorMessage() }}</p>
+        <button
+          type="button"
+          (click)="restart()"
+          class="rounded-full border border-primary text-primary font-medium px-6 py-2"
+        >
+          Erneut versuchen
+        </button>
+      </section>
+    }
+  </div>
+</div>
