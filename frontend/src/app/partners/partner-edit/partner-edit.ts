@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   FormArray,
@@ -9,6 +10,10 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PartnerService } from '../partner.service';
+import {
+  LocationPickResult,
+  LocationPickerDialogComponent,
+} from '../location-picker/location-picker-dialog';
 import {
   CATEGORY_LABELS,
   Category,
@@ -45,7 +50,7 @@ type PartnerForm = FormGroup<{
 
 @Component({
   selector: 'app-partner-edit',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, DecimalPipe, LocationPickerDialogComponent],
   templateUrl: './partner-edit.html',
   styleUrl: './partner-edit.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -63,6 +68,11 @@ export class PartnerEditComponent {
   readonly partnerId = signal<string | null>(null);
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly latitude = signal<number | null>(null);
+  readonly longitude = signal<number | null>(null);
+  readonly geocoding = signal(false);
+  readonly geocodeMessage = signal<string | null>(null);
+  readonly pickerOpen = signal(false);
 
   readonly form: PartnerForm = this.buildForm();
 
@@ -138,7 +148,52 @@ export class PartnerEditComponent {
     });
   }
 
+  openPicker(): void {
+    this.pickerOpen.set(true);
+  }
+
+  closePicker(): void {
+    this.pickerOpen.set(false);
+  }
+
+  applyPick(pick: LocationPickResult): void {
+    this.latitude.set(pick.latitude);
+    this.longitude.set(pick.longitude);
+    const patch: Partial<{ street: string; postalCode: string; city: string }> = {};
+    if (pick.street != null) patch.street = pick.street;
+    if (pick.postalCode != null) patch.postalCode = pick.postalCode;
+    if (pick.city != null) patch.city = pick.city;
+    if (Object.keys(patch).length > 0) {
+      this.form.patchValue(patch);
+    }
+    this.geocodeMessage.set(null);
+    this.pickerOpen.set(false);
+  }
+
+  regeocode(): void {
+    const id = this.partnerId();
+    if (!id) return;
+    this.geocoding.set(true);
+    this.geocodeMessage.set(null);
+    this.service.regeocode(id).subscribe({
+      next: (partner) => {
+        this.geocoding.set(false);
+        this.latitude.set(partner.latitude);
+        this.longitude.set(partner.longitude);
+        if (partner.latitude == null || partner.longitude == null) {
+          this.geocodeMessage.set('Adresse konnte nicht gefunden werden.');
+        }
+      },
+      error: () => {
+        this.geocoding.set(false);
+        this.geocodeMessage.set('Geocoding fehlgeschlagen.');
+      },
+    });
+  }
+
   private patchForm(partner: Partner): void {
+    this.latitude.set(partner.latitude);
+    this.longitude.set(partner.longitude);
     this.form.patchValue({
       name: partner.name,
       category: partner.category,
@@ -174,6 +229,8 @@ export class PartnerEditComponent {
       contact: raw.contact,
       pickupSlots: raw.pickupSlots,
       status: raw.status,
+      latitude: this.latitude(),
+      longitude: this.longitude(),
     };
   }
 }

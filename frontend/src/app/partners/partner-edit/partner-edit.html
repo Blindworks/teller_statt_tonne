@@ -106,6 +106,46 @@
           </select>
         </label>
       </div>
+
+      <div
+        class="mt-6 px-4 py-3 rounded-lg flex flex-wrap items-center gap-3 text-sm"
+        [class.bg-secondary-container]="latitude() == null || longitude() == null"
+        [class.text-on-secondary-container]="latitude() == null || longitude() == null"
+        [class.bg-surface-container]="latitude() != null && longitude() != null"
+        [class.text-on-surface-variant]="latitude() != null && longitude() != null"
+      >
+        <span class="material-symbols-outlined text-base">
+          {{ latitude() != null && longitude() != null ? 'place' : 'wrong_location' }}
+        </span>
+        <div class="flex-1 min-w-[200px]">
+          @if (latitude() != null && longitude() != null) {
+            <span>Auf Karte verortet ({{ latitude() | number: '1.4-4' }}, {{ longitude() | number: '1.4-4' }}).</span>
+          } @else {
+            <span>Noch nicht auf der Karte verortet — Adresse eingeben oder Pin setzen.</span>
+          }
+          @if (geocodeMessage()) {
+            <span class="block text-xs mt-1">{{ geocodeMessage() }}</span>
+          }
+        </div>
+        <button
+          type="button"
+          (click)="openPicker()"
+          class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-surface-container-high text-on-surface flex items-center gap-1"
+        >
+          <span class="material-symbols-outlined text-base">map</span>
+          Auf Karte wählen
+        </button>
+        @if (isEdit) {
+          <button
+            type="button"
+            (click)="regeocode()"
+            [disabled]="geocoding()"
+            class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-primary text-on-primary disabled:opacity-60"
+          >
+            {{ geocoding() ? 'Geocode…' : 'Geocode erneut' }}
+          </button>
+        }
+      </div>
     </div>
 
     <!-- Logo/Foto -->
@@ -242,4 +282,13 @@
       </button>
     </div>
   </form>
+
+  @if (pickerOpen()) {
+    <app-location-picker-dialog
+      [initialLatitude]="latitude()"
+      [initialLongitude]="longitude()"
+      (accepted)="applyPick($event)"
+      (cancelled)="closePicker()"
+    />
+  }
 </main>

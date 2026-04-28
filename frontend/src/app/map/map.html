@@ -1,0 +1,73 @@
+<main class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+    <div>
+      <h3 class="text-4xl font-extrabold text-on-surface leading-tight">Karte</h3>
+      <p class="text-on-surface-variant mt-1">
+        {{ filteredPartners().length }} von {{ partners().length }} Partnern sichtbar.
+        @if (missingCoordsCount() > 0) {
+          <span class="text-secondary">
+            · {{ missingCoordsCount() }} ohne Koordinaten
+          </span>
+        }
+      </p>
+    </div>
+  </section>
+
+  @if (loadError()) {
+    <div class="mb-6 px-6 py-4 rounded-xl bg-error-container text-on-error-container text-sm font-semibold">
+      {{ loadError() }}
+    </div>
+  }
+
+  <section class="bg-surface-container-low rounded-xl p-4 mb-4 flex flex-wrap items-center gap-3">
+    <div class="flex flex-wrap gap-2">
+      @for (cat of allCategories; track cat) {
+        <button
+          type="button"
+          (click)="toggleCategory(cat)"
+          [class.bg-primary]="isCategorySelected(cat)"
+          [class.text-on-primary]="isCategorySelected(cat)"
+          [class.bg-surface-container-high]="!isCategorySelected(cat)"
+          [class.text-on-surface-variant]="!isCategorySelected(cat)"
+          class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+        >
+          <span class="material-symbols-outlined text-base">{{ categoryIcons[cat] }}</span>
+          {{ categoryLabels[cat] }}
+        </button>
+      }
+    </div>
+
+    <div class="h-6 w-px bg-outline-variant/40 mx-2 hidden md:block"></div>
+
+    <button
+      type="button"
+      (click)="toggleActiveOnly()"
+      [class.bg-primary]="activeOnly()"
+      [class.text-on-primary]="activeOnly()"
+      [class.bg-surface-container-high]="!activeOnly()"
+      [class.text-on-surface-variant]="!activeOnly()"
+      class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+    >
+      Nur aktive
+    </button>
+
+    <div class="ml-auto flex items-center gap-2">
+      <label for="day-select" class="text-xs uppercase tracking-wider text-on-surface-variant font-bold">
+        Tag
+      </label>
+      <select
+        id="day-select"
+        [value]="selectedDay()"
+        (change)="setDay($any($event.target).value)"
+        class="bg-surface-container-high text-on-surface text-sm font-medium rounded-full px-4 py-2 focus:outline-none"
+      >
+        <option value="ALL">Alle Tage</option>
+        @for (w of weekdays; track w.value) {
+          <option [value]="w.value">{{ w.label }}</option>
+        }
+      </select>
+    </div>
+  </section>
+
+  <div #mapContainer class="map-canvas rounded-xl overflow-hidden shadow-md"></div>
+</main>

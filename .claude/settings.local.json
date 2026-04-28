@@ -4,7 +4,9 @@
       "Read(//c/Users/bened/.claude/**)",
       "Read(//c/Users/bened/.claude/plugins/**)",
       "Bash(npx ng *)",
-      "Bash(./mvnw -q -DskipTests compile)"
+      "Bash(./mvnw -q -DskipTests compile)",
+      "Bash(./mvnw -q test)",
+      "Bash(./mvnw test *)"
     ]
   }
 }

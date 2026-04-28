@@ -33,6 +33,8 @@ export interface Partner {
   contact: Contact;
   pickupSlots: PickupSlot[];
   status: Status;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export const WEEKDAYS: ReadonlyArray<{ value: Weekday; label: string }> = [
@@ -76,5 +78,7 @@ export function emptyPartner(): Partner {
       active: false,
     })),
     status: 'ACTIVE',
+    latitude: null,
+    longitude: null,
   };
 }

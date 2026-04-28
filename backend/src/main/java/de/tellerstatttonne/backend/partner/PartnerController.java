@@ -47,6 +47,13 @@ public class PartnerController {
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{id}/geocode")
+    public ResponseEntity<Partner> regeocode(@PathVariable String id) {
+        return service.regeocode(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();

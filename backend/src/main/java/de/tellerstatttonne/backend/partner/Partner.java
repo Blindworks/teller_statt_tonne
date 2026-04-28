@@ -12,7 +12,9 @@ public record Partner(
     String logoUrl,
     Contact contact,
     List<PickupSlot> pickupSlots,
-    Status status
+    Status status,
+    Double latitude,
+    Double longitude
 ) {
     public enum Category { BAKERY, SUPERMARKET, CAFE, RESTAURANT }
 
@@ -26,6 +28,6 @@ public record Partner(
 
     public Partner withId(String newId) {
         return new Partner(newId, name, category, street, postalCode, city, logoUrl,
-            contact, pickupSlots, status);
+            contact, pickupSlots, status, latitude, longitude);
     }
 }

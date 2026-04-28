@@ -23,7 +23,9 @@ final class PartnerMapper {
                 : e.getPickupSlots().stream()
                     .map(s -> new Partner.PickupSlot(s.getWeekday(), s.getStartTime(), s.getEndTime(), s.isActive()))
                     .toList(),
-            e.getStatus()
+            e.getStatus(),
+            e.getLatitude(),
+            e.getLongitude()
         );
     }
 

@@ -1,0 +1,104 @@
+.map-canvas {
+  height: calc(100vh - 18rem);
+  min-height: 480px;
+}
+
+:host ::ng-deep .map-marker {
+  background: transparent;
+  border: none;
+}
+
+:host ::ng-deep .map-marker__pin {
+  width: 40px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary, #116e20);
+  color: var(--color-on-primary, #eaffe2);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+:host ::ng-deep .map-marker__pin .material-symbols-outlined {
+  transform: rotate(45deg);
+  font-size: 20px;
+}
+
+:host ::ng-deep .map-marker__badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--color-tertiary-container, #feb300);
+  color: var(--color-on-tertiary-container, #523700);
+  font-family: var(--font-headline, sans-serif);
+  font-size: 11px;
+  font-weight: 800;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(45deg);
+  border: 2px solid #fff;
+}
+
+:host ::ng-deep .map-popup {
+  font-family: var(--font-body, sans-serif);
+  min-width: 220px;
+}
+
+:host ::ng-deep .map-popup__title {
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+:host ::ng-deep .map-popup__badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-surface-container-high, #e7eada);
+  color: var(--color-on-surface-variant, #5d6153);
+}
+
+:host ::ng-deep .map-popup__badge--active {
+  background: var(--color-primary-container, #9df898);
+  color: var(--color-on-primary-container, #006016);
+}
+
+:host ::ng-deep .map-popup__category {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-on-surface-variant, #5d6153);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+:host ::ng-deep .map-popup__address {
+  font-size: 13px;
+  color: var(--color-on-surface, #303428);
+  margin-bottom: 8px;
+}
+
+:host ::ng-deep .map-popup__link {
+  display: inline-block;
+  color: var(--color-primary, #116e20);
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+:host ::ng-deep .map-popup__link:hover {
+  text-decoration: underline;
+}

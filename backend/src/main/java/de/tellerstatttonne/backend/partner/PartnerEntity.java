@@ -56,6 +56,10 @@ public class PartnerEntity {
     @Column(nullable = false, length = 16)
     private Partner.Status status = Partner.Status.ACTIVE;
 
+    private Double latitude;
+
+    private Double longitude;
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getName() { return name; }
@@ -76,6 +80,10 @@ public class PartnerEntity {
     public void setPickupSlots(List<PickupSlotEmbeddable> pickupSlots) { this.pickupSlots = pickupSlots; }
     public Partner.Status getStatus() { return status; }
     public void setStatus(Partner.Status status) { this.status = status; }
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
 
     @Embeddable
     public static class ContactEmbeddable {

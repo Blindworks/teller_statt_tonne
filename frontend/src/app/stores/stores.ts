@@ -15,7 +15,7 @@ export class StoresComponent {
 
   readonly partners = signal<Partner[]>([]);
   readonly loadError = signal<string | null>(null);
-  readonly city = 'Berlin';
+  readonly city = 'Bad Vilbel';
   readonly categoryIcons = CATEGORY_ICONS;
   readonly categoryLabels = CATEGORY_LABELS;
 
