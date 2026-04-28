@@ -11,5 +11,6 @@
     <include file="db/changelog/changes/004-add-partner-coordinates.xml"/>
     <include file="db/changelog/changes/005-create-user.xml"/>
     <include file="db/changelog/changes/006-create-quiz.xml"/>
+    <include file="db/changelog/changes/007-seed-quiz-questions.xml"/>
 
 </databaseChangeLog>
