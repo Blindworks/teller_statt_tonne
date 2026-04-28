@@ -8,5 +8,7 @@
     <include file="db/changelog/changes/001-create-partner.xml"/>
     <include file="db/changelog/changes/002-create-member.xml"/>
     <include file="db/changelog/changes/003-create-pickup.xml"/>
+    <include file="db/changelog/changes/004-add-partner-coordinates.xml"/>
+    <include file="db/changelog/changes/005-create-user.xml"/>
 
 </databaseChangeLog>
