@@ -122,12 +122,21 @@
   white-space: nowrap;
 }
 @media (max-width: 760px) {
-  .nav a:not(.btn) {
+  .nav a:not(.btn):not(.nav-login) {
     display: none;
   }
 }
 .nav a:hover {
   background: rgba(31, 122, 58, 0.1);
+}
+.nav a.nav-login {
+  color: var(--green-dark);
+  border: 1.5px solid var(--green-dark);
+  padding: 7px 14px;
+}
+.nav a.nav-login:hover {
+  background: var(--green-dark);
+  color: #fff;
 }
 .btn {
   display: inline-flex;
