@@ -50,77 +50,125 @@
 
   @if (selected(); as sel) {
     <div
-      class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       (click)="close()"
     >
       <div
-        class="bg-surface rounded-3xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6"
+        class="bg-surface rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
         (click)="$event.stopPropagation()"
       >
-        <header class="flex items-start justify-between mb-4">
-          <div>
-            <h2 class="text-xl font-bold">{{ sel.applicantName }}</h2>
-            <p class="text-sm text-on-surface-variant">{{ sel.applicantEmail }}</p>
-            <p class="text-xs text-on-surface-variant">
-              {{ sel.completedAt | date: 'medium' }}
-            </p>
-          </div>
-          <button
-            type="button"
-            (click)="close()"
-            class="rounded-full border border-outline-variant px-3 py-1 text-sm"
-          >
-            ✕
-          </button>
-        </header>
-
-        <div class="rounded-2xl p-4 mb-4"
+        <header
+          class="relative px-6 py-5 border-b border-outline-variant"
           [class.bg-green-50]="sel.color === 'GREEN'"
           [class.bg-yellow-50]="sel.color === 'YELLOW'"
           [class.bg-red-50]="sel.color === 'RED'"
         >
-          <p class="font-semibold">
-            {{ colorEmoji[sel.color] }} {{ sel.resultLabel ?? '—' }}
-          </p>
-          <p class="text-sm">
-            Fehlerpunkte: <strong>{{ sel.score }}</strong>
-            @if (sel.knockoutTriggered) {
-              &middot; <span class="text-error font-medium">K.O. ausgelöst</span>
-            }
-          </p>
-        </div>
+          <button
+            type="button"
+            (click)="close()"
+            aria-label="Schließen"
+            class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/80 hover:bg-surface text-on-surface-variant hover:text-on-surface flex items-center justify-center text-base transition shadow-sm"
+          >
+            ✕
+          </button>
 
-        <h3 class="font-semibold mb-2">Antworten</h3>
-        <ol class="space-y-3">
-          @for (ans of sel.answers; track $index) {
-            <li class="rounded-xl border border-outline-variant p-3">
-              <p class="font-medium mb-1">
-                {{ $index + 1 }}. {{ ans.questionText }}
-                <span class="text-xs text-on-surface-variant">(Gewichtung {{ ans.questionWeight }})</span>
+          <div class="flex items-center gap-4 pr-12">
+            <div
+              class="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white shadow-md shrink-0"
+              [class.bg-green-600]="sel.color === 'GREEN'"
+              [class.bg-yellow-600]="sel.color === 'YELLOW'"
+              [class.bg-red-600]="sel.color === 'RED'"
+            >
+              {{ initials(sel.applicantName) }}
+            </div>
+            <div class="min-w-0 flex-1">
+              <h2 class="text-xl font-bold text-on-surface truncate">{{ sel.applicantName }}</h2>
+              <p class="text-sm text-on-surface-variant truncate">{{ sel.applicantEmail }}</p>
+              <p class="text-xs text-on-surface-variant mt-0.5">
+                {{ sel.completedAt | date: 'medium' }}
               </p>
-              <p class="text-xs mb-1"
-                [class.text-green-700]="ans.wasCorrect"
-                [class.text-red-700]="!ans.wasCorrect"
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap items-center gap-2">
+            <span
+              class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold shadow-sm"
+              [class.bg-green-600]="sel.color === 'GREEN'"
+              [class.bg-yellow-500]="sel.color === 'YELLOW'"
+              [class.bg-red-600]="sel.color === 'RED'"
+              [class.text-white]="true"
+            >
+              {{ colorEmoji[sel.color] }} {{ sel.resultLabel ?? '—' }}
+            </span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.5 text-sm border border-outline-variant">
+              <span class="text-on-surface-variant">Fehlerpunkte</span>
+              <strong class="text-on-surface">{{ sel.score }}</strong>
+            </span>
+            @if (sel.knockoutTriggered) {
+              <span class="inline-flex items-center rounded-full bg-error px-3 py-1.5 text-sm font-semibold text-white">
+                K.O. ausgelöst
+              </span>
+            }
+          </div>
+        </header>
+
+        <div class="overflow-y-auto px-6 py-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-on-surface-variant">
+              Antworten
+            </h3>
+            <span class="text-xs text-on-surface-variant">
+              {{ sel.answers.length }} Fragen
+            </span>
+          </div>
+
+          <ol class="space-y-3">
+            @for (ans of sel.answers; track $index) {
+              <li
+                class="relative rounded-2xl bg-surface-container p-4 pl-5 border-l-4 shadow-sm"
+                [class.border-green-500]="ans.wasCorrect"
+                [class.border-red-500]="!ans.wasCorrect"
               >
-                {{ ans.wasCorrect ? '✓ richtig' : '✗ falsch' }}
-              </p>
-              @if (ans.selectedAnswers.length === 0) {
-                <p class="text-sm text-on-surface-variant italic">Keine Antwort ausgewählt</p>
-              } @else {
-                <ul class="text-sm space-y-1">
-                  @for (s of ans.selectedAnswers; track $index) {
-                    <li>
-                      &bull; {{ s.answerText }}
-                      @if (s.wasKnockout) {
-                        <span class="text-error font-medium">(K.O.)</span>
-                      }
-                    </li>
-                  }
-                </ul>
-              }
-            </li>
-          }
-        </ol>
+                <div class="flex items-start justify-between gap-3 mb-2">
+                  <p class="font-medium text-on-surface text-sm leading-snug">
+                    <span class="text-on-surface-variant">{{ $index + 1 }}.</span>
+                    {{ ans.questionText }}
+                  </p>
+                  <span class="shrink-0 text-[11px] text-on-surface-variant rounded-full bg-surface px-2 py-0.5 border border-outline-variant">
+                    ×{{ ans.questionWeight }}
+                  </span>
+                </div>
+
+                <p class="inline-flex items-center gap-1 text-xs font-semibold mb-2 rounded-full px-2 py-0.5"
+                  [class.bg-green-100]="ans.wasCorrect"
+                  [class.text-green-800]="ans.wasCorrect"
+                  [class.bg-red-100]="!ans.wasCorrect"
+                  [class.text-red-800]="!ans.wasCorrect"
+                >
+                  {{ ans.wasCorrect ? '✓ richtig' : '✗ falsch' }}
+                </p>
+
+                @if (ans.selectedAnswers.length === 0) {
+                  <p class="text-sm text-on-surface-variant italic">Keine Antwort ausgewählt</p>
+                } @else {
+                  <ul class="text-sm space-y-1.5">
+                    @for (s of ans.selectedAnswers; track $index) {
+                      <li class="flex items-start gap-2 text-on-surface">
+                        <span class="text-on-surface-variant mt-0.5">•</span>
+                        <span class="flex-1">{{ s.answerText }}</span>
+                        @if (s.wasKnockout) {
+                          <span class="shrink-0 text-[11px] font-semibold text-white bg-error rounded-full px-2 py-0.5">
+                            K.O.
+                          </span>
+                        }
+                      </li>
+                    }
+                  </ul>
+                }
+              </li>
+            }
+          </ol>
+        </div>
       </div>
     </div>
   }
