@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -35,6 +35,7 @@ export class QuestionEditComponent {
   private readonly service = inject(QuizService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly weights = ALLOWED_WEIGHTS;
   readonly questionId = signal<string | null>(null);
@@ -120,6 +121,7 @@ export class QuestionEditComponent {
     for (const a of q.answers) {
       this.answers.push(this.answerGroup(a));
     }
+    this.cdr.detectChanges();
   }
 
   private toQuestion(): QuizQuestion {
