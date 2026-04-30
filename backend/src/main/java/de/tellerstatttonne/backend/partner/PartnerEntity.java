@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.partner;
 
+import de.tellerstatttonne.backend.member.MemberEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -11,10 +12,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "partner")
@@ -60,6 +65,14 @@ public class PartnerEntity {
 
     private Double longitude;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "partner_member",
+        joinColumns = @JoinColumn(name = "partner_id"),
+        inverseJoinColumns = @JoinColumn(name = "member_id")
+    )
+    private Set<MemberEntity> members = new HashSet<>();
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getName() { return name; }
@@ -84,6 +97,8 @@ public class PartnerEntity {
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+    public Set<MemberEntity> getMembers() { return members; }
+    public void setMembers(Set<MemberEntity> members) { this.members = members; }
 
     @Embeddable
     public static class ContactEmbeddable {

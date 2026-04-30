@@ -76,6 +76,11 @@ export const routes: Routes = [
           import('./members/member-edit/member-edit').then((m) => m.MemberEditComponent),
       },
       {
+        path: 'admin/store-members',
+        loadComponent: () =>
+          import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),
+      },
+      {
         path: 'admin/quiz/questions',
         loadComponent: () =>
           import('./quiz/admin/quiz-questions').then((m) => m.QuizQuestionsComponent),

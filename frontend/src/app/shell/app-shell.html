@@ -71,6 +71,18 @@
       Members
     </a>
     <a
+      routerLink="/admin/store-members"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #storeMembersLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!storeMembersLink.isActive"
+      [class.hover:bg-surface-container]="!storeMembersLink.isActive"
+      [class.hover:translate-x-1]="!storeMembersLink.isActive"
+    >
+      <span class="material-symbols-outlined">groups</span>
+      Store-Mitglieder
+    </a>
+    <a
       routerLink="/admin/quiz/questions"
       routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
       #quizLink="routerLinkActive"

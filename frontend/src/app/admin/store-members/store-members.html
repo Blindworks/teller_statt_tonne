@@ -1,0 +1,223 @@
+<main
+  class="pt-24 pb-32 md:pb-12 px-4 md:pl-80 md:pr-8 max-w-screen-2xl mx-auto min-h-screen flex flex-col md:flex-row gap-6"
+>
+  @if (loadError()) {
+    <div
+      class="fixed top-20 right-8 z-40 px-6 py-4 rounded-xl bg-error-container text-on-error-container text-sm font-semibold shadow-lg"
+    >
+      {{ loadError() }}
+    </div>
+  }
+
+  <!-- Linke Spalte: Store-Liste -->
+  <aside class="w-full md:w-80 flex flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <h2 class="text-3xl font-extrabold tracking-tight text-primary">Partner Stores</h2>
+      <p class="text-on-surface-variant text-sm px-1">
+        Mitglieder aktiven Partnerschaften zuordnen.
+      </p>
+    </div>
+    <div class="space-y-4 overflow-y-auto max-h-[calc(100vh-16rem)] px-1 py-1">
+      @for (store of stores(); track store.id) {
+        @let active = store.id === selectedStoreId();
+        <button
+          type="button"
+          (click)="selectStore(store.id!)"
+          class="w-full text-left p-5 rounded-xl transition-all border-2"
+          [class.bg-surface-container-lowest]="active"
+          [class.border-primary]="active"
+          [class.bg-surface-container-low]="!active"
+          [class.border-transparent]="!active"
+          [class.hover:bg-surface-container]="!active"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="w-14 h-14 rounded-md bg-primary-container flex items-center justify-center text-on-primary-container overflow-hidden"
+            >
+              @if (store.logoUrl) {
+                <img class="w-full h-full object-cover" [src]="store.logoUrl" alt="" />
+              } @else {
+                <span class="material-symbols-outlined">{{
+                  categoryIcons[store.category]
+                }}</span>
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-on-surface truncate">{{ store.name }}</h3>
+              <div class="flex items-center gap-1 text-xs text-on-surface-variant">
+                <span class="material-symbols-outlined text-[14px]">{{
+                  categoryIcons[store.category]
+                }}</span>
+                <span class="truncate">{{ categoryLabels[store.category] }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-end items-center">
+            <span
+              class="text-xs font-semibold"
+              [class.text-primary]="active"
+              [class.text-on-surface-variant]="!active"
+            >
+              {{ memberCount(store.id) }} Mitglieder
+            </span>
+          </div>
+        </button>
+      }
+      @if (stores().length === 0) {
+        <p class="text-sm text-on-surface-variant text-center py-12">
+          Keine Stores vorhanden.
+        </p>
+      }
+    </div>
+  </aside>
+
+  <!-- Rechte Spalte: Detailansicht -->
+  @if (selectedStore(); as partner) {
+    <section
+      class="flex-1 bg-surface-container-lowest rounded-xl p-6 md:p-10 shadow-[0_4px_60px_rgba(48,52,40,0.04)] relative overflow-hidden"
+    >
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+
+      <!-- Header -->
+      <div
+        class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 relative z-10"
+      >
+        <div class="flex flex-col gap-2">
+          @if (partner.status === 'ACTIVE') {
+            <div
+              class="inline-flex items-center gap-2 px-3 py-1 bg-primary-container text-on-primary-container text-[10px] font-bold uppercase tracking-widest rounded-full w-fit"
+            >
+              Aktiver Partner
+            </div>
+          }
+          <h1 class="text-4xl md:text-5xl font-black text-on-surface tracking-tight leading-none">
+            {{ partner.name }}
+          </h1>
+          <div class="flex items-center gap-2 text-on-surface-variant">
+            <span class="material-symbols-outlined text-secondary">location_on</span>
+            <span class="font-medium">
+              {{ partner.street }}@if (partner.postalCode || partner.city) {
+                , {{ partner.postalCode }} {{ partner.city }}
+              }
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="openAssignDialog()"
+          class="bg-primary text-on-primary flex items-center gap-2 px-8 py-4 rounded-full font-bold hover:bg-primary-dim transition-all active:scale-95 shadow-lg shadow-primary/10"
+        >
+          <span class="material-symbols-outlined">person_add</span>
+          Mitglied zuweisen
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 gap-10">
+        <!-- Mitglieder-Grid -->
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">volunteer_activism</span>
+              Mitglieder
+            </h3>
+            <div
+              class="flex items-center px-4 py-2 bg-surface-container-high rounded-full"
+            >
+              <span class="material-symbols-outlined text-on-surface-variant mr-2 text-sm"
+                >search</span
+              >
+              <input
+                type="text"
+                placeholder="Filtern…"
+                [ngModel]="filterTerm()"
+                (ngModelChange)="onFilterChange($event)"
+                class="bg-transparent border-none focus:ring-0 text-sm w-32 placeholder:text-on-surface-variant/50 outline-none"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @for (member of filteredMembers(); track member.id) {
+              <div
+                class="bg-surface-container-low p-4 rounded-xl flex items-center gap-4 border border-transparent hover:border-primary/20 transition-all"
+              >
+                <div class="relative">
+                  @if (member.photoUrl) {
+                    <img
+                      [src]="member.photoUrl"
+                      [alt]="member.firstName + ' ' + member.lastName"
+                      class="w-14 h-14 rounded-full object-cover"
+                    />
+                  } @else {
+                    <div
+                      class="w-14 h-14 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold"
+                    >
+                      {{ initials(member) }}
+                    </div>
+                  }
+                  <div
+                    class="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-surface-container-low"
+                    [class]="onlineDotClass(member.onlineStatus)"
+                  ></div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-bold text-on-surface truncate">
+                    {{ member.firstName }} {{ member.lastName }}
+                  </h4>
+                  <p class="text-xs text-on-surface-variant truncate">
+                    {{ formatLastPickup(member.lastPickupDate) }}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  (click)="removeMember(member.id)"
+                  title="Zuweisung entfernen"
+                  class="text-on-surface-variant hover:text-error p-2 rounded-full hover:bg-error-container/10 transition-all"
+                >
+                  <span class="material-symbols-outlined text-lg">close</span>
+                </button>
+              </div>
+            }
+
+            <button
+              type="button"
+              (click)="openAssignDialog()"
+              class="border-2 border-dashed border-outline-variant p-4 rounded-xl flex items-center justify-center gap-4 hover:bg-surface-container-high transition-all cursor-pointer group"
+            >
+              <span
+                class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform"
+                >add_circle</span
+              >
+              <span class="text-sm font-bold text-on-surface-variant"
+                >Mitglied hinzufügen</span
+              >
+            </button>
+          </div>
+
+          @if (members().length === 0) {
+            <p
+              class="text-sm text-on-surface-variant text-center py-8 col-span-full"
+            >
+              Diesem Store sind noch keine Mitglieder zugewiesen.
+            </p>
+          }
+        </div>
+      </div>
+    </section>
+  } @else {
+    <section
+      class="flex-1 flex items-center justify-center bg-surface-container-lowest rounded-xl p-12"
+    >
+      <p class="text-on-surface-variant">Bitte einen Store auswählen.</p>
+    </section>
+  }
+</main>
+
+@if (assignDialogOpen() && selectedStore(); as partner) {
+  <app-assign-member-dialog
+    [partnerName]="partner.name"
+    [members]="assignableMembers()"
+    (assign)="onAssignMember($event)"
+    (close)="closeAssignDialog()"
+  />
+}

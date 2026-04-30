@@ -1,6 +1,8 @@
 package de.tellerstatttonne.backend.partner;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,14 +19,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class PartnerController {
 
     private final PartnerService service;
+    private final PartnerRepository partnerRepository;
 
-    public PartnerController(PartnerService service) {
+    public PartnerController(PartnerService service, PartnerRepository partnerRepository) {
         this.service = service;
+        this.partnerRepository = partnerRepository;
     }
 
     @GetMapping
     public List<Partner> list() {
         return service.findAll();
+    }
+
+    @GetMapping("/member-counts")
+    public Map<String, Integer> memberCounts() {
+        return partnerRepository.countMembersGroupedByPartner().stream()
+            .collect(Collectors.toMap(
+                PartnerRepository.MemberCountRow::getPartnerId,
+                row -> row.getMemberCount() != null ? row.getMemberCount() : 0
+            ));
     }
 
     @GetMapping("/{id}")

@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,9 @@ public class PickupEntity {
     @Column(length = 500)
     private String notes;
 
+    @Column(name = "saved_kg", precision = 10, scale = 2)
+    private BigDecimal savedKg;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "pickup_assignment",
@@ -73,6 +77,8 @@ public class PickupEntity {
     public void setCapacity(int capacity) { this.capacity = capacity; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+    public BigDecimal getSavedKg() { return savedKg; }
+    public void setSavedKg(BigDecimal savedKg) { this.savedKg = savedKg; }
     public List<AssignmentEmbeddable> getAssignments() { return assignments; }
     public void setAssignments(List<AssignmentEmbeddable> assignments) { this.assignments = assignments; }
 

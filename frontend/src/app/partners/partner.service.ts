@@ -21,6 +21,10 @@ export class PartnerService {
     return this.http.get<Partner[]>(this.baseUrl);
   }
 
+  memberCounts(): Observable<Record<string, number>> {
+    return this.http.get<Record<string, number>>(`${this.baseUrl}/member-counts`);
+  }
+
   get(id: string): Observable<Partner> {
     return this.http.get<Partner>(`${this.baseUrl}/${id}`);
   }
