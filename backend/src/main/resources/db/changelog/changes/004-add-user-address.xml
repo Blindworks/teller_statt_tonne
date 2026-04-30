@@ -5,9 +5,12 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
 
-    <include file="db/changelog/changes/001-init.xml"/>
-    <include file="db/changelog/changes/002-seed-quiz.xml"/>
-    <include file="db/changelog/changes/003-merge-user-member.xml"/>
-    <include file="db/changelog/changes/004-add-user-address.xml"/>
+    <changeSet id="004-add-user-address-columns" author="teller-statt-tonne">
+        <addColumn tableName="app_user">
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(20)"/>
+            <column name="country" type="VARCHAR(100)"/>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

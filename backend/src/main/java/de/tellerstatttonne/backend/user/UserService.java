@@ -42,7 +42,10 @@ public class UserService {
         entity.setFirstName(request.firstName().trim());
         entity.setLastName(request.lastName().trim());
         entity.setPhone(request.phone());
+        entity.setStreet(request.street());
+        entity.setPostalCode(request.postalCode());
         entity.setCity(request.city());
+        entity.setCountry(request.country());
         return UserMapper.toDto(repository.save(entity));
     }
 

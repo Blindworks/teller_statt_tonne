@@ -15,7 +15,10 @@ public final class UserMapper {
             e.getFirstName(),
             e.getLastName(),
             e.getPhone(),
+            e.getStreet(),
+            e.getPostalCode(),
             e.getCity(),
+            e.getCountry(),
             e.getPhotoUrl(),
             e.getOnlineStatus(),
             e.getStatus(),
@@ -31,7 +34,10 @@ public final class UserMapper {
             target.setEmail(src.email());
         }
         target.setPhone(src.phone());
+        target.setStreet(src.street());
+        target.setPostalCode(src.postalCode());
         target.setCity(src.city());
+        target.setCountry(src.country());
         target.setPhotoUrl(src.photoUrl());
         target.setOnlineStatus(
             src.onlineStatus() != null ? src.onlineStatus() : UserEntity.OnlineStatus.OFFLINE);

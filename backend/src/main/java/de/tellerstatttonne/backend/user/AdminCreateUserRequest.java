@@ -12,5 +12,8 @@ public record AdminCreateUserRequest(
     @NotBlank String lastName,
     @NotNull Role role,
     String phone,
-    String city
+    String street,
+    String postalCode,
+    String city,
+    String country
 ) {}

@@ -52,6 +52,15 @@ public class UserEntity {
 
     private String city;
 
+    @Column(length = 255)
+    private String street;
+
+    @Column(name = "postal_code", length = 20)
+    private String postalCode;
+
+    @Column(length = 100)
+    private String country;
+
     @Column(name = "photo_url", length = 1024)
     private String photoUrl;
 
@@ -106,6 +115,12 @@ public class UserEntity {
     public void setPhone(String phone) { this.phone = phone; }
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
+    public String getStreet() { return street; }
+    public void setStreet(String street) { this.street = street; }
+    public String getPostalCode() { return postalCode; }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
     public String getPhotoUrl() { return photoUrl; }
     public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
     public OnlineStatus getOnlineStatus() { return onlineStatus; }

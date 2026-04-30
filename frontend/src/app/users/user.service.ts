@@ -17,7 +17,10 @@ export interface AdminCreateUserRequest {
   lastName: string;
   role: Role;
   phone?: string | null;
+  street?: string | null;
+  postalCode?: string | null;
   city?: string | null;
+  country?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })

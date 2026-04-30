@@ -32,7 +32,10 @@ type UserForm = FormGroup<{
   email: FormControl<string>;
   password: FormControl<string>;
   phone: FormControl<string>;
+  street: FormControl<string>;
+  postalCode: FormControl<string>;
   city: FormControl<string>;
+  country: FormControl<string>;
   photoUrl: FormControl<string>;
   onlineStatus: FormControl<OnlineStatus>;
   status: FormControl<UserStatus>;
@@ -170,7 +173,10 @@ export class UserEditComponent {
       email: this.fb.nonNullable.control(defaults.email, [Validators.required, Validators.email]),
       password: this.fb.nonNullable.control(''),
       phone: this.fb.nonNullable.control(defaults.phone ?? ''),
+      street: this.fb.nonNullable.control(defaults.street ?? ''),
+      postalCode: this.fb.nonNullable.control(defaults.postalCode ?? ''),
       city: this.fb.nonNullable.control(defaults.city ?? ''),
+      country: this.fb.nonNullable.control(defaults.country ?? ''),
       photoUrl: this.fb.nonNullable.control(''),
       onlineStatus: this.fb.nonNullable.control<OnlineStatus>(defaults.onlineStatus),
       status: this.fb.nonNullable.control<UserStatus>(defaults.status),
@@ -185,7 +191,10 @@ export class UserEditComponent {
       role: user.role,
       email: user.email ?? '',
       phone: user.phone ?? '',
+      street: user.street ?? '',
+      postalCode: user.postalCode ?? '',
       city: user.city ?? '',
+      country: user.country ?? '',
       photoUrl: user.photoUrl ?? '',
       onlineStatus: user.onlineStatus,
       status: user.status,
@@ -205,7 +214,10 @@ export class UserEditComponent {
       role: raw.role,
       email: raw.email,
       phone: raw.phone || null,
+      street: raw.street || null,
+      postalCode: raw.postalCode || null,
       city: raw.city || null,
+      country: raw.country || null,
       photoUrl: raw.photoUrl?.trim() ? raw.photoUrl.trim() : null,
       onlineStatus: raw.onlineStatus,
       status: raw.status,
@@ -222,7 +234,10 @@ export class UserEditComponent {
       lastName: raw.lastName,
       role: raw.role,
       phone: raw.phone || null,
+      street: raw.street || null,
+      postalCode: raw.postalCode || null,
       city: raw.city || null,
+      country: raw.country || null,
     };
   }
 }

@@ -14,7 +14,10 @@ export interface User {
   role: Role;
   email: string;
   phone: string | null;
+  street: string | null;
+  postalCode: string | null;
   city: string | null;
+  country: string | null;
   photoUrl: string | null;
   onlineStatus: OnlineStatus;
   status: UserStatus;
@@ -45,7 +48,10 @@ export function emptyUser(defaultRole: Role = 'RETTER'): User {
     role: defaultRole,
     email: '',
     phone: '',
+    street: '',
+    postalCode: '',
     city: '',
+    country: '',
     photoUrl: null,
     onlineStatus: 'OFFLINE',
     status: 'ACTIVE',

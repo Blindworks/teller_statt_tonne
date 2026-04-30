@@ -19,7 +19,10 @@ type ProfileForm = FormGroup<{
   firstName: FormControl<string>;
   lastName: FormControl<string>;
   phone: FormControl<string>;
+  street: FormControl<string>;
+  postalCode: FormControl<string>;
   city: FormControl<string>;
+  country: FormControl<string>;
   tags: FormArray<FormControl<string>>;
 }>;
 
@@ -73,7 +76,10 @@ export class ProfileComponent {
     firstName: this.fb.nonNullable.control('', Validators.required),
     lastName: this.fb.nonNullable.control('', Validators.required),
     phone: this.fb.nonNullable.control(''),
+    street: this.fb.nonNullable.control(''),
+    postalCode: this.fb.nonNullable.control(''),
     city: this.fb.nonNullable.control(''),
+    country: this.fb.nonNullable.control(''),
     tags: this.fb.array<FormControl<string>>([]),
   });
 
@@ -165,7 +171,10 @@ export class ProfileComponent {
       firstName: raw.firstName,
       lastName: raw.lastName,
       phone: raw.phone || null,
+      street: raw.street || null,
+      postalCode: raw.postalCode || null,
       city: raw.city || null,
+      country: raw.country || null,
       tags: raw.tags.map((t) => t.trim()).filter((t) => t.length > 0),
     };
     this.savingProfile.set(true);
@@ -219,7 +228,10 @@ export class ProfileComponent {
       firstName: user.firstName,
       lastName: user.lastName,
       phone: user.phone ?? '',
+      street: user.street ?? '',
+      postalCode: user.postalCode ?? '',
       city: user.city ?? '',
+      country: user.country ?? '',
     });
     this.tagsArray.clear();
     for (const tag of user.tags ?? []) {
