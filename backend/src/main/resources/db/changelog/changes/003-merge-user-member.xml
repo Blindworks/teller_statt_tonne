@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <!--
+        Schritt 1: Member-Spalten zu app_user hinzufuegen (zunaechst nullable).
+        SQL ist bewusst portabel formuliert (H2 und MariaDB), daher keine UPDATE...JOIN-Syntax,
+        sondern korrelierte Subqueries.
+    -->
+    <changeSet id="003-add-member-columns-to-app-user" author="teller-statt-tonne">
+        <addColumn tableName="app_user">
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(64)"/>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="photo_url" type="VARCHAR(1024)"/>
+            <column name="online_status" type="VARCHAR(16)" defaultValue="OFFLINE"/>
+            <column name="status" type="VARCHAR(16)" defaultValue="ACTIVE"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- Schritt 2: Member-Daten in app_user kopieren (nur fuer verlinkte app_user). -->
+    <changeSet id="003-copy-member-data-into-app-user" author="teller-statt-tonne">
+        <sql>
+            UPDATE app_user
+            SET first_name = (SELECT m.first_name FROM member m WHERE m.id = app_user.member_id)
+            WHERE member_id IS NOT NULL AND role &lt;&gt; 'ADMIN'
+        </sql>
+        <sql>
+            UPDATE app_user
+            SET last_name = (SELECT m.last_name FROM member m WHERE m.id = app_user.member_id)
+            WHERE member_id IS NOT NULL AND role &lt;&gt; 'ADMIN'
+        </sql>
+        <sql>
+            UPDATE app_user
+            SET phone = (SELECT m.phone FROM member m WHERE m.id = app_user.member_id)
+            WHERE member_id IS NOT NULL AND role &lt;&gt; 'ADMIN'
+        </sql>
+        <sql>
+            UPDATE app_user
+            SET city = (SELECT m.city FROM member m WHERE m.id = app_user.member_id)
+            WHERE member_id IS NOT NULL AND role &lt;&gt; 'ADMIN'
+        </sql>
+        <sql>
+            UPDATE app_user
+            SET photo_url = (SELECT m.photo_url FROM member m WHERE m.id = app_user.member_id)
+            WHERE member_id IS NOT NULL AND role &lt;&gt; 'ADMIN'
+        </sql>
+        <sql>
+            UPDATE app_user
+            SET online_status = (SELECT m.online_status FROM member m WHERE m.id = app_user.member_id)
+            WHERE member_id IS NOT NULL AND role &lt;&gt; 'ADMIN'
+        </sql>
+        <sql>
+            UPDATE app_user
+            SET status = (SELECT m.status FROM member m WHERE m.id = app_user.member_id)
+            WHERE member_id IS NOT NULL AND role &lt;&gt; 'ADMIN'
+        </sql>
+        <sql>
+            UPDATE app_user
+            SET role = (SELECT CASE m.role WHEN 'FOODSAVER' THEN 'RETTER' ELSE m.role END
+                        FROM member m WHERE m.id = app_user.member_id)
+            WHERE member_id IS NOT NULL AND role &lt;&gt; 'ADMIN'
+        </sql>
+    </changeSet>
+
+    <!-- Schritt 3: Rollen-Werte aus dem alten auth.Role-Enum auf das neue Schema mappen. -->
+    <changeSet id="003-rename-admin-role" author="teller-statt-tonne">
+        <sql>UPDATE app_user SET role = 'ADMINISTRATOR' WHERE role = 'ADMIN'</sql>
+    </changeSet>
+    <changeSet id="003-rename-user-role" author="teller-statt-tonne">
+        <sql>UPDATE app_user SET role = 'NEW_MEMBER' WHERE role = 'USER'</sql>
+    </changeSet>
+
+    <!-- Schritt 4: Admin-Account braucht first_name/last_name (laeuft sonst beim NOT-NULL-Schritt auf). -->
+    <changeSet id="003-backfill-admin-name" author="teller-statt-tonne">
+        <sql>
+            UPDATE app_user
+            SET first_name = COALESCE(first_name, 'System'),
+                last_name = COALESCE(last_name, 'Administrator')
+            WHERE first_name IS NULL OR last_name IS NULL
+        </sql>
+    </changeSet>
+
+    <!-- Schritt 5: FK-Constraints auf member.id droppen, damit wir die member_id-Spalten umbiegen koennen. -->
+    <changeSet id="003-drop-member-fks" author="teller-statt-tonne">
+        <dropForeignKeyConstraint baseTableName="member_tag" constraintName="fk_member_tag_member"/>
+        <dropForeignKeyConstraint baseTableName="partner_member" constraintName="fk_partner_member_member"/>
+        <dropForeignKeyConstraint baseTableName="member_availability" constraintName="fk_member_availability_member"/>
+        <dropForeignKeyConstraint baseTableName="app_user" constraintName="fk_app_user_member"/>
+    </changeSet>
+
+    <!-- Schritt 6: Datensaetze loeschen, die auf Member ohne app_user-Verknuepfung verweisen. -->
+    <changeSet id="003-delete-orphan-references" author="teller-statt-tonne">
+        <sql>
+            DELETE FROM member_tag
+            WHERE member_id NOT IN (SELECT member_id FROM app_user WHERE member_id IS NOT NULL)
+        </sql>
+        <sql>
+            DELETE FROM member_availability
+            WHERE member_id NOT IN (SELECT member_id FROM app_user WHERE member_id IS NOT NULL)
+        </sql>
+        <sql>
+            DELETE FROM partner_member
+            WHERE member_id NOT IN (SELECT member_id FROM app_user WHERE member_id IS NOT NULL)
+        </sql>
+        <sql>
+            DELETE FROM pickup_assignment
+            WHERE member_id NOT IN (SELECT member_id FROM app_user WHERE member_id IS NOT NULL)
+        </sql>
+    </changeSet>
+
+    <!--
+        Schritt 7: member_id in den abhaengigen Tabellen auf app_user.id ummappen.
+        Korrelierte UPDATEs (statt UPDATE...JOIN) fuer H2/MariaDB-Kompatibilitaet.
+    -->
+    <changeSet id="003-remap-member-id-to-app-user-id" author="teller-statt-tonne">
+        <sql>
+            UPDATE member_tag
+            SET member_id = (SELECT u.id FROM app_user u WHERE u.member_id = member_tag.member_id)
+            WHERE EXISTS (SELECT 1 FROM app_user u WHERE u.member_id = member_tag.member_id)
+        </sql>
+        <sql>
+            UPDATE member_availability
+            SET member_id = (SELECT u.id FROM app_user u WHERE u.member_id = member_availability.member_id)
+            WHERE EXISTS (SELECT 1 FROM app_user u WHERE u.member_id = member_availability.member_id)
+        </sql>
+        <sql>
+            UPDATE partner_member
+            SET member_id = (SELECT u.id FROM app_user u WHERE u.member_id = partner_member.member_id)
+            WHERE EXISTS (SELECT 1 FROM app_user u WHERE u.member_id = partner_member.member_id)
+        </sql>
+        <sql>
+            UPDATE pickup_assignment
+            SET member_id = (SELECT u.id FROM app_user u WHERE u.member_id = pickup_assignment.member_id)
+            WHERE EXISTS (SELECT 1 FROM app_user u WHERE u.member_id = pickup_assignment.member_id)
+        </sql>
+    </changeSet>
+
+    <!-- Schritt 8: Spalten member_id -> user_id umbenennen. -->
+    <changeSet id="003-rename-member-id-columns" author="teller-statt-tonne">
+        <renameColumn tableName="member_tag" oldColumnName="member_id" newColumnName="user_id"
+                      columnDataType="BIGINT"/>
+        <renameColumn tableName="member_availability" oldColumnName="member_id" newColumnName="user_id"
+                      columnDataType="BIGINT"/>
+        <renameColumn tableName="partner_member" oldColumnName="member_id" newColumnName="user_id"
+                      columnDataType="BIGINT"/>
+        <renameColumn tableName="pickup_assignment" oldColumnName="member_id" newColumnName="user_id"
+                      columnDataType="BIGINT"/>
+    </changeSet>
+
+    <!-- Schritt 9: Tabellen mit Member-Bezug auf User-Namen umbenennen. -->
+    <changeSet id="003-rename-tables" author="teller-statt-tonne">
+        <renameTable oldTableName="member_tag" newTableName="user_tag"/>
+        <renameTable oldTableName="member_availability" newTableName="user_availability"/>
+        <renameTable oldTableName="partner_member" newTableName="partner_user"/>
+    </changeSet>
+
+    <!-- Schritt 10: PK/Indizes/Unique-Constraints, die den alten Namen tragen, neu setzen. -->
+    <changeSet id="003-recreate-user-tag-pk" author="teller-statt-tonne">
+        <dropPrimaryKey tableName="user_tag" constraintName="pk_member_tag"/>
+        <addPrimaryKey tableName="user_tag" columnNames="user_id, tag_order"
+                       constraintName="pk_user_tag"/>
+    </changeSet>
+
+    <changeSet id="003-recreate-user-availability-constraints" author="teller-statt-tonne">
+        <dropUniqueConstraint tableName="user_availability"
+                              constraintName="uq_member_availability"/>
+        <addUniqueConstraint tableName="user_availability"
+                             columnNames="user_id, weekday, start_time, end_time"
+                             constraintName="uq_user_availability"/>
+        <dropIndex tableName="user_availability" indexName="idx_member_availability_match"/>
+        <createIndex tableName="user_availability" indexName="idx_user_availability_match">
+            <column name="weekday"/>
+            <column name="start_time"/>
+            <column name="end_time"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-recreate-partner-user-pk" author="teller-statt-tonne">
+        <!--
+            MariaDB blockiert DROP PRIMARY KEY, solange ein FK auf eine Spalte des Composite-PK
+            zeigt. Daher droppen wir zuerst den FK auf partner_id, rotieren den PK
+            und legen den FK anschliessend unter dem neuen Namen wieder an.
+        -->
+        <dropForeignKeyConstraint baseTableName="partner_user"
+                                  constraintName="fk_partner_member_partner"/>
+        <dropPrimaryKey tableName="partner_user" constraintName="pk_partner_member"/>
+        <addPrimaryKey tableName="partner_user" columnNames="partner_id, user_id"
+                       constraintName="pk_partner_user"/>
+        <dropIndex tableName="partner_user" indexName="idx_partner_member_member"/>
+        <createIndex tableName="partner_user" indexName="idx_partner_user_user">
+            <column name="user_id"/>
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="partner_user" baseColumnNames="partner_id"
+                                 referencedTableName="partner" referencedColumnNames="id"
+                                 constraintName="fk_partner_user_partner" onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Schritt 11: Neue FKs auf app_user(id). -->
+    <changeSet id="003-add-user-fks" author="teller-statt-tonne">
+        <addForeignKeyConstraint baseTableName="user_tag" baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_user_tag_user" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="user_availability" baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_user_availability_user" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="partner_user" baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_partner_user_user" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_assignment" baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_pickup_assignment_user" onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Schritt 12: Pflichtfelder scharf schalten. -->
+    <changeSet id="003-make-name-columns-not-null" author="teller-statt-tonne">
+        <addNotNullConstraint tableName="app_user" columnName="first_name" columnDataType="VARCHAR(255)"/>
+        <addNotNullConstraint tableName="app_user" columnName="last_name" columnDataType="VARCHAR(255)"/>
+        <addNotNullConstraint tableName="app_user" columnName="online_status" columnDataType="VARCHAR(16)"/>
+        <addNotNullConstraint tableName="app_user" columnName="status" columnDataType="VARCHAR(16)"/>
+    </changeSet>
+
+    <!-- Schritt 13: app_user.member_id und member-Tabelle entsorgen. -->
+    <changeSet id="003-drop-member-id-column" author="teller-statt-tonne">
+        <dropColumn tableName="app_user" columnName="member_id"/>
+    </changeSet>
+
+    <changeSet id="003-drop-member-table" author="teller-statt-tonne">
+        <dropTable tableName="member"/>
+    </changeSet>
+
+</databaseChangeLog>

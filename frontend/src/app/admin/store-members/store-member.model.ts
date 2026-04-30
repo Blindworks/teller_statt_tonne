@@ -1,15 +1,15 @@
-import { OnlineStatus, MemberStatus, MemberRole } from '../../members/member.model';
+import { OnlineStatus, Role, UserStatus } from '../../users/user.model';
 
 export interface StoreMember {
   id: number;
   firstName: string;
   lastName: string;
-  role: MemberRole;
+  role: Role;
   email: string | null;
   city: string | null;
   photoUrl: string | null;
   onlineStatus: OnlineStatus;
-  status: MemberStatus;
+  status: UserStatus;
   lastPickupDate: string | null;
   totalSavedKg: number | null;
   pickupCount: number;

@@ -3,11 +3,12 @@ package de.tellerstatttonne.backend.pickup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import de.tellerstatttonne.backend.member.Member;
-import de.tellerstatttonne.backend.member.MemberRole;
-import de.tellerstatttonne.backend.member.MemberService;
 import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerService;
+import de.tellerstatttonne.backend.user.Role;
+import de.tellerstatttonne.backend.user.UserEntity;
+import de.tellerstatttonne.backend.user.UserRepository;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,10 +24,10 @@ class PickupControllerTest {
     @Autowired private PickupController controller;
     @Autowired private PickupRepository pickupRepository;
     @Autowired private PartnerService partnerService;
-    @Autowired private MemberService memberService;
+    @Autowired private UserRepository userRepository;
 
-    private String partnerId;
-    private String memberId;
+    private Long partnerId;
+    private Long memberId;
 
     @BeforeEach
     void setup() {
@@ -39,12 +40,20 @@ class PickupControllerTest {
         ));
         partnerId = partner.id();
 
-        Member member = memberService.create(new Member(
-            null, "Lisa", "Muster", MemberRole.FOODSAVER,
-            "lisa@example.de", "+49 30 222", "Berlin", null,
-            Member.OnlineStatus.ONLINE, Member.Status.ACTIVE, List.of()
-        ));
-        memberId = member.id();
+        UserEntity user = new UserEntity();
+        user.setEmail("lisa-" + System.nanoTime() + "@example.de");
+        user.setPasswordHash("dummy");
+        user.setRole(Role.RETTER);
+        user.setFirstName("Lisa");
+        user.setLastName("Muster");
+        user.setPhone("+49 30 222");
+        user.setCity("Berlin");
+        user.setOnlineStatus(UserEntity.OnlineStatus.ONLINE);
+        user.setStatus(UserEntity.Status.ACTIVE);
+        Instant now = Instant.now();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+        memberId = userRepository.save(user).getId();
     }
 
     @Test
@@ -59,7 +68,7 @@ class PickupControllerTest {
 
         Pickup created = controller.create(payload).getBody();
         assertThat(created).isNotNull();
-        assertThat(created.id()).isNotBlank();
+        assertThat(created.id()).isNotNull();
         assertThat(created.partnerName()).isEqualTo("Bio-Markt Sonne");
         assertThat(created.partnerCategory()).isEqualTo(Partner.Category.SUPERMARKET);
         assertThat(created.assignments()).hasSize(1);
@@ -115,10 +124,10 @@ class PickupControllerTest {
     @Test
     void updateMissingReturns404() {
         Pickup payload = new Pickup(
-            "nope", partnerId, null, null, null, null, null,
+            -1L, partnerId, null, null, null, null, null,
             LocalDate.of(2026, 4, 21), "10:00", "10:30",
             Pickup.Status.SCHEDULED, 1, List.of(), null
         );
-        assertThat(controller.update("nope", payload).getStatusCode().value()).isEqualTo(404);
+        assertThat(controller.update(-1L, payload).getStatusCode().value()).isEqualTo(404);
     }
 }

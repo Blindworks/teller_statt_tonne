@@ -7,5 +7,6 @@
 
     <include file="db/changelog/changes/001-init.xml"/>
     <include file="db/changelog/changes/002-seed-quiz.xml"/>
+    <include file="db/changelog/changes/003-merge-user-member.xml"/>
 
 </databaseChangeLog>

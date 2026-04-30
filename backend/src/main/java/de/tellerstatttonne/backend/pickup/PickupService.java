@@ -1,9 +1,9 @@
 package de.tellerstatttonne.backend.pickup;
 
-import de.tellerstatttonne.backend.member.Member;
-import de.tellerstatttonne.backend.member.MemberService;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
+import de.tellerstatttonne.backend.user.User;
+import de.tellerstatttonne.backend.user.UserService;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -24,14 +24,14 @@ public class PickupService {
 
     private final PickupRepository repository;
     private final PartnerRepository partnerRepository;
-    private final MemberService memberService;
+    private final UserService userService;
 
     public PickupService(PickupRepository repository,
                          PartnerRepository partnerRepository,
-                         MemberService memberService) {
+                         UserService userService) {
         this.repository = repository;
         this.partnerRepository = partnerRepository;
-        this.memberService = memberService;
+        this.userService = userService;
     }
 
     @Transactional(readOnly = true)
@@ -54,7 +54,7 @@ public class PickupService {
 
     @Transactional(readOnly = true)
     public Optional<Pickup> findById(Long id) {
-        return repository.findById(id).map(e -> PickupMapper.toDto(e, resolveMembers(List.of(e))));
+        return repository.findById(id).map(e -> PickupMapper.toDto(e, resolveUsers(List.of(e))));
     }
 
     public Pickup create(Pickup pickup) {
@@ -63,7 +63,7 @@ public class PickupService {
         PickupEntity entity = new PickupEntity();
         PickupMapper.applyToEntity(entity, pickup, partner);
         PickupEntity saved = repository.save(entity);
-        return PickupMapper.toDto(saved, resolveMembers(List.of(saved)));
+        return PickupMapper.toDto(saved, resolveUsers(List.of(saved)));
     }
 
     public Optional<Pickup> update(Long id, Pickup pickup) {
@@ -72,7 +72,7 @@ public class PickupService {
             PartnerEntity partner = loadPartner(pickup.partnerId());
             PickupMapper.applyToEntity(entity, pickup, partner);
             PickupEntity saved = repository.save(entity);
-            return PickupMapper.toDto(saved, resolveMembers(List.of(saved)));
+            return PickupMapper.toDto(saved, resolveUsers(List.of(saved)));
         });
     }
 
@@ -85,23 +85,23 @@ public class PickupService {
     }
 
     private List<Pickup> mapAll(List<PickupEntity> entities) {
-        Map<Long, Member> members = resolveMembers(entities);
-        return entities.stream().map(e -> PickupMapper.toDto(e, members)).toList();
+        Map<Long, User> users = resolveUsers(entities);
+        return entities.stream().map(e -> PickupMapper.toDto(e, users)).toList();
     }
 
-    private Map<Long, Member> resolveMembers(List<PickupEntity> entities) {
+    private Map<Long, User> resolveUsers(List<PickupEntity> entities) {
         Set<Long> ids = new HashSet<>();
         for (PickupEntity e : entities) {
             if (e.getAssignments() == null) continue;
             for (PickupEntity.AssignmentEmbeddable a : e.getAssignments()) {
-                if (a.getMemberId() != null) ids.add(a.getMemberId());
+                if (a.getUserId() != null) ids.add(a.getUserId());
             }
         }
         return ids.stream()
-            .map(memberService::findById)
+            .map(userService::findById)
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .collect(Collectors.toMap(Member::id, m -> m));
+            .collect(Collectors.toMap(User::id, u -> u));
     }
 
     private PartnerEntity loadPartner(Long partnerId) {

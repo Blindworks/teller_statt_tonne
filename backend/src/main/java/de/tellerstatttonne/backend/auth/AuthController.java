@@ -4,7 +4,8 @@ import de.tellerstatttonne.backend.auth.AuthDtos.AuthResponse;
 import de.tellerstatttonne.backend.auth.AuthDtos.ChangePasswordRequest;
 import de.tellerstatttonne.backend.auth.AuthDtos.LoginRequest;
 import de.tellerstatttonne.backend.auth.AuthDtos.RefreshRequest;
-import de.tellerstatttonne.backend.auth.AuthDtos.RegisterRequest;
+import de.tellerstatttonne.backend.user.User;
+import de.tellerstatttonne.backend.user.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +28,6 @@ public class AuthController {
     public AuthController(AuthService authService, UserRepository userRepository) {
         this.authService = authService;
         this.userRepository = userRepository;
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse response = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
@@ -58,7 +53,6 @@ public class AuthController {
         }
         Long userId = Long.parseLong(authentication.getName());
         return userRepository.findById(userId)
-            .map(authService::ensureMemberLink)
             .map(authService::toDto)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());

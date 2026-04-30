@@ -1,11 +1,5 @@
-export type Role = 'ADMIN' | 'USER';
-
-export interface User {
-  id: number;
-  email: string;
-  role: Role;
-  memberId: number | null;
-}
+export type { OnlineStatus, Role, User, UserStatus } from '../users/user.model';
+import type { User } from '../users/user.model';
 
 export interface AuthResponse {
   accessToken: string;

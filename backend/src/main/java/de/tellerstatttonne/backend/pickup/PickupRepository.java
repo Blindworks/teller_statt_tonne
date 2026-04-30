@@ -18,14 +18,14 @@ public interface PickupRepository extends JpaRepository<PickupEntity, Long> {
         Pickup.Status status, LocalDate from, Pageable pageable);
 
     @Query("""
-        select a.memberId as memberId,
+        select a.userId as memberId,
                max(p.date) as lastPickupDate,
                coalesce(sum(p.savedKg), 0) as totalSavedKg,
                count(p) as pickupCount
         from PickupEntity p
         join p.assignments a
         where p.partner.id = :partnerId
-        group by a.memberId
+        group by a.userId
         """)
     List<MemberPickupStats> aggregateByPartner(@Param("partnerId") Long partnerId);
 

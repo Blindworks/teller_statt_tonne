@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.auth;
 
+import de.tellerstatttonne.backend.user.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

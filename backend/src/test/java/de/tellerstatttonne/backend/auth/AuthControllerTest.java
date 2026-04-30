@@ -8,19 +8,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.tellerstatttonne.backend.user.Role;
+import de.tellerstatttonne.backend.user.UserEntity;
+import de.tellerstatttonne.backend.user.UserRepository;
+import jakarta.servlet.Filter;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.security.web.SecurityFilterChain;
-import jakarta.servlet.Filter;
 
 @SpringBootTest
 @Transactional
@@ -40,6 +45,9 @@ class AuthControllerTest {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -53,24 +61,39 @@ class AuthControllerTest {
         userRepository.deleteAll();
     }
 
+    private void createUser(String email, String password, Role role) {
+        UserEntity user = new UserEntity();
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setFirstName("Alice");
+        user.setLastName("Test");
+        Instant now = Instant.now();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+        userRepository.save(user);
+    }
+
     @Test
-    void register_login_me_refresh_logout_flow() throws Exception {
-        String registerBody = """
+    void login_me_refresh_logout_flow() throws Exception {
+        createUser("alice@example.de", "secret123", Role.RETTER);
+
+        String loginBody = """
             {"email":"alice@example.de","password":"secret123"}
             """;
 
-        MvcResult registered = mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON).content(registerBody))
-            .andExpect(status().isCreated())
+        MvcResult logged = mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON).content(loginBody))
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.accessToken").isNotEmpty())
             .andExpect(jsonPath("$.refreshToken").isNotEmpty())
             .andExpect(jsonPath("$.user.email").value("alice@example.de"))
-            .andExpect(jsonPath("$.user.role").value("USER"))
+            .andExpect(jsonPath("$.user.role").value("RETTER"))
             .andReturn();
 
-        JsonNode regJson = objectMapper.readTree(registered.getResponse().getContentAsString());
-        String accessToken = regJson.get("accessToken").asText();
-        String refreshToken = regJson.get("refreshToken").asText();
+        JsonNode logJson = objectMapper.readTree(logged.getResponse().getContentAsString());
+        String accessToken = logJson.get("accessToken").asText();
+        String refreshToken = logJson.get("refreshToken").asText();
 
         mockMvc.perform(get("/api/auth/me")
                 .header("Authorization", "Bearer " + accessToken))
@@ -79,14 +102,6 @@ class AuthControllerTest {
 
         mockMvc.perform(get("/api/auth/me"))
             .andExpect(status().isUnauthorized());
-
-        String loginBody = """
-            {"email":"alice@example.de","password":"secret123"}
-            """;
-        mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON).content(loginBody))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.accessToken").isNotEmpty());
 
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -117,14 +132,11 @@ class AuthControllerTest {
     }
 
     @Test
-    void duplicateRegistrationFails() throws Exception {
+    void registerEndpointIsRemoved() throws Exception {
         String body = "{\"email\":\"bob@example.de\",\"password\":\"secret123\"}";
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON).content(body))
-            .andExpect(status().isCreated());
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON).content(body))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test

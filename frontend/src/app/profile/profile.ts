@@ -11,9 +11,9 @@ import {
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-import { MemberService } from '../members/member.service';
-import { Member } from '../members/member.model';
-import { resolvePhotoUrl } from '../members/photo-url';
+import { UserService } from '../users/user.service';
+import { User } from '../users/user.model';
+import { resolvePhotoUrl } from '../users/photo-url';
 
 type ProfileForm = FormGroup<{
   firstName: FormControl<string>;
@@ -39,25 +39,24 @@ type PasswordForm = FormGroup<{
 export class ProfileComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
-  private readonly memberService = inject(MemberService);
+  private readonly userService = inject(UserService);
 
   readonly currentUser = this.auth.currentUser;
-  readonly currentMember = this.auth.currentMember;
-  readonly hasMemberLink = computed(() => !!this.currentUser()?.memberId);
+  readonly hasProfile = computed(() => !!this.currentUser());
 
   readonly photoPreview = signal<string | null>(null);
   readonly displayPhoto = computed(() => {
     const preview = this.photoPreview();
     if (preview) return preview;
-    return resolvePhotoUrl(this.currentMember()?.photoUrl ?? null);
+    return resolvePhotoUrl(this.currentUser()?.photoUrl ?? null);
   });
   readonly initials = computed(() => {
-    const m = this.currentMember();
-    const f = m?.firstName?.[0] ?? '';
-    const l = m?.lastName?.[0] ?? '';
+    const u = this.currentUser();
+    const f = u?.firstName?.[0] ?? '';
+    const l = u?.lastName?.[0] ?? '';
     const i = (f + l).trim().toUpperCase();
     if (i) return i;
-    const email = this.currentUser()?.email ?? '';
+    const email = u?.email ?? '';
     return email.slice(0, 1).toUpperCase() || '?';
   });
 
@@ -89,12 +88,9 @@ export class ProfileComponent {
 
   constructor() {
     effect(() => {
-      const m = this.currentMember();
-      if (m) this.patchForm(m);
+      const u = this.currentUser();
+      if (u) this.patchForm(u);
     });
-    if (!this.currentMember() && this.currentUser()?.memberId) {
-      this.auth.reloadCurrentMember().subscribe();
-    }
   }
 
   get tagsArray(): FormArray<FormControl<string>> {
@@ -126,8 +122,8 @@ export class ProfileComponent {
       return;
     }
 
-    const member = this.currentMember();
-    if (!member?.id) {
+    const user = this.currentUser();
+    if (!user?.id) {
       this.photoError.set('Kein verknüpftes Profil gefunden.');
       input.value = '';
       return;
@@ -136,10 +132,10 @@ export class ProfileComponent {
     const previewUrl = URL.createObjectURL(file);
     this.photoPreview.set(previewUrl);
     this.uploadingPhoto.set(true);
-    this.memberService.uploadPhoto(member.id, file).subscribe({
+    this.userService.uploadPhoto(user.id, file).subscribe({
       next: (updated) => {
         this.uploadingPhoto.set(false);
-        this.auth.setCurrentMember(updated);
+        this.auth.setCurrentUser(updated);
         URL.revokeObjectURL(previewUrl);
         this.photoPreview.set(null);
         input.value = '';
@@ -161,24 +157,24 @@ export class ProfileComponent {
       this.form.markAllAsTouched();
       return;
     }
-    const member = this.currentMember();
-    if (!member?.id) return;
+    const user = this.currentUser();
+    if (!user?.id) return;
     const raw = this.form.getRawValue();
-    const payload: Member = {
-      ...member,
+    const payload: User = {
+      ...user,
       firstName: raw.firstName,
       lastName: raw.lastName,
-      phone: raw.phone,
-      city: raw.city,
+      phone: raw.phone || null,
+      city: raw.city || null,
       tags: raw.tags.map((t) => t.trim()).filter((t) => t.length > 0),
     };
     this.savingProfile.set(true);
     this.profileError.set(null);
     this.profileMessage.set(null);
-    this.memberService.update(member.id, payload).subscribe({
+    this.userService.update(user.id, payload).subscribe({
       next: (updated) => {
         this.savingProfile.set(false);
-        this.auth.setCurrentMember(updated);
+        this.auth.setCurrentUser(updated);
         this.profileMessage.set('Profil gespeichert.');
       },
       error: (err) => {
@@ -218,15 +214,15 @@ export class ProfileComponent {
     });
   }
 
-  private patchForm(member: Member): void {
+  private patchForm(user: User): void {
     this.form.patchValue({
-      firstName: member.firstName,
-      lastName: member.lastName,
-      phone: member.phone ?? '',
-      city: member.city ?? '',
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone ?? '',
+      city: user.city ?? '',
     });
     this.tagsArray.clear();
-    for (const tag of member.tags ?? []) {
+    for (const tag of user.tags ?? []) {
       this.tagsArray.push(this.fb.nonNullable.control(tag));
     }
   }

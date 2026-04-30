@@ -17,10 +17,6 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/login/login').then((m) => m.LoginComponent),
   },
   {
-    path: 'register',
-    loadComponent: () => import('./auth/register/register').then((m) => m.RegisterComponent),
-  },
-  {
     path: 'quiz',
     loadComponent: () => import('./quiz/quiz').then((m) => m.QuizComponent),
   },
@@ -61,19 +57,19 @@ export const routes: Routes = [
           import('./pickups/pickup-edit/pickup-edit').then((m) => m.PickupEditComponent),
       },
       {
-        path: 'members',
+        path: 'users',
         loadComponent: () =>
-          import('./members/members-list/members-list').then((m) => m.MembersListComponent),
+          import('./users/users-list/users-list').then((m) => m.UsersListComponent),
       },
       {
-        path: 'members/new',
+        path: 'users/new',
         loadComponent: () =>
-          import('./members/member-edit/member-edit').then((m) => m.MemberEditComponent),
+          import('./users/user-edit/user-edit').then((m) => m.UserEditComponent),
       },
       {
-        path: 'members/edit/:id',
+        path: 'users/edit/:id',
         loadComponent: () =>
-          import('./members/member-edit/member-edit').then((m) => m.MemberEditComponent),
+          import('./users/user-edit/user-edit').then((m) => m.UserEditComponent),
       },
       {
         path: 'profile',

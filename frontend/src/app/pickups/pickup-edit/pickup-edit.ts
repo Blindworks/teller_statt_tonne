@@ -8,8 +8,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MemberService } from '../../members/member.service';
-import { Member } from '../../members/member.model';
+import { UserService } from '../../users/user.service';
+import { User } from '../../users/user.model';
 import { PartnerService } from '../../partners/partner.service';
 import { Partner } from '../../partners/partner.model';
 import { PickupService } from '../pickup.service';
@@ -41,7 +41,7 @@ export class PickupEditComponent {
   private readonly fb = inject(FormBuilder);
   private readonly service = inject(PickupService);
   private readonly partnerService = inject(PartnerService);
-  private readonly memberService = inject(MemberService);
+  private readonly userService = inject(UserService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -50,7 +50,7 @@ export class PickupEditComponent {
   readonly errorMessage = signal<string | null>(null);
 
   readonly partners = signal<Partner[]>([]);
-  readonly members = signal<Member[]>([]);
+  readonly members = signal<User[]>([]);
 
   readonly statuses: PickupStatus[] = ['SCHEDULED', 'COMPLETED', 'CANCELLED'];
 
@@ -61,7 +61,7 @@ export class PickupEditComponent {
       next: (list) => this.partners.set(list),
       error: () => {},
     });
-    this.memberService.list({}).subscribe({
+    this.userService.list({}).subscribe({
       next: (list) => this.members.set(list),
       error: () => {},
     });

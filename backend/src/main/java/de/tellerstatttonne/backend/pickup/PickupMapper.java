@@ -1,7 +1,7 @@
 package de.tellerstatttonne.backend.pickup;
 
-import de.tellerstatttonne.backend.member.Member;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
+import de.tellerstatttonne.backend.user.User;
 import java.util.List;
 import java.util.Map;
 
@@ -9,19 +9,19 @@ final class PickupMapper {
 
     private PickupMapper() {}
 
-    static Pickup toDto(PickupEntity e, Map<Long, Member> membersById) {
+    static Pickup toDto(PickupEntity e, Map<Long, User> usersById) {
         PartnerEntity partner = e.getPartner();
         List<Pickup.Assignment> assignments = e.getAssignments() == null
             ? List.of()
             : e.getAssignments().stream().map(a -> {
-                Member m = membersById.get(a.getMemberId());
-                if (m == null) {
-                    return new Pickup.Assignment(a.getMemberId(), null, null);
+                User u = usersById.get(a.getUserId());
+                if (u == null) {
+                    return new Pickup.Assignment(a.getUserId(), null, null);
                 }
                 return new Pickup.Assignment(
-                    a.getMemberId(),
-                    (m.firstName() + " " + m.lastName()).trim(),
-                    m.photoUrl()
+                    a.getUserId(),
+                    (u.firstName() + " " + u.lastName()).trim(),
+                    u.photoUrl()
                 );
             }).toList();
 
@@ -56,7 +56,7 @@ final class PickupMapper {
         if (src.assignments() != null) {
             for (Pickup.Assignment a : src.assignments()) {
                 PickupEntity.AssignmentEmbeddable emb = new PickupEntity.AssignmentEmbeddable();
-                emb.setMemberId(a.memberId());
+                emb.setUserId(a.memberId());
                 target.getAssignments().add(emb);
             }
         }

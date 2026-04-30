@@ -8,12 +8,12 @@ import {
 import { FormsModule } from '@angular/forms';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Partner } from '../../partners/partner.model';
 import { PartnerService } from '../../partners/partner.service';
-import { MemberService } from '../../members/member.service';
-import { Member } from '../../members/member.model';
+import { UserService } from '../../users/user.service';
+import { User } from '../../users/user.model';
 import { StoreMember } from './store-member.model';
 import { StoreMembersService } from './store-members.service';
 import { AssignMemberDialogComponent } from './assign-member-dialog/assign-member-dialog';
-import { PhotoUrlPipe } from '../../members/photo-url.pipe';
+import { PhotoUrlPipe } from '../../users/photo-url.pipe';
 
 @Component({
   selector: 'app-store-members',
@@ -24,7 +24,7 @@ import { PhotoUrlPipe } from '../../members/photo-url.pipe';
 })
 export class StoreMembersComponent {
   private readonly partnerService = inject(PartnerService);
-  private readonly memberService = inject(MemberService);
+  private readonly userService = inject(UserService);
   private readonly storeMembersService = inject(StoreMembersService);
 
   readonly stores = signal<Partner[]>([]);
@@ -33,7 +33,7 @@ export class StoreMembersComponent {
   readonly members = signal<StoreMember[]>([]);
   readonly filterTerm = signal('');
   readonly loadError = signal<string | null>(null);
-  readonly allMembers = signal<Member[]>([]);
+  readonly allMembers = signal<User[]>([]);
   readonly assignDialogOpen = signal(false);
 
   readonly categoryIcons = CATEGORY_ICONS;
@@ -59,7 +59,7 @@ export class StoreMembersComponent {
 
   constructor() {
     this.loadStores();
-    this.memberService.list().subscribe({
+    this.userService.list().subscribe({
       next: (list) => this.allMembers.set(list),
     });
   }

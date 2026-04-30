@@ -1,7 +1,7 @@
 package de.tellerstatttonne.backend.partner;
 
-import de.tellerstatttonne.backend.member.availability.MemberAvailabilityService;
-import de.tellerstatttonne.backend.member.availability.MemberAvailabilityService.SlotKey;
+import de.tellerstatttonne.backend.user.availability.UserAvailabilityService;
+import de.tellerstatttonne.backend.user.availability.UserAvailabilityService.SlotKey;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -17,12 +17,12 @@ public class PartnerService {
 
     private final PartnerRepository repository;
     private final GeocodingService geocodingService;
-    private final MemberAvailabilityService availabilityService;
+    private final UserAvailabilityService availabilityService;
 
     public PartnerService(
         PartnerRepository repository,
         GeocodingService geocodingService,
-        MemberAvailabilityService availabilityService
+        UserAvailabilityService availabilityService
     ) {
         this.repository = repository;
         this.geocodingService = geocodingService;

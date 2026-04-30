@@ -95,7 +95,7 @@ class QuizServiceTest {
 
     @Test
     void tooManyAnswersAlsoCountsAsWrong() {
-        List<String> tooMany = q1.answers().stream().map(Answer::id).toList();
+        List<Long> tooMany = q1.answers().stream().map(Answer::id).toList();
 
         QuizSubmission submission = new QuizSubmission(
             "Tom", "tom@example.de",
@@ -112,7 +112,7 @@ class QuizServiceTest {
 
     @Test
     void knockoutAnswerForcesRedRegardlessOfScore() {
-        String knockoutId = q2KO.answers().stream()
+        Long knockoutId = q2KO.answers().stream()
             .filter(a -> Boolean.TRUE.equals(a.isKnockout()))
             .findFirst().orElseThrow().id();
 
@@ -166,7 +166,7 @@ class QuizServiceTest {
         assertThat(attempt.answers().get(0).questionText()).isNotBlank();
     }
 
-    private static List<String> correctIds(Question q) {
+    private static List<Long> correctIds(Question q) {
         return q.answers().stream()
             .filter(a -> Boolean.TRUE.equals(a.isCorrect()))
             .map(Answer::id)

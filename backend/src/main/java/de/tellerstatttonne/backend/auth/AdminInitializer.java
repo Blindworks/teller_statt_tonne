@@ -1,5 +1,8 @@
 package de.tellerstatttonne.backend.auth;
 
+import de.tellerstatttonne.backend.user.Role;
+import de.tellerstatttonne.backend.user.UserEntity;
+import de.tellerstatttonne.backend.user.UserRepository;
 import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,23 +39,25 @@ public class AdminInitializer implements CommandLineRunner {
     public void run(String... args) {
         userRepository.findByEmail(adminEmail).ifPresentOrElse(
             existing -> {
-                if (existing.getRole() != Role.ADMIN) {
-                    existing.setRole(Role.ADMIN);
+                if (existing.getRole() != Role.ADMINISTRATOR) {
+                    existing.setRole(Role.ADMINISTRATOR);
                     userRepository.save(existing);
-                    log.info("Admin-Rolle fuer bestehenden Account '{}' gesetzt.", adminEmail);
+                    log.info("Administrator-Rolle fuer bestehenden Account '{}' gesetzt.", adminEmail);
                 }
             },
             () -> {
                 UserEntity admin = new UserEntity();
                 admin.setEmail(adminEmail);
                 admin.setPasswordHash(passwordEncoder.encode(adminPassword));
-                admin.setRole(Role.ADMIN);
+                admin.setRole(Role.ADMINISTRATOR);
+                admin.setFirstName("System");
+                admin.setLastName("Administrator");
                 Instant now = Instant.now();
                 admin.setCreatedAt(now);
                 admin.setUpdatedAt(now);
                 userRepository.save(admin);
                 log.warn(
-                    "Admin-Account angelegt: '{}'. Bitte Passwort sofort aendern (app.admin.password).",
+                    "Administrator-Account angelegt: '{}'. Bitte Passwort sofort aendern (app.admin.password).",
                     adminEmail
                 );
             }

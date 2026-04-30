@@ -1,6 +1,6 @@
 package de.tellerstatttonne.backend.partner;
 
-import de.tellerstatttonne.backend.member.MemberEntity;
+import de.tellerstatttonne.backend.user.UserEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -69,11 +69,11 @@ public class PartnerEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "partner_member",
+        name = "partner_user",
         joinColumns = @JoinColumn(name = "partner_id"),
-        inverseJoinColumns = @JoinColumn(name = "member_id")
+        inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<MemberEntity> members = new HashSet<>();
+    private Set<UserEntity> members = new HashSet<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -99,8 +99,8 @@ public class PartnerEntity {
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
-    public Set<MemberEntity> getMembers() { return members; }
-    public void setMembers(Set<MemberEntity> members) { this.members = members; }
+    public Set<UserEntity> getMembers() { return members; }
+    public void setMembers(Set<UserEntity> members) { this.members = members; }
 
     @Embeddable
     public static class ContactEmbeddable {

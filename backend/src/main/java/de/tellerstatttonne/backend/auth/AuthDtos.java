@@ -1,17 +1,12 @@
 package de.tellerstatttonne.backend.auth;
 
-import jakarta.validation.constraints.Email;
+import de.tellerstatttonne.backend.user.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public final class AuthDtos {
 
     private AuthDtos() {}
-
-    public record RegisterRequest(
-        @Email @NotBlank String email,
-        @NotBlank @Size(min = 8, max = 100) String password
-    ) {}
 
     public record LoginRequest(
         @NotBlank String email,

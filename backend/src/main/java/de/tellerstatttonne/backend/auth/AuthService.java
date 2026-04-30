@@ -2,9 +2,10 @@ package de.tellerstatttonne.backend.auth;
 
 import de.tellerstatttonne.backend.auth.AuthDtos.AuthResponse;
 import de.tellerstatttonne.backend.auth.AuthDtos.LoginRequest;
-import de.tellerstatttonne.backend.auth.AuthDtos.RegisterRequest;
-import de.tellerstatttonne.backend.member.Member;
-import de.tellerstatttonne.backend.member.MemberService;
+import de.tellerstatttonne.backend.user.User;
+import de.tellerstatttonne.backend.user.UserEntity;
+import de.tellerstatttonne.backend.user.UserMapper;
+import de.tellerstatttonne.backend.user.UserRepository;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -25,7 +26,6 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final MemberService memberService;
     private final Duration refreshTtl;
     private final SecureRandom random = new SecureRandom();
 
@@ -34,38 +34,13 @@ public class AuthService {
         RefreshTokenRepository refreshTokenRepository,
         PasswordEncoder passwordEncoder,
         JwtService jwtService,
-        MemberService memberService,
         @Value("${app.jwt.refresh-ttl}") Duration refreshTtl
     ) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
-        this.memberService = memberService;
         this.refreshTtl = refreshTtl;
-    }
-
-    public UserEntity ensureMemberLink(UserEntity user) {
-        if (user.getMemberId() != null) {
-            return user;
-        }
-        Member created = memberService.createForUser(user.getEmail());
-        user.setMemberId(created.id());
-        return userRepository.save(user);
-    }
-
-    public AuthResponse register(RegisterRequest request) {
-        String email = request.email().trim().toLowerCase();
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already registered");
-        }
-        UserEntity entity = new UserEntity();
-        entity.setEmail(email);
-        entity.setPasswordHash(passwordEncoder.encode(request.password()));
-        entity.setRole(Role.USER);
-        UserEntity saved = userRepository.save(entity);
-        saved = ensureMemberLink(saved);
-        return buildAuthResponse(saved);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -75,7 +50,6 @@ public class AuthService {
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new BadCredentialsException("Invalid credentials");
         }
-        user = ensureMemberLink(user);
         return buildAuthResponse(user);
     }
 
@@ -114,7 +88,7 @@ public class AuthService {
     }
 
     public User toDto(UserEntity entity) {
-        return new User(entity.getId(), entity.getEmail(), entity.getRole(), entity.getMemberId());
+        return UserMapper.toDto(entity);
     }
 
     private AuthResponse buildAuthResponse(UserEntity user) {

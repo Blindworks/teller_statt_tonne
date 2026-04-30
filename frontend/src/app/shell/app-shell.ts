@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-import { resolvePhotoUrl } from '../members/photo-url';
+import { resolvePhotoUrl } from '../users/photo-url';
 
 @Component({
   selector: 'app-shell',
@@ -24,22 +24,21 @@ export class AppShellComponent {
   private readonly host = inject(ElementRef<HTMLElement>);
 
   readonly currentUser = this.auth.currentUser;
-  readonly currentMember = this.auth.currentMember;
 
-  readonly photoSrc = computed(() => resolvePhotoUrl(this.currentMember()?.photoUrl ?? null));
+  readonly photoSrc = computed(() => resolvePhotoUrl(this.currentUser()?.photoUrl ?? null));
   readonly initials = computed(() => {
-    const m = this.currentMember();
-    const f = m?.firstName?.[0] ?? '';
-    const l = m?.lastName?.[0] ?? '';
+    const u = this.currentUser();
+    const f = u?.firstName?.[0] ?? '';
+    const l = u?.lastName?.[0] ?? '';
     const i = (f + l).trim().toUpperCase();
     if (i) return i;
-    const email = this.currentUser()?.email ?? '';
+    const email = u?.email ?? '';
     return email.slice(0, 1).toUpperCase() || '?';
   });
   readonly displayName = computed(() => {
-    const m = this.currentMember();
-    if (m) return `${m.firstName} ${m.lastName}`.trim();
-    return this.currentUser()?.email ?? '';
+    const u = this.currentUser();
+    if (u && (u.firstName || u.lastName)) return `${u.firstName} ${u.lastName}`.trim();
+    return u?.email ?? '';
   });
 
   readonly menuOpen = signal(false);
