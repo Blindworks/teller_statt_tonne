@@ -398,13 +398,14 @@
 .logo-block {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 6px;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 12px;
   flex-wrap: nowrap;
 }
 .logo-block img {
-  width: 64px;
-  height: 64px;
+  width: 140px;
+  height: 140px;
   flex: none;
   object-fit: contain;
 }
@@ -412,15 +413,38 @@
   text-align: left;
   display: flex;
   flex-direction: column;
-  line-height: 1.05;
+  line-height: 1.02;
 }
 .logo-text .name,
 .logo-text .ev {
   font-family: var(--display-font);
   font-weight: 900;
-  font-size: 24px;
+  font-size: 52px;
   color: var(--green-dark);
   white-space: nowrap;
+}
+@media (max-width: 880px) {
+  .logo-block {
+    gap: 16px;
+  }
+  .logo-block img {
+    width: 96px;
+    height: 96px;
+  }
+  .logo-text .name,
+  .logo-text .ev {
+    font-size: 34px;
+  }
+}
+@media (max-width: 520px) {
+  .logo-block img {
+    width: 72px;
+    height: 72px;
+  }
+  .logo-text .name,
+  .logo-text .ev {
+    font-size: 26px;
+  }
 }
 .tagline {
   font-size: 14px;
