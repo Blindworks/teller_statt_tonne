@@ -38,6 +38,26 @@ export class QuizComponent {
     }
     this.errorMessage.set(null);
     this.loading.set(true);
+    const email = this.applicantEmail().trim();
+    this.service.checkEligibility(email).subscribe({
+      next: (elig) => {
+        if (!elig.eligible) {
+          this.loading.set(false);
+          this.errorMessage.set(this.eligibilityMessage(elig.reason));
+          this.step.set('error');
+          return;
+        }
+        this.loadQuestions();
+      },
+      error: () => {
+        this.loading.set(false);
+        this.errorMessage.set('Status konnte nicht geprüft werden.');
+        this.step.set('error');
+      },
+    });
+  }
+
+  private loadQuestions(): void {
     this.service.getPublicQuestions().subscribe({
       next: (qs) => {
         this.questions.set(qs);
@@ -64,6 +84,16 @@ export class QuizComponent {
         this.step.set('error');
       },
     });
+  }
+
+  private eligibilityMessage(reason: 'PASSED' | 'LOCKED' | null): string {
+    if (reason === 'PASSED') {
+      return 'Du hast das Quiz bereits erfolgreich abgeschlossen.';
+    }
+    if (reason === 'LOCKED') {
+      return 'Du hast die maximale Anzahl an Versuchen erreicht. Bitte wende dich an einen Admin, um wieder freigeschaltet zu werden.';
+    }
+    return 'Teilnahme nicht möglich.';
   }
 
   isSelected(questionId: number, answerId: number): boolean {
@@ -105,6 +135,11 @@ export class QuizComponent {
         },
         error: (err) => {
           this.loading.set(false);
+          if (err?.status === 409 && err.error?.reason) {
+            this.errorMessage.set(this.eligibilityMessage(err.error.reason));
+            this.step.set('error');
+            return;
+          }
           this.errorMessage.set(
             typeof err?.error === 'string' ? err.error : 'Auswertung fehlgeschlagen.',
           );

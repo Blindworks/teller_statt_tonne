@@ -3,7 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
+  QuizApplicantStatus,
   QuizAttempt,
+  QuizEligibility,
   QuizQuestion,
   QuizResult,
   QuizResultCategory,
@@ -23,6 +25,12 @@ export class QuizService {
 
   submit(submission: QuizSubmission): Observable<QuizResult> {
     return this.http.post<QuizResult>(`${this.publicUrl}/submit`, submission);
+  }
+
+  checkEligibility(email: string): Observable<QuizEligibility> {
+    return this.http.get<QuizEligibility>(`${this.publicUrl}/eligibility`, {
+      params: { email },
+    });
   }
 
   // Admin: Questions
@@ -70,5 +78,17 @@ export class QuizService {
 
   getAttempt(id: number): Observable<QuizAttempt> {
     return this.http.get<QuizAttempt>(`${this.adminUrl}/attempts/${id}`);
+  }
+
+  // Admin: Applicants (Wiederholungs-Status)
+  listApplicants(): Observable<QuizApplicantStatus[]> {
+    return this.http.get<QuizApplicantStatus[]>(`${this.adminUrl}/applicants`);
+  }
+
+  unlockApplicant(email: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.adminUrl}/applicants/${encodeURIComponent(email)}/unlock`,
+      {},
+    );
   }
 }

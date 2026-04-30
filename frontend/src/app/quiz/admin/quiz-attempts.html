@@ -21,39 +21,154 @@
     <p class="text-error mb-4">{{ errorMessage() }}</p>
   }
 
-  <div class="space-y-2">
-    @for (a of attempts(); track a.id) {
-      <article
-        class="bg-surface-container rounded-2xl p-4 shadow-sm flex items-center gap-4 cursor-pointer hover:bg-green-50"
-        (click)="open(a)"
-      >
-        <span class="text-2xl">{{ colorEmoji[a.color] }}</span>
-        <div class="flex-1">
-          <p class="font-medium text-on-surface">{{ a.applicantName }}</p>
-          <p class="text-xs text-on-surface-variant">{{ a.applicantEmail }}</p>
+  <div class="flex gap-2 mb-4">
+    <button
+      type="button"
+      (click)="switchView('attempts')"
+      class="rounded-full px-4 py-1.5 text-sm font-medium border"
+      [class.bg-primary]="view() === 'attempts'"
+      [class.text-on-primary]="view() === 'attempts'"
+      [class.border-primary]="view() === 'attempts'"
+      [class.text-primary]="view() !== 'attempts'"
+      [class.border-outline-variant]="view() !== 'attempts'"
+    >
+      Versuche
+    </button>
+    <button
+      type="button"
+      (click)="switchView('applicants')"
+      class="rounded-full px-4 py-1.5 text-sm font-medium border"
+      [class.bg-primary]="view() === 'applicants'"
+      [class.text-on-primary]="view() === 'applicants'"
+      [class.border-primary]="view() === 'applicants'"
+      [class.text-primary]="view() !== 'applicants'"
+      [class.border-outline-variant]="view() !== 'applicants'"
+    >
+      Bewerber
+    </button>
+  </div>
+
+  @if (view() === 'applicants') {
+    <div class="space-y-2">
+      @for (app of applicants(); track app.email) {
+        <article class="bg-surface-container rounded-2xl p-4 shadow-sm flex items-center gap-4">
+          @if (app.lastResultColor) {
+            <span class="text-2xl">{{ colorEmoji[app.lastResultColor] }}</span>
+          }
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-on-surface truncate">{{ app.name }}</p>
+            <p class="text-xs text-on-surface-variant truncate">{{ app.email }}</p>
+          </div>
+          <div class="text-right shrink-0">
+            <p class="text-sm text-on-surface">
+              {{ app.attempts }} / {{ app.attemptsAllowed }} Versuche
+            </p>
+            @if (app.lastAttemptAt) {
+              <p class="text-xs text-on-surface-variant">
+                {{ app.lastAttemptAt | date: 'short' }}
+              </p>
+            }
+          </div>
+          <span
+            class="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+            [class.bg-green-100]="app.passed"
+            [class.text-green-800]="app.passed"
+            [class.bg-red-100]="app.locked"
+            [class.text-red-800]="app.locked"
+            [class.bg-surface]="!app.passed && !app.locked"
+            [class.text-on-surface-variant]="!app.passed && !app.locked"
+            [class.border]="!app.passed && !app.locked"
+            [class.border-outline-variant]="!app.passed && !app.locked"
+          >
+            {{ applicantStatusLabel(app) }}
+          </span>
+          @if (app.locked) {
+            <button
+              type="button"
+              (click)="unlock(app)"
+              [disabled]="unlockingEmail() === app.email"
+              class="shrink-0 rounded-full bg-primary text-on-primary px-3 py-1.5 text-xs font-semibold shadow-sm hover:opacity-90 disabled:opacity-50 transition"
+            >
+              {{ unlockingEmail() === app.email ? 'Entsperre ...' : 'Entsperren' }}
+            </button>
+          }
+        </article>
+      } @empty {
+        <p class="text-on-surface-variant">Noch keine Bewerber.</p>
+      }
+    </div>
+  }
+
+  @if (view() === 'attempts') {
+  <div class="space-y-6">
+    @for (group of attemptGroups(); track group.email) {
+      <section>
+        <header class="flex items-center gap-3 mb-2 px-1">
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-on-surface truncate">{{ group.name }}</p>
+            <p class="text-xs text-on-surface-variant truncate">
+              {{ group.email }} &middot; {{ group.attempts.length }} Versuch{{ group.attempts.length === 1 ? '' : 'e' }}
+            </p>
+          </div>
+          @if (group.status) {
+            <span
+              class="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+              [class.bg-green-100]="group.status.passed"
+              [class.text-green-800]="group.status.passed"
+              [class.bg-red-100]="group.status.locked"
+              [class.text-red-800]="group.status.locked"
+              [class.bg-surface]="!group.status.passed && !group.status.locked"
+              [class.text-on-surface-variant]="!group.status.passed && !group.status.locked"
+              [class.border]="!group.status.passed && !group.status.locked"
+              [class.border-outline-variant]="!group.status.passed && !group.status.locked"
+            >
+              {{ applicantStatusLabel(group.status) }}
+            </span>
+            @if (group.status.locked) {
+              <button
+                type="button"
+                (click)="unlock(group.status)"
+                [disabled]="unlockingEmail() === group.status.email"
+                class="shrink-0 rounded-full bg-primary text-on-primary px-3 py-1.5 text-xs font-semibold shadow-sm hover:opacity-90 disabled:opacity-50 transition"
+              >
+                {{ unlockingEmail() === group.status.email ? 'Entsperre ...' : 'Entsperren' }}
+              </button>
+            }
+          }
+          <button
+            type="button"
+            (click)="createUser(group.attempts[0])"
+            class="shrink-0 rounded-full bg-primary text-on-primary px-3 py-1.5 text-xs font-semibold shadow-sm hover:opacity-90 transition"
+          >
+            + Nutzer anlegen
+          </button>
+        </header>
+        <div class="space-y-2">
+          @for (a of group.attempts; track a.id) {
+            <article
+              class="bg-surface-container rounded-2xl p-4 shadow-sm flex items-center gap-4 cursor-pointer hover:bg-green-50"
+              (click)="open(a)"
+            >
+              <span class="text-2xl">{{ colorEmoji[a.color] }}</span>
+              <div class="flex-1 text-right">
+                <p class="text-sm font-medium">{{ a.resultLabel ?? '—' }}</p>
+                <p class="text-xs text-on-surface-variant">
+                  {{ a.score }} Punkte &middot;
+                  {{ a.completedAt | date: 'short' }}
+                </p>
+              </div>
+              @if (a.knockoutTriggered) {
+                <span class="text-xs text-error font-medium">K.O.</span>
+              }
+            </article>
+          }
         </div>
-        <div class="text-right">
-          <p class="text-sm font-medium">{{ a.resultLabel ?? '—' }}</p>
-          <p class="text-xs text-on-surface-variant">
-            {{ a.score }} Punkte &middot;
-            {{ a.completedAt | date: 'short' }}
-          </p>
-        </div>
-        @if (a.knockoutTriggered) {
-          <span class="text-xs text-error font-medium">K.O.</span>
-        }
-        <button
-          type="button"
-          (click)="createUser(a); $event.stopPropagation()"
-          class="shrink-0 rounded-full bg-primary text-on-primary px-3 py-1.5 text-xs font-semibold shadow-sm hover:opacity-90 transition"
-        >
-          + Nutzer anlegen
-        </button>
-      </article>
+      </section>
     } @empty {
       <p class="text-on-surface-variant">Noch keine Quiz-Versuche.</p>
     }
   </div>
+  }
 
   @if (selected(); as sel) {
     <div

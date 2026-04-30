@@ -2,11 +2,15 @@ package de.tellerstatttonne.backend.quiz;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,19 +21,29 @@ public class QuizService {
     private final QuestionRepository questionRepository;
     private final ResultCategoryRepository categoryRepository;
     private final QuizAttemptRepository attemptRepository;
+    private final QuizApplicantLockRepository lockRepository;
+    private final int maxAttempts;
 
     public QuizService(
         QuestionRepository questionRepository,
         ResultCategoryRepository categoryRepository,
-        QuizAttemptRepository attemptRepository
+        QuizAttemptRepository attemptRepository,
+        QuizApplicantLockRepository lockRepository,
+        @Value("${quiz.max-attempts:3}") int maxAttempts
     ) {
         this.questionRepository = questionRepository;
         this.categoryRepository = categoryRepository;
         this.attemptRepository = attemptRepository;
+        this.lockRepository = lockRepository;
+        this.maxAttempts = maxAttempts;
     }
 
     public QuizResult submit(QuizSubmission submission) {
         validateSubmission(submission);
+        Eligibility eligibility = checkEligibility(submission.applicantEmail());
+        if (!eligibility.eligible()) {
+            throw new QuizNotEligibleException(eligibility.reason());
+        }
 
         List<QuestionEntity> questions = questionRepository.findAllByOrderByOrderIndexAsc();
         Map<Long, QuestionEntity> questionsById = questions.stream()
@@ -139,6 +153,81 @@ public class QuizService {
     @Transactional(readOnly = true)
     public java.util.Optional<QuizAttempt> findAttempt(Long id) {
         return attemptRepository.findById(id).map(QuizMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Eligibility checkEligibility(String rawEmail) {
+        if (rawEmail == null || rawEmail.isBlank()) {
+            throw new IllegalArgumentException("email is required");
+        }
+        String email = rawEmail.trim();
+        int bonus = lockRepository.findByEmail(email.toLowerCase())
+            .map(QuizApplicantLockEntity::getAttemptsBonus)
+            .orElse(0);
+        int allowed = maxAttempts + bonus;
+        long used = attemptRepository.countByApplicantEmailIgnoreCase(email);
+        boolean passed = attemptRepository.existsByApplicantEmailIgnoreCaseAndResultColor(email, QuizColor.GREEN);
+        if (passed) {
+            return Eligibility.blocked(Eligibility.Reason.PASSED, used, allowed);
+        }
+        if (used >= allowed) {
+            return Eligibility.blocked(Eligibility.Reason.LOCKED, used, allowed);
+        }
+        return Eligibility.ok(used, allowed);
+    }
+
+    public void unlock(String rawEmail) {
+        if (rawEmail == null || rawEmail.isBlank()) {
+            throw new IllegalArgumentException("email is required");
+        }
+        String email = rawEmail.trim().toLowerCase();
+        QuizApplicantLockEntity lock = lockRepository.findByEmail(email)
+            .orElseGet(() -> {
+                QuizApplicantLockEntity created = new QuizApplicantLockEntity();
+                created.setEmail(email);
+                created.setAttemptsBonus(0);
+                return created;
+            });
+        lock.setAttemptsBonus(lock.getAttemptsBonus() + maxAttempts);
+        lock.setUpdatedAt(Instant.now());
+        lockRepository.save(lock);
+    }
+
+    @Transactional(readOnly = true)
+    public List<QuizApplicantStatus> findAllApplicants() {
+        List<QuizAttemptEntity> attempts = attemptRepository.findAllByOrderByCompletedAtDesc();
+        Map<String, List<QuizAttemptEntity>> byEmail = new HashMap<>();
+        for (QuizAttemptEntity a : attempts) {
+            String key = a.getApplicantEmail() == null ? "" : a.getApplicantEmail().trim().toLowerCase();
+            byEmail.computeIfAbsent(key, k -> new ArrayList<>()).add(a);
+        }
+        Map<String, Integer> bonusByEmail = lockRepository.findAll().stream()
+            .collect(Collectors.toMap(
+                l -> l.getEmail().toLowerCase(),
+                QuizApplicantLockEntity::getAttemptsBonus,
+                (a, b) -> a));
+
+        List<QuizApplicantStatus> result = new ArrayList<>();
+        for (Map.Entry<String, List<QuizAttemptEntity>> entry : byEmail.entrySet()) {
+            List<QuizAttemptEntity> list = entry.getValue();
+            QuizAttemptEntity latest = list.get(0);
+            long count = list.size();
+            boolean passed = list.stream().anyMatch(a -> a.getResultColor() == QuizColor.GREEN);
+            int allowed = maxAttempts + bonusByEmail.getOrDefault(entry.getKey(), 0);
+            boolean locked = !passed && count >= allowed;
+            result.add(new QuizApplicantStatus(
+                latest.getApplicantEmail(),
+                latest.getApplicantName(),
+                count,
+                allowed,
+                locked,
+                passed,
+                latest.getCompletedAt(),
+                latest.getResultColor()
+            ));
+        }
+        result.sort(Comparator.comparing(QuizApplicantStatus::lastAttemptAt, Comparator.nullsLast(Comparator.reverseOrder())));
+        return result;
     }
 
     private void validateSubmission(QuizSubmission s) {

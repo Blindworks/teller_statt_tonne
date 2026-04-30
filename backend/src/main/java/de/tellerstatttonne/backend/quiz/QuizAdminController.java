@@ -95,6 +95,17 @@ public class QuizAdminController {
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/applicants")
+    public List<QuizApplicantStatus> listApplicants() {
+        return quizService.findAllApplicants();
+    }
+
+    @PostMapping("/applicants/{email}/unlock")
+    public ResponseEntity<Void> unlockApplicant(@PathVariable String email) {
+        quizService.unlock(email);
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());

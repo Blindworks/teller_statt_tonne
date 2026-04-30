@@ -67,6 +67,26 @@ export interface QuizAttempt {
   answers: QuizAttemptAnswer[];
 }
 
+export type EligibilityReason = 'PASSED' | 'LOCKED' | null;
+
+export interface QuizEligibility {
+  eligible: boolean;
+  reason: EligibilityReason;
+  attemptsUsed: number;
+  attemptsAllowed: number;
+}
+
+export interface QuizApplicantStatus {
+  email: string;
+  name: string;
+  attempts: number;
+  attemptsAllowed: number;
+  locked: boolean;
+  passed: boolean;
+  lastAttemptAt: string | null;
+  lastResultColor: QuizColor | null;
+}
+
 export const ALLOWED_WEIGHTS: ReadonlyArray<number> = [0.5, 1.0, 1.5];
 
 export const COLOR_LABELS: Record<QuizColor, string> = {

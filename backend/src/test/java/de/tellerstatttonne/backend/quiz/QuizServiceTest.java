@@ -1,6 +1,7 @@
 package de.tellerstatttonne.backend.quiz;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,12 +27,16 @@ class QuizServiceTest {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private QuizApplicantLockRepository lockRepository;
+
     private Question q1;
     private Question q2KO;
 
     @BeforeEach
     void setup() {
         attemptRepository.deleteAll();
+        lockRepository.deleteAll();
         questionRepository.deleteAll();
 
         q1 = questionService.create(new Question(
@@ -164,6 +169,115 @@ class QuizServiceTest {
         assertThat(attempt.answers()).hasSize(2);
         assertThat(attempt.answers().get(0).selectedAnswers()).isNotEmpty();
         assertThat(attempt.answers().get(0).questionText()).isNotBlank();
+    }
+
+    @Test
+    void eligibilityLocksAfterMaxAttempts() {
+        String email = "limit@example.de";
+        // Default max-attempts=3 (siehe application.properties). Drei nicht-bestandene Versuche.
+        for (int i = 0; i < 3; i++) {
+            quizService.submit(failingSubmission(email));
+        }
+
+        Eligibility eligibility = quizService.checkEligibility(email);
+
+        assertThat(eligibility.eligible()).isFalse();
+        assertThat(eligibility.reason()).isEqualTo(Eligibility.Reason.LOCKED);
+        assertThat(eligibility.attemptsUsed()).isEqualTo(3);
+        assertThat(eligibility.attemptsAllowed()).isEqualTo(3);
+    }
+
+    @Test
+    void submitThrowsWhenLocked() {
+        String email = "blocked@example.de";
+        for (int i = 0; i < 3; i++) {
+            quizService.submit(failingSubmission(email));
+        }
+
+        assertThatThrownBy(() -> quizService.submit(failingSubmission(email)))
+            .isInstanceOf(QuizNotEligibleException.class)
+            .matches(t -> ((QuizNotEligibleException) t).getReason() == Eligibility.Reason.LOCKED);
+    }
+
+    @Test
+    void passingMakesFurtherAttemptsImpossible() {
+        String email = "winner@example.de";
+        quizService.submit(passingSubmission(email));
+
+        Eligibility eligibility = quizService.checkEligibility(email);
+
+        assertThat(eligibility.eligible()).isFalse();
+        assertThat(eligibility.reason()).isEqualTo(Eligibility.Reason.PASSED);
+
+        assertThatThrownBy(() -> quizService.submit(passingSubmission(email)))
+            .isInstanceOf(QuizNotEligibleException.class);
+    }
+
+    @Test
+    void unlockGrantsFurtherAttempts() {
+        String email = "unlock@example.de";
+        for (int i = 0; i < 3; i++) {
+            quizService.submit(failingSubmission(email));
+        }
+        assertThat(quizService.checkEligibility(email).eligible()).isFalse();
+
+        quizService.unlock(email);
+
+        Eligibility eligibility = quizService.checkEligibility(email);
+        assertThat(eligibility.eligible()).isTrue();
+        assertThat(eligibility.attemptsAllowed()).isEqualTo(6);
+    }
+
+    @Test
+    void emailComparisonIsCaseInsensitive() {
+        quizService.submit(failingSubmission("Mixed@Example.de"));
+        quizService.submit(failingSubmission("MIXED@example.DE"));
+        quizService.submit(failingSubmission("mixed@example.de"));
+
+        Eligibility eligibility = quizService.checkEligibility("MIXED@EXAMPLE.DE");
+        assertThat(eligibility.eligible()).isFalse();
+        assertThat(eligibility.reason()).isEqualTo(Eligibility.Reason.LOCKED);
+    }
+
+    @Test
+    void findAllApplicantsAggregatesByEmail() {
+        quizService.submit(failingSubmission("a@example.de"));
+        quizService.submit(failingSubmission("a@example.de"));
+        quizService.submit(passingSubmission("b@example.de"));
+
+        List<QuizApplicantStatus> applicants = quizService.findAllApplicants();
+
+        assertThat(applicants).hasSize(2);
+        QuizApplicantStatus a = applicants.stream().filter(s -> s.email().equalsIgnoreCase("a@example.de")).findFirst().orElseThrow();
+        QuizApplicantStatus b = applicants.stream().filter(s -> s.email().equalsIgnoreCase("b@example.de")).findFirst().orElseThrow();
+        assertThat(a.attempts()).isEqualTo(2);
+        assertThat(a.locked()).isFalse();
+        assertThat(a.passed()).isFalse();
+        assertThat(b.passed()).isTrue();
+        assertThat(b.locked()).isFalse();
+    }
+
+    private QuizSubmission failingSubmission(String email) {
+        // Alle Antworten leer → score = 1.5 + 1.0 = 2.5 → RED, kein KO.
+        return new QuizSubmission(
+            "Test",
+            email,
+            List.of(
+                new QuizSubmission.SubmittedAnswer(q1.id(), List.of()),
+                new QuizSubmission.SubmittedAnswer(q2KO.id(), List.of())
+            )
+        );
+    }
+
+    private QuizSubmission passingSubmission(String email) {
+        return new QuizSubmission(
+            "Test",
+            email,
+            List.of(
+                new QuizSubmission.SubmittedAnswer(q1.id(), correctIds(q1)),
+                new QuizSubmission.SubmittedAnswer(q2KO.id(), correctIds(q2KO))
+            )
+        );
     }
 
     private static List<Long> correctIds(Question q) {
