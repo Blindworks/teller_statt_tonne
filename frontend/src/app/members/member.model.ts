@@ -1,13 +1,17 @@
-export type MemberType = 'BOTSCHAFTER' | 'FOODSAVER' | 'NEW_MEMBER';
+export type MemberRole = string;
 export type OnlineStatus = 'ONLINE' | 'AWAY' | 'ON_BREAK' | 'OFFLINE';
 export type MemberStatus = 'ACTIVE' | 'PENDING' | 'INACTIVE';
+
+export interface MemberRoleOption {
+  value: MemberRole;
+  label: string;
+}
 
 export interface Member {
   id: string | null;
   firstName: string;
   lastName: string;
-  type: MemberType;
-  roleTitle: string;
+  role: MemberRole;
   email: string;
   phone: string;
   city: string;
@@ -16,18 +20,6 @@ export interface Member {
   status: MemberStatus;
   tags: string[];
 }
-
-export const MEMBER_TYPES: ReadonlyArray<{ value: MemberType; label: string }> = [
-  { value: 'BOTSCHAFTER', label: 'Botschafter' },
-  { value: 'FOODSAVER', label: 'Foodsaver' },
-  { value: 'NEW_MEMBER', label: 'Neues Mitglied' },
-];
-
-export const MEMBER_TYPE_LABELS: Record<MemberType, string> = {
-  BOTSCHAFTER: 'Botschafter',
-  FOODSAVER: 'Foodsaver',
-  NEW_MEMBER: 'Neues Mitglied',
-};
 
 export const ONLINE_STATUS_LABELS: Record<OnlineStatus, string> = {
   ONLINE: 'Online',
@@ -45,13 +37,12 @@ export const MEMBER_STATUS_LABELS: Record<MemberStatus, string> = {
 export const ONLINE_STATUSES: OnlineStatus[] = ['ONLINE', 'AWAY', 'ON_BREAK', 'OFFLINE'];
 export const MEMBER_STATUSES: MemberStatus[] = ['ACTIVE', 'PENDING', 'INACTIVE'];
 
-export function emptyMember(): Member {
+export function emptyMember(defaultRole: MemberRole = 'FOODSAVER'): Member {
   return {
     id: null,
     firstName: '',
     lastName: '',
-    type: 'FOODSAVER',
-    roleTitle: '',
+    role: defaultRole,
     email: '',
     phone: '',
     city: '',

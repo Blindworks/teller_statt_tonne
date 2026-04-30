@@ -6,8 +6,7 @@ public record Member(
     String id,
     String firstName,
     String lastName,
-    Type type,
-    String roleTitle,
+    MemberRole role,
     String email,
     String phone,
     String city,
@@ -16,14 +15,12 @@ public record Member(
     Status status,
     List<String> tags
 ) {
-    public enum Type { BOTSCHAFTER, FOODSAVER, NEW_MEMBER }
-
     public enum OnlineStatus { ONLINE, AWAY, ON_BREAK, OFFLINE }
 
     public enum Status { ACTIVE, PENDING, INACTIVE }
 
     public Member withId(String newId) {
-        return new Member(newId, firstName, lastName, type, roleTitle, email, phone, city,
+        return new Member(newId, firstName, lastName, role, email, phone, city,
             photoUrl, onlineStatus, status, tags);
     }
 }

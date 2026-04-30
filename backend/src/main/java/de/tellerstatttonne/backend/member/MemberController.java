@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.member;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,13 +24,22 @@ public class MemberController {
         this.service = service;
     }
 
+    public record RoleOption(MemberRole value, String label) {}
+
     @GetMapping
     public List<Member> list(
-        @RequestParam(required = false) Member.Type type,
+        @RequestParam(required = false) MemberRole role,
         @RequestParam(name = "activeOnly", required = false, defaultValue = "false") boolean activeOnly,
         @RequestParam(name = "q", required = false) String search
     ) {
-        return service.findAll(type, activeOnly, search);
+        return service.findAll(role, activeOnly, search);
+    }
+
+    @GetMapping("/roles")
+    public List<RoleOption> roles() {
+        return Arrays.stream(MemberRole.values())
+            .map(r -> new RoleOption(r, r.getLabel()))
+            .toList();
     }
 
     @GetMapping("/{id}")

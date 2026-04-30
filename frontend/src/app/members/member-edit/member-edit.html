@@ -48,25 +48,16 @@
             class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </label>
-        <label class="flex flex-col gap-2">
-          <span class="text-sm font-semibold text-on-surface-variant">Typ *</span>
+        <label class="flex flex-col gap-2 md:col-span-2">
+          <span class="text-sm font-semibold text-on-surface-variant">Rolle *</span>
           <select
-            formControlName="type"
+            formControlName="role"
             class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            @for (t of memberTypes; track t.value) {
-              <option [value]="t.value">{{ t.label }}</option>
+            @for (r of roles(); track r.value) {
+              <option [value]="r.value">{{ r.label }}</option>
             }
           </select>
-        </label>
-        <label class="flex flex-col gap-2">
-          <span class="text-sm font-semibold text-on-surface-variant">Rolle / Titel</span>
-          <input
-            type="text"
-            formControlName="roleTitle"
-            placeholder="z. B. Regional Coordinator"
-            class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          />
         </label>
         <label class="flex flex-col gap-2 md:col-span-2">
           <span class="text-sm font-semibold text-on-surface-variant">Foto-URL</span>

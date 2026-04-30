@@ -1,11 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Member, MemberType } from './member.model';
+import { Member, MemberRole, MemberRoleOption } from './member.model';
 
 export interface MemberFilter {
-  type?: MemberType | null;
+  role?: MemberRole | null;
   activeOnly?: boolean;
   q?: string;
 }
@@ -14,11 +14,12 @@ export interface MemberFilter {
 export class MemberService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/members`;
+  private roles$?: Observable<MemberRoleOption[]>;
 
   list(filter: MemberFilter = {}): Observable<Member[]> {
     let params = new HttpParams();
-    if (filter.type) {
-      params = params.set('type', filter.type);
+    if (filter.role) {
+      params = params.set('role', filter.role);
     }
     if (filter.activeOnly) {
       params = params.set('activeOnly', 'true');
@@ -43,5 +44,14 @@ export class MemberService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  roles(): Observable<MemberRoleOption[]> {
+    if (!this.roles$) {
+      this.roles$ = this.http
+        .get<MemberRoleOption[]>(`${this.baseUrl}/roles`)
+        .pipe(shareReplay({ bufferSize: 1, refCount: false }));
+    }
+    return this.roles$;
   }
 }

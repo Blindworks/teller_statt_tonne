@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="008-member-rename-type-to-role" author="teller-statt-tonne">
+        <renameColumn
+            tableName="member"
+            oldColumnName="type"
+            newColumnName="role"
+            columnDataType="VARCHAR(32)"/>
+    </changeSet>
+
+    <changeSet id="008-member-drop-role-title" author="teller-statt-tonne">
+        <dropColumn tableName="member" columnName="role_title"/>
+    </changeSet>
+
+</databaseChangeLog>

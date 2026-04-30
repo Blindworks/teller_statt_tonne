@@ -48,7 +48,7 @@
       />
     </div>
     <div class="flex flex-wrap gap-3">
-      @for (chip of filters; track chip.label; let i = $index) {
+      @for (chip of filters(); track chip.label; let i = $index) {
         <button
           type="button"
           (click)="setFilter(i)"
@@ -80,15 +80,15 @@
     @for (member of members(); track member.id) {
       <div
         class="bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-6 shadow-[0_20px_50px_rgba(48,52,40,0.04)] hover:shadow-xl transition-all duration-500 group"
-        [class.border-l-8]="member.type === 'NEW_MEMBER'"
-        [class.border-secondary]="member.type === 'NEW_MEMBER'"
+        [class.border-l-8]="member.role === 'NEW_MEMBER'"
+        [class.border-secondary]="member.role === 'NEW_MEMBER'"
       >
         <div class="flex justify-between items-start">
           <div
             class="w-20 h-20 rounded-full overflow-hidden ring-4 shadow-lg group-hover:scale-105 transition-transform duration-500"
-            [class.ring-tertiary-container]="member.type === 'BOTSCHAFTER'"
-            [class.ring-primary-container\\/30]="member.type === 'FOODSAVER'"
-            [class.ring-secondary-container]="member.type === 'NEW_MEMBER'"
+            [class.ring-tertiary-container]="member.role === 'BOTSCHAFTER'"
+            [class.ring-primary-container\\/30]="member.role === 'FOODSAVER'"
+            [class.ring-secondary-container]="member.role === 'NEW_MEMBER'"
           >
             @if (member.photoUrl) {
               <img
@@ -106,9 +106,9 @@
           </div>
           <span
             class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider"
-            [class]="typeBadgeClass(member.type)"
+            [class]="roleBadgeClass(member.role)"
           >
-            {{ typeLabel(member.type) }}
+            {{ roleLabel(member.role) }}
           </span>
         </div>
 
@@ -116,9 +116,6 @@
           <h4 class="text-2xl font-extrabold text-on-surface">
             {{ member.firstName }} {{ member.lastName }}
           </h4>
-          @if (member.roleTitle) {
-            <p class="text-on-surface-variant/70 font-medium">{{ member.roleTitle }}</p>
-          }
         </div>
 
         @if (member.tags.length > 0) {

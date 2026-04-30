@@ -29,11 +29,8 @@ public class MemberEntity {
     private String lastName;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 32)
-    private Member.Type type;
-
-    @Column(name = "role_title")
-    private String roleTitle;
+    @Column(name = "role", nullable = false, length = 32)
+    private MemberRole role;
 
     private String email;
 
@@ -68,10 +65,8 @@ public class MemberEntity {
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
-    public Member.Type getType() { return type; }
-    public void setType(Member.Type type) { this.type = type; }
-    public String getRoleTitle() { return roleTitle; }
-    public void setRoleTitle(String roleTitle) { this.roleTitle = roleTitle; }
+    public MemberRole getRole() { return role; }
+    public void setRole(MemberRole role) { this.role = role; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public String getPhone() { return phone; }

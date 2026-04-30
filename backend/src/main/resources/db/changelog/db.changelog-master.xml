@@ -12,5 +12,6 @@
     <include file="db/changelog/changes/005-create-user.xml"/>
     <include file="db/changelog/changes/006-create-quiz.xml"/>
     <include file="db/changelog/changes/007-seed-quiz-questions.xml"/>
+    <include file="db/changelog/changes/008-member-rename-type-drop-role-title.xml"/>
 
 </databaseChangeLog>

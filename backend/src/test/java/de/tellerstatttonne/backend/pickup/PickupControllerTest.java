@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.tellerstatttonne.backend.member.Member;
+import de.tellerstatttonne.backend.member.MemberRole;
 import de.tellerstatttonne.backend.member.MemberService;
 import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerService;
@@ -39,7 +40,7 @@ class PickupControllerTest {
         partnerId = partner.id();
 
         Member member = memberService.create(new Member(
-            null, "Lisa", "Muster", Member.Type.FOODSAVER, null,
+            null, "Lisa", "Muster", MemberRole.FOODSAVER,
             "lisa@example.de", "+49 30 222", "Berlin", null,
             Member.OnlineStatus.ONLINE, Member.Status.ACTIVE, List.of()
         ));

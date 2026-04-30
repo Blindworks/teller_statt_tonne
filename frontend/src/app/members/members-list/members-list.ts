@@ -4,9 +4,9 @@ import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MemberFilter, MemberService } from '../member.service';
-import { Member, MemberType } from '../member.model';
+import { Member, MemberRole, MemberRoleOption } from '../member.model';
 
-type FilterChip = { label: string; type: MemberType | null; activeOnly: boolean };
+type FilterChip = { label: string; role: MemberRole | null; activeOnly: boolean };
 
 @Component({
   selector: 'app-members-list',
@@ -23,13 +23,11 @@ export class MembersListComponent {
   readonly loadError = signal<string | null>(null);
   readonly activeFilterIndex = signal(0);
   readonly search = signal('');
-
-  readonly filters: FilterChip[] = [
-    { label: 'Alle Mitglieder', type: null, activeOnly: false },
-    { label: 'Botschafter', type: 'BOTSCHAFTER', activeOnly: false },
-    { label: 'Foodsaver', type: 'FOODSAVER', activeOnly: false },
-    { label: 'Jetzt aktiv', type: null, activeOnly: true },
-  ];
+  readonly roles = signal<MemberRoleOption[]>([]);
+  readonly filters = signal<FilterChip[]>([
+    { label: 'Alle Mitglieder', role: null, activeOnly: false },
+    { label: 'Jetzt aktiv', role: null, activeOnly: true },
+  ]);
 
   readonly totalCount = computed(() => this.members().length);
 
@@ -38,7 +36,7 @@ export class MembersListComponent {
       .pipe(
         debounceTime(250),
         distinctUntilChanged(
-          (a, b) => a.type === b.type && a.activeOnly === b.activeOnly && a.q === b.q,
+          (a, b) => a.role === b.role && a.activeOnly === b.activeOnly && a.q === b.q,
         ),
         switchMap((filter) => this.service.list(filter)),
         takeUntilDestroyed(),
@@ -50,6 +48,26 @@ export class MembersListComponent {
         },
         error: () => this.loadError.set('Mitglieder konnten nicht geladen werden.'),
       });
+
+    this.service
+      .roles()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (roles) => {
+          this.roles.set(roles);
+          const roleChips: FilterChip[] = roles.map((r) => ({
+            label: r.label,
+            role: r.value,
+            activeOnly: false,
+          }));
+          this.filters.set([
+            { label: 'Alle Mitglieder', role: null, activeOnly: false },
+            ...roleChips,
+            { label: 'Jetzt aktiv', role: null, activeOnly: true },
+          ]);
+        },
+      });
+
     this.triggerReload();
   }
 
@@ -63,26 +81,21 @@ export class MembersListComponent {
     this.triggerReload();
   }
 
-  typeBadgeClass(type: MemberType): string {
-    switch (type) {
+  roleBadgeClass(role: MemberRole): string {
+    switch (role) {
       case 'BOTSCHAFTER':
         return 'bg-tertiary-container text-on-tertiary-fixed';
       case 'FOODSAVER':
         return 'bg-primary-container text-on-primary-container';
       case 'NEW_MEMBER':
         return 'bg-secondary-container text-on-secondary-container';
+      default:
+        return 'bg-surface-container text-on-surface';
     }
   }
 
-  typeLabel(type: MemberType): string {
-    switch (type) {
-      case 'BOTSCHAFTER':
-        return 'Botschafter';
-      case 'FOODSAVER':
-        return 'Foodsaver';
-      case 'NEW_MEMBER':
-        return 'Neu';
-    }
+  roleLabel(role: MemberRole): string {
+    return this.roles().find((r) => r.value === role)?.label ?? role;
   }
 
   onlineDotClass(status: Member['onlineStatus']): string {
@@ -123,7 +136,8 @@ export class MembersListComponent {
   }
 
   private triggerReload(): void {
-    const chip = this.filters[this.activeFilterIndex()];
-    this.reload$.next({ type: chip.type, activeOnly: chip.activeOnly, q: this.search() });
+    const chip = this.filters()[this.activeFilterIndex()];
+    if (!chip) return;
+    this.reload$.next({ role: chip.role, activeOnly: chip.activeOnly, q: this.search() });
   }
 }

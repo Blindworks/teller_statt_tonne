@@ -20,11 +20,11 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<Member> findAll(Member.Type type, boolean activeOnly, String search) {
+    public List<Member> findAll(MemberRole role, boolean activeOnly, String search) {
         Specification<MemberEntity> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (type != null) {
-                predicates.add(cb.equal(root.get("type"), type));
+            if (role != null) {
+                predicates.add(cb.equal(root.get("role"), role));
             }
             if (activeOnly) {
                 predicates.add(cb.equal(root.get("onlineStatus"), Member.OnlineStatus.ONLINE));
@@ -78,8 +78,8 @@ public class MemberService {
         if (member.lastName() == null || member.lastName().isBlank()) {
             throw new IllegalArgumentException("lastName is required");
         }
-        if (member.type() == null) {
-            throw new IllegalArgumentException("type is required");
+        if (member.role() == null) {
+            throw new IllegalArgumentException("role is required");
         }
     }
 }

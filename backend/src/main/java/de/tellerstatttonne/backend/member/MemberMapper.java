@@ -12,8 +12,7 @@ final class MemberMapper {
             e.getId(),
             e.getFirstName(),
             e.getLastName(),
-            e.getType(),
-            e.getRoleTitle(),
+            e.getRole(),
             e.getEmail(),
             e.getPhone(),
             e.getCity(),
@@ -27,8 +26,7 @@ final class MemberMapper {
     static void applyToEntity(MemberEntity target, Member src) {
         target.setFirstName(src.firstName());
         target.setLastName(src.lastName());
-        target.setType(src.type());
-        target.setRoleTitle(src.roleTitle());
+        target.setRole(src.role());
         target.setEmail(src.email());
         target.setPhone(src.phone());
         target.setCity(src.city());

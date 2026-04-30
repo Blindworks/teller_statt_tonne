@@ -8,15 +8,15 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MemberService } from '../member.service';
 import {
   MEMBER_STATUSES,
   MEMBER_STATUS_LABELS,
-  MEMBER_TYPES,
-  MEMBER_TYPE_LABELS,
   Member,
+  MemberRole,
+  MemberRoleOption,
   MemberStatus,
-  MemberType,
   ONLINE_STATUSES,
   ONLINE_STATUS_LABELS,
   OnlineStatus,
@@ -26,8 +26,7 @@ import {
 type MemberForm = FormGroup<{
   firstName: FormControl<string>;
   lastName: FormControl<string>;
-  type: FormControl<MemberType>;
-  roleTitle: FormControl<string>;
+  role: FormControl<MemberRole>;
   email: FormControl<string>;
   phone: FormControl<string>;
   city: FormControl<string>;
@@ -50,8 +49,7 @@ export class MemberEditComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  readonly memberTypes = MEMBER_TYPES;
-  readonly memberTypeLabels = MEMBER_TYPE_LABELS;
+  readonly roles = signal<MemberRoleOption[]>([]);
   readonly onlineStatuses = ONLINE_STATUSES;
   readonly onlineStatusLabels = ONLINE_STATUS_LABELS;
   readonly memberStatuses = MEMBER_STATUSES;
@@ -65,6 +63,18 @@ export class MemberEditComponent {
   readonly form: MemberForm = this.buildForm();
 
   constructor() {
+    this.service
+      .roles()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (roles) => {
+          this.roles.set(roles);
+          if (!this.isEdit && roles.length > 0 && !this.form.controls.role.value) {
+            this.form.controls.role.setValue(roles[0].value);
+          }
+        },
+      });
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.memberId.set(id);
@@ -134,12 +144,11 @@ export class MemberEditComponent {
   }
 
   private buildForm(): MemberForm {
-    const defaults = emptyMember();
+    const defaults = emptyMember('');
     return this.fb.group({
       firstName: this.fb.nonNullable.control(defaults.firstName, Validators.required),
       lastName: this.fb.nonNullable.control(defaults.lastName, Validators.required),
-      type: this.fb.nonNullable.control<MemberType>(defaults.type, Validators.required),
-      roleTitle: this.fb.nonNullable.control(defaults.roleTitle),
+      role: this.fb.nonNullable.control<MemberRole>(defaults.role, Validators.required),
       email: this.fb.nonNullable.control(defaults.email, Validators.email),
       phone: this.fb.nonNullable.control(defaults.phone),
       city: this.fb.nonNullable.control(defaults.city),
@@ -154,8 +163,7 @@ export class MemberEditComponent {
     this.form.patchValue({
       firstName: member.firstName,
       lastName: member.lastName,
-      type: member.type,
-      roleTitle: member.roleTitle ?? '',
+      role: member.role,
       email: member.email ?? '',
       phone: member.phone ?? '',
       city: member.city ?? '',
@@ -175,8 +183,7 @@ export class MemberEditComponent {
       id: this.memberId(),
       firstName: raw.firstName,
       lastName: raw.lastName,
-      type: raw.type,
-      roleTitle: raw.roleTitle,
+      role: raw.role,
       email: raw.email,
       phone: raw.phone,
       city: raw.city,
