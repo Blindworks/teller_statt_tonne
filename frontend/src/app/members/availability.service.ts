@@ -9,11 +9,11 @@ export class MemberAvailabilityService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/members`;
 
-  list(memberId: string): Observable<MemberAvailability[]> {
+  list(memberId: number): Observable<MemberAvailability[]> {
     return this.http.get<MemberAvailability[]>(`${this.baseUrl}/${memberId}/availabilities`);
   }
 
-  replaceAll(memberId: string, items: MemberAvailability[]): Observable<MemberAvailability[]> {
+  replaceAll(memberId: number, items: MemberAvailability[]): Observable<MemberAvailability[]> {
     return this.http.put<MemberAvailability[]>(
       `${this.baseUrl}/${memberId}/availabilities`,
       items,

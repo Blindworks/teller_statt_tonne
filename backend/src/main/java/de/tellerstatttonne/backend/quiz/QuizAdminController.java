@@ -38,7 +38,7 @@ public class QuizAdminController {
     }
 
     @GetMapping("/questions/{id}")
-    public ResponseEntity<Question> getQuestion(@PathVariable String id) {
+    public ResponseEntity<Question> getQuestion(@PathVariable Long id) {
         return questionService.findById(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
@@ -50,14 +50,14 @@ public class QuizAdminController {
     }
 
     @PutMapping("/questions/{id}")
-    public ResponseEntity<Question> updateQuestion(@PathVariable String id, @RequestBody Question question) {
+    public ResponseEntity<Question> updateQuestion(@PathVariable Long id, @RequestBody Question question) {
         return questionService.update(id, question)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/questions/{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable String id) {
+    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
         return questionService.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
@@ -72,14 +72,14 @@ public class QuizAdminController {
     }
 
     @PutMapping("/categories/{id}")
-    public ResponseEntity<ResultCategory> updateCategory(@PathVariable String id, @RequestBody ResultCategory category) {
+    public ResponseEntity<ResultCategory> updateCategory(@PathVariable Long id, @RequestBody ResultCategory category) {
         return categoryService.update(id, category)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/categories/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         return categoryService.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
@@ -89,7 +89,7 @@ public class QuizAdminController {
     }
 
     @GetMapping("/attempts/{id}")
-    public ResponseEntity<QuizAttempt> getAttempt(@PathVariable String id) {
+    public ResponseEntity<QuizAttempt> getAttempt(@PathVariable Long id) {
         return quizService.findAttempt(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());

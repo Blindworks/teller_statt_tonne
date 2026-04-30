@@ -2,6 +2,8 @@ package de.tellerstatttonne.backend.quiz;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -10,8 +12,8 @@ import jakarta.persistence.Table;
 public class AnswerEntity {
 
     @Id
-    @Column(length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, length = 1024)
     private String text;
@@ -22,8 +24,8 @@ public class AnswerEntity {
     @Column(name = "is_knockout", nullable = false)
     private boolean knockout;
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
     public boolean isCorrect() { return correct; }

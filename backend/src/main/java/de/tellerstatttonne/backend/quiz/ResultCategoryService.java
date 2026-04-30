@@ -2,7 +2,6 @@ package de.tellerstatttonne.backend.quiz;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,13 +25,12 @@ public class ResultCategoryService {
     public ResultCategory create(ResultCategory category) {
         validate(category);
         ResultCategoryEntity entity = new ResultCategoryEntity();
-        entity.setId(UUID.randomUUID().toString());
         entity.setOrderIndex((int) repository.count());
         QuizMapper.applyToEntity(entity, category);
         return QuizMapper.toDto(repository.save(entity));
     }
 
-    public Optional<ResultCategory> update(String id, ResultCategory category) {
+    public Optional<ResultCategory> update(Long id, ResultCategory category) {
         return repository.findById(id).map(entity -> {
             validate(category);
             QuizMapper.applyToEntity(entity, category);
@@ -40,7 +38,7 @@ public class ResultCategoryService {
         });
     }
 
-    public boolean delete(String id) {
+    public boolean delete(Long id) {
         if (!repository.existsById(id)) {
             return false;
         }

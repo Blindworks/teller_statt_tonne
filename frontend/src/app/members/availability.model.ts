@@ -1,8 +1,8 @@
 import { Weekday } from '../partners/partner.model';
 
 export interface MemberAvailability {
-  id: string | null;
-  memberId: string;
+  id: number | null;
+  memberId: number;
   weekday: Weekday;
   startTime: string;
   endTime: string;

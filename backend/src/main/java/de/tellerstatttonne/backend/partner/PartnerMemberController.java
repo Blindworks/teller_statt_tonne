@@ -20,7 +20,7 @@ public class PartnerMemberController {
     }
 
     @GetMapping
-    public ResponseEntity<List<StoreMember>> list(@PathVariable String partnerId) {
+    public ResponseEntity<List<StoreMember>> list(@PathVariable Long partnerId) {
         return service.list(partnerId)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
@@ -28,8 +28,8 @@ public class PartnerMemberController {
 
     @PutMapping("/{memberId}")
     public ResponseEntity<Void> assign(
-        @PathVariable String partnerId,
-        @PathVariable String memberId
+        @PathVariable Long partnerId,
+        @PathVariable Long memberId
     ) {
         return switch (service.assign(partnerId, memberId)) {
             case OK -> ResponseEntity.noContent().build();
@@ -39,8 +39,8 @@ public class PartnerMemberController {
 
     @DeleteMapping("/{memberId}")
     public ResponseEntity<Void> unassign(
-        @PathVariable String partnerId,
-        @PathVariable String memberId
+        @PathVariable Long partnerId,
+        @PathVariable Long memberId
     ) {
         return switch (service.unassign(partnerId, memberId)) {
             case OK -> ResponseEntity.noContent().build();

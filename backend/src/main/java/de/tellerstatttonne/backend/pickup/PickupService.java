@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
@@ -54,7 +53,7 @@ public class PickupService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Pickup> findById(String id) {
+    public Optional<Pickup> findById(Long id) {
         return repository.findById(id).map(e -> PickupMapper.toDto(e, resolveMembers(List.of(e))));
     }
 
@@ -62,13 +61,12 @@ public class PickupService {
         validate(pickup);
         PartnerEntity partner = loadPartner(pickup.partnerId());
         PickupEntity entity = new PickupEntity();
-        entity.setId(UUID.randomUUID().toString());
         PickupMapper.applyToEntity(entity, pickup, partner);
         PickupEntity saved = repository.save(entity);
         return PickupMapper.toDto(saved, resolveMembers(List.of(saved)));
     }
 
-    public Optional<Pickup> update(String id, Pickup pickup) {
+    public Optional<Pickup> update(Long id, Pickup pickup) {
         return repository.findById(id).map(entity -> {
             validate(pickup);
             PartnerEntity partner = loadPartner(pickup.partnerId());
@@ -78,7 +76,7 @@ public class PickupService {
         });
     }
 
-    public boolean delete(String id) {
+    public boolean delete(Long id) {
         if (!repository.existsById(id)) {
             return false;
         }
@@ -87,12 +85,12 @@ public class PickupService {
     }
 
     private List<Pickup> mapAll(List<PickupEntity> entities) {
-        Map<String, Member> members = resolveMembers(entities);
+        Map<Long, Member> members = resolveMembers(entities);
         return entities.stream().map(e -> PickupMapper.toDto(e, members)).toList();
     }
 
-    private Map<String, Member> resolveMembers(List<PickupEntity> entities) {
-        Set<String> ids = new HashSet<>();
+    private Map<Long, Member> resolveMembers(List<PickupEntity> entities) {
+        Set<Long> ids = new HashSet<>();
         for (PickupEntity e : entities) {
             if (e.getAssignments() == null) continue;
             for (PickupEntity.AssignmentEmbeddable a : e.getAssignments()) {
@@ -106,8 +104,8 @@ public class PickupService {
             .collect(Collectors.toMap(Member::id, m -> m));
     }
 
-    private PartnerEntity loadPartner(String partnerId) {
-        if (partnerId == null || partnerId.isBlank()) {
+    private PartnerEntity loadPartner(Long partnerId) {
+        if (partnerId == null) {
             throw new IllegalArgumentException("partnerId is required");
         }
         return partnerRepository.findById(partnerId)

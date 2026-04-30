@@ -5,6 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -25,11 +27,11 @@ import jakarta.persistence.UniqueConstraint;
 public class MemberAvailabilityEntity {
 
     @Id
-    @Column(length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "member_id", length = 36, nullable = false)
-    private String memberId;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "weekday", length = 16, nullable = false)
@@ -41,10 +43,10 @@ public class MemberAvailabilityEntity {
     @Column(name = "end_time", length = 8, nullable = false)
     private String endTime;
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getMemberId() { return memberId; }
-    public void setMemberId(String memberId) { this.memberId = memberId; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getMemberId() { return memberId; }
+    public void setMemberId(Long memberId) { this.memberId = memberId; }
     public Partner.Weekday getWeekday() { return weekday; }
     public void setWeekday(Partner.Weekday weekday) { this.weekday = weekday; }
     public String getStartTime() { return startTime; }

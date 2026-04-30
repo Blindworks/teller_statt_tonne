@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record Question(
-    String id,
+    Long id,
     String text,
     BigDecimal weight,
     List<Answer> answers

@@ -56,7 +56,7 @@ public class MemberController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Member> get(@PathVariable String id) {
+    public ResponseEntity<Member> get(@PathVariable Long id) {
         return service.findById(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
@@ -69,20 +69,20 @@ public class MemberController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Member> update(@PathVariable String id, @RequestBody Member member) {
+    public ResponseEntity<Member> update(@PathVariable Long id, @RequestBody Member member) {
         return service.update(id, member)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @PostMapping("/{id}/photo")
     public ResponseEntity<Member> uploadPhoto(
-        @PathVariable String id,
+        @PathVariable Long id,
         @RequestPart("file") MultipartFile file,
         Authentication authentication
     ) {
@@ -102,11 +102,11 @@ public class MemberController {
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    private boolean isAuthorizedForMember(Authentication authentication, String memberId) {
+    private boolean isAuthorizedForMember(Authentication authentication, Long memberId) {
         boolean isAdmin = authentication.getAuthorities().stream()
             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (isAdmin) return true;
-        String userId = authentication.getName();
+        Long userId = Long.parseLong(authentication.getName());
         return userRepository.findById(userId)
             .map(u -> memberId.equals(u.getMemberId()))
             .orElse(false);

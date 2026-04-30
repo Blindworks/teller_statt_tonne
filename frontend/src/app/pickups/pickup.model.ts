@@ -3,14 +3,14 @@ import { Category } from '../partners/partner.model';
 export type PickupStatus = 'SCHEDULED' | 'COMPLETED' | 'CANCELLED';
 
 export interface PickupAssignment {
-  memberId: string;
+  memberId: number;
   memberName: string | null;
   memberAvatarUrl: string | null;
 }
 
 export interface Pickup {
-  id: string | null;
-  partnerId: string;
+  id: number | null;
+  partnerId: number | null;
   partnerName: string | null;
   partnerCategory: Category | null;
   partnerStreet: string | null;
@@ -34,7 +34,7 @@ export const PICKUP_STATUS_LABELS: Record<PickupStatus, string> = {
 export function emptyPickup(): Pickup {
   return {
     id: null,
-    partnerId: '',
+    partnerId: null,
     partnerName: null,
     partnerCategory: null,
     partnerStreet: null,

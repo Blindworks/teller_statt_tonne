@@ -3,7 +3,7 @@ package de.tellerstatttonne.backend.member;
 import java.util.List;
 
 public record Member(
-    String id,
+    Long id,
     String firstName,
     String lastName,
     MemberRole role,
@@ -19,7 +19,7 @@ public record Member(
 
     public enum Status { ACTIVE, PENDING, INACTIVE }
 
-    public Member withId(String newId) {
+    public Member withId(Long newId) {
         return new Member(newId, firstName, lastName, role, email, phone, city,
             photoUrl, onlineStatus, status, tags);
     }

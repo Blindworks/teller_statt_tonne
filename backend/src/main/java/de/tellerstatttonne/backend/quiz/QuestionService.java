@@ -3,7 +3,6 @@ package de.tellerstatttonne.backend.quiz;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,20 +27,19 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Question> findById(String id) {
+    public Optional<Question> findById(Long id) {
         return repository.findById(id).map(e -> QuizMapper.toDto(e, true));
     }
 
     public Question create(Question question) {
         validate(question);
         QuestionEntity entity = new QuestionEntity();
-        entity.setId(UUID.randomUUID().toString());
         entity.setOrderIndex((int) repository.count());
         QuizMapper.applyToEntity(entity, question);
         return QuizMapper.toDto(repository.save(entity), true);
     }
 
-    public Optional<Question> update(String id, Question question) {
+    public Optional<Question> update(Long id, Question question) {
         return repository.findById(id).map(entity -> {
             validate(question);
             QuizMapper.applyToEntity(entity, question);
@@ -49,7 +47,7 @@ public class QuestionService {
         });
     }
 
-    public boolean delete(String id) {
+    public boolean delete(Long id) {
         if (!repository.existsById(id)) {
             return false;
         }

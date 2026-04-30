@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity, String> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity, Long> {
 
     Optional<RefreshTokenEntity> findByTokenHash(String tokenHash);
 
     @Modifying
     @Query("update RefreshTokenEntity t set t.revoked = true where t.userId = :userId")
-    void revokeAllForUser(@Param("userId") String userId);
+    void revokeAllForUser(@Param("userId") Long userId);
 }

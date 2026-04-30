@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +26,13 @@ public class MemberAvailabilityService {
     }
 
     @Transactional(readOnly = true)
-    public List<MemberAvailability> findByMemberId(String memberId) {
+    public List<MemberAvailability> findByMemberId(Long memberId) {
         return repository.findByMemberId(memberId).stream()
             .map(MemberAvailabilityService::toDto)
             .toList();
     }
 
-    public List<MemberAvailability> replaceAll(String memberId, List<MemberAvailability> items) {
+    public List<MemberAvailability> replaceAll(Long memberId, List<MemberAvailability> items) {
         if (!memberRepository.existsById(memberId)) {
             throw new IllegalArgumentException("member not found: " + memberId);
         }
@@ -45,7 +44,6 @@ public class MemberAvailabilityService {
             .filter(a -> seen.add(a.weekday() + "|" + a.startTime() + "|" + a.endTime()))
             .map(a -> {
                 MemberAvailabilityEntity e = new MemberAvailabilityEntity();
-                e.setId(UUID.randomUUID().toString());
                 e.setMemberId(memberId);
                 e.setWeekday(a.weekday());
                 e.setStartTime(a.startTime());

@@ -3,6 +3,6 @@ package de.tellerstatttonne.backend.quiz;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface QuizAttemptRepository extends JpaRepository<QuizAttemptEntity, String> {
+public interface QuizAttemptRepository extends JpaRepository<QuizAttemptEntity, Long> {
     List<QuizAttemptEntity> findAllByOrderByCompletedAtDesc();
 }

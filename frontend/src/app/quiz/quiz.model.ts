@@ -1,21 +1,21 @@
 export type QuizColor = 'GREEN' | 'YELLOW' | 'RED';
 
 export interface QuizAnswer {
-  id: string | null;
+  id: number | null;
   text: string;
   isCorrect: boolean | null;
   isKnockout: boolean | null;
 }
 
 export interface QuizQuestion {
-  id: string | null;
+  id: number | null;
   text: string;
   weight: number;
   answers: QuizAnswer[];
 }
 
 export interface QuizResultCategory {
-  id: string | null;
+  id: number | null;
   label: string;
   color: QuizColor;
   minScore: number;
@@ -23,8 +23,8 @@ export interface QuizResultCategory {
 }
 
 export interface SubmittedAnswer {
-  questionId: string;
-  selectedAnswerIds: string[];
+  questionId: number;
+  selectedAnswerIds: number[];
 }
 
 export interface QuizSubmission {
@@ -34,7 +34,7 @@ export interface QuizSubmission {
 }
 
 export interface QuizResult {
-  attemptId: string;
+  attemptId: number;
   score: number;
   resultLabel: string | null;
   color: QuizColor;
@@ -42,13 +42,13 @@ export interface QuizResult {
 }
 
 export interface QuizAttemptSelectedAnswer {
-  answerId: string | null;
+  answerId: number | null;
   answerText: string | null;
   wasKnockout: boolean;
 }
 
 export interface QuizAttemptAnswer {
-  questionId: string | null;
+  questionId: number | null;
   questionText: string | null;
   questionWeight: number;
   wasCorrect: boolean;
@@ -56,7 +56,7 @@ export interface QuizAttemptAnswer {
 }
 
 export interface QuizAttempt {
-  id: string;
+  id: number;
   applicantName: string;
   applicantEmail: string;
   score: number;

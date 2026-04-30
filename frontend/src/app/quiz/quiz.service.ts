@@ -30,7 +30,7 @@ export class QuizService {
     return this.http.get<QuizQuestion[]>(`${this.adminUrl}/questions`);
   }
 
-  getQuestion(id: string): Observable<QuizQuestion> {
+  getQuestion(id: number): Observable<QuizQuestion> {
     return this.http.get<QuizQuestion>(`${this.adminUrl}/questions/${id}`);
   }
 
@@ -38,11 +38,11 @@ export class QuizService {
     return this.http.post<QuizQuestion>(`${this.adminUrl}/questions`, q);
   }
 
-  updateQuestion(id: string, q: QuizQuestion): Observable<QuizQuestion> {
+  updateQuestion(id: number, q: QuizQuestion): Observable<QuizQuestion> {
     return this.http.put<QuizQuestion>(`${this.adminUrl}/questions/${id}`, q);
   }
 
-  deleteQuestion(id: string): Observable<void> {
+  deleteQuestion(id: number): Observable<void> {
     return this.http.delete<void>(`${this.adminUrl}/questions/${id}`);
   }
 
@@ -55,11 +55,11 @@ export class QuizService {
     return this.http.post<QuizResultCategory>(`${this.adminUrl}/categories`, c);
   }
 
-  updateCategory(id: string, c: QuizResultCategory): Observable<QuizResultCategory> {
+  updateCategory(id: number, c: QuizResultCategory): Observable<QuizResultCategory> {
     return this.http.put<QuizResultCategory>(`${this.adminUrl}/categories/${id}`, c);
   }
 
-  deleteCategory(id: string): Observable<void> {
+  deleteCategory(id: number): Observable<void> {
     return this.http.delete<void>(`${this.adminUrl}/categories/${id}`);
   }
 
@@ -68,7 +68,7 @@ export class QuizService {
     return this.http.get<QuizAttempt[]>(`${this.adminUrl}/attempts`);
   }
 
-  getAttempt(id: string): Observable<QuizAttempt> {
+  getAttempt(id: number): Observable<QuizAttempt> {
     return this.http.get<QuizAttempt>(`${this.adminUrl}/attempts/${id}`);
   }
 }

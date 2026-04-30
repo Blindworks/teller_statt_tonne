@@ -25,7 +25,7 @@ export interface PickupSlot {
 }
 
 export interface Partner {
-  id: string | null;
+  id: number | null;
   name: string;
   category: Category;
   street: string;

@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record StoreMember(
-    String id,
+    Long id,
     String firstName,
     String lastName,
     MemberRole role,

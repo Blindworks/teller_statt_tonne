@@ -33,9 +33,9 @@ public class PartnerMemberService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<List<StoreMember>> list(String partnerId) {
+    public Optional<List<StoreMember>> list(Long partnerId) {
         return partnerRepository.findById(partnerId).map(partner -> {
-            Map<String, MemberPickupStats> statsByMember = new HashMap<>();
+            Map<Long, MemberPickupStats> statsByMember = new HashMap<>();
             for (MemberPickupStats row : pickupRepository.aggregateByPartner(partnerId)) {
                 statsByMember.put(row.getMemberId(), row);
             }
@@ -48,7 +48,7 @@ public class PartnerMemberService {
         });
     }
 
-    public AssignResult assign(String partnerId, String memberId) {
+    public AssignResult assign(Long partnerId, Long memberId) {
         Optional<PartnerEntity> partnerOpt = partnerRepository.findById(partnerId);
         if (partnerOpt.isEmpty()) {
             return AssignResult.PARTNER_NOT_FOUND;
@@ -66,7 +66,7 @@ public class PartnerMemberService {
         return AssignResult.OK;
     }
 
-    public AssignResult unassign(String partnerId, String memberId) {
+    public AssignResult unassign(Long partnerId, Long memberId) {
         Optional<PartnerEntity> partnerOpt = partnerRepository.findById(partnerId);
         if (partnerOpt.isEmpty()) {
             return AssignResult.PARTNER_NOT_FOUND;

@@ -19,7 +19,7 @@ interface SlotEntry {
 export class MemberAvailabilityComponent {
   private readonly service = inject(MemberAvailabilityService);
 
-  readonly memberId = input.required<string>();
+  readonly memberId = input.required<number>();
 
   readonly weekdays = WEEKDAYS;
   readonly slotsByDay = signal<Record<Weekday, SlotEntry[]>>(this.emptyState());
@@ -96,7 +96,7 @@ export class MemberAvailabilityComponent {
     });
   }
 
-  private toRequestPayload(memberId: string): MemberAvailability[] | null {
+  private toRequestPayload(memberId: number): MemberAvailability[] | null {
     const result: MemberAvailability[] = [];
     const slots = this.slotsByDay();
     for (const day of Object.keys(slots) as Weekday[]) {

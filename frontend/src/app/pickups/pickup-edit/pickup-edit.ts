@@ -16,11 +16,11 @@ import { PickupService } from '../pickup.service';
 import { Pickup, PickupStatus, emptyPickup } from '../pickup.model';
 
 type AssignmentForm = FormGroup<{
-  memberId: FormControl<string>;
+  memberId: FormControl<number>;
 }>;
 
 type PickupForm = FormGroup<{
-  partnerId: FormControl<string>;
+  partnerId: FormControl<number | null>;
   date: FormControl<string>;
   startTime: FormControl<string>;
   endTime: FormControl<string>;
@@ -45,7 +45,7 @@ export class PickupEditComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  readonly pickupId = signal<string | null>(null);
+  readonly pickupId = signal<number | null>(null);
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
@@ -66,8 +66,9 @@ export class PickupEditComponent {
       error: () => {},
     });
 
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      const id = Number(idParam);
       this.pickupId.set(id);
       this.service.get(id).subscribe({
         next: (p) => this.patchForm(p),
@@ -87,7 +88,7 @@ export class PickupEditComponent {
   addAssignment(): void {
     this.assignments.push(
       this.fb.group({
-        memberId: this.fb.nonNullable.control('', Validators.required),
+        memberId: this.fb.nonNullable.control<number>(0, Validators.required),
       }),
     );
   }
@@ -133,7 +134,7 @@ export class PickupEditComponent {
   private buildForm(): PickupForm {
     const defaults = emptyPickup();
     return this.fb.group({
-      partnerId: this.fb.nonNullable.control(defaults.partnerId, Validators.required),
+      partnerId: this.fb.control<number | null>(defaults.partnerId, Validators.required),
       date: this.fb.nonNullable.control(defaults.date, Validators.required),
       startTime: this.fb.nonNullable.control(defaults.startTime, Validators.required),
       endTime: this.fb.nonNullable.control(defaults.endTime, Validators.required),
@@ -144,7 +145,7 @@ export class PickupEditComponent {
       ]),
       notes: this.fb.nonNullable.control(defaults.notes ?? ''),
       assignments: this.fb.array<AssignmentForm>([]),
-    });
+    }) as PickupForm;
   }
 
   private patchForm(p: Pickup): void {
@@ -161,7 +162,7 @@ export class PickupEditComponent {
     for (const a of p.assignments) {
       this.assignments.push(
         this.fb.group({
-          memberId: this.fb.nonNullable.control(a.memberId, Validators.required),
+          memberId: this.fb.nonNullable.control<number>(a.memberId, Validators.required),
         }),
       );
     }

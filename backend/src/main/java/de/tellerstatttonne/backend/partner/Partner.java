@@ -3,7 +3,7 @@ package de.tellerstatttonne.backend.partner;
 import java.util.List;
 
 public record Partner(
-    String id,
+    Long id,
     String name,
     Category category,
     String street,
@@ -40,7 +40,7 @@ public record Partner(
         }
     }
 
-    public Partner withId(String newId) {
+    public Partner withId(Long newId) {
         return new Partner(newId, name, category, street, postalCode, city, logoUrl,
             contact, pickupSlots, status, latitude, longitude);
     }

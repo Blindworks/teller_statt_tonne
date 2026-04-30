@@ -44,7 +44,7 @@ public class PickupController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pickup> get(@PathVariable String id) {
+    public ResponseEntity<Pickup> get(@PathVariable Long id) {
         return service.findById(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
@@ -56,14 +56,14 @@ public class PickupController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Pickup> update(@PathVariable String id, @RequestBody Pickup pickup) {
+    public ResponseEntity<Pickup> update(@PathVariable Long id, @RequestBody Pickup pickup) {
         return service.update(id, pickup)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 

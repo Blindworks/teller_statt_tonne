@@ -21,11 +21,11 @@ export class PartnerService {
     return this.http.get<Partner[]>(this.baseUrl);
   }
 
-  memberCounts(): Observable<Record<string, number>> {
-    return this.http.get<Record<string, number>>(`${this.baseUrl}/member-counts`);
+  memberCounts(): Observable<Record<number, number>> {
+    return this.http.get<Record<number, number>>(`${this.baseUrl}/member-counts`);
   }
 
-  get(id: string): Observable<Partner> {
+  get(id: number): Observable<Partner> {
     return this.http.get<Partner>(`${this.baseUrl}/${id}`);
   }
 
@@ -33,15 +33,15 @@ export class PartnerService {
     return this.http.post<Partner>(this.baseUrl, partner);
   }
 
-  update(id: string, partner: Partner): Observable<Partner> {
+  update(id: number, partner: Partner): Observable<Partner> {
     return this.http.put<Partner>(`${this.baseUrl}/${id}`, partner);
   }
 
-  delete(id: string): Observable<void> {
+  delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  regeocode(id: string): Observable<Partner> {
+  regeocode(id: number): Observable<Partner> {
     return this.http.post<Partner>(`${this.baseUrl}/${id}/geocode`, null);
   }
 

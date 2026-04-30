@@ -28,8 +28,8 @@ export class StoreMembersComponent {
   private readonly storeMembersService = inject(StoreMembersService);
 
   readonly stores = signal<Partner[]>([]);
-  readonly memberCounts = signal<Record<string, number>>({});
-  readonly selectedStoreId = signal<string | null>(null);
+  readonly memberCounts = signal<Record<number, number>>({});
+  readonly selectedStoreId = signal<number | null>(null);
   readonly members = signal<StoreMember[]>([]);
   readonly filterTerm = signal('');
   readonly loadError = signal<string | null>(null);
@@ -64,7 +64,7 @@ export class StoreMembersComponent {
     });
   }
 
-  selectStore(id: string): void {
+  selectStore(id: number): void {
     if (this.selectedStoreId() === id) return;
     this.selectedStoreId.set(id);
     this.filterTerm.set('');
@@ -83,7 +83,7 @@ export class StoreMembersComponent {
     this.assignDialogOpen.set(false);
   }
 
-  onAssignMember(memberId: string): void {
+  onAssignMember(memberId: number): void {
     const partnerId = this.selectedStoreId();
     if (!partnerId) return;
     this.storeMembersService.assign(partnerId, memberId).subscribe({
@@ -96,7 +96,7 @@ export class StoreMembersComponent {
     });
   }
 
-  removeMember(memberId: string): void {
+  removeMember(memberId: number): void {
     const partnerId = this.selectedStoreId();
     if (!partnerId) return;
     this.storeMembersService.unassign(partnerId, memberId).subscribe({
@@ -108,7 +108,7 @@ export class StoreMembersComponent {
     });
   }
 
-  memberCount(storeId: string | null): number {
+  memberCount(storeId: number | null): number {
     if (!storeId) return 0;
     return this.memberCounts()[storeId] ?? 0;
   }
@@ -167,7 +167,7 @@ export class StoreMembersComponent {
     });
   }
 
-  private loadMembers(partnerId: string): void {
+  private loadMembers(partnerId: number): void {
     this.storeMembersService.list(partnerId).subscribe({
       next: (members) => {
         this.members.set(members);

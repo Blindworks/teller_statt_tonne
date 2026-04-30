@@ -22,7 +22,7 @@ export class AssignMemberDialogComponent {
   @Input({ required: true }) set members(value: Member[]) {
     this._members.set(value);
   }
-  @Output() assign = new EventEmitter<string>();
+  @Output() assign = new EventEmitter<number>();
   @Output() close = new EventEmitter<void>();
 
   private readonly _members = signal<Member[]>([]);

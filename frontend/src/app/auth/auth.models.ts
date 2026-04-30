@@ -1,10 +1,10 @@
 export type Role = 'ADMIN' | 'USER';
 
 export interface User {
-  id: string;
+  id: number;
   email: string;
   role: Role;
-  memberId: string | null;
+  memberId: number | null;
 }
 
 export interface AuthResponse {

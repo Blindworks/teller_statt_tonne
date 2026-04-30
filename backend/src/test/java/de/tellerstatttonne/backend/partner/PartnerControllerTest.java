@@ -43,7 +43,7 @@ class PartnerControllerTest {
 
         Partner created = controller.create(payload).getBody();
         assertThat(created).isNotNull();
-        assertThat(created.id()).isNotBlank();
+        assertThat(created.id()).isNotNull();
         assertThat(created.name()).isEqualTo("Bäckerei Sonnenschein");
         assertThat(created.pickupSlots()).hasSize(1);
 
@@ -68,8 +68,8 @@ class PartnerControllerTest {
 
     @Test
     void updateMissingReturns404() {
-        Partner partner = new Partner("nope", "X", Partner.Category.CAFE, "s", "p", "c",
+        Partner partner = new Partner(999L, "X", Partner.Category.CAFE, "s", "p", "c",
             null, new Partner.Contact("a", "b", "c"), List.of(), Partner.Status.ACTIVE, null, null);
-        assertThat(controller.update("nope", partner).getStatusCode().value()).isEqualTo(404);
+        assertThat(controller.update(999L, partner).getStatusCode().value()).isEqualTo(404);
     }
 }

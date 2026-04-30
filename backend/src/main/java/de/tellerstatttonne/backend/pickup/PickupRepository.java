@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PickupRepository extends JpaRepository<PickupEntity, String> {
+public interface PickupRepository extends JpaRepository<PickupEntity, Long> {
 
     List<PickupEntity> findByDateBetweenOrderByDateAscStartTimeAsc(LocalDate from, LocalDate to);
 
@@ -27,10 +27,10 @@ public interface PickupRepository extends JpaRepository<PickupEntity, String> {
         where p.partner.id = :partnerId
         group by a.memberId
         """)
-    List<MemberPickupStats> aggregateByPartner(@Param("partnerId") String partnerId);
+    List<MemberPickupStats> aggregateByPartner(@Param("partnerId") Long partnerId);
 
     interface MemberPickupStats {
-        String getMemberId();
+        Long getMemberId();
         LocalDate getLastPickupDate();
         BigDecimal getTotalSavedKg();
         Long getPickupCount();

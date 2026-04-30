@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -13,8 +15,8 @@ import java.math.BigDecimal;
 public class ResultCategoryEntity {
 
     @Id
-    @Column(length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, length = 64)
     private String label;
@@ -32,8 +34,8 @@ public class ResultCategoryEntity {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getLabel() { return label; }
     public void setLabel(String label) { this.label = label; }
     public QuizColor getColor() { return color; }

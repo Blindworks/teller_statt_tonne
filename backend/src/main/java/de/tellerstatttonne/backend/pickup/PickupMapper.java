@@ -9,7 +9,7 @@ final class PickupMapper {
 
     private PickupMapper() {}
 
-    static Pickup toDto(PickupEntity e, Map<String, Member> membersById) {
+    static Pickup toDto(PickupEntity e, Map<Long, Member> membersById) {
         PartnerEntity partner = e.getPartner();
         List<Pickup.Assignment> assignments = e.getAssignments() == null
             ? List.of()

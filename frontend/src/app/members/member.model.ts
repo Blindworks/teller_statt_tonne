@@ -8,7 +8,7 @@ export interface MemberRoleOption {
 }
 
 export interface Member {
-  id: string | null;
+  id: number | null;
   firstName: string;
   lastName: string;
   role: MemberRole;

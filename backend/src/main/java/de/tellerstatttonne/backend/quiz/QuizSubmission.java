@@ -7,5 +7,5 @@ public record QuizSubmission(
     String applicantEmail,
     List<SubmittedAnswer> answers
 ) {
-    public record SubmittedAnswer(String questionId, List<String> selectedAnswerIds) {}
+    public record SubmittedAnswer(Long questionId, List<Long> selectedAnswerIds) {}
 }

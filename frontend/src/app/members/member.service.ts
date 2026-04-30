@@ -30,7 +30,7 @@ export class MemberService {
     return this.http.get<Member[]>(this.baseUrl, { params });
   }
 
-  get(id: string): Observable<Member> {
+  get(id: number): Observable<Member> {
     return this.http.get<Member>(`${this.baseUrl}/${id}`);
   }
 
@@ -38,15 +38,15 @@ export class MemberService {
     return this.http.post<Member>(this.baseUrl, member);
   }
 
-  update(id: string, member: Member): Observable<Member> {
+  update(id: number, member: Member): Observable<Member> {
     return this.http.put<Member>(`${this.baseUrl}/${id}`, member);
   }
 
-  delete(id: string): Observable<void> {
+  delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  uploadPhoto(id: string, file: File): Observable<Member> {
+  uploadPhoto(id: number, file: File): Observable<Member> {
     const form = new FormData();
     form.append('file', file);
     return this.http.post<Member>(`${this.baseUrl}/${id}/photo`, form);

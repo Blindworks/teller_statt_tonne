@@ -3,7 +3,7 @@ package de.tellerstatttonne.backend.quiz;
 import java.math.BigDecimal;
 
 public record ResultCategory(
-    String id,
+    Long id,
     String label,
     QuizColor color,
     BigDecimal minScore,

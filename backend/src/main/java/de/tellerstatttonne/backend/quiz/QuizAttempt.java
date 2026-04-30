@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.List;
 
 public record QuizAttempt(
-    String id,
+    Long id,
     String applicantName,
     String applicantEmail,
     BigDecimal score,
@@ -16,7 +16,7 @@ public record QuizAttempt(
     List<AttemptAnswer> answers
 ) {
     public record AttemptAnswer(
-        String questionId,
+        Long questionId,
         String questionText,
         BigDecimal questionWeight,
         boolean wasCorrect,
@@ -24,7 +24,7 @@ public record QuizAttempt(
     ) {}
 
     public record SelectedAnswer(
-        String answerId,
+        Long answerId,
         String answerText,
         boolean wasKnockout
     ) {}

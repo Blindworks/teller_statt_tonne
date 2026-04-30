@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -24,8 +26,8 @@ import java.util.List;
 public class PickupEntity {
 
     @Id
-    @Column(length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "partner_id", nullable = false)
@@ -61,8 +63,8 @@ public class PickupEntity {
     @OrderColumn(name = "slot_order")
     private List<AssignmentEmbeddable> assignments = new ArrayList<>();
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public PartnerEntity getPartner() { return partner; }
     public void setPartner(PartnerEntity partner) { this.partner = partner; }
     public LocalDate getDate() { return date; }
@@ -84,10 +86,10 @@ public class PickupEntity {
 
     @Embeddable
     public static class AssignmentEmbeddable {
-        @Column(name = "member_id", length = 36, nullable = false)
-        private String memberId;
+        @Column(name = "member_id", nullable = false)
+        private Long memberId;
 
-        public String getMemberId() { return memberId; }
-        public void setMemberId(String memberId) { this.memberId = memberId; }
+        public Long getMemberId() { return memberId; }
+        public void setMemberId(Long memberId) { this.memberId = memberId; }
     }
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +36,7 @@ public class PartnerService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Partner> findById(String id) {
+    public Optional<Partner> findById(Long id) {
         return repository.findById(id)
             .map(PartnerMapper::toDto)
             .map(p -> enrichWithAvailability(List.of(p)).get(0));
@@ -78,7 +77,6 @@ public class PartnerService {
     public Partner create(Partner partner) {
         validate(partner);
         PartnerEntity entity = new PartnerEntity();
-        entity.setId(UUID.randomUUID().toString());
         PartnerMapper.applyToEntity(entity, partner);
         if (hasCoordinates(partner)) {
             entity.setLatitude(partner.latitude());
@@ -89,7 +87,7 @@ public class PartnerService {
         return PartnerMapper.toDto(repository.save(entity));
     }
 
-    public Optional<Partner> update(String id, Partner partner) {
+    public Optional<Partner> update(Long id, Partner partner) {
         return repository.findById(id).map(entity -> {
             validate(partner);
             boolean addressChanged = !addressEquals(entity, partner);
@@ -104,14 +102,14 @@ public class PartnerService {
         });
     }
 
-    public Optional<Partner> regeocode(String id) {
+    public Optional<Partner> regeocode(Long id) {
         return repository.findById(id).map(entity -> {
             applyForwardGeocoding(entity);
             return PartnerMapper.toDto(repository.save(entity));
         });
     }
 
-    public boolean delete(String id) {
+    public boolean delete(Long id) {
         if (!repository.existsById(id)) {
             return false;
         }

@@ -26,7 +26,7 @@ export class QuizQuestionsComponent {
     });
   }
 
-  delete(id: string): void {
+  delete(id: number): void {
     if (!confirm('Frage wirklich löschen?')) return;
     this.service.deleteQuestion(id).subscribe({
       next: () => this.load(),

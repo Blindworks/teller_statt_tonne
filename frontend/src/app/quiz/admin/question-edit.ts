@@ -12,7 +12,7 @@ import { QuizService } from '../quiz.service';
 import { ALLOWED_WEIGHTS, QuizAnswer, QuizQuestion, emptyQuestion } from '../quiz.model';
 
 type AnswerForm = FormGroup<{
-  id: FormControl<string | null>;
+  id: FormControl<number | null>;
   text: FormControl<string>;
   isCorrect: FormControl<boolean>;
   isKnockout: FormControl<boolean>;
@@ -38,15 +38,16 @@ export class QuestionEditComponent {
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly weights = ALLOWED_WEIGHTS;
-  readonly questionId = signal<string | null>(null);
+  readonly questionId = signal<number | null>(null);
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
   readonly form: QuestionForm = this.buildForm();
 
   constructor() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      const id = Number(idParam);
       this.questionId.set(id);
       this.service.getQuestion(id).subscribe({
         next: (q) => this.patchForm(q),
@@ -108,7 +109,7 @@ export class QuestionEditComponent {
 
   private answerGroup(a: QuizAnswer): AnswerForm {
     return this.fb.group({
-      id: this.fb.control<string | null>(a.id),
+      id: this.fb.control<number | null>(a.id),
       text: this.fb.nonNullable.control(a.text, Validators.required),
       isCorrect: this.fb.nonNullable.control(Boolean(a.isCorrect)),
       isKnockout: this.fb.nonNullable.control(Boolean(a.isKnockout)),

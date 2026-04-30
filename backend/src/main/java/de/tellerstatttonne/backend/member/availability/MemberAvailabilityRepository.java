@@ -7,11 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface MemberAvailabilityRepository
-    extends JpaRepository<MemberAvailabilityEntity, String> {
+    extends JpaRepository<MemberAvailabilityEntity, Long> {
 
-    List<MemberAvailabilityEntity> findByMemberId(String memberId);
+    List<MemberAvailabilityEntity> findByMemberId(Long memberId);
 
-    void deleteByMemberId(String memberId);
+    void deleteByMemberId(Long memberId);
 
     /**
      * Counts distinct ACTIVE members that have at least one availability covering the given slot.

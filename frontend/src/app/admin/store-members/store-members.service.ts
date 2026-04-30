@@ -9,15 +9,15 @@ export class StoreMembersService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/partners`;
 
-  list(partnerId: string): Observable<StoreMember[]> {
+  list(partnerId: number): Observable<StoreMember[]> {
     return this.http.get<StoreMember[]>(`${this.baseUrl}/${partnerId}/members`);
   }
 
-  assign(partnerId: string, memberId: string): Observable<void> {
+  assign(partnerId: number, memberId: number): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${partnerId}/members/${memberId}`, null);
   }
 
-  unassign(partnerId: string, memberId: string): Observable<void> {
+  unassign(partnerId: number, memberId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${partnerId}/members/${memberId}`);
   }
 }

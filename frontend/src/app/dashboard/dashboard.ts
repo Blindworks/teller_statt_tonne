@@ -12,7 +12,7 @@ interface NewsItem {
 }
 
 interface DisplayPickup {
-  id: string;
+  id: number | string;
   store: string;
   image: string | null;
   location: string;

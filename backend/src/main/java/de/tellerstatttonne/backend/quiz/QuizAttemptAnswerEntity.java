@@ -6,6 +6,8 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OrderColumn;
@@ -19,11 +21,11 @@ import java.util.List;
 public class QuizAttemptAnswerEntity {
 
     @Id
-    @Column(length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "question_id", length = 36)
-    private String questionId;
+    @Column(name = "question_id")
+    private Long questionId;
 
     @Column(name = "question_text", length = 2048)
     private String questionText;
@@ -42,10 +44,10 @@ public class QuizAttemptAnswerEntity {
     @OrderColumn(name = "selection_order")
     private List<SelectedAnswerEmbeddable> selectedAnswers = new ArrayList<>();
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getQuestionId() { return questionId; }
-    public void setQuestionId(String questionId) { this.questionId = questionId; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getQuestionId() { return questionId; }
+    public void setQuestionId(Long questionId) { this.questionId = questionId; }
     public String getQuestionText() { return questionText; }
     public void setQuestionText(String questionText) { this.questionText = questionText; }
     public BigDecimal getQuestionWeight() { return questionWeight; }
@@ -57,8 +59,8 @@ public class QuizAttemptAnswerEntity {
 
     @Embeddable
     public static class SelectedAnswerEmbeddable {
-        @Column(name = "answer_id", length = 36)
-        private String answerId;
+        @Column(name = "answer_id")
+        private Long answerId;
 
         @Column(name = "answer_text", length = 1024)
         private String answerText;
@@ -66,8 +68,8 @@ public class QuizAttemptAnswerEntity {
         @Column(name = "was_knockout", nullable = false)
         private boolean wasKnockout;
 
-        public String getAnswerId() { return answerId; }
-        public void setAnswerId(String answerId) { this.answerId = answerId; }
+        public Long getAnswerId() { return answerId; }
+        public void setAnswerId(Long answerId) { this.answerId = answerId; }
         public String getAnswerText() { return answerText; }
         public void setAnswerText(String answerText) { this.answerText = answerText; }
         public boolean isWasKnockout() { return wasKnockout; }

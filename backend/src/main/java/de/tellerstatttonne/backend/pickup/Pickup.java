@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record Pickup(
-    String id,
-    String partnerId,
+    Long id,
+    Long partnerId,
     String partnerName,
     Partner.Category partnerCategory,
     String partnerStreet,
@@ -22,9 +22,9 @@ public record Pickup(
 ) {
     public enum Status { SCHEDULED, COMPLETED, CANCELLED }
 
-    public record Assignment(String memberId, String memberName, String memberAvatarUrl) {}
+    public record Assignment(Long memberId, String memberName, String memberAvatarUrl) {}
 
-    public Pickup withId(String newId) {
+    public Pickup withId(Long newId) {
         return new Pickup(newId, partnerId, partnerName, partnerCategory,
             partnerStreet, partnerCity, partnerLogoUrl, date,
             startTime, endTime, status, capacity, assignments, notes);

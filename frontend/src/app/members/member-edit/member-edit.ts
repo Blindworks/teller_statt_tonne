@@ -56,7 +56,7 @@ export class MemberEditComponent {
   readonly memberStatuses = MEMBER_STATUSES;
   readonly memberStatusLabels = MEMBER_STATUS_LABELS;
 
-  readonly memberId = signal<string | null>(null);
+  readonly memberId = signal<number | null>(null);
   readonly saving = signal(false);
   readonly deleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -76,8 +76,9 @@ export class MemberEditComponent {
         },
       });
 
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      const id = Number(idParam);
       this.memberId.set(id);
       this.service.get(id).subscribe({
         next: (member) => this.patchForm(member),

@@ -21,13 +21,13 @@ public class MemberAvailabilityController {
     }
 
     @GetMapping
-    public List<MemberAvailability> list(@PathVariable String memberId) {
+    public List<MemberAvailability> list(@PathVariable Long memberId) {
         return service.findByMemberId(memberId);
     }
 
     @PutMapping
     public List<MemberAvailability> replaceAll(
-        @PathVariable String memberId,
+        @PathVariable Long memberId,
         @RequestBody List<MemberAvailability> items
     ) {
         return service.replaceAll(memberId, items);

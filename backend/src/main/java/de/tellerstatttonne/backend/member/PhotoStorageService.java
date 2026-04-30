@@ -31,7 +31,7 @@ public class PhotoStorageService {
         }
     }
 
-    public String store(String memberId, MultipartFile file, String previousPhotoUrl) {
+    public String store(Long memberId, MultipartFile file, String previousPhotoUrl) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("file is required");
         }

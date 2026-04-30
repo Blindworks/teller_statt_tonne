@@ -1,7 +1,7 @@
 import { OnlineStatus, MemberStatus, MemberRole } from '../../members/member.model';
 
 export interface StoreMember {
-  id: string;
+  id: number;
   firstName: string;
   lastName: string;
   role: MemberRole;

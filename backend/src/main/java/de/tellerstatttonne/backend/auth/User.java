@@ -1,9 +1,9 @@
 package de.tellerstatttonne.backend.auth;
 
 public record User(
-    String id,
+    Long id,
     String email,
     Role role,
-    String memberId
+    Long memberId
 ) {
 }

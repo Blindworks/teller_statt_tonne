@@ -12,7 +12,6 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class AuthService {
     }
 
     public UserEntity ensureMemberLink(UserEntity user) {
-        if (user.getMemberId() != null && !user.getMemberId().isBlank()) {
+        if (user.getMemberId() != null) {
             return user;
         }
         Member created = memberService.createForUser(user.getEmail());
@@ -61,7 +60,6 @@ public class AuthService {
             throw new IllegalArgumentException("Email already registered");
         }
         UserEntity entity = new UserEntity();
-        entity.setId(UUID.randomUUID().toString());
         entity.setEmail(email);
         entity.setPasswordHash(passwordEncoder.encode(request.password()));
         entity.setRole(Role.USER);
@@ -97,7 +95,7 @@ public class AuthService {
         return buildAuthResponse(user);
     }
 
-    public void changePassword(String userId, String oldPassword, String newPassword) {
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
         UserEntity user = userRepository.findById(userId)
             .orElseThrow(() -> new BadCredentialsException("User not found"));
         if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
@@ -124,7 +122,6 @@ public class AuthService {
         String refreshToken = generateRefreshToken();
 
         RefreshTokenEntity entity = new RefreshTokenEntity();
-        entity.setId(UUID.randomUUID().toString());
         entity.setTokenHash(sha256(refreshToken));
         entity.setUserId(user.getId());
         entity.setExpiresAt(Instant.now().plus(refreshTtl));

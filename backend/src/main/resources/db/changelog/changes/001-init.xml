@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="001-create-partner" author="teller-statt-tonne">
+        <createTable tableName="partner">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(16)"/>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="logo_url" type="VARCHAR(1024)"/>
+            <column name="contact_name" type="VARCHAR(255)"/>
+            <column name="contact_email" type="VARCHAR(255)"/>
+            <column name="contact_phone" type="VARCHAR(64)"/>
+            <column name="status" type="VARCHAR(16)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-create-partner-pickup-slot" author="teller-statt-tonne">
+        <createTable tableName="partner_pickup_slot">
+            <column name="partner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weekday" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="VARCHAR(8)"/>
+            <column name="end_time" type="VARCHAR(8)"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="capacity" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="partner_pickup_slot" columnNames="partner_id, slot_order"
+                       constraintName="pk_partner_pickup_slot"/>
+        <addForeignKeyConstraint baseTableName="partner_pickup_slot" baseColumnNames="partner_id"
+                                 referencedTableName="partner" referencedColumnNames="id"
+                                 constraintName="fk_partner_pickup_slot_partner" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-member" author="teller-statt-tonne">
+        <createTable tableName="member">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(64)"/>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="photo_url" type="VARCHAR(1024)"/>
+            <column name="online_status" type="VARCHAR(16)" defaultValue="OFFLINE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(16)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-create-member-tag" author="teller-statt-tonne">
+        <createTable tableName="member_tag">
+            <column name="member_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag" type="VARCHAR(64)"/>
+        </createTable>
+        <addPrimaryKey tableName="member_tag" columnNames="member_id, tag_order"
+                       constraintName="pk_member_tag"/>
+        <addForeignKeyConstraint baseTableName="member_tag" baseColumnNames="member_id"
+                                 referencedTableName="member" referencedColumnNames="id"
+                                 constraintName="fk_member_tag_member" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-partner-member" author="teller-statt-tonne">
+        <createTable tableName="partner_member">
+            <column name="partner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="member_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="partner_member" columnNames="partner_id, member_id"
+                       constraintName="pk_partner_member"/>
+        <addForeignKeyConstraint baseTableName="partner_member" baseColumnNames="partner_id"
+                                 referencedTableName="partner" referencedColumnNames="id"
+                                 constraintName="fk_partner_member_partner" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="partner_member" baseColumnNames="member_id"
+                                 referencedTableName="member" referencedColumnNames="id"
+                                 constraintName="fk_partner_member_member" onDelete="CASCADE"/>
+        <createIndex tableName="partner_member" indexName="idx_partner_member_member">
+            <column name="member_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="001-create-member-availability" author="teller-statt-tonne">
+        <createTable tableName="member_availability">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"
+                             primaryKeyName="pk_member_availability"/>
+            </column>
+            <column name="member_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weekday" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="VARCHAR(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="VARCHAR(8)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="member_availability" baseColumnNames="member_id"
+                                 referencedTableName="member" referencedColumnNames="id"
+                                 constraintName="fk_member_availability_member" onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="member_availability"
+                             columnNames="member_id, weekday, start_time, end_time"
+                             constraintName="uq_member_availability"/>
+        <createIndex tableName="member_availability" indexName="idx_member_availability_match">
+            <column name="weekday"/>
+            <column name="start_time"/>
+            <column name="end_time"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="001-create-pickup" author="teller-statt-tonne">
+        <createTable tableName="pickup">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="partner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="VARCHAR(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="VARCHAR(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(16)" defaultValue="SCHEDULED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="capacity" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notes" type="VARCHAR(500)"/>
+            <column name="saved_kg" type="DECIMAL(10,2)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="pickup" baseColumnNames="partner_id"
+                                 referencedTableName="partner" referencedColumnNames="id"
+                                 constraintName="fk_pickup_partner" onDelete="CASCADE"/>
+        <createIndex tableName="pickup" indexName="idx_pickup_date">
+            <column name="pickup_date"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="001-create-pickup-assignment" author="teller-statt-tonne">
+        <createTable tableName="pickup_assignment">
+            <column name="pickup_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="member_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="pickup_assignment" columnNames="pickup_id, slot_order"
+                       constraintName="pk_pickup_assignment"/>
+        <addForeignKeyConstraint baseTableName="pickup_assignment" baseColumnNames="pickup_id"
+                                 referencedTableName="pickup" referencedColumnNames="id"
+                                 constraintName="fk_pickup_assignment_pickup" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-app-user" author="teller-statt-tonne">
+        <createTable tableName="app_user">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="member_id" type="BIGINT"/>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="app_user" baseColumnNames="member_id"
+                                 referencedTableName="member" referencedColumnNames="id"
+                                 constraintName="fk_app_user_member" onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="001-create-refresh-token" author="teller-statt-tonne">
+        <createTable tableName="refresh_token">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="token_hash" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="revoked" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="refresh_token" baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_refresh_token_user" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-quiz-question" author="teller-statt-tonne">
+        <createTable tableName="quiz_question">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="text" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight" type="DECIMAL(3,1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_index" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-create-quiz-answer" author="teller-statt-tonne">
+        <createTable tableName="quiz_answer">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="question_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_correct" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_knockout" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_index" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="quiz_answer" baseColumnNames="question_id"
+                                 referencedTableName="quiz_question" referencedColumnNames="id"
+                                 constraintName="fk_quiz_answer_question" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-quiz-result-category" author="teller-statt-tonne">
+        <createTable tableName="quiz_result_category">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="color" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="min_score" type="DECIMAL(5,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_score" type="DECIMAL(5,2)"/>
+            <column name="order_index" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-seed-quiz-result-category" author="teller-statt-tonne">
+        <insert tableName="quiz_result_category">
+            <column name="label" value="geeignet"/>
+            <column name="color" value="GREEN"/>
+            <column name="min_score" valueNumeric="0.0"/>
+            <column name="max_score" valueNumeric="1.0"/>
+            <column name="order_index" valueNumeric="0"/>
+        </insert>
+        <insert tableName="quiz_result_category">
+            <column name="label" value="Gespräch / Probeabholung"/>
+            <column name="color" value="YELLOW"/>
+            <column name="min_score" valueNumeric="1.5"/>
+            <column name="max_score" valueNumeric="2.0"/>
+            <column name="order_index" valueNumeric="1"/>
+        </insert>
+        <insert tableName="quiz_result_category">
+            <column name="label" value="nicht geeignet"/>
+            <column name="color" value="RED"/>
+            <column name="min_score" valueNumeric="2.5"/>
+            <column name="order_index" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="001-create-quiz-attempt" author="teller-statt-tonne">
+        <createTable tableName="quiz_attempt">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="applicant_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="applicant_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="DECIMAL(5,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="result_category_label" type="VARCHAR(64)"/>
+            <column name="result_color" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="knockout_triggered" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-create-quiz-attempt-answer" author="teller-statt-tonne">
+        <createTable tableName="quiz_attempt_answer">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="attempt_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="question_id" type="BIGINT"/>
+            <column name="question_text" type="VARCHAR(2048)"/>
+            <column name="question_weight" type="DECIMAL(3,1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="was_correct" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_index" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="quiz_attempt_answer" baseColumnNames="attempt_id"
+                                 referencedTableName="quiz_attempt" referencedColumnNames="id"
+                                 constraintName="fk_quiz_attempt_answer_attempt" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-quiz-attempt-selected" author="teller-statt-tonne">
+        <createTable tableName="quiz_attempt_selected_answer">
+            <column name="attempt_answer_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="selection_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="answer_id" type="BIGINT"/>
+            <column name="answer_text" type="VARCHAR(1024)"/>
+            <column name="was_knockout" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="quiz_attempt_selected_answer"
+                       columnNames="attempt_answer_id, selection_order"
+                       constraintName="pk_quiz_attempt_selected_answer"/>
+        <addForeignKeyConstraint baseTableName="quiz_attempt_selected_answer"
+                                 baseColumnNames="attempt_answer_id"
+                                 referencedTableName="quiz_attempt_answer"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_quiz_attempt_selected_attempt_answer"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

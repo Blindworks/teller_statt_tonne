@@ -56,7 +56,7 @@ public class AuthController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        String userId = authentication.getName();
+        Long userId = Long.parseLong(authentication.getName());
         return userRepository.findById(userId)
             .map(authService::ensureMemberLink)
             .map(authService::toDto)
@@ -72,7 +72,7 @@ public class AuthController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        authService.changePassword(authentication.getName(), request.oldPassword(), request.newPassword());
+        authService.changePassword(Long.parseLong(authentication.getName()), request.oldPassword(), request.newPassword());
         return ResponseEntity.noContent().build();
     }
 

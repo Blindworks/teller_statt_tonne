@@ -5,128 +5,124 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
 
-    <changeSet id="007-seed-quiz-questions" author="teller-statt-tonne">
+    <changeSet id="002-seed-quiz-questions" author="teller-statt-tonne">
         <insert tableName="quiz_question">
-            <column name="id" value="q0000001-0000-0000-0000-000000000001"/>
+            <column name="id" valueNumeric="1"/>
             <column name="text" value="Frage 1 – Motivation: Warum möchtest du bei „Teller statt Tonne“ mitmachen?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000002-0000-0000-0000-000000000002"/>
+            <column name="id" valueNumeric="2"/>
             <column name="text" value="Frage 2 – Grundverständnis: Was bedeutet Lebensmittelrettung im Rahmen des Vereins?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000003-0000-0000-0000-000000000003"/>
+            <column name="id" valueNumeric="3"/>
             <column name="text" value="Frage 3 – Umgang mit geretteten Lebensmitteln: Wie gehst du mit geretteten Lebensmitteln um, die du selbst nicht verbrauchen kannst?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000004-0000-0000-0000-000000000004"/>
+            <column name="id" valueNumeric="4"/>
             <column name="text" value="Frage 4 – Verantwortung gegenüber Betrieben: Was ist im Umgang mit kooperierenden Betrieben besonders wichtig?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="3"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000005-0000-0000-0000-000000000005"/>
+            <column name="id" valueNumeric="5"/>
             <column name="text" value="Frage 5 – Auftreten: Wie solltest du dich bei einer Abholung im Betrieb verhalten?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="4"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000006-0000-0000-0000-000000000006"/>
+            <column name="id" valueNumeric="6"/>
             <column name="text" value="Frage 6 – Vorbereitung: Was gehört zu einer guten Vorbereitung auf eine Abholung?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="5"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000007-0000-0000-0000-000000000007"/>
+            <column name="id" valueNumeric="7"/>
             <column name="text" value="Frage 7 – Verhalten im Betrieb: Wie gehst du im Betrieb vor?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="6"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000008-0000-0000-0000-000000000008"/>
+            <column name="id" valueNumeric="8"/>
             <column name="text" value="Frage 8 – Hygiene: Was ist im Umgang mit geretteten Lebensmitteln besonders wichtig?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="7"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000009-0000-0000-0000-000000000009"/>
+            <column name="id" valueNumeric="9"/>
             <column name="text" value="Frage 9 – Weitergabe: Was ist im Rahmen des Vereins erlaubt?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="8"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000010-0000-0000-0000-000000000010"/>
+            <column name="id" valueNumeric="10"/>
             <column name="text" value="Frage 10 – Zuverlässigkeit: Warum ist Verlässlichkeit bei Abholungen wichtig?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="9"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000011-0000-0000-0000-000000000011"/>
+            <column name="id" valueNumeric="11"/>
             <column name="text" value="Frage 11 – Unklare Situation: Du bist dir unsicher, ob bestimmte Lebensmittel zur Abholung gehören. Wie gehst du vor?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="10"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000012-0000-0000-0000-000000000012"/>
+            <column name="id" valueNumeric="12"/>
             <column name="text" value="Frage 12 – Verspätung: Du merkst, dass du dich zu einer Abholung verspäten wirst. Was ist angemessen?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="11"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000013-0000-0000-0000-000000000013"/>
+            <column name="id" valueNumeric="13"/>
             <column name="text" value="Frage 13 – Grenzfall Hygiene (Praxisfall): Eine Verpackung ist beschädigt (z. B. aufgerissen oder angenagt), der Inhalt wirkt äußerlich unauffällig. Wie gehst du vor?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="12"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000014-0000-0000-0000-000000000014"/>
+            <column name="id" valueNumeric="14"/>
             <column name="text" value="Frage 14 – Verantwortung bei Weitergabe: Was ist bei der Weitergabe geretteter Lebensmittel wichtig?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="13"/>
         </insert>
         <insert tableName="quiz_question">
-            <column name="id" value="q0000015-0000-0000-0000-000000000015"/>
+            <column name="id" valueNumeric="15"/>
             <column name="text" value="Frage 15 – Rolle des Vereins: Welche Rolle hat der Verein über die reine Lebensmittelrettung hinaus?"/>
             <column name="weight" valueNumeric="0.5"/>
             <column name="order_index" valueNumeric="14"/>
         </insert>
     </changeSet>
 
-    <changeSet id="007-seed-quiz-answers" author="teller-statt-tonne">
+    <changeSet id="002-seed-quiz-answers" author="teller-statt-tonne">
         <!-- Frage 1 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000001-0000-0000-0000-000000000101"/>
-            <column name="question_id" value="q0000001-0000-0000-0000-000000000001"/>
+            <column name="question_id" valueNumeric="1"/>
             <column name="text" value="Ich möchte aktiv dazu beitragen, Lebensmittelverschwendung zu reduzieren"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000001-0000-0000-0000-000000000102"/>
-            <column name="question_id" value="q0000001-0000-0000-0000-000000000001"/>
+            <column name="question_id" valueNumeric="1"/>
             <column name="text" value="Ich sehe darin vor allem eine Möglichkeit, meinen eigenen Bedarf zu decken"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000001-0000-0000-0000-000000000103"/>
-            <column name="question_id" value="q0000001-0000-0000-0000-000000000001"/>
+            <column name="question_id" valueNumeric="1"/>
             <column name="text" value="Ich interessiere mich für nachhaltigen Umgang mit Ressourcen"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000001-0000-0000-0000-000000000104"/>
-            <column name="question_id" value="q0000001-0000-0000-0000-000000000001"/>
+            <column name="question_id" valueNumeric="1"/>
             <column name="text" value="Ich möchte möglichst unkompliziert an Lebensmittel kommen"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -135,32 +131,28 @@
 
         <!-- Frage 2 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000002-0000-0000-0000-000000000201"/>
-            <column name="question_id" value="q0000002-0000-0000-0000-000000000002"/>
+            <column name="question_id" valueNumeric="2"/>
             <column name="text" value="Lebensmittel vor der Entsorgung bewahren"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000002-0000-0000-0000-000000000202"/>
-            <column name="question_id" value="q0000002-0000-0000-0000-000000000002"/>
+            <column name="question_id" valueNumeric="2"/>
             <column name="text" value="Sich einen möglichst großen Anteil sichern"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000002-0000-0000-0000-000000000203"/>
-            <column name="question_id" value="q0000002-0000-0000-0000-000000000002"/>
+            <column name="question_id" valueNumeric="2"/>
             <column name="text" value="Verantwortungsvoll mit Lebensmitteln und Ressourcen umgehen"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000002-0000-0000-0000-000000000204"/>
-            <column name="question_id" value="q0000002-0000-0000-0000-000000000002"/>
+            <column name="question_id" valueNumeric="2"/>
             <column name="text" value="Hauptsache, die Lebensmittel sind kostenlos"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -169,32 +161,28 @@
 
         <!-- Frage 3 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000003-0000-0000-0000-000000000301"/>
-            <column name="question_id" value="q0000003-0000-0000-0000-000000000003"/>
+            <column name="question_id" valueNumeric="3"/>
             <column name="text" value="Ich gebe sie im Rahmen der Vereinsregeln an andere weiter (z. B. Verteilerkreis)"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000003-0000-0000-0000-000000000302"/>
-            <column name="question_id" value="q0000003-0000-0000-0000-000000000003"/>
+            <column name="question_id" valueNumeric="3"/>
             <column name="text" value="Ich behalte sie vorsorglich, falls ich sie doch noch nutzen kann"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000003-0000-0000-0000-000000000303"/>
-            <column name="question_id" value="q0000003-0000-0000-0000-000000000003"/>
+            <column name="question_id" valueNumeric="3"/>
             <column name="text" value="Ich gebe sie an Personen oder Organisationen weiter, die sie sinnvoll nutzen"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000003-0000-0000-0000-000000000304"/>
-            <column name="question_id" value="q0000003-0000-0000-0000-000000000003"/>
+            <column name="question_id" valueNumeric="3"/>
             <column name="text" value="Ich entsorge sie, wenn sie mir zu viel werden"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -203,32 +191,28 @@
 
         <!-- Frage 4 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000004-0000-0000-0000-000000000401"/>
-            <column name="question_id" value="q0000004-0000-0000-0000-000000000004"/>
+            <column name="question_id" valueNumeric="4"/>
             <column name="text" value="Dass die Abholung für mich möglichst einfach ist"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000004-0000-0000-0000-000000000402"/>
-            <column name="question_id" value="q0000004-0000-0000-0000-000000000004"/>
+            <column name="question_id" valueNumeric="4"/>
             <column name="text" value="Dass der Betrieb sich auf uns verlassen kann"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000004-0000-0000-0000-000000000403"/>
-            <column name="question_id" value="q0000004-0000-0000-0000-000000000004"/>
+            <column name="question_id" valueNumeric="4"/>
             <column name="text" value="Dass Vertrauen aufgebaut und erhalten wird"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000004-0000-0000-0000-000000000404"/>
-            <column name="question_id" value="q0000004-0000-0000-0000-000000000004"/>
+            <column name="question_id" valueNumeric="4"/>
             <column name="text" value="Dass möglichst viele Lebensmittel mitgenommen werden"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -237,32 +221,28 @@
 
         <!-- Frage 5 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000005-0000-0000-0000-000000000501"/>
-            <column name="question_id" value="q0000005-0000-0000-0000-000000000005"/>
+            <column name="question_id" valueNumeric="5"/>
             <column name="text" value="Ruhig, respektvoll und möglichst unauffällig"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000005-0000-0000-0000-000000000502"/>
-            <column name="question_id" value="q0000005-0000-0000-0000-000000000005"/>
+            <column name="question_id" valueNumeric="5"/>
             <column name="text" value="Eigenständig entscheiden, wenn es schneller geht"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000005-0000-0000-0000-000000000503"/>
-            <column name="question_id" value="q0000005-0000-0000-0000-000000000005"/>
+            <column name="question_id" valueNumeric="5"/>
             <column name="text" value="Freundlich, zurückhaltend und verlässlich"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000005-0000-0000-0000-000000000504"/>
-            <column name="question_id" value="q0000005-0000-0000-0000-000000000005"/>
+            <column name="question_id" valueNumeric="5"/>
             <column name="text" value="Situativ so handeln, wie es für mich passt"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -271,32 +251,28 @@
 
         <!-- Frage 6 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000006-0000-0000-0000-000000000601"/>
-            <column name="question_id" value="q0000006-0000-0000-0000-000000000006"/>
+            <column name="question_id" valueNumeric="6"/>
             <column name="text" value="Ich erscheine einfach zum Termin"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000006-0000-0000-0000-000000000602"/>
-            <column name="question_id" value="q0000006-0000-0000-0000-000000000006"/>
+            <column name="question_id" valueNumeric="6"/>
             <column name="text" value="Ich informiere mich vorab über aktuelle Abläufe oder Hinweise"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000006-0000-0000-0000-000000000603"/>
-            <column name="question_id" value="q0000006-0000-0000-0000-000000000006"/>
+            <column name="question_id" valueNumeric="6"/>
             <column name="text" value="Ich bringe geeignete Behälter und Transportmöglichkeiten mit"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000006-0000-0000-0000-000000000604"/>
-            <column name="question_id" value="q0000006-0000-0000-0000-000000000006"/>
+            <column name="question_id" valueNumeric="6"/>
             <column name="text" value="Vorbereitung ist zweitrangig, wichtig ist nur die Abholung"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -305,32 +281,28 @@
 
         <!-- Frage 7 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000007-0000-0000-0000-000000000701"/>
-            <column name="question_id" value="q0000007-0000-0000-0000-000000000007"/>
+            <column name="question_id" valueNumeric="7"/>
             <column name="text" value="Ich orientiere mich eigenständig und nehme, was bereitsteht"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000007-0000-0000-0000-000000000702"/>
-            <column name="question_id" value="q0000007-0000-0000-0000-000000000007"/>
+            <column name="question_id" valueNumeric="7"/>
             <column name="text" value="Ich melde mich beim Personal und halte mich an Absprachen"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000007-0000-0000-0000-000000000703"/>
-            <column name="question_id" value="q0000007-0000-0000-0000-000000000007"/>
+            <column name="question_id" valueNumeric="7"/>
             <column name="text" value="Ich greife ein, wenn ich etwas für falsch halte"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000007-0000-0000-0000-000000000704"/>
-            <column name="question_id" value="q0000007-0000-0000-0000-000000000007"/>
+            <column name="question_id" valueNumeric="7"/>
             <column name="text" value="Ich verhalte mich ruhig und abgestimmt mit dem Betrieb"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -339,32 +311,28 @@
 
         <!-- Frage 8 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000008-0000-0000-0000-000000000801"/>
-            <column name="question_id" value="q0000008-0000-0000-0000-000000000008"/>
+            <column name="question_id" valueNumeric="8"/>
             <column name="text" value="Sauberes und hygienisches Arbeiten"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000008-0000-0000-0000-000000000802"/>
-            <column name="question_id" value="q0000008-0000-0000-0000-000000000008"/>
+            <column name="question_id" valueNumeric="8"/>
             <column name="text" value="Möglichst alles weitergeben, um nichts zu verschwenden"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000008-0000-0000-0000-000000000803"/>
-            <column name="question_id" value="q0000008-0000-0000-0000-000000000008"/>
+            <column name="question_id" valueNumeric="8"/>
             <column name="text" value="Im Zweifel Lebensmittel aussortieren"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000008-0000-0000-0000-000000000804"/>
-            <column name="question_id" value="q0000008-0000-0000-0000-000000000008"/>
+            <column name="question_id" valueNumeric="8"/>
             <column name="text" value="Hygiene ist nachrangig"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -373,32 +341,28 @@
 
         <!-- Frage 9 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000009-0000-0000-0000-000000000901"/>
-            <column name="question_id" value="q0000009-0000-0000-0000-000000000009"/>
+            <column name="question_id" valueNumeric="9"/>
             <column name="text" value="Weitergabe ohne Gegenleistung (z. B. verschenken)"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000009-0000-0000-0000-000000000902"/>
-            <column name="question_id" value="q0000009-0000-0000-0000-000000000009"/>
+            <column name="question_id" valueNumeric="9"/>
             <column name="text" value="Verkauf einzelner Produkte, wenn sie noch gut sind"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000009-0000-0000-0000-000000000903"/>
-            <column name="question_id" value="q0000009-0000-0000-0000-000000000009"/>
+            <column name="question_id" valueNumeric="9"/>
             <column name="text" value="Nutzung im eigenen Haushalt"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000009-0000-0000-0000-000000000904"/>
-            <column name="question_id" value="q0000009-0000-0000-0000-000000000009"/>
+            <column name="question_id" valueNumeric="9"/>
             <column name="text" value="Weitergabe gegen kleine Gegenleistungen"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -407,32 +371,28 @@
 
         <!-- Frage 10 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000010-0000-0000-0000-000000001001"/>
-            <column name="question_id" value="q0000010-0000-0000-0000-000000000010"/>
+            <column name="question_id" valueNumeric="10"/>
             <column name="text" value="Weil Abläufe im Betrieb darauf abgestimmt sind"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000010-0000-0000-0000-000000001002"/>
-            <column name="question_id" value="q0000010-0000-0000-0000-000000000010"/>
+            <column name="question_id" valueNumeric="10"/>
             <column name="text" value="Weil ich selbst flexibel bleiben möchte"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000010-0000-0000-0000-000000001003"/>
-            <column name="question_id" value="q0000010-0000-0000-0000-000000000010"/>
+            <column name="question_id" valueNumeric="10"/>
             <column name="text" value="Weil Verspätungen oder Ausfälle Auswirkungen auf den Betrieb haben"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000010-0000-0000-0000-000000001004"/>
-            <column name="question_id" value="q0000010-0000-0000-0000-000000000010"/>
+            <column name="question_id" valueNumeric="10"/>
             <column name="text" value="Weil es nur gelegentlich relevant ist"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -441,32 +401,28 @@
 
         <!-- Frage 11 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000011-0000-0000-0000-000000001101"/>
-            <column name="question_id" value="q0000011-0000-0000-0000-000000000011"/>
+            <column name="question_id" valueNumeric="11"/>
             <column name="text" value="Ich nehme sie mit, wenn sie noch gut erscheinen"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000011-0000-0000-0000-000000001102"/>
-            <column name="question_id" value="q0000011-0000-0000-0000-000000000011"/>
+            <column name="question_id" valueNumeric="11"/>
             <column name="text" value="Ich kläre die Situation mit dem Personal oder der zuständigen Person"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000011-0000-0000-0000-000000001103"/>
-            <column name="question_id" value="q0000011-0000-0000-0000-000000000011"/>
+            <column name="question_id" valueNumeric="11"/>
             <column name="text" value="Ich entscheide nach eigener Einschätzung"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000011-0000-0000-0000-000000001104"/>
-            <column name="question_id" value="q0000011-0000-0000-0000-000000000011"/>
+            <column name="question_id" valueNumeric="11"/>
             <column name="text" value="Ich nehme sie vorsichtshalber nicht mit, ohne nachzufragen"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -475,32 +431,28 @@
 
         <!-- Frage 12 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000012-0000-0000-0000-000000001201"/>
-            <column name="question_id" value="q0000012-0000-0000-0000-000000000012"/>
+            <column name="question_id" valueNumeric="12"/>
             <column name="text" value="Ich komme später, ohne Bescheid zu geben"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000012-0000-0000-0000-000000001202"/>
-            <column name="question_id" value="q0000012-0000-0000-0000-000000000012"/>
+            <column name="question_id" valueNumeric="12"/>
             <column name="text" value="Ich informiere das Team rechtzeitig"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000012-0000-0000-0000-000000001203"/>
-            <column name="question_id" value="q0000012-0000-0000-0000-000000000012"/>
+            <column name="question_id" valueNumeric="12"/>
             <column name="text" value="Ich informiere den Betrieb, wenn nötig"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000012-0000-0000-0000-000000001204"/>
-            <column name="question_id" value="q0000012-0000-0000-0000-000000000012"/>
+            <column name="question_id" valueNumeric="12"/>
             <column name="text" value="Ich lasse die Abholung ausfallen"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -509,32 +461,28 @@
 
         <!-- Frage 13 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000013-0000-0000-0000-000000001301"/>
-            <column name="question_id" value="q0000013-0000-0000-0000-000000000013"/>
+            <column name="question_id" valueNumeric="13"/>
             <column name="text" value="Ich gebe das Produkt weiter, da es noch nutzbar sein könnte"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000013-0000-0000-0000-000000001302"/>
-            <column name="question_id" value="q0000013-0000-0000-0000-000000000013"/>
+            <column name="question_id" valueNumeric="13"/>
             <column name="text" value="Ich prüfe den Zustand sorgfältig und entscheide im Zweifel gegen eine Weitergabe"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000013-0000-0000-0000-000000001303"/>
-            <column name="question_id" value="q0000013-0000-0000-0000-000000000013"/>
+            <column name="question_id" valueNumeric="13"/>
             <column name="text" value="Ich überlasse die Entscheidung den Empfängern"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000013-0000-0000-0000-000000001304"/>
-            <column name="question_id" value="q0000013-0000-0000-0000-000000000013"/>
+            <column name="question_id" valueNumeric="13"/>
             <column name="text" value="Ich nehme es mit, um es später selbst zu beurteilen"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -543,32 +491,28 @@
 
         <!-- Frage 14 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000014-0000-0000-0000-000000001401"/>
-            <column name="question_id" value="q0000014-0000-0000-0000-000000000014"/>
+            <column name="question_id" valueNumeric="14"/>
             <column name="text" value="Den Zustand realistisch einschätzen und transparent kommunizieren"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000014-0000-0000-0000-000000001402"/>
-            <column name="question_id" value="q0000014-0000-0000-0000-000000000014"/>
+            <column name="question_id" valueNumeric="14"/>
             <column name="text" value="Möglichst alles weitergeben, um nichts zu verlieren"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000014-0000-0000-0000-000000001403"/>
-            <column name="question_id" value="q0000014-0000-0000-0000-000000000014"/>
+            <column name="question_id" valueNumeric="14"/>
             <column name="text" value="Im Zweifel verantwortungsvoll aussortieren"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000014-0000-0000-0000-000000001404"/>
-            <column name="question_id" value="q0000014-0000-0000-0000-000000000014"/>
+            <column name="question_id" valueNumeric="14"/>
             <column name="text" value="Die Entscheidung vollständig an andere abgeben"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
@@ -577,32 +521,28 @@
 
         <!-- Frage 15 -->
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000015-0000-0000-0000-000000001501"/>
-            <column name="question_id" value="q0000015-0000-0000-0000-000000000015"/>
+            <column name="question_id" valueNumeric="15"/>
             <column name="text" value="Bewusstsein für Lebensmittelverschwendung schaffen"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="0"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000015-0000-0000-0000-000000001502"/>
-            <column name="question_id" value="q0000015-0000-0000-0000-000000000015"/>
+            <column name="question_id" valueNumeric="15"/>
             <column name="text" value="In erster Linie die eigenen Mitglieder versorgen"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="1"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000015-0000-0000-0000-000000001503"/>
-            <column name="question_id" value="q0000015-0000-0000-0000-000000000015"/>
+            <column name="question_id" valueNumeric="15"/>
             <column name="text" value="Vorbild im Umgang mit Ressourcen sein"/>
             <column name="is_correct" valueBoolean="true"/>
             <column name="is_knockout" valueBoolean="false"/>
             <column name="order_index" valueNumeric="2"/>
         </insert>
         <insert tableName="quiz_answer">
-            <column name="id" value="a0000015-0000-0000-0000-000000001504"/>
-            <column name="question_id" value="q0000015-0000-0000-0000-000000000015"/>
+            <column name="question_id" valueNumeric="15"/>
             <column name="text" value="Öffentlich möglichst wenig auffallen"/>
             <column name="is_correct" valueBoolean="false"/>
             <column name="is_knockout" valueBoolean="false"/>

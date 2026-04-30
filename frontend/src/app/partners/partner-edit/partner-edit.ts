@@ -67,7 +67,7 @@ export class PartnerEditComponent {
   readonly categoryLabels = CATEGORY_LABELS;
   readonly categories: Category[] = ['BAKERY', 'SUPERMARKET', 'CAFE', 'RESTAURANT'];
 
-  readonly partnerId = signal<string | null>(null);
+  readonly partnerId = signal<number | null>(null);
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly latitude = signal<number | null>(null);
@@ -79,8 +79,9 @@ export class PartnerEditComponent {
   readonly form: PartnerForm = this.buildForm();
 
   constructor() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      const id = Number(idParam);
       this.partnerId.set(id);
       this.service.get(id).subscribe({
         next: (partner) => this.patchForm(partner),

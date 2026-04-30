@@ -32,7 +32,7 @@ public class PartnerController {
     }
 
     @GetMapping("/member-counts")
-    public Map<String, Integer> memberCounts() {
+    public Map<Long, Integer> memberCounts() {
         return partnerRepository.countMembersGroupedByPartner().stream()
             .collect(Collectors.toMap(
                 PartnerRepository.MemberCountRow::getPartnerId,
@@ -41,7 +41,7 @@ public class PartnerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Partner> get(@PathVariable String id) {
+    public ResponseEntity<Partner> get(@PathVariable Long id) {
         return service.findById(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
@@ -54,21 +54,21 @@ public class PartnerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Partner> update(@PathVariable String id, @RequestBody Partner partner) {
+    public ResponseEntity<Partner> update(@PathVariable Long id, @RequestBody Partner partner) {
         return service.update(id, partner)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{id}/geocode")
-    public ResponseEntity<Partner> regeocode(@PathVariable String id) {
+    public ResponseEntity<Partner> regeocode(@PathVariable Long id) {
         return service.regeocode(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 

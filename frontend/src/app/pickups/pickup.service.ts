@@ -23,7 +23,7 @@ export class PickupService {
     return this.http.get<Pickup[]>(`${this.baseUrl}/upcoming`, { params });
   }
 
-  get(id: string): Observable<Pickup> {
+  get(id: number): Observable<Pickup> {
     return this.http.get<Pickup>(`${this.baseUrl}/${id}`);
   }
 
@@ -31,11 +31,11 @@ export class PickupService {
     return this.http.post<Pickup>(this.baseUrl, pickup);
   }
 
-  update(id: string, pickup: Pickup): Observable<Pickup> {
+  update(id: number, pickup: Pickup): Observable<Pickup> {
     return this.http.put<Pickup>(`${this.baseUrl}/${id}`, pickup);
   }
 
-  delete(id: string): Observable<void> {
+  delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

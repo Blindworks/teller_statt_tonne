@@ -5,16 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
 
-    <include file="db/changelog/changes/001-create-partner.xml"/>
-    <include file="db/changelog/changes/002-create-member.xml"/>
-    <include file="db/changelog/changes/003-create-pickup.xml"/>
-    <include file="db/changelog/changes/004-add-partner-coordinates.xml"/>
-    <include file="db/changelog/changes/005-create-user.xml"/>
-    <include file="db/changelog/changes/006-create-quiz.xml"/>
-    <include file="db/changelog/changes/007-seed-quiz-questions.xml"/>
-    <include file="db/changelog/changes/008-member-rename-type-drop-role-title.xml"/>
-    <include file="db/changelog/changes/009-create-partner-member.xml"/>
-    <include file="db/changelog/changes/010-create-member-availability.xml"/>
-    <include file="db/changelog/changes/011-add-pickup-slot-capacity.xml"/>
+    <include file="db/changelog/changes/001-init.xml"/>
+    <include file="db/changelog/changes/002-seed-quiz.xml"/>
 
 </databaseChangeLog>

@@ -1,7 +1,6 @@
 package de.tellerstatttonne.backend.auth;
 
 import java.time.Instant;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +44,6 @@ public class AdminInitializer implements CommandLineRunner {
             },
             () -> {
                 UserEntity admin = new UserEntity();
-                admin.setId(UUID.randomUUID().toString());
                 admin.setEmail(adminEmail);
                 admin.setPasswordHash(passwordEncoder.encode(adminPassword));
                 admin.setRole(Role.ADMIN);

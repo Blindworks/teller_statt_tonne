@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,10 +32,10 @@ public class QuizService {
         validateSubmission(submission);
 
         List<QuestionEntity> questions = questionRepository.findAllByOrderByOrderIndexAsc();
-        Map<String, QuestionEntity> questionsById = questions.stream()
+        Map<Long, QuestionEntity> questionsById = questions.stream()
             .collect(Collectors.toMap(QuestionEntity::getId, q -> q));
 
-        Map<String, QuizSubmission.SubmittedAnswer> submittedById = submission.answers() == null
+        Map<Long, QuizSubmission.SubmittedAnswer> submittedById = submission.answers() == null
             ? Map.of()
             : submission.answers().stream()
                 .filter(a -> a.questionId() != null)
@@ -49,32 +48,30 @@ public class QuizService {
         boolean knockout = false;
 
         QuizAttemptEntity attempt = new QuizAttemptEntity();
-        attempt.setId(UUID.randomUUID().toString());
         attempt.setApplicantName(submission.applicantName().trim());
         attempt.setApplicantEmail(submission.applicantEmail().trim());
         attempt.setCompletedAt(Instant.now());
 
         for (QuestionEntity question : questions) {
             QuizSubmission.SubmittedAnswer submitted = submittedById.get(question.getId());
-            Set<String> selectedIds = submitted == null || submitted.selectedAnswerIds() == null
+            Set<Long> selectedIds = submitted == null || submitted.selectedAnswerIds() == null
                 ? Set.of()
                 : new HashSet<>(submitted.selectedAnswerIds());
 
-            Map<String, AnswerEntity> answersById = question.getAnswers().stream()
+            Map<Long, AnswerEntity> answersById = question.getAnswers().stream()
                 .collect(Collectors.toMap(AnswerEntity::getId, a -> a));
 
-            Set<String> correctIds = question.getAnswers().stream()
+            Set<Long> correctIds = question.getAnswers().stream()
                 .filter(AnswerEntity::isCorrect)
                 .map(AnswerEntity::getId)
                 .collect(Collectors.toSet());
 
             QuizAttemptAnswerEntity attemptAnswer = new QuizAttemptAnswerEntity();
-            attemptAnswer.setId(UUID.randomUUID().toString());
             attemptAnswer.setQuestionId(question.getId());
             attemptAnswer.setQuestionText(question.getText());
             attemptAnswer.setQuestionWeight(question.getWeight());
 
-            for (String selectedId : selectedIds) {
+            for (Long selectedId : selectedIds) {
                 AnswerEntity ans = answersById.get(selectedId);
                 QuizAttemptAnswerEntity.SelectedAnswerEmbeddable sel =
                     new QuizAttemptAnswerEntity.SelectedAnswerEmbeddable();
@@ -140,7 +137,7 @@ public class QuizService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.Optional<QuizAttempt> findAttempt(String id) {
+    public java.util.Optional<QuizAttempt> findAttempt(Long id) {
         return attemptRepository.findById(id).map(QuizMapper::toDto);
     }
 

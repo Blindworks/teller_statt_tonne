@@ -57,7 +57,7 @@ export class QuizCategoriesComponent {
     });
   }
 
-  delete(id: string): void {
+  delete(id: number): void {
     if (!confirm('Kategorie löschen?')) return;
     this.service.deleteCategory(id).subscribe({
       next: () => this.load(),
@@ -65,7 +65,7 @@ export class QuizCategoriesComponent {
     });
   }
 
-  trackById(_: number, c: QuizResultCategory): string {
-    return c.id ?? '';
+  trackById(_: number, c: QuizResultCategory): number {
+    return c.id ?? 0;
   }
 }

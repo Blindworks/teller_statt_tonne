@@ -18,7 +18,7 @@ export class QuizComponent {
   readonly applicantName = signal('');
   readonly applicantEmail = signal('');
   readonly questions = signal<QuizQuestion[]>([]);
-  readonly selections = signal<Record<string, Set<string>>>({});
+  readonly selections = signal<Record<number, Set<number>>>({});
   readonly result = signal<QuizResult | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly loading = signal(false);
@@ -44,10 +44,10 @@ export class QuizComponent {
         this.selections.set(
           qs.reduce(
             (acc, q) => {
-              if (q.id) acc[q.id] = new Set<string>();
+              if (q.id != null) acc[q.id] = new Set<number>();
               return acc;
             },
-            {} as Record<string, Set<string>>,
+            {} as Record<number, Set<number>>,
           ),
         );
         this.loading.set(false);
@@ -66,11 +66,11 @@ export class QuizComponent {
     });
   }
 
-  isSelected(questionId: string, answerId: string): boolean {
+  isSelected(questionId: number, answerId: number): boolean {
     return this.selections()[questionId]?.has(answerId) ?? false;
   }
 
-  toggle(questionId: string, answerId: string): void {
+  toggle(questionId: number, answerId: number): void {
     const current = this.selections();
     const set = new Set(current[questionId] ?? []);
     if (set.has(answerId)) {
@@ -83,10 +83,10 @@ export class QuizComponent {
 
   submit(): void {
     const answers: SubmittedAnswer[] = this.questions()
-      .filter((q) => q.id)
+      .filter((q) => q.id != null)
       .map((q) => ({
-        questionId: q.id as string,
-        selectedAnswerIds: Array.from(this.selections()[q.id as string] ?? []),
+        questionId: q.id as number,
+        selectedAnswerIds: Array.from(this.selections()[q.id as number] ?? []),
       }));
 
     this.loading.set(true);

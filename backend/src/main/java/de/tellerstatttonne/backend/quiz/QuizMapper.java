@@ -1,7 +1,6 @@
 package de.tellerstatttonne.backend.quiz;
 
 import java.util.List;
-import java.util.UUID;
 
 final class QuizMapper {
 
@@ -24,7 +23,9 @@ final class QuizMapper {
         if (src.answers() != null) {
             for (Answer a : src.answers()) {
                 AnswerEntity entity = new AnswerEntity();
-                entity.setId(a.id() != null && !a.id().isBlank() ? a.id() : UUID.randomUUID().toString());
+                if (a.id() != null) {
+                    entity.setId(a.id());
+                }
                 entity.setText(a.text());
                 entity.setCorrect(Boolean.TRUE.equals(a.isCorrect()));
                 entity.setKnockout(Boolean.TRUE.equals(a.isKnockout()));

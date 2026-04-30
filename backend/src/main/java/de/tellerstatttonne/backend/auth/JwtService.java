@@ -32,7 +32,7 @@ public class JwtService {
     public String generateAccessToken(UserEntity user) {
         Instant now = Instant.now();
         return Jwts.builder()
-            .subject(user.getId())
+            .subject(String.valueOf(user.getId()))
             .claim("email", user.getEmail())
             .claim("role", user.getRole().name())
             .issuedAt(Date.from(now))

@@ -4,7 +4,6 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,14 +42,13 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Member> findById(String id) {
+    public Optional<Member> findById(Long id) {
         return repository.findById(id).map(MemberMapper::toDto);
     }
 
     public Member create(Member member) {
         validate(member);
         MemberEntity entity = new MemberEntity();
-        entity.setId(UUID.randomUUID().toString());
         MemberMapper.applyToEntity(entity, member);
         return MemberMapper.toDto(repository.save(entity));
     }
@@ -59,7 +57,6 @@ public class MemberService {
         String localPart = email == null ? "" : email.split("@", 2)[0];
         String firstName = localPart.isBlank() ? "Neues" : capitalize(localPart);
         MemberEntity entity = new MemberEntity();
-        entity.setId(UUID.randomUUID().toString());
         entity.setFirstName(firstName);
         entity.setLastName("Mitglied");
         entity.setRole(MemberRole.NEW_MEMBER);
@@ -72,7 +69,7 @@ public class MemberService {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
-    public Optional<Member> update(String id, Member member) {
+    public Optional<Member> update(Long id, Member member) {
         return repository.findById(id).map(entity -> {
             validate(member);
             MemberMapper.applyToEntity(entity, member);
@@ -80,7 +77,7 @@ public class MemberService {
         });
     }
 
-    public Optional<Member> updatePhotoUrl(String id, String photoUrl) {
+    public Optional<Member> updatePhotoUrl(Long id, String photoUrl) {
         return repository.findById(id).map(entity -> {
             entity.setPhotoUrl(photoUrl);
             return MemberMapper.toDto(repository.save(entity));
@@ -88,11 +85,11 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<String> findPhotoUrl(String id) {
+    public Optional<String> findPhotoUrl(Long id) {
         return repository.findById(id).map(MemberEntity::getPhotoUrl);
     }
 
-    public boolean delete(String id) {
+    public boolean delete(Long id) {
         if (!repository.existsById(id)) {
             return false;
         }
