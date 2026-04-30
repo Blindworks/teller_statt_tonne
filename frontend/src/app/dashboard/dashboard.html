@@ -13,35 +13,9 @@
   </section>
 
   <!-- Stats Bento Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-    <!-- Impact Card -->
-    <div class="md:col-span-2 bg-secondary-container rounded-xl p-8 relative overflow-hidden group">
-      <div class="relative z-10">
-        <h3
-          class="text-on-secondary-container font-semibold uppercase tracking-widest text-xs mb-8"
-        >
-          Community Impact
-        </h3>
-        <div class="flex items-end gap-2 mb-2">
-          <span class="text-7xl font-black text-on-secondary-container leading-none">2,481</span>
-          <span class="text-xl font-bold text-on-secondary-container opacity-60 pb-2">KG</span>
-        </div>
-        <p class="text-on-secondary-container/80 font-medium">Total food saved since January</p>
-      </div>
-      <div
-        class="absolute -right-12 -bottom-12 w-64 h-64 bg-secondary opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-500"
-      ></div>
-      <div class="absolute right-8 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none">
-        <span
-          class="material-symbols-outlined"
-          style="font-size: 120px; font-variation-settings: 'FILL' 1"
-          >eco</span
-        >
-      </div>
-    </div>
-
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
     <!-- Mini Stats Column -->
-    <div class="grid grid-rows-2 gap-6">
+    <div class="grid grid-cols-2 gap-6 md:col-span-2">
       <div
         class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between"
       >
@@ -67,79 +41,136 @@
           <span class="text-tertiary text-xs font-bold">Today</span>
         </div>
         <div>
-          <p class="text-4xl font-black text-on-surface">8</p>
-          <p class="text-on-surface-variant text-sm font-medium">Pickups Scheduled</p>
+          <p class="text-4xl font-black text-on-surface">{{ displaySlots().length }}</p>
+          <p class="text-on-surface-variant text-sm font-medium">Slots heute</p>
         </div>
       </div>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-    <!-- Next Pickups -->
+    <!-- Heute -->
     <div class="lg:col-span-2">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-2xl font-extrabold text-on-surface tracking-tight">Next Pickups</h3>
+        <h3 class="text-2xl font-extrabold text-on-surface tracking-tight">Heute</h3>
         <button type="button" class="text-primary font-bold text-sm hover:underline">
-          View All
+          Alle Pickups
         </button>
       </div>
 
-      <div class="space-y-4">
-        @for (pickup of displayPickups(); track pickup.id) {
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (slot of displaySlots(); track slot.key) {
           <div
-            class="bg-surface-container-low rounded-lg p-6 flex items-center gap-6 group hover:bg-surface-container-high transition-all"
+            class="bg-surface-container-low rounded-lg p-5 flex flex-col gap-4 group hover:bg-surface-container-high transition-all"
+            [class.opacity-80]="slot.isTemplate"
           >
-            <div
-              class="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-primary-container flex items-center justify-center text-on-primary-container"
-            >
-              @if (pickup.image) {
-                <img
-                  [src]="pickup.image"
-                  [alt]="pickup.store"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                />
-              } @else {
-                <span class="material-symbols-outlined" style="font-size: 36px">{{
-                  pickup.categoryIcon
-                }}</span>
-              }
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1">
-                @if (pickup.isExpiring) {
-                  <span
-                    class="px-2 py-0.5 rounded-full bg-error-container text-[10px] font-bold text-on-error-container uppercase tracking-tight"
-                    >{{ pickup.badgeLabel }}</span
-                  >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-14 h-14 rounded-md overflow-hidden flex-shrink-0 bg-primary-container flex items-center justify-center text-on-primary-container"
+              >
+                @if (slot.logoUrl) {
+                  <img
+                    [src]="slot.logoUrl"
+                    [alt]="slot.partnerName"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                  />
                 } @else {
-                  <span
-                    class="px-2 py-0.5 rounded-full bg-primary-container text-[10px] font-bold text-on-primary-container uppercase tracking-tight"
-                    >{{ pickup.badgeLabel }}</span
-                  >
+                  <span class="material-symbols-outlined" style="font-size: 28px">{{
+                    slot.categoryIcon
+                  }}</span>
                 }
-                <h4 class="font-bold text-lg text-on-surface">{{ pickup.store }}</h4>
               </div>
-              <div class="flex items-center gap-4 text-on-surface-variant text-sm">
-                <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-sm">location_on</span>
-                  {{ pickup.location }}
-                </span>
-                <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-sm">alarm</span>
-                  {{ pickup.time }}
-                </span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                  @if (slot.isTemplate) {
+                    <span
+                      class="px-2 py-0.5 rounded-full bg-tertiary-container text-[10px] font-bold text-on-tertiary-container uppercase tracking-tight"
+                      >{{ slot.badgeLabel }}</span
+                    >
+                  } @else {
+                    <span
+                      class="px-2 py-0.5 rounded-full bg-primary-container text-[10px] font-bold text-on-primary-container uppercase tracking-tight"
+                      >{{ slot.badgeLabel }}</span
+                    >
+                  }
+                  <h4 class="font-bold text-base text-on-surface truncate">
+                    {{ slot.partnerName }}
+                  </h4>
+                </div>
+                <div class="flex items-center gap-3 text-on-surface-variant text-xs">
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">alarm</span>
+                    {{ slot.time }}
+                  </span>
+                  <span class="flex items-center gap-1 truncate">
+                    <span class="material-symbols-outlined text-sm">location_on</span>
+                    {{ slot.location }}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                (click)="openSlot(slot)"
+                class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all flex-shrink-0"
+                [attr.aria-label]="'Pickup öffnen: ' + slot.partnerName"
+              >
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+              </button>
+            </div>
+
+            <!-- Slot row -->
+            <div class="flex items-center gap-2 flex-wrap pt-2 border-t border-outline-variant/20">
+              <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">
+                Retter
+                <span class="text-on-surface ml-1">{{ slot.assignedCount }}/{{ slot.capacity }}</span>
+              </span>
+              <div class="flex items-center gap-2 flex-wrap">
+                @for (chip of slot.chips; track $index) {
+                  @if (chip.filled) {
+                    <div
+                      class="flex items-center gap-1.5 bg-primary-container/60 text-on-primary-container rounded-full pl-1 pr-2.5 py-0.5"
+                      [title]="chip.memberName ?? ''"
+                    >
+                      @if (chip.avatarUrl) {
+                        <img
+                          [src]="chip.avatarUrl"
+                          [alt]="chip.memberName ?? ''"
+                          class="w-6 h-6 rounded-full object-cover"
+                        />
+                      } @else {
+                        <span
+                          class="w-6 h-6 rounded-full bg-primary text-on-primary text-xs font-bold flex items-center justify-center"
+                          >{{ chip.initial }}</span
+                        >
+                      }
+                      <span class="text-xs font-medium truncate max-w-[8rem]">{{
+                        chip.memberName ?? '—'
+                      }}</span>
+                    </div>
+                  } @else {
+                    <button
+                      type="button"
+                      (click)="openSlot(slot)"
+                      class="flex items-center gap-1.5 border-2 border-dashed border-outline-variant/60 text-on-surface-variant hover:border-primary hover:text-primary rounded-full pl-1 pr-2.5 py-0.5 transition-colors"
+                      aria-label="Freien Slot zuweisen"
+                    >
+                      <span
+                        class="w-6 h-6 rounded-full border-2 border-dashed border-current flex items-center justify-center"
+                      >
+                        <span class="material-symbols-outlined" style="font-size: 14px">add</span>
+                      </span>
+                      <span class="text-xs font-semibold">Frei</span>
+                    </button>
+                  }
+                }
               </div>
             </div>
-            <button
-              type="button"
-              class="w-12 h-12 rounded-full border border-outline-variant/30 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all"
-            >
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </button>
           </div>
         } @empty {
-          <div class="bg-surface-container-low rounded-lg p-6 text-on-surface-variant text-sm">
-            Keine geplanten Pickups.
+          <div
+            class="md:col-span-2 bg-surface-container-low rounded-lg p-6 text-on-surface-variant text-sm"
+          >
+            Heute keine Pickups oder Slots geplant.
           </div>
         }
       </div>

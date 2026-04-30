@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
-import { Pickup } from '../pickups/pickup.model';
-import { PickupService } from '../pickups/pickup.service';
+import { PickupAssignment } from '../pickups/pickup.model';
+import { DaySlot } from './day-slot.model';
+import { DashboardService } from './dashboard.service';
 
 interface NewsItem {
   type: 'event' | 'milestone' | 'maintenance';
@@ -11,15 +13,31 @@ interface NewsItem {
   description: string;
 }
 
-interface DisplayPickup {
-  id: number | string;
-  store: string;
-  image: string | null;
+interface SlotChip {
+  filled: boolean;
+  memberName: string | null;
+  avatarUrl: string | null;
+  initial: string;
+}
+
+interface DisplaySlot {
+  key: string;
+  pickupId: number | null;
+  partnerId: number;
+  partnerName: string;
   location: string;
   time: string;
+  date: string;
+  startTime: string;
+  endTime: string;
   badgeLabel: string;
-  isExpiring: boolean;
+  isTemplate: boolean;
   categoryIcon: string;
+  logoUrl: string | null;
+  capacity: number;
+  assignedCount: number;
+  freeCount: number;
+  chips: SlotChip[];
 }
 
 @Component({
@@ -30,16 +48,15 @@ interface DisplayPickup {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
-  private readonly pickupService = inject(PickupService);
+  private readonly dashboardService = inject(DashboardService);
+  private readonly router = inject(Router);
 
-  private readonly upcomingPickups = toSignal(this.pickupService.upcoming(3), {
-    initialValue: [] as Pickup[],
+  private readonly daySlots = toSignal(this.dashboardService.day(), {
+    initialValue: [] as DaySlot[],
   });
 
-  private readonly now = signal(new Date());
-
-  readonly displayPickups = computed<DisplayPickup[]>(() =>
-    this.upcomingPickups().map((p) => this.toDisplay(p, this.now())),
+  readonly displaySlots = computed<DisplaySlot[]>(() =>
+    this.daySlots().map((s, idx) => this.toDisplay(s, idx)),
   );
 
   readonly news: NewsItem[] = [
@@ -72,56 +89,64 @@ export class DashboardComponent {
   readonly profileImage =
     'https://lh3.googleusercontent.com/aida-public/AB6AXuAlnI7Jvlz_ItVX5RMs8c1rQ2KnMKp8akokDrB8ge2wAaZPKWb0ZDKUztGT9bQkumnREcvOTokVb7yTetcJwvZJIctkI5SOdI3iYH6EcWu-6h6KRX4XNypVJaFdgZglXJMWHELSUGH_u0Lvqx7Yy0AEwqDJ5KHcNMqF8eTxPtwdDcRpjpv75EulDc28zDPv0eIEFRMS9w0I8Yw0rbYWBF4HU9IFqaNxK5ICJ83u0UqpC-UhY4-fq1vwPvtT02JkgJhBJhKB8gWkHaQu';
 
-  private toDisplay(p: Pickup, now: Date): DisplayPickup {
-    const category: Category | null = p.partnerCategory;
+  openSlot(slot: DisplaySlot): void {
+    if (slot.pickupId != null) {
+      this.router.navigate(['/pickups/edit', slot.pickupId]);
+      return;
+    }
+    this.router.navigate(['/pickups/new'], {
+      queryParams: {
+        partnerId: slot.partnerId,
+        date: slot.date,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+      },
+    });
+  }
+
+  private toDisplay(s: DaySlot, idx: number): DisplaySlot {
+    const category: Category | null = s.partnerCategory;
     const categoryIcon = category ? CATEGORY_ICONS[category] : 'storefront';
     const categoryLabel = category ? CATEGORY_LABELS[category] : 'Pickup';
 
-    const location = [p.partnerStreet, p.partnerCity].filter((s) => !!s).join(', ');
-
-    const isExpiring = this.isStartingSoon(p, now);
+    const location = [s.partnerStreet, s.partnerCity].filter((x) => !!x).join(', ');
+    const assignments = s.assignments ?? [];
+    const capacity = Math.max(s.capacity, assignments.length);
+    const chips: SlotChip[] = [];
+    for (let i = 0; i < capacity; i++) {
+      const a: PickupAssignment | undefined = assignments[i];
+      chips.push({
+        filled: !!a,
+        memberName: a?.memberName ?? null,
+        avatarUrl: a?.memberAvatarUrl ?? null,
+        initial: this.initial(a?.memberName ?? null),
+      });
+    }
 
     return {
-      id: p.id ?? '',
-      store: p.partnerName ?? 'Unbekannter Partner',
-      image: p.partnerLogoUrl,
+      key: `${s.pickupId ?? 't'}-${s.partnerId}-${s.startTime}-${idx}`,
+      pickupId: s.pickupId,
+      partnerId: s.partnerId,
+      partnerName: s.partnerName,
       location: location || '—',
-      time: this.formatTime(p, now),
-      badgeLabel: isExpiring ? 'Expiring Soon' : categoryLabel,
-      isExpiring,
+      time: `${s.startTime} – ${s.endTime}`,
+      date: s.date,
+      startTime: s.startTime,
+      endTime: s.endTime,
+      badgeLabel: s.isTemplate ? 'Slot frei' : categoryLabel,
+      isTemplate: s.isTemplate,
       categoryIcon,
+      logoUrl: s.partnerLogoUrl,
+      capacity,
+      assignedCount: assignments.length,
+      freeCount: Math.max(0, capacity - assignments.length),
+      chips,
     };
   }
 
-  private isStartingSoon(p: Pickup, now: Date): boolean {
-    const start = this.parseDateTime(p.date, p.startTime);
-    if (!start) return false;
-    const diffMs = start.getTime() - now.getTime();
-    const twoHoursMs = 2 * 60 * 60 * 1000;
-    return diffMs >= 0 && diffMs <= twoHoursMs;
-  }
-
-  private formatTime(p: Pickup, now: Date): string {
-    const today = this.toDateKey(now);
-    const tomorrow = this.toDateKey(new Date(now.getTime() + 24 * 60 * 60 * 1000));
-    if (p.date === today) return `${p.startTime} Heute`;
-    if (p.date === tomorrow) return `${p.startTime} Morgen`;
-    const [y, m, d] = p.date.split('-');
-    return `${p.startTime}, ${d}.${m}.${y}`;
-  }
-
-  private toDateKey(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
-
-  private parseDateTime(date: string, time: string): Date | null {
-    if (!date || !time) return null;
-    const [y, mo, d] = date.split('-').map(Number);
-    const [h, mi] = time.split(':').map(Number);
-    if ([y, mo, d, h, mi].some((n) => Number.isNaN(n))) return null;
-    return new Date(y, mo - 1, d, h, mi);
+  private initial(name: string | null): string {
+    if (!name) return '?';
+    const trimmed = name.trim();
+    return trimmed.length > 0 ? trimmed.charAt(0).toUpperCase() : '?';
   }
 }

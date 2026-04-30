@@ -74,6 +74,29 @@ export class PickupEditComponent {
         next: (p) => this.patchForm(p),
         error: () => this.errorMessage.set('Abholung konnte nicht geladen werden.'),
       });
+    } else {
+      this.applyQueryParamDefaults();
+    }
+  }
+
+  private applyQueryParamDefaults(): void {
+    const q = this.route.snapshot.queryParamMap;
+    const partnerId = q.get('partnerId');
+    const date = q.get('date');
+    const startTime = q.get('startTime');
+    const endTime = q.get('endTime');
+    const patch: Partial<{
+      partnerId: number | null;
+      date: string;
+      startTime: string;
+      endTime: string;
+    }> = {};
+    if (partnerId && !Number.isNaN(Number(partnerId))) patch.partnerId = Number(partnerId);
+    if (date) patch.date = date;
+    if (startTime) patch.startTime = startTime;
+    if (endTime) patch.endTime = endTime;
+    if (Object.keys(patch).length > 0) {
+      this.form.patchValue(patch);
     }
   }
 
