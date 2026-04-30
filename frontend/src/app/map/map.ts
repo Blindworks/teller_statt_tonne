@@ -97,8 +97,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
     });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap-Mitwirkende',
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO',
+      subdomains: 'abcd',
       maxZoom: 19,
     }).addTo(this.map);
     this.cluster = L.markerClusterGroup();
@@ -170,9 +171,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       const latlngs: L.LatLngTuple[] = ordered.map((p) => [p.latitude!, p.longitude!]);
       this.routeLayer = L.polyline(latlngs, {
         color: '#116e20',
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '6 8',
+        weight: 4,
+        opacity: 0.75,
+        dashArray: '4 10',
+        lineCap: 'round',
       }).addTo(this.map);
     }
 
@@ -186,22 +188,26 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private buildIcon(partner: Partner, order: number | null): L.DivIcon {
     const symbol = CATEGORY_ICONS[partner.category];
-    const dim = partner.status === 'INACTIVE' ? 'opacity:0.55;' : '';
+    const inactive = partner.status === 'INACTIVE' ? ' is-inactive' : '';
+    const categoryClass = ` map-marker--${partner.category.toLowerCase()}`;
     const badge =
       order != null
         ? `<span class="map-marker__badge">${order}</span>`
         : '';
     return L.divIcon({
-      className: 'map-marker',
+      className: `map-marker${categoryClass}${inactive}`,
       html: `
-        <div class="map-marker__pin" style="${dim}">
+        <div class="map-marker__pin">
           <span class="material-symbols-outlined">${symbol}</span>
           ${badge}
         </div>
+        <svg class="map-marker__tail" viewBox="0 0 12 10" aria-hidden="true">
+          <path d="M0 0 H12 L6 10 Z"/>
+        </svg>
       `,
-      iconSize: [40, 48],
-      iconAnchor: [20, 44],
-      popupAnchor: [0, -40],
+      iconSize: [36, 44],
+      iconAnchor: [18, 42],
+      popupAnchor: [0, -38],
     });
   }
 
