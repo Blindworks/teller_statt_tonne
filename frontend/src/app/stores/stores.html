@@ -101,9 +101,25 @@
         <div
           class="mt-6 pt-6 border-t border-outline-variant/10 flex justify-between items-center text-xs text-on-surface-variant"
         >
-          <span class="flex items-center gap-1">
-            <span class="material-symbols-outlined text-xs">schedule</span>
-            {{ activeSlotsCount(partner) }} Abholzeiten
+          <span class="flex items-center gap-3 flex-wrap">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">schedule</span>
+              {{ activeSlotsCount(partner) }} Abholzeiten
+            </span>
+            <span
+              class="flex items-center gap-1"
+              [title]="'Gesamtkapazität (Summe der Plätze über alle aktiven Slots)'"
+            >
+              <span class="material-symbols-outlined text-xs">groups</span>
+              {{ totalCapacity(partner) }} Plätze
+            </span>
+            <span
+              class="flex items-center gap-1"
+              [title]="availableRettersCount(partner) + ' Retter können abholen (Summe über alle aktiven Slots)'"
+            >
+              <span class="material-symbols-outlined text-xs">volunteer_activism</span>
+              {{ availableRettersCount(partner) }} Retter
+            </span>
           </span>
           <span class="font-medium">{{ partner.contact.name }}</span>
         </div>

@@ -20,6 +20,8 @@ export interface PickupSlot {
   startTime: string;
   endTime: string;
   active: boolean;
+  capacity: number;
+  availableMemberCount?: number;
 }
 
 export interface Partner {
@@ -76,6 +78,7 @@ export function emptyPartner(): Partner {
       startTime: '09:00',
       endTime: '10:00',
       active: false,
+      capacity: 1,
     })),
     status: 'ACTIVE',
     latitude: null,

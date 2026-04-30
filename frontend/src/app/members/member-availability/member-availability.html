@@ -1,0 +1,76 @@
+<fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-4">
+  <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+    Verfügbarkeiten (Wochenkalender)
+  </legend>
+  <p class="text-sm text-on-surface-variant">
+    Pflege deine wiederkehrenden Zeitfenster. Du wirst bei jedem Partner-Slot mitgezählt,
+    den dein Zeitfenster vollständig abdeckt.
+  </p>
+
+  @if (errorMessage()) {
+    <div class="px-4 py-3 rounded-lg bg-error-container text-on-error-container text-sm font-semibold">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (successMessage()) {
+    <div class="px-4 py-3 rounded-lg bg-primary-container text-on-primary-container text-sm font-semibold">
+      {{ successMessage() }}
+    </div>
+  }
+
+  <div class="space-y-3">
+    @for (w of weekdays; track w.value) {
+      <div class="flex flex-col md:flex-row md:items-start md:gap-4 bg-surface-container-low rounded-lg p-4">
+        <div class="w-32 font-bold text-on-surface-variant pt-2">{{ w.label }}</div>
+        <div class="flex-1 space-y-2">
+          @for (slot of slotsByDay()[w.value]; track $index; let i = $index) {
+            <div class="flex items-center gap-2">
+              <input
+                type="time"
+                [ngModel]="slot.startTime"
+                (ngModelChange)="updateSlot(w.value, i, 'startTime', $event)"
+                [name]="'start_' + w.value + '_' + i"
+                class="bg-surface-container-high border-none rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+              />
+              <span class="text-on-surface-variant">–</span>
+              <input
+                type="time"
+                [ngModel]="slot.endTime"
+                (ngModelChange)="updateSlot(w.value, i, 'endTime', $event)"
+                [name]="'end_' + w.value + '_' + i"
+                class="bg-surface-container-high border-none rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="button"
+                (click)="removeSlot(w.value, i)"
+                class="w-9 h-9 rounded-full bg-error-container text-on-error-container hover:bg-error hover:text-on-error transition-colors flex items-center justify-center"
+                aria-label="Zeitfenster entfernen"
+              >
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          }
+          <button
+            type="button"
+            (click)="addSlot(w.value)"
+            class="text-primary font-bold text-sm hover:underline flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-base">add</span>
+            Zeitfenster hinzufügen
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="flex justify-end">
+    <button
+      type="button"
+      (click)="save()"
+      [disabled]="saving()"
+      class="bg-primary text-on-primary px-6 py-3 rounded-full font-bold shadow-lg shadow-primary/20 disabled:opacity-60 active:scale-95 transition-transform"
+    >
+      {{ saving() ? 'Speichern...' : 'Verfügbarkeiten speichern' }}
+    </button>
+  </div>
+</fieldset>

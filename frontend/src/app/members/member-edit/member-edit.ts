@@ -10,6 +10,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MemberService } from '../member.service';
+import { MemberAvailabilityComponent } from '../member-availability/member-availability';
 import {
   MEMBER_STATUSES,
   MEMBER_STATUS_LABELS,
@@ -38,7 +39,7 @@ type MemberForm = FormGroup<{
 
 @Component({
   selector: 'app-member-edit',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, MemberAvailabilityComponent],
   templateUrl: './member-edit.html',
   styleUrl: './member-edit.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

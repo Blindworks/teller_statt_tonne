@@ -32,4 +32,16 @@ export class StoresComponent {
   activeSlotsCount(partner: Partner): number {
     return partner.pickupSlots.filter((s) => s.active).length;
   }
+
+  availableRettersCount(partner: Partner): number {
+    return partner.pickupSlots
+      .filter((s) => s.active)
+      .reduce((sum, s) => sum + (s.availableMemberCount ?? 0), 0);
+  }
+
+  totalCapacity(partner: Partner): number {
+    return partner.pickupSlots
+      .filter((s) => s.active)
+      .reduce((sum, s) => sum + (s.capacity ?? 0), 0);
+  }
 }

@@ -30,6 +30,8 @@ type SlotForm = FormGroup<{
   startTime: FormControl<string>;
   endTime: FormControl<string>;
   active: FormControl<boolean>;
+  capacity: FormControl<number>;
+  availableMemberCount: FormControl<number | null>;
 }>;
 
 type PartnerForm = FormGroup<{
@@ -145,6 +147,11 @@ export class PartnerEditComponent {
       startTime: this.fb.nonNullable.control(slot.startTime),
       endTime: this.fb.nonNullable.control(slot.endTime),
       active: this.fb.nonNullable.control(slot.active),
+      capacity: this.fb.nonNullable.control(slot.capacity ?? 1, [
+        Validators.required,
+        Validators.min(0),
+      ]),
+      availableMemberCount: this.fb.control<number | null>(slot.availableMemberCount ?? null),
     });
   }
 
@@ -227,7 +234,13 @@ export class PartnerEditComponent {
       city: raw.city,
       logoUrl: raw.logoUrl?.trim() ? raw.logoUrl.trim() : null,
       contact: raw.contact,
-      pickupSlots: raw.pickupSlots,
+      pickupSlots: raw.pickupSlots.map((s) => ({
+        weekday: s.weekday,
+        startTime: s.startTime,
+        endTime: s.endTime,
+        active: s.active,
+        capacity: s.capacity ?? 1,
+      })),
       status: raw.status,
       latitude: this.latitude(),
       longitude: this.longitude(),

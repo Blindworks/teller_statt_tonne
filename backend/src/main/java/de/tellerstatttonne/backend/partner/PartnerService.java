@@ -1,6 +1,11 @@
 package de.tellerstatttonne.backend.partner;
 
+import de.tellerstatttonne.backend.member.availability.MemberAvailabilityService;
+import de.tellerstatttonne.backend.member.availability.MemberAvailabilityService.SlotKey;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,20 +18,61 @@ public class PartnerService {
 
     private final PartnerRepository repository;
     private final GeocodingService geocodingService;
+    private final MemberAvailabilityService availabilityService;
 
-    public PartnerService(PartnerRepository repository, GeocodingService geocodingService) {
+    public PartnerService(
+        PartnerRepository repository,
+        GeocodingService geocodingService,
+        MemberAvailabilityService availabilityService
+    ) {
         this.repository = repository;
         this.geocodingService = geocodingService;
+        this.availabilityService = availabilityService;
     }
 
     @Transactional(readOnly = true)
     public List<Partner> findAll() {
-        return repository.findAll().stream().map(PartnerMapper::toDto).toList();
+        List<Partner> partners = repository.findAll().stream().map(PartnerMapper::toDto).toList();
+        return enrichWithAvailability(partners);
     }
 
     @Transactional(readOnly = true)
     public Optional<Partner> findById(String id) {
-        return repository.findById(id).map(PartnerMapper::toDto);
+        return repository.findById(id)
+            .map(PartnerMapper::toDto)
+            .map(p -> enrichWithAvailability(List.of(p)).get(0));
+    }
+
+    private List<Partner> enrichWithAvailability(List<Partner> partners) {
+        LinkedHashSet<SlotKey> slotKeys = new LinkedHashSet<>();
+        for (Partner p : partners) {
+            if (p.pickupSlots() == null) continue;
+            for (Partner.PickupSlot s : p.pickupSlots()) {
+                if (s.weekday() != null && s.startTime() != null && s.endTime() != null) {
+                    slotKeys.add(new SlotKey(s.weekday(), s.startTime(), s.endTime()));
+                }
+            }
+        }
+        if (slotKeys.isEmpty()) return partners;
+        Map<SlotKey, Integer> counts = availabilityService.countAvailableForSlots(new ArrayList<>(slotKeys));
+        return partners.stream().map(p -> withSlotCounts(p, counts)).toList();
+    }
+
+    private static Partner withSlotCounts(Partner p, Map<SlotKey, Integer> counts) {
+        if (p.pickupSlots() == null || p.pickupSlots().isEmpty()) return p;
+        List<Partner.PickupSlot> enriched = p.pickupSlots().stream()
+            .map(s -> {
+                Integer count = counts.get(new SlotKey(s.weekday(), s.startTime(), s.endTime()));
+                return new Partner.PickupSlot(
+                    s.weekday(), s.startTime(), s.endTime(), s.active(),
+                    s.capacity(), count != null ? count : 0
+                );
+            })
+            .toList();
+        return new Partner(
+            p.id(), p.name(), p.category(), p.street(), p.postalCode(), p.city(),
+            p.logoUrl(), p.contact(), enriched, p.status(), p.latitude(), p.longitude()
+        );
     }
 
     public Partner create(Partner partner) {

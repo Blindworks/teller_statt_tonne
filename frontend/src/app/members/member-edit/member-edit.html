@@ -171,6 +171,10 @@
       </button>
     </fieldset>
 
+    @if (isEdit && memberId()) {
+      <app-member-availability [memberId]="memberId()!" />
+    }
+
     <!-- Actions -->
     <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
       <div class="flex gap-3">

@@ -128,6 +128,8 @@ public class PartnerEntity {
         private String endTime;
         @Column(nullable = false)
         private boolean active;
+        @Column(nullable = false)
+        private int capacity = 1;
 
         public Partner.Weekday getWeekday() { return weekday; }
         public void setWeekday(Partner.Weekday weekday) { this.weekday = weekday; }
@@ -137,5 +139,7 @@ public class PartnerEntity {
         public void setEndTime(String endTime) { this.endTime = endTime; }
         public boolean isActive() { return active; }
         public void setActive(boolean active) { this.active = active; }
+        public int getCapacity() { return capacity; }
+        public void setCapacity(int capacity) { this.capacity = capacity; }
     }
 }
