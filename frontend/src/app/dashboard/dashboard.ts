@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../auth/auth.service';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
 import { PickupAssignment } from '../pickups/pickup.model';
+import { Role } from '../users/user.model';
 import { DaySlot } from './day-slot.model';
 import { DashboardService } from './dashboard.service';
 
@@ -38,6 +39,8 @@ interface DisplaySlot {
   assignedCount: number;
   freeCount: number;
   chips: SlotChip[];
+  currentUserAssigned: boolean;
+  canSignup: boolean;
 }
 
 @Component({
@@ -49,15 +52,28 @@ interface DisplaySlot {
 })
 export class DashboardComponent {
   private readonly dashboardService = inject(DashboardService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  private readonly daySlots = toSignal(this.dashboardService.day(), {
-    initialValue: [] as DaySlot[],
-  });
+  private readonly daySlotsSignal = signal<DaySlot[]>([]);
+  private readonly errorSignal = signal<string | null>(null);
 
   readonly displaySlots = computed<DisplaySlot[]>(() =>
-    this.daySlots().map((s, idx) => this.toDisplay(s, idx)),
+    this.daySlotsSignal().map((s, idx) => this.toDisplay(s, idx)),
   );
+
+  readonly userRole = computed<Role | null>(() => this.authService.currentUser()?.role ?? null);
+  readonly isRetter = computed(() => this.userRole() === 'RETTER');
+  readonly isAdminOrAmbassador = computed(() => {
+    const role = this.userRole();
+    return role === 'ADMINISTRATOR' || role === 'BOTSCHAFTER';
+  });
+  readonly isNewMember = computed(() => this.userRole() === 'NEW_MEMBER');
+  readonly errorMessage = this.errorSignal.asReadonly();
+
+  constructor() {
+    this.loadSlots();
+  }
 
   readonly news: NewsItem[] = [
     {
@@ -104,6 +120,39 @@ export class DashboardComponent {
     });
   }
 
+  signup(slot: DisplaySlot): void {
+    if (slot.pickupId == null) return;
+    this.errorSignal.set(null);
+    this.dashboardService.signup(slot.pickupId).subscribe({
+      next: () => this.loadSlots(),
+      error: (err) => this.errorSignal.set(this.errorText(err, 'Eintragen fehlgeschlagen.')),
+    });
+  }
+
+  unassign(slot: DisplaySlot): void {
+    if (slot.pickupId == null) return;
+    this.errorSignal.set(null);
+    this.dashboardService.unassign(slot.pickupId).subscribe({
+      next: () => this.loadSlots(),
+      error: (err) => this.errorSignal.set(this.errorText(err, 'Austragen fehlgeschlagen.')),
+    });
+  }
+
+  private loadSlots(): void {
+    this.dashboardService.day().subscribe({
+      next: (slots) => this.daySlotsSignal.set(slots),
+      error: () => this.daySlotsSignal.set([]),
+    });
+  }
+
+  private errorText(err: unknown, fallback: string): string {
+    const status = (err as { status?: number })?.status;
+    if (status === 403) return 'Du bist diesem Store nicht zugeordnet.';
+    if (status === 409) return 'Slot ist bereits voll.';
+    if (status === 404) return 'Slot wurde nicht gefunden.';
+    return fallback;
+  }
+
   private toDisplay(s: DaySlot, idx: number): DisplaySlot {
     const category: Category | null = s.partnerCategory;
     const categoryIcon = category ? CATEGORY_ICONS[category] : 'storefront';
@@ -123,6 +172,8 @@ export class DashboardComponent {
       });
     }
 
+    const freeCount = Math.max(0, capacity - assignments.length);
+
     return {
       key: `${s.pickupId ?? 't'}-${s.partnerId}-${s.startTime}-${idx}`,
       pickupId: s.pickupId,
@@ -139,8 +190,10 @@ export class DashboardComponent {
       logoUrl: s.partnerLogoUrl,
       capacity,
       assignedCount: assignments.length,
-      freeCount: Math.max(0, capacity - assignments.length),
+      freeCount,
       chips,
+      currentUserAssigned: s.currentUserAssigned,
+      canSignup: !s.isTemplate && !s.currentUserAssigned && freeCount > 0,
     };
   }
 

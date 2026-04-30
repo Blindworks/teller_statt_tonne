@@ -15,4 +15,5 @@ export interface DaySlot {
   capacity: number;
   assignments: PickupAssignment[];
   isTemplate: boolean;
+  currentUserAssigned: boolean;
 }

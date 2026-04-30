@@ -18,5 +18,6 @@ public record DaySlot(
     String endTime,
     int capacity,
     List<Pickup.Assignment> assignments,
-    boolean isTemplate
+    boolean isTemplate,
+    boolean currentUserAssigned
 ) {}

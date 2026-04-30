@@ -5,6 +5,9 @@ import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
 import de.tellerstatttonne.backend.pickup.Pickup;
 import de.tellerstatttonne.backend.pickup.PickupService;
+import de.tellerstatttonne.backend.user.Role;
+import de.tellerstatttonne.backend.user.UserEntity;
+import de.tellerstatttonne.backend.user.UserRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,44 +24,61 @@ public class DashboardService {
 
     private final PickupService pickupService;
     private final PartnerRepository partnerRepository;
+    private final UserRepository userRepository;
 
-    public DashboardService(PickupService pickupService, PartnerRepository partnerRepository) {
+    public DashboardService(PickupService pickupService,
+                            PartnerRepository partnerRepository,
+                            UserRepository userRepository) {
         this.pickupService = pickupService;
         this.partnerRepository = partnerRepository;
+        this.userRepository = userRepository;
     }
 
-    public List<DaySlot> findDaySlots(LocalDate date) {
+    public List<DaySlot> findDaySlots(LocalDate date, Long currentUserId) {
+        UserEntity user = userRepository.findById(currentUserId).orElse(null);
+        if (user == null || user.getRole() == Role.NEW_MEMBER) {
+            return List.of();
+        }
+
+        boolean isRetter = user.getRole() == Role.RETTER;
+        Set<Long> allowedPartnerIds = isRetter ? memberPartnerIds(user.getId()) : null;
+
         List<Pickup> pickups = pickupService.findBetween(date, date);
         List<DaySlot> result = new ArrayList<>();
         Set<String> covered = new HashSet<>();
 
         for (Pickup p : pickups) {
+            if (isRetter && !allowedPartnerIds.contains(p.partnerId())) continue;
+            boolean assigned = p.assignments() != null && p.assignments().stream()
+                .anyMatch(a -> currentUserId.equals(a.memberId()));
             result.add(new DaySlot(
                 p.id(), p.partnerId(), p.partnerName(), p.partnerCategory(),
                 p.partnerStreet(), p.partnerCity(), p.partnerLogoUrl(),
                 p.date(), p.startTime(), p.endTime(),
                 p.capacity(), p.assignments() == null ? List.of() : p.assignments(),
-                false
+                false, assigned
             ));
             covered.add(coverageKey(p.partnerId(), p.startTime(), p.endTime()));
         }
 
-        Partner.Weekday weekday = toWeekday(date.getDayOfWeek());
-        for (PartnerEntity partner : partnerRepository.findAll()) {
-            if (partner.getStatus() != Partner.Status.ACTIVE) continue;
-            if (partner.getPickupSlots() == null) continue;
-            for (PartnerEntity.PickupSlotEmbeddable slot : partner.getPickupSlots()) {
-                if (!slot.isActive()) continue;
-                if (slot.getWeekday() != weekday) continue;
-                String key = coverageKey(partner.getId(), slot.getStartTime(), slot.getEndTime());
-                if (covered.contains(key)) continue;
-                result.add(new DaySlot(
-                    null, partner.getId(), partner.getName(), partner.getCategory(),
-                    partner.getStreet(), partner.getCity(), partner.getLogoUrl(),
-                    date, slot.getStartTime(), slot.getEndTime(),
-                    slot.getCapacity(), List.of(),
-                    true
-                ));
+        if (!isRetter) {
+            Partner.Weekday weekday = toWeekday(date.getDayOfWeek());
+            for (PartnerEntity partner : partnerRepository.findAll()) {
+                if (partner.getStatus() != Partner.Status.ACTIVE) continue;
+                if (partner.getPickupSlots() == null) continue;
+                for (PartnerEntity.PickupSlotEmbeddable slot : partner.getPickupSlots()) {
+                    if (!slot.isActive()) continue;
+                    if (slot.getWeekday() != weekday) continue;
+                    String key = coverageKey(partner.getId(), slot.getStartTime(), slot.getEndTime());
+                    if (covered.contains(key)) continue;
+                    result.add(new DaySlot(
+                        null, partner.getId(), partner.getName(), partner.getCategory(),
+                        partner.getStreet(), partner.getCity(), partner.getLogoUrl(),
+                        date, slot.getStartTime(), slot.getEndTime(),
+                        slot.getCapacity(), List.of(),
+                        true, false
+                    ));
+                }
             }
         }
 
@@ -66,6 +86,19 @@ public class DashboardService {
             .comparing(DaySlot::startTime, Comparator.nullsLast(String::compareTo))
             .thenComparing(DaySlot::partnerName, Comparator.nullsLast(String::compareTo)));
         return result;
+    }
+
+    private Set<Long> memberPartnerIds(Long userId) {
+        Set<Long> ids = new HashSet<>();
+        for (PartnerEntity partner : partnerRepository.findAll()) {
+            for (UserEntity m : partner.getMembers()) {
+                if (userId.equals(m.getId())) {
+                    ids.add(partner.getId());
+                    break;
+                }
+            }
+        }
+        return ids;
     }
 
     private static String coverageKey(Long partnerId, String startTime, String endTime) {

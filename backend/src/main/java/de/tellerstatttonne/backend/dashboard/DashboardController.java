@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.dashboard;
 
+import de.tellerstatttonne.backend.auth.CurrentUser;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,6 +24,6 @@ public class DashboardController {
         @RequestParam(required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        return service.findDaySlots(date != null ? date : LocalDate.now());
+        return service.findDaySlots(date != null ? date : LocalDate.now(), CurrentUser.requireId());
     }
 }
