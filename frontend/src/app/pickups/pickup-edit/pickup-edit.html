@@ -110,6 +110,36 @@
             class="bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary transition-all outline-none"
           ></textarea>
         </label>
+
+        @if (!isEdit) {
+          <div class="md:col-span-2 mt-2 p-4 bg-surface-container-low rounded-lg">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                [checked]="recurring()"
+                (change)="toggleRecurring()"
+                class="w-5 h-5 accent-primary"
+              />
+              <span class="text-sm font-bold text-on-surface">Wöchentlich wiederholen</span>
+            </label>
+            @if (recurring()) {
+              <label class="flex flex-col gap-2 mt-4">
+                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">
+                  Wiederholen bis *
+                </span>
+                <input
+                  type="date"
+                  [value]="recurringUntil()"
+                  (change)="setRecurringUntil($any($event.target).value)"
+                  class="bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary transition-all outline-none max-w-xs"
+                />
+                <span class="text-xs text-on-surface-variant">
+                  Erstellt eine identische Abholung jede Woche bis (inkl.) zu diesem Datum.
+                </span>
+              </label>
+            }
+          </div>
+        }
       </div>
     </div>
 

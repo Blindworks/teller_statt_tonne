@@ -1,7 +1,49 @@
 <main class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
   <!-- Page Title -->
-  <section class="mb-8">
-    <h3 class="text-4xl font-extrabold text-primary leading-tight tracking-tight">Pickups</h3>
+  <section class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div>
+      <h3 class="text-4xl font-extrabold text-primary leading-tight tracking-tight">
+        Abholung-Planer
+      </h3>
+      <p class="text-sm text-on-surface-variant mt-2">
+        Plane Pickups für die kommenden Wochen, lege Serien an und behalte freie Slots im Blick.
+      </p>
+    </div>
+    <div class="flex items-center gap-2 bg-surface-container-low p-1 rounded-full">
+      <button
+        type="button"
+        (click)="prevWeek()"
+        class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant"
+        aria-label="Vorherige Woche"
+      >
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <button
+        type="button"
+        (click)="goToToday()"
+        class="px-4 py-2 rounded-full text-sm font-bold text-on-surface hover:bg-surface-container-high"
+      >
+        Heute
+      </button>
+      <div class="px-4 text-sm font-bold text-on-surface whitespace-nowrap">
+        {{ weekLabel() }}
+      </div>
+      <input
+        type="date"
+        [value]="weekStartInputValue()"
+        (change)="onWeekDateChange($any($event.target).value)"
+        class="bg-transparent text-sm text-on-surface-variant outline-none cursor-pointer"
+        aria-label="Woche wählen"
+      />
+      <button
+        type="button"
+        (click)="nextWeek()"
+        class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant"
+        aria-label="Nächste Woche"
+      >
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
   </section>
 
   @if (loadError()) {
@@ -145,6 +187,14 @@
           @for (p of day.pickups; track p.id) {
             <app-pickup-card [pickup]="p" [today]="day.isToday" />
           }
+          <a
+            [routerLink]="['/pickups/new']"
+            [queryParams]="{ date: day.iso }"
+            class="flex items-center justify-center gap-1 py-2 rounded-xl border border-dashed border-outline-variant/30 text-xs font-medium text-on-surface-variant hover:border-primary hover:text-primary transition-colors"
+            aria-label="Abholung hinzufügen"
+          >
+            <span class="material-symbols-outlined text-sm">add</span> Hinzufügen
+          </a>
         } @else if (day.isSunday) {
           <div
             class="py-8 text-center bg-surface-container-low/30 rounded-xl border-2 border-dashed border-outline-variant/10"
@@ -155,16 +205,20 @@
             <p class="text-[10px] font-medium text-on-surface-variant px-4">Sonntagsruhe</p>
           </div>
         } @else {
-          <div
-            class="py-8 text-center bg-surface-container-low/30 rounded-xl border-2 border-dashed border-outline-variant/10"
+          <a
+            [routerLink]="['/pickups/new']"
+            [queryParams]="{ date: day.iso }"
+            class="block py-8 text-center bg-surface-container-low/30 rounded-xl border-2 border-dashed border-outline-variant/10 hover:border-primary hover:bg-primary-container/20 transition-colors group"
           >
-            <span class="material-symbols-outlined text-outline-variant text-3xl mb-2">
-              event_busy
+            <span
+              class="material-symbols-outlined text-outline-variant text-3xl mb-2 group-hover:text-primary"
+            >
+              add_circle
             </span>
-            <p class="text-[10px] font-medium text-on-surface-variant px-4">
-              Noch keine Abholungen
+            <p class="text-[10px] font-medium text-on-surface-variant px-4 group-hover:text-primary">
+              Abholung hinzufügen
             </p>
-          </div>
+          </a>
         }
       </div>
     }

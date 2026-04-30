@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
 import { UserService } from '../../users/user.service';
 import { User } from '../../users/user.model';
 import { PartnerService } from '../../partners/partner.service';
@@ -48,6 +49,9 @@ export class PickupEditComponent {
   readonly pickupId = signal<number | null>(null);
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
+
+  readonly recurring = signal(false);
+  readonly recurringUntil = signal<string>('');
 
   readonly partners = signal<Partner[]>([]);
   readonly members = signal<User[]>([]);
@@ -125,24 +129,39 @@ export class PickupEditComponent {
       this.form.markAllAsTouched();
       return;
     }
+    const useSeries = !this.isEdit && this.recurring() && !!this.recurringUntil();
+    if (useSeries && this.recurringUntil() < this.form.controls.date.value) {
+      this.errorMessage.set('Wiederholungsdatum muss nach dem Startdatum liegen.');
+      return;
+    }
     this.saving.set(true);
     this.errorMessage.set(null);
     const payload = this.toPickup();
-    const req$ = this.isEdit
+    const req$: Observable<unknown> = this.isEdit
       ? this.service.update(this.pickupId()!, payload)
+      : useSeries
+      ? this.service.createSeries(payload, this.recurringUntil())
       : this.service.create(payload);
     req$.subscribe({
       next: () => {
         this.saving.set(false);
         this.router.navigate(['/pickups']);
       },
-      error: (err) => {
+      error: (err: { error?: unknown }) => {
         this.saving.set(false);
         this.errorMessage.set(
           typeof err?.error === 'string' ? err.error : 'Speichern fehlgeschlagen.',
         );
       },
     });
+  }
+
+  toggleRecurring(): void {
+    this.recurring.update((v) => !v);
+  }
+
+  setRecurringUntil(value: string): void {
+    this.recurringUntil.set(value);
   }
 
   delete(): void {

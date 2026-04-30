@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PickupService } from '../pickup.service';
 import { Pickup } from '../pickup.model';
@@ -32,8 +32,27 @@ export class PickupsComponent {
   readonly view = signal<ViewMode>('WEEK');
   readonly availableOnly = signal(false);
 
-  readonly weekStart: Date;
-  readonly weekEnd: Date;
+  readonly currentWeekStart = signal<Date>(startOfIsoWeek(new Date()));
+
+  readonly weekEnd = computed(() => {
+    const d = new Date(this.currentWeekStart());
+    d.setDate(d.getDate() + 6);
+    return d;
+  });
+
+  readonly weekStartIso = computed(() => toIsoDate(this.currentWeekStart()));
+  readonly weekEndIso = computed(() => toIsoDate(this.weekEnd()));
+
+  readonly weekLabel = computed(() => {
+    const start = this.currentWeekStart();
+    const end = this.weekEnd();
+    const week = isoWeekNumber(start);
+    const fmt = (d: Date) =>
+      d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+    return `KW ${week} · ${fmt(start)} – ${fmt(end)}`;
+  });
+
+  readonly weekStartInputValue = computed(() => this.weekStartIso());
 
   readonly days = computed<DayColumn[]>(() => {
     const filter = this.availableOnly();
@@ -47,10 +66,11 @@ export class PickupsComponent {
     }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const start = this.currentWeekStart();
     const result: DayColumn[] = [];
     for (let i = 0; i < 7; i++) {
-      const d = new Date(this.weekStart);
-      d.setDate(this.weekStart.getDate() + i);
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
       const iso = toIsoDate(d);
       result.push({
         date: d,
@@ -100,14 +120,14 @@ export class PickupsComponent {
   ];
 
   constructor() {
-    const today = new Date();
-    this.weekStart = startOfIsoWeek(today);
-    this.weekEnd = new Date(this.weekStart);
-    this.weekEnd.setDate(this.weekStart.getDate() + 6);
-
-    this.service.list(toIsoDate(this.weekStart), toIsoDate(this.weekEnd)).subscribe({
-      next: (list) => this.pickups.set(list),
-      error: () => this.loadError.set('Abholungen konnten nicht geladen werden.'),
+    effect(() => {
+      const from = this.weekStartIso();
+      const to = this.weekEndIso();
+      this.loadError.set(null);
+      this.service.list(from, to).subscribe({
+        next: (list) => this.pickups.set(list),
+        error: () => this.loadError.set('Abholungen konnten nicht geladen werden.'),
+      });
     });
 
     this.service.recent().subscribe({
@@ -122,6 +142,31 @@ export class PickupsComponent {
 
   setView(view: ViewMode): void {
     this.view.set(view);
+  }
+
+  prevWeek(): void {
+    this.shiftWeek(-7);
+  }
+
+  nextWeek(): void {
+    this.shiftWeek(7);
+  }
+
+  goToToday(): void {
+    this.currentWeekStart.set(startOfIsoWeek(new Date()));
+  }
+
+  onWeekDateChange(value: string): void {
+    if (!value) return;
+    const d = new Date(`${value}T00:00:00`);
+    if (isNaN(d.getTime())) return;
+    this.currentWeekStart.set(startOfIsoWeek(d));
+  }
+
+  private shiftWeek(days: number): void {
+    const d = new Date(this.currentWeekStart());
+    d.setDate(d.getDate() + days);
+    this.currentWeekStart.set(d);
   }
 
   logStatusLabel(p: Pickup): string {
@@ -184,4 +229,12 @@ function isSameDay(a: Date, b: Date): boolean {
 function formatDateShort(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+}
+
+function isoWeekNumber(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }

@@ -55,6 +55,14 @@ public class PickupController {
         return ResponseEntity.ok(service.create(pickup));
     }
 
+    @PostMapping("/series")
+    public ResponseEntity<List<Pickup>> createSeries(
+        @RequestBody Pickup pickup,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate until
+    ) {
+        return ResponseEntity.ok(service.createSeries(pickup, until));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Pickup> update(@PathVariable Long id, @RequestBody Pickup pickup) {
         return service.update(id, pickup)

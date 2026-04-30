@@ -31,6 +31,11 @@ export class PickupService {
     return this.http.post<Pickup>(this.baseUrl, pickup);
   }
 
+  createSeries(pickup: Pickup, until: string): Observable<Pickup[]> {
+    const params = new HttpParams().set('until', until);
+    return this.http.post<Pickup[]>(`${this.baseUrl}/series`, pickup, { params });
+  }
+
   update(id: number, pickup: Pickup): Observable<Pickup> {
     return this.http.put<Pickup>(`${this.baseUrl}/${id}`, pickup);
   }

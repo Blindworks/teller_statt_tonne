@@ -3,7 +3,10 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { StoresComponent } from './stores/stores';
 import { AppShellComponent } from './shell/app-shell';
 import { authGuard } from './auth/auth.guard';
+import { roleGuard } from './auth/role.guard';
 import { landingGuard } from './landing/landing.guard';
+
+const plannerRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER']);
 
 export const routes: Routes = [
   {
@@ -43,16 +46,19 @@ export const routes: Routes = [
       },
       {
         path: 'pickups',
+        canActivate: [plannerRoles],
         loadComponent: () =>
           import('./pickups/pickups/pickups').then((m) => m.PickupsComponent),
       },
       {
         path: 'pickups/new',
+        canActivate: [plannerRoles],
         loadComponent: () =>
           import('./pickups/pickup-edit/pickup-edit').then((m) => m.PickupEditComponent),
       },
       {
         path: 'pickups/edit/:id',
+        canActivate: [plannerRoles],
         loadComponent: () =>
           import('./pickups/pickup-edit/pickup-edit').then((m) => m.PickupEditComponent),
       },

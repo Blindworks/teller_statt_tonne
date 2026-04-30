@@ -66,6 +66,32 @@ public class PickupService {
         return PickupMapper.toDto(saved, resolveUsers(List.of(saved)));
     }
 
+    public List<Pickup> createSeries(Pickup template, LocalDate until) {
+        if (template.date() == null) {
+            throw new IllegalArgumentException("date is required");
+        }
+        if (until == null || until.isBefore(template.date())) {
+            throw new IllegalArgumentException("until must be on or after the start date");
+        }
+        LocalDate maxUntil = template.date().plusWeeks(26);
+        if (until.isAfter(maxUntil)) {
+            throw new IllegalArgumentException("until must be at most 26 weeks after the start date");
+        }
+        java.util.List<Pickup> created = new java.util.ArrayList<>();
+        LocalDate cursor = template.date();
+        while (!cursor.isAfter(until)) {
+            Pickup occurrence = new Pickup(
+                null, template.partnerId(), template.partnerName(), template.partnerCategory(),
+                template.partnerStreet(), template.partnerCity(), template.partnerLogoUrl(),
+                cursor, template.startTime(), template.endTime(), template.status(),
+                template.capacity(), template.assignments(), template.notes()
+            );
+            created.add(create(occurrence));
+            cursor = cursor.plusWeeks(1);
+        }
+        return created;
+    }
+
     public Optional<Pickup> update(Long id, Pickup pickup) {
         return repository.findById(id).map(entity -> {
             validate(pickup);

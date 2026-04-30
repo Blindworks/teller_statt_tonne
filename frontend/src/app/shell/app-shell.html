@@ -46,18 +46,20 @@
       <span class="material-symbols-outlined">map</span>
       Karte
     </a>
-    <a
-      routerLink="/pickups"
-      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
-      #pickupsLink="routerLinkActive"
-      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
-      [class.text-on-surface]="!pickupsLink.isActive"
-      [class.hover:bg-surface-container]="!pickupsLink.isActive"
-      [class.hover:translate-x-1]="!pickupsLink.isActive"
-    >
-      <span class="material-symbols-outlined">calendar_today</span>
-      Pickups
-    </a>
+    @if (isPlanner()) {
+      <a
+        routerLink="/pickups"
+        routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+        #pickupsLink="routerLinkActive"
+        class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+        [class.text-on-surface]="!pickupsLink.isActive"
+        [class.hover:bg-surface-container]="!pickupsLink.isActive"
+        [class.hover:translate-x-1]="!pickupsLink.isActive"
+      >
+        <span class="material-symbols-outlined">calendar_today</span>
+        Abholung-Planer
+      </a>
+    }
     <a
       routerLink="/users"
       routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
@@ -194,16 +196,18 @@
     <span class="material-symbols-outlined">map</span>
     <span class="text-[10px]">Karte</span>
   </a>
-  <a
-    routerLink="/pickups"
-    routerLinkActive="text-primary font-bold"
-    #pickupsMob="routerLinkActive"
-    class="flex flex-col items-center gap-1"
-    [class.text-on-surface-variant]="!pickupsMob.isActive"
-  >
-    <span class="material-symbols-outlined">calendar_today</span>
-    <span class="text-[10px]">Pickups</span>
-  </a>
+  @if (isPlanner()) {
+    <a
+      routerLink="/pickups"
+      routerLinkActive="text-primary font-bold"
+      #pickupsMob="routerLinkActive"
+      class="flex flex-col items-center gap-1"
+      [class.text-on-surface-variant]="!pickupsMob.isActive"
+    >
+      <span class="material-symbols-outlined">calendar_today</span>
+      <span class="text-[10px]">Planer</span>
+    </a>
+  }
   <a
     routerLink="/users"
     routerLinkActive="text-primary font-bold"

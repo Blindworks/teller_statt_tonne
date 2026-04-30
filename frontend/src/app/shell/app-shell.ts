@@ -43,6 +43,11 @@ export class AppShellComponent {
 
   readonly menuOpen = signal(false);
 
+  readonly isPlanner = computed(() => {
+    const role = this.currentUser()?.role;
+    return role === 'ADMINISTRATOR' || role === 'BOTSCHAFTER';
+  });
+
   constructor() {
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationStart) this.menuOpen.set(false);
