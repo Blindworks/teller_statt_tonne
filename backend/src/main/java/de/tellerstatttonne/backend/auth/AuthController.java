@@ -58,6 +58,7 @@ public class AuthController {
         }
         String userId = authentication.getName();
         return userRepository.findById(userId)
+            .map(authService::ensureMemberLink)
             .map(authService::toDto)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());

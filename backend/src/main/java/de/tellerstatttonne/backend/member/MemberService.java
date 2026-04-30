@@ -55,6 +55,23 @@ public class MemberService {
         return MemberMapper.toDto(repository.save(entity));
     }
 
+    public Member createForUser(String email) {
+        String localPart = email == null ? "" : email.split("@", 2)[0];
+        String firstName = localPart.isBlank() ? "Neues" : capitalize(localPart);
+        MemberEntity entity = new MemberEntity();
+        entity.setId(UUID.randomUUID().toString());
+        entity.setFirstName(firstName);
+        entity.setLastName("Mitglied");
+        entity.setRole(MemberRole.NEW_MEMBER);
+        entity.setEmail(email);
+        return MemberMapper.toDto(repository.save(entity));
+    }
+
+    private static String capitalize(String s) {
+        if (s == null || s.isEmpty()) return s;
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
     public Optional<Member> update(String id, Member member) {
         return repository.findById(id).map(entity -> {
             validate(member);
