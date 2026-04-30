@@ -1,6 +1,7 @@
 package de.tellerstatttonne.backend.auth;
 
 import de.tellerstatttonne.backend.auth.AuthDtos.AuthResponse;
+import de.tellerstatttonne.backend.auth.AuthDtos.ChangePasswordRequest;
 import de.tellerstatttonne.backend.auth.AuthDtos.LoginRequest;
 import de.tellerstatttonne.backend.auth.AuthDtos.RefreshRequest;
 import de.tellerstatttonne.backend.auth.AuthDtos.RegisterRequest;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,6 +61,18 @@ public class AuthController {
             .map(authService::toDto)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<Void> changePassword(
+        @Valid @RequestBody ChangePasswordRequest request,
+        Authentication authentication
+    ) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        authService.changePassword(authentication.getName(), request.oldPassword(), request.newPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

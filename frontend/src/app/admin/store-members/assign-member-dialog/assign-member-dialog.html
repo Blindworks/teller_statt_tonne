@@ -47,7 +47,7 @@
           >
             @if (member.photoUrl) {
               <img
-                [src]="member.photoUrl"
+                [src]="member.photoUrl | photoUrl"
                 alt=""
                 class="w-10 h-10 rounded-full object-cover"
               />

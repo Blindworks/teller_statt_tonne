@@ -63,6 +63,18 @@ public class MemberService {
         });
     }
 
+    public Optional<Member> updatePhotoUrl(String id, String photoUrl) {
+        return repository.findById(id).map(entity -> {
+            entity.setPhotoUrl(photoUrl);
+            return MemberMapper.toDto(repository.save(entity));
+        });
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<String> findPhotoUrl(String id) {
+        return repository.findById(id).map(MemberEntity::getPhotoUrl);
+    }
+
     public boolean delete(String id) {
         if (!repository.existsById(id)) {
             return false;

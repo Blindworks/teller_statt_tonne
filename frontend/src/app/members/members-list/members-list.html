@@ -92,7 +92,7 @@
           >
             @if (member.photoUrl) {
               <img
-                [src]="member.photoUrl"
+                [src]="member.photoUrl | photoUrl"
                 [alt]="member.firstName + ' ' + member.lastName"
                 class="w-full h-full object-cover"
               />

@@ -5,12 +5,13 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MemberFilter, MemberService } from '../member.service';
 import { Member, MemberRole, MemberRoleOption } from '../member.model';
+import { PhotoUrlPipe } from '../photo-url.pipe';
 
 type FilterChip = { label: string; role: MemberRole | null; activeOnly: boolean };
 
 @Component({
   selector: 'app-members-list',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, PhotoUrlPipe],
   templateUrl: './members-list.html',
   styleUrl: './members-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

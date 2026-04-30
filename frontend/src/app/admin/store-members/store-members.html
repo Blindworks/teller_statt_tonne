@@ -144,7 +144,7 @@
                 <div class="relative">
                   @if (member.photoUrl) {
                     <img
-                      [src]="member.photoUrl"
+                      [src]="member.photoUrl | photoUrl"
                       [alt]="member.firstName + ' ' + member.lastName"
                       class="w-14 h-14 rounded-full object-cover"
                     />

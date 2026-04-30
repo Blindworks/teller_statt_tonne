@@ -112,17 +112,49 @@
       <span class="material-symbols-outlined">notifications</span>
       <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
     </button>
-    @if (currentUser(); as user) {
-      <span class="hidden sm:inline text-sm text-on-surface-variant">{{ user.email }}</span>
-    }
-    <button
-      type="button"
-      (click)="logout()"
-      title="Abmelden"
-      class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-green-50 transition-colors"
-    >
-      <span class="material-symbols-outlined">logout</span>
-    </button>
+    <div class="relative">
+      <button
+        type="button"
+        (click)="toggleMenu(); $event.stopPropagation()"
+        title="Profilmenü"
+        class="w-10 h-10 rounded-full overflow-hidden bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm ring-2 ring-transparent hover:ring-primary transition-all"
+      >
+        @if (photoSrc()) {
+          <img [src]="photoSrc()" alt="Profilfoto" class="w-full h-full object-cover" />
+        } @else {
+          <span>{{ initials() }}</span>
+        }
+      </button>
+      @if (menuOpen()) {
+        <div
+          class="absolute right-0 mt-2 w-64 rounded-2xl bg-surface shadow-2xl ring-1 ring-outline-variant/20 overflow-hidden z-50"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="px-5 py-4 border-b border-outline-variant/20">
+            <p class="text-sm font-bold text-on-surface truncate">{{ displayName() }}</p>
+            @if (currentUser(); as user) {
+              <p class="text-xs text-on-surface-variant truncate">{{ user.email }}</p>
+            }
+          </div>
+          <a
+            routerLink="/profile"
+            (click)="closeMenu()"
+            class="flex items-center gap-3 px-5 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-colors"
+          >
+            <span class="material-symbols-outlined text-base">person</span>
+            Mein Profil
+          </a>
+          <button
+            type="button"
+            (click)="logout()"
+            class="w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-colors"
+          >
+            <span class="material-symbols-outlined text-base">logout</span>
+            Abmelden
+          </button>
+        </div>
+      }
+    </div>
   </div>
 </header>
 

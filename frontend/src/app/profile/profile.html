@@ -1,0 +1,245 @@
+<main class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <section class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div>
+      <h3 class="text-4xl font-extrabold text-on-surface leading-tight">Mein Profil</h3>
+      <p class="text-on-surface-variant mt-1 max-w-2xl">
+        Aktualisiere deine persönlichen Daten, dein Profilfoto oder dein Passwort.
+      </p>
+    </div>
+    <a
+      routerLink="/dashboard"
+      class="text-sm font-semibold text-on-surface-variant hover:text-primary flex items-center gap-1"
+    >
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Zurück
+    </a>
+  </section>
+
+  @if (!currentMember() && hasMemberLink()) {
+    <div class="px-6 py-4 rounded-xl bg-surface-container-low text-on-surface-variant text-sm">
+      Profil wird geladen…
+    </div>
+  } @else {
+    <div class="space-y-8 max-w-4xl">
+      @if (!hasMemberLink()) {
+        <div
+          class="px-6 py-4 rounded-xl bg-surface-container-low text-on-surface-variant text-sm"
+        >
+          <p class="font-semibold text-on-surface">Kein Mitgliedsprofil verknüpft</p>
+          <p class="mt-1">
+            Mit deinem Account ({{ currentUser()?.email }}) ist kein Mitgliedseintrag
+            verbunden. Stammdaten und Profilfoto können daher nicht bearbeitet werden. Du
+            kannst dein Passwort weiter unten ändern.
+          </p>
+        </div>
+      }
+      @if (currentMember()) {
+      <!-- Foto -->
+      <fieldset class="bg-surface-container-lowest rounded-xl p-8">
+        <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
+          Profilfoto
+        </legend>
+        <div class="flex flex-col md:flex-row items-center gap-8">
+          <div
+            class="w-32 h-32 rounded-full overflow-hidden bg-primary-container text-on-primary-container flex items-center justify-center text-4xl font-extrabold shrink-0 ring-4 ring-surface-container-low"
+          >
+            @if (displayPhoto()) {
+              <img [src]="displayPhoto()" alt="Profilfoto" class="w-full h-full object-cover" />
+            } @else {
+              <span>{{ initials() }}</span>
+            }
+          </div>
+          <div class="flex flex-col gap-3 w-full">
+            <label
+              class="bg-primary text-on-primary px-6 py-3 rounded-full font-bold shadow-lg shadow-primary/20 active:scale-95 transition-transform cursor-pointer inline-flex items-center justify-center gap-2 w-fit"
+            >
+              <span class="material-symbols-outlined text-base">upload</span>
+              {{ uploadingPhoto() ? 'Lädt hoch…' : 'Foto hochladen' }}
+              <input
+                type="file"
+                accept="image/*"
+                class="hidden"
+                [disabled]="uploadingPhoto()"
+                (change)="onPhotoSelected($event)"
+              />
+            </label>
+            <p class="text-xs text-on-surface-variant">
+              JPG, PNG, WebP oder GIF. Maximal 5 MB.
+            </p>
+            @if (photoError()) {
+              <p class="text-sm text-error font-semibold">{{ photoError() }}</p>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Stammdaten -->
+      <form [formGroup]="form" (ngSubmit)="submitProfile()" class="space-y-8">
+        <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-6">
+          <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+            Stammdaten
+          </legend>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-on-surface-variant">Vorname *</span>
+              <input
+                type="text"
+                formControlName="firstName"
+                class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-on-surface-variant">Nachname *</span>
+              <input
+                type="text"
+                formControlName="lastName"
+                class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-on-surface-variant">Telefon</span>
+              <input
+                type="tel"
+                formControlName="phone"
+                class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-on-surface-variant">Ort</span>
+              <input
+                type="text"
+                formControlName="city"
+                placeholder="z. B. Berlin, Kreuzberg"
+                class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-6">
+          <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+            Tags
+          </legend>
+          <div class="space-y-3" formArrayName="tags">
+            @for (tag of tagsArray.controls; track $index; let i = $index) {
+              <div class="flex items-center gap-3">
+                <input
+                  type="text"
+                  [formControlName]="i"
+                  placeholder="z. B. Vegan expert"
+                  class="flex-1 bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="button"
+                  (click)="removeTag(i)"
+                  class="w-10 h-10 rounded-full bg-error-container text-on-error-container hover:bg-error hover:text-on-error transition-colors flex items-center justify-center"
+                  aria-label="Tag entfernen"
+                >
+                  <span class="material-symbols-outlined text-base">delete</span>
+                </button>
+              </div>
+            }
+          </div>
+          <button
+            type="button"
+            (click)="addTag()"
+            class="text-primary font-bold text-sm hover:underline flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-base">add</span>
+            Tag hinzufügen
+          </button>
+        </fieldset>
+
+        @if (profileError()) {
+          <div
+            class="px-6 py-4 rounded-xl bg-error-container text-on-error-container text-sm font-semibold"
+          >
+            {{ profileError() }}
+          </div>
+        }
+        @if (profileMessage()) {
+          <div
+            class="px-6 py-4 rounded-xl bg-tertiary-container text-on-tertiary-container text-sm font-semibold"
+          >
+            {{ profileMessage() }}
+          </div>
+        }
+
+        <div>
+          <button
+            type="submit"
+            [disabled]="savingProfile()"
+            class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold shadow-lg shadow-primary/20 disabled:opacity-60 active:scale-95 transition-transform"
+          >
+            {{ savingProfile() ? 'Speichern…' : 'Profil speichern' }}
+          </button>
+        </div>
+      </form>
+      }
+
+      <!-- Passwort -->
+      <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()" class="space-y-6">
+        <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-6">
+          <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+            Passwort ändern
+          </legend>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <label class="flex flex-col gap-2 md:col-span-2">
+              <span class="text-sm font-semibold text-on-surface-variant">Aktuelles Passwort *</span>
+              <input
+                type="password"
+                formControlName="oldPassword"
+                autocomplete="current-password"
+                class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-on-surface-variant">Neues Passwort *</span>
+              <input
+                type="password"
+                formControlName="newPassword"
+                autocomplete="new-password"
+                class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="text-sm font-semibold text-on-surface-variant">Wiederholen *</span>
+              <input
+                type="password"
+                formControlName="newPasswordRepeat"
+                autocomplete="new-password"
+                class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </label>
+          </div>
+          @if (passwordForm.errors?.['passwordsMismatch'] && passwordForm.get('newPasswordRepeat')?.touched) {
+            <p class="text-sm text-error font-semibold">Passwörter stimmen nicht überein.</p>
+          }
+          @if (passwordError()) {
+            <div
+              class="px-6 py-4 rounded-xl bg-error-container text-on-error-container text-sm font-semibold"
+            >
+              {{ passwordError() }}
+            </div>
+          }
+          @if (passwordMessage()) {
+            <div
+              class="px-6 py-4 rounded-xl bg-tertiary-container text-on-tertiary-container text-sm font-semibold"
+            >
+              {{ passwordMessage() }}
+            </div>
+          }
+        </fieldset>
+        <div>
+          <button
+            type="submit"
+            [disabled]="changingPassword()"
+            class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold shadow-lg shadow-primary/20 disabled:opacity-60 active:scale-95 transition-transform"
+          >
+            {{ changingPassword() ? 'Wird geändert…' : 'Passwort ändern' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</main>

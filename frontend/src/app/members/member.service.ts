@@ -46,6 +46,12 @@ export class MemberService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+  uploadPhoto(id: string, file: File): Observable<Member> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<Member>(`${this.baseUrl}/${id}/photo`, form);
+  }
+
   roles(): Observable<MemberRoleOption[]> {
     if (!this.roles$) {
       this.roles$ = this.http

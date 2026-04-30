@@ -9,10 +9,11 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Member } from '../../../members/member.model';
+import { PhotoUrlPipe } from '../../../members/photo-url.pipe';
 
 @Component({
   selector: 'app-assign-member-dialog',
-  imports: [FormsModule],
+  imports: [FormsModule, PhotoUrlPipe],
   templateUrl: './assign-member-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -76,6 +76,10 @@ export const routes: Routes = [
           import('./members/member-edit/member-edit').then((m) => m.MemberEditComponent),
       },
       {
+        path: 'profile',
+        loadComponent: () => import('./profile/profile').then((m) => m.ProfileComponent),
+      },
+      {
         path: 'admin/store-members',
         loadComponent: () =>
           import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),

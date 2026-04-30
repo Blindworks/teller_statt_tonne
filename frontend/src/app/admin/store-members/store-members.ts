@@ -13,10 +13,11 @@ import { Member } from '../../members/member.model';
 import { StoreMember } from './store-member.model';
 import { StoreMembersService } from './store-members.service';
 import { AssignMemberDialogComponent } from './assign-member-dialog/assign-member-dialog';
+import { PhotoUrlPipe } from '../../members/photo-url.pipe';
 
 @Component({
   selector: 'app-store-members',
-  imports: [FormsModule, AssignMemberDialogComponent],
+  imports: [FormsModule, AssignMemberDialogComponent, PhotoUrlPipe],
   templateUrl: './store-members.html',
   styleUrl: './store-members.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

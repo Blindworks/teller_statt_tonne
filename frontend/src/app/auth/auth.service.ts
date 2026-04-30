@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, of, tap } from 'rxjs';
+import { Observable, catchError, of, switchMap, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Member } from '../members/member.model';
 import { AuthResponse, User } from './auth.models';
 
 const ACCESS_KEY = 'tst.access';
@@ -15,8 +16,10 @@ export class AuthService {
   private readonly accessTokenSignal = signal<string | null>(this.readStorage(ACCESS_KEY));
   private readonly refreshTokenSignal = signal<string | null>(this.readStorage(REFRESH_KEY));
   private readonly currentUserSignal = signal<User | null>(null);
+  private readonly currentMemberSignal = signal<Member | null>(null);
 
   readonly currentUser = this.currentUserSignal.asReadonly();
+  readonly currentMember = this.currentMemberSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
 
   constructor() {
@@ -64,8 +67,36 @@ export class AuthService {
   me(): Observable<User | null> {
     return this.http.get<User>(`${this.baseUrl}/me`).pipe(
       tap((user) => this.currentUserSignal.set(user)),
+      switchMap((user) => this.loadMember(user).pipe(switchMap(() => of(user)))),
       catchError(() => {
         this.currentUserSignal.set(null);
+        this.currentMemberSignal.set(null);
+        return of(null);
+      }),
+    );
+  }
+
+  reloadCurrentMember(): Observable<Member | null> {
+    return this.loadMember(this.currentUserSignal());
+  }
+
+  setCurrentMember(member: Member | null): void {
+    this.currentMemberSignal.set(member);
+  }
+
+  changePassword(oldPassword: string, newPassword: string): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/password`, { oldPassword, newPassword });
+  }
+
+  private loadMember(user: User | null): Observable<Member | null> {
+    if (!user || !user.memberId) {
+      this.currentMemberSignal.set(null);
+      return of(null);
+    }
+    return this.http.get<Member>(`${environment.apiBaseUrl}/api/members/${user.memberId}`).pipe(
+      tap((m) => this.currentMemberSignal.set(m)),
+      catchError(() => {
+        this.currentMemberSignal.set(null);
         return of(null);
       }),
     );
@@ -88,12 +119,14 @@ export class AuthService {
     this.currentUserSignal.set(res.user);
     this.writeStorage(ACCESS_KEY, res.accessToken);
     this.writeStorage(REFRESH_KEY, res.refreshToken);
+    this.loadMember(res.user).subscribe();
   }
 
   private clearTokens(): void {
     this.accessTokenSignal.set(null);
     this.refreshTokenSignal.set(null);
     this.currentUserSignal.set(null);
+    this.currentMemberSignal.set(null);
     this.writeStorage(ACCESS_KEY, null);
     this.writeStorage(REFRESH_KEY, null);
   }

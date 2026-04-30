@@ -81,6 +81,16 @@ public class AuthService {
         return buildAuthResponse(user);
     }
 
+    public void changePassword(String userId, String oldPassword, String newPassword) {
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new BadCredentialsException("User not found"));
+        if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
+            throw new BadCredentialsException("Invalid credentials");
+        }
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
     public void logout(String refreshToken) {
         String hash = sha256(refreshToken);
         refreshTokenRepository.findByTokenHash(hash).ifPresent(t -> {
