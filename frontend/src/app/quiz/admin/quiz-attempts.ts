@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../quiz.service';
 import { COLOR_EMOJI, QuizAttempt } from '../quiz.model';
 
@@ -12,6 +12,7 @@ import { COLOR_EMOJI, QuizAttempt } from '../quiz.model';
 })
 export class QuizAttemptsComponent {
   private readonly service = inject(QuizService);
+  private readonly router = inject(Router);
 
   readonly attempts = signal<QuizAttempt[]>([]);
   readonly selected = signal<QuizAttempt | null>(null);
@@ -32,6 +33,19 @@ export class QuizAttemptsComponent {
 
   close(): void {
     this.selected.set(null);
+  }
+
+  createUser(attempt: QuizAttempt): void {
+    const parts = attempt.applicantName.trim().split(/\s+/).filter(Boolean);
+    const lastName = parts.length > 1 ? parts[parts.length - 1]! : '';
+    const firstName = parts.length > 1 ? parts.slice(0, -1).join(' ') : (parts[0] ?? '');
+    this.router.navigate(['/users/new'], {
+      queryParams: {
+        firstName,
+        lastName,
+        email: attempt.applicantEmail,
+      },
+    });
   }
 
   initials(name: string): string {

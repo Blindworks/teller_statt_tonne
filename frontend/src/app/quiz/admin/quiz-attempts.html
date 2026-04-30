@@ -42,6 +42,13 @@
         @if (a.knockoutTriggered) {
           <span class="text-xs text-error font-medium">K.O.</span>
         }
+        <button
+          type="button"
+          (click)="createUser(a); $event.stopPropagation()"
+          class="shrink-0 rounded-full bg-primary text-on-primary px-3 py-1.5 text-xs font-semibold shadow-sm hover:opacity-90 transition"
+        >
+          + Nutzer anlegen
+        </button>
       </article>
     } @empty {
       <p class="text-on-surface-variant">Noch keine Quiz-Versuche.</p>

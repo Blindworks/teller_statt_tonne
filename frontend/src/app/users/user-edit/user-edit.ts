@@ -93,6 +93,14 @@ export class UserEditComponent {
     } else {
       this.form.controls.password.setValidators([Validators.required, Validators.minLength(8)]);
       this.form.controls.password.updateValueAndValidity();
+
+      const qp = this.route.snapshot.queryParamMap;
+      const firstName = qp.get('firstName');
+      const lastName = qp.get('lastName');
+      const email = qp.get('email');
+      if (firstName) this.form.controls.firstName.setValue(firstName);
+      if (lastName) this.form.controls.lastName.setValue(lastName);
+      if (email) this.form.controls.email.setValue(email);
     }
   }
 
