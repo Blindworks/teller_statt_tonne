@@ -55,9 +55,9 @@
       @if (v === 'FILLED') {
         <div class="flex -space-x-2">
           @for (a of p.assignments; track a.memberId) {
-            @if (a.memberAvatarUrl) {
+            @if (avatarUrl(a.memberAvatarUrl); as src) {
               <img
-                [src]="a.memberAvatarUrl"
+                [src]="src"
                 [alt]="a.memberName ?? 'Mitglied'"
                 class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest object-cover"
               />
@@ -84,9 +84,9 @@
         } @else {
           <div class="flex -space-x-2">
             @for (a of p.assignments; track a.memberId) {
-              @if (a.memberAvatarUrl) {
+              @if (avatarUrl(a.memberAvatarUrl); as src) {
                 <img
-                  [src]="a.memberAvatarUrl"
+                  [src]="src"
                   [alt]="a.memberName ?? 'Mitglied'"
                   class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest object-cover"
                 />

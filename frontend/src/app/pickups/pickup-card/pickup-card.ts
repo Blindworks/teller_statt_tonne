@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CATEGORY_LABELS, Category } from '../../partners/partner.model';
+import { resolvePhotoUrl } from '../../users/photo-url';
 import { Pickup } from '../pickup.model';
 
 type Variant = 'FILLED' | 'OPEN' | 'COMPLETED' | 'CANCELLED';
@@ -75,6 +76,10 @@ export class PickupCardComponent {
     const id = this.pickup().id;
     return id ? ['/pickups/edit', id] : null;
   });
+
+  avatarUrl(url: string | null): string | null {
+    return resolvePhotoUrl(url);
+  }
 
   onSignup(event: MouseEvent): void {
     event.preventDefault();

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { resolvePhotoUrl } from '../../users/photo-url';
 import { PickupService } from '../pickup.service';
 import { Pickup } from '../pickup.model';
 import { PickupCardComponent } from '../pickup-card/pickup-card';
@@ -236,7 +237,7 @@ export class PickupsComponent {
   }
 
   logAvatar(p: Pickup): string | null {
-    return p.assignments[0]?.memberAvatarUrl ?? null;
+    return resolvePhotoUrl(p.assignments[0]?.memberAvatarUrl ?? null);
   }
 }
 
