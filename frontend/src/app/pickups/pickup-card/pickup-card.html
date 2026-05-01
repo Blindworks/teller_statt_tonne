@@ -3,7 +3,7 @@
 
 <a
   [routerLink]="editLink()"
-  class="block p-4 rounded-xl shadow-sm transition-all group"
+  class="flex flex-col p-4 min-h-[200px] rounded-xl shadow-sm transition-all group"
   [class.bg-surface-container-lowest]="v === 'COMPLETED' || v === 'CANCELLED'"
   [class.bg-primary-container/40]="v === 'FILLED'"
   [class.bg-tertiary-container/30]="v === 'PARTIAL'"

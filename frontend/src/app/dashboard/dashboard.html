@@ -28,42 +28,6 @@
     </div>
   }
 
-  <!-- Stats Bento Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-    <!-- Mini Stats Column -->
-    <div class="grid grid-cols-2 gap-6 md:col-span-2">
-      <div
-        class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between"
-      >
-        <div class="flex justify-between items-start">
-          <span class="p-3 bg-primary-container text-on-primary-container rounded-full">
-            <span class="material-symbols-outlined">group</span>
-          </span>
-          <span class="text-primary text-xs font-bold">+12%</span>
-        </div>
-        <div>
-          <p class="text-4xl font-black text-on-surface">42</p>
-          <p class="text-on-surface-variant text-sm font-medium">Active Members</p>
-        </div>
-      </div>
-
-      <div
-        class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between"
-      >
-        <div class="flex justify-between items-start">
-          <span class="p-3 bg-tertiary-container text-on-tertiary-container rounded-full">
-            <span class="material-symbols-outlined">schedule</span>
-          </span>
-          <span class="text-tertiary text-xs font-bold">Today</span>
-        </div>
-        <div>
-          <p class="text-4xl font-black text-on-surface">{{ displaySlots().length }}</p>
-          <p class="text-on-surface-variant text-sm font-medium">Slots heute</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
     <!-- Heute -->
     <div class="lg:col-span-2">
@@ -232,6 +196,36 @@
 
     <!-- News Feed -->
     <div class="space-y-6">
+      <div
+        class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-6"
+      >
+        <div class="flex justify-between items-start">
+          <span class="p-3 bg-primary-container text-on-primary-container rounded-full">
+            <span class="material-symbols-outlined">group</span>
+          </span>
+          <span class="text-primary text-xs font-bold">+12%</span>
+        </div>
+        <div>
+          <p class="text-4xl font-black text-on-surface">42</p>
+          <p class="text-on-surface-variant text-sm font-medium">Active Members</p>
+        </div>
+      </div>
+
+      <div
+        class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-6"
+      >
+        <div class="flex justify-between items-start">
+          <span class="p-3 bg-tertiary-container text-on-tertiary-container rounded-full">
+            <span class="material-symbols-outlined">schedule</span>
+          </span>
+          <span class="text-tertiary text-xs font-bold">Today</span>
+        </div>
+        <div>
+          <p class="text-4xl font-black text-on-surface">{{ displaySlots().length }}</p>
+          <p class="text-on-surface-variant text-sm font-medium">Slots heute</p>
+        </div>
+      </div>
+
       <h3 class="text-2xl font-extrabold text-on-surface tracking-tight mb-2">Community News</h3>
       <div class="bg-surface-container-high/50 p-6 rounded-lg space-y-6">
         @for (item of news; track item.title) {
