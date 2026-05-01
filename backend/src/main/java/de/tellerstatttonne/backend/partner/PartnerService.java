@@ -42,8 +42,15 @@ public class PartnerService {
 
     @Transactional(readOnly = true)
     public List<Partner> findAll() {
-        List<Partner> partners = repository.findAll().stream().map(PartnerMapper::toDto).toList();
+        List<Partner> partners = repository.findAllByStatusNot(Partner.Status.DELETED).stream()
+            .map(PartnerMapper::toDto).toList();
         return enrichWithAvailability(partners);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Partner> findAllDeleted() {
+        return repository.findAllByStatus(Partner.Status.DELETED).stream()
+            .map(PartnerMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
@@ -122,11 +129,18 @@ public class PartnerService {
     }
 
     public boolean delete(Long id) {
-        if (!repository.existsById(id)) {
-            return false;
-        }
-        repository.deleteById(id);
-        return true;
+        return repository.findById(id).map(entity -> {
+            entity.setStatus(Partner.Status.DELETED);
+            repository.save(entity);
+            return true;
+        }).orElse(false);
+    }
+
+    public Optional<Partner> restore(Long id) {
+        return repository.findById(id).map(entity -> {
+            entity.setStatus(Partner.Status.ACTIVE);
+            return PartnerMapper.toDto(repository.save(entity));
+        });
     }
 
     private static boolean hasCoordinates(Partner partner) {

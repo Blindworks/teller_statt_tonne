@@ -48,6 +48,8 @@ export class AppShellComponent {
     return role === 'ADMINISTRATOR' || role === 'BOTSCHAFTER' || role === 'RETTER';
   });
 
+  readonly isAdmin = computed(() => this.currentUser()?.role === 'ADMINISTRATOR');
+
   constructor() {
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationStart) this.menuOpen.set(false);

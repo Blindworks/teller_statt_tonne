@@ -1,5 +1,5 @@
 export type Category = 'BAKERY' | 'SUPERMARKET' | 'CAFE' | 'RESTAURANT';
-export type Status = 'ACTIVE' | 'INACTIVE';
+export type Status = 'ACTIVE' | 'INACTIVE' | 'DELETED';
 export type Weekday =
   | 'MONDAY'
   | 'TUESDAY'

@@ -21,6 +21,14 @@ export class PartnerService {
     return this.http.get<Partner[]>(this.baseUrl);
   }
 
+  listDeleted(): Observable<Partner[]> {
+    return this.http.get<Partner[]>(`${this.baseUrl}/deleted`);
+  }
+
+  restore(id: number): Observable<Partner> {
+    return this.http.post<Partner>(`${this.baseUrl}/${id}/restore`, null);
+  }
+
   memberCounts(): Observable<Record<number, number>> {
     return this.http.get<Record<number, number>>(`${this.baseUrl}/member-counts`);
   }

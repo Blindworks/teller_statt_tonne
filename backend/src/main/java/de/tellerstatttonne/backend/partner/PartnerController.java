@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,12 @@ public class PartnerController {
     @GetMapping
     public List<Partner> list() {
         return service.findAll();
+    }
+
+    @GetMapping("/deleted")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public List<Partner> listDeleted() {
+        return service.findAllDeleted();
     }
 
     @GetMapping("/member-counts")
@@ -69,8 +76,17 @@ public class PartnerController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/restore")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public ResponseEntity<Partner> restore(@PathVariable Long id) {
+        return service.restore(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

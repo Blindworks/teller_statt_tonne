@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { AuthService } from '../../auth/auth.service';
 import {
   FormArray,
   FormBuilder,
@@ -14,6 +15,7 @@ import {
   LocationPickResult,
   LocationPickerDialogComponent,
 } from '../location-picker/location-picker-dialog';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog';
 import {
   CATEGORY_LABELS,
   Category,
@@ -52,7 +54,7 @@ type PartnerForm = FormGroup<{
 
 @Component({
   selector: 'app-partner-edit',
-  imports: [ReactiveFormsModule, RouterLink, DecimalPipe, LocationPickerDialogComponent],
+  imports: [ReactiveFormsModule, RouterLink, DecimalPipe, LocationPickerDialogComponent, ConfirmDialogComponent],
   templateUrl: './partner-edit.html',
   styleUrl: './partner-edit.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,6 +64,14 @@ export class PartnerEditComponent {
   private readonly service = inject(PartnerService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
+
+  readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMINISTRATOR');
+  readonly partnerStatus = signal<Status | null>(null);
+  readonly partnerName = signal<string>('');
+  readonly isDeleted = computed(() => this.partnerStatus() === 'DELETED');
+  readonly deleteDialogOpen = signal(false);
+  readonly deleting = signal(false);
 
   readonly weekdays = WEEKDAYS;
   readonly categoryLabels = CATEGORY_LABELS;
@@ -205,9 +215,49 @@ export class PartnerEditComponent {
     });
   }
 
+  openDeleteDialog(): void {
+    this.deleteDialogOpen.set(true);
+  }
+
+  closeDeleteDialog(): void {
+    if (this.deleting()) return;
+    this.deleteDialogOpen.set(false);
+  }
+
+  confirmDelete(): void {
+    const id = this.partnerId();
+    if (!id) return;
+    this.errorMessage.set(null);
+    this.deleting.set(true);
+    this.service.delete(id).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.deleteDialogOpen.set(false);
+        this.router.navigate(['/stores']);
+      },
+      error: () => {
+        this.deleting.set(false);
+        this.deleteDialogOpen.set(false);
+        this.errorMessage.set('Löschen fehlgeschlagen.');
+      },
+    });
+  }
+
+  restore(): void {
+    const id = this.partnerId();
+    if (!id) return;
+    this.errorMessage.set(null);
+    this.service.restore(id).subscribe({
+      next: () => this.router.navigate(['/stores']),
+      error: () => this.errorMessage.set('Wiederherstellen fehlgeschlagen.'),
+    });
+  }
+
   private patchForm(partner: Partner): void {
     this.latitude.set(partner.latitude);
     this.longitude.set(partner.longitude);
+    this.partnerStatus.set(partner.status);
+    this.partnerName.set(partner.name);
     this.form.patchValue({
       name: partner.name,
       category: partner.category,

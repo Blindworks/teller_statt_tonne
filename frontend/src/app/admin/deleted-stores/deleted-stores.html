@@ -1,0 +1,95 @@
+<main class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+    <div>
+      <h3 class="text-4xl font-extrabold text-on-surface leading-tight">Papierkorb · Partner</h3>
+      <p class="text-on-surface-variant mt-1">
+        {{ partners().length }} gelöschte Partner. Wiederhergestellte Partner werden direkt wieder aktiv.
+      </p>
+    </div>
+    <a
+      routerLink="/stores"
+      class="text-sm font-semibold text-on-surface-variant hover:text-primary flex items-center gap-1"
+    >
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Zurück zur Übersicht
+    </a>
+  </section>
+
+  @if (loadError()) {
+    <div
+      class="mb-6 px-6 py-4 rounded-xl bg-error-container text-on-error-container text-sm font-semibold"
+    >
+      {{ loadError() }}
+    </div>
+  }
+
+  @if (actionError()) {
+    <div
+      class="mb-6 px-6 py-4 rounded-xl bg-error-container text-on-error-container text-sm font-semibold"
+    >
+      {{ actionError() }}
+    </div>
+  }
+
+  @if (partners().length === 0 && !loadError()) {
+    <div
+      class="bg-surface-container-low rounded-xl p-12 text-center text-on-surface-variant"
+    >
+      <span class="material-symbols-outlined text-5xl text-primary mb-4">delete</span>
+      <p class="text-lg font-bold text-on-surface">Keine gelöschten Partner</p>
+      <p class="mt-1">Alle Partner sind aktiv oder inaktiv — der Papierkorb ist leer.</p>
+    </div>
+  }
+
+  @if (partners().length > 0) {
+    <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-surface-container-high text-on-surface-variant">
+          <tr>
+            <th class="text-left px-6 py-4 font-bold uppercase tracking-wider text-xs">Name</th>
+            <th class="text-left px-6 py-4 font-bold uppercase tracking-wider text-xs">Kategorie</th>
+            <th class="text-left px-6 py-4 font-bold uppercase tracking-wider text-xs">Adresse</th>
+            <th class="text-right px-6 py-4 font-bold uppercase tracking-wider text-xs">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (partner of partners(); track partner.id) {
+            <tr class="border-t border-outline-variant/10">
+              <td class="px-6 py-4 font-bold text-on-surface flex items-center gap-3">
+                <span
+                  class="material-symbols-outlined text-base text-primary"
+                >{{ categoryIcons[partner.category] }}</span>
+                {{ partner.name }}
+              </td>
+              <td class="px-6 py-4 text-on-surface-variant">
+                {{ categoryLabels[partner.category] }}
+              </td>
+              <td class="px-6 py-4 text-on-surface-variant">
+                {{ partner.street }}, {{ partner.postalCode }} {{ partner.city }}
+              </td>
+              <td class="px-6 py-4 text-right">
+                <div class="inline-flex gap-2">
+                  <a
+                    [routerLink]="['/stores/edit', partner.id]"
+                    class="px-4 py-2 rounded-full text-xs font-bold bg-surface-container-high text-on-surface-variant hover:bg-surface-container transition-colors flex items-center gap-1"
+                  >
+                    <span class="material-symbols-outlined text-base">visibility</span>
+                    Ansehen
+                  </a>
+                  <button
+                    type="button"
+                    (click)="restore(partner)"
+                    class="px-4 py-2 rounded-full text-xs font-bold bg-primary text-on-primary hover:bg-primary-dim transition-colors flex items-center gap-1"
+                  >
+                    <span class="material-symbols-outlined text-base">restore_from_trash</span>
+                    Wiederherstellen
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</main>

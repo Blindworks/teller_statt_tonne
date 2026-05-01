@@ -1,0 +1,53 @@
+<div
+  (click)="onBackdrop($event)"
+  class="fixed inset-0 z-50 bg-on-surface/40 backdrop-blur-sm flex items-center justify-center p-4"
+>
+  <div
+    class="bg-surface-container-lowest rounded-xl w-full max-w-md flex flex-col shadow-2xl overflow-hidden"
+    role="dialog"
+    aria-modal="true"
+  >
+    <header class="px-6 pt-6 pb-4 flex items-start gap-4">
+      <div
+        class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+        [class.bg-error-container]="danger"
+        [class.text-on-error-container]="danger"
+        [class.bg-primary-container]="!danger"
+        [class.text-on-primary-container]="!danger"
+      >
+        <span class="material-symbols-outlined">{{ icon }}</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-lg font-bold text-on-surface">{{ title }}</h3>
+        <p class="text-sm text-on-surface-variant mt-1 whitespace-pre-line">{{ message }}</p>
+      </div>
+    </header>
+
+    <footer class="px-6 py-4 bg-surface-container-low flex justify-end gap-3">
+      <button
+        type="button"
+        (click)="cancel.emit()"
+        [disabled]="busy"
+        class="px-5 py-2 rounded-full font-bold text-sm text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {{ cancelLabel }}
+      </button>
+      <button
+        type="button"
+        (click)="confirm.emit()"
+        [disabled]="busy"
+        class="px-5 py-2 rounded-full font-bold text-sm text-on-primary transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+        [class.bg-error]="danger"
+        [class.hover:bg-error-container]="danger"
+        [class.hover:text-on-error-container]="danger"
+        [class.bg-primary]="!danger"
+        [class.hover:bg-primary-dim]="!danger"
+      >
+        @if (busy) {
+          <span class="material-symbols-outlined text-base animate-spin">progress_activity</span>
+        }
+        {{ confirmLabel }}
+      </button>
+    </footer>
+  </div>
+</div>

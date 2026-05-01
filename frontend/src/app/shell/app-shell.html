@@ -84,6 +84,20 @@
       <span class="material-symbols-outlined">groups</span>
       Store-Mitglieder
     </a>
+    @if (isAdmin()) {
+      <a
+        routerLink="/admin/stores/deleted"
+        routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+        #deletedStoresLink="routerLinkActive"
+        class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+        [class.text-on-surface]="!deletedStoresLink.isActive"
+        [class.hover:bg-surface-container]="!deletedStoresLink.isActive"
+        [class.hover:translate-x-1]="!deletedStoresLink.isActive"
+      >
+        <span class="material-symbols-outlined">delete</span>
+        Papierkorb · Partner
+      </a>
+    }
     <a
       routerLink="/admin/quiz/questions"
       routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"

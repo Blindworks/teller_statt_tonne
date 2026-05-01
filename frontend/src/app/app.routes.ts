@@ -88,6 +88,12 @@ export const routes: Routes = [
           import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),
       },
       {
+        path: 'admin/stores/deleted',
+        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        loadComponent: () =>
+          import('./admin/deleted-stores/deleted-stores').then((m) => m.DeletedStoresComponent),
+      },
+      {
         path: 'admin/quiz/questions',
         loadComponent: () =>
           import('./quiz/admin/quiz-questions').then((m) => m.QuizQuestionsComponent),
