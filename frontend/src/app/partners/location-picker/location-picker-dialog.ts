@@ -18,6 +18,20 @@ import { PartnerService, ReverseGeocodeResult } from '../partner.service';
 const DEFAULT_CENTER: L.LatLngTuple = [50.1817, 8.74];
 const DEFAULT_ZOOM = 14;
 
+const PICKER_ICON: L.DivIcon = L.divIcon({
+  className: 'picker-marker',
+  html: `
+    <div class="picker-marker__pin">
+      <span class="material-symbols-outlined">place</span>
+    </div>
+    <svg class="picker-marker__tail" viewBox="0 0 12 10" aria-hidden="true">
+      <path d="M0 0 H12 L6 10 Z"/>
+    </svg>
+  `,
+  iconSize: [36, 44],
+  iconAnchor: [18, 42],
+});
+
 export interface LocationPickResult {
   latitude: number;
   longitude: number;
@@ -111,7 +125,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
-      this.marker = L.marker([lat, lon], { draggable: true }).addTo(this.map);
+      this.marker = L.marker([lat, lon], { draggable: true, icon: PICKER_ICON }).addTo(this.map);
       this.marker.on('dragend', () => {
         const pos = this.marker!.getLatLng();
         this.placePin(pos.lat, pos.lng, true);

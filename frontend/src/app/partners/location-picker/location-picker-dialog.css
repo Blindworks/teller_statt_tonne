@@ -28,3 +28,39 @@
   min-height: 320px;
   width: 100%;
 }
+
+:host ::ng-deep .picker-marker {
+  background: transparent;
+  border: none;
+}
+
+:host ::ng-deep .picker-marker__pin {
+  width: 36px;
+  height: 36px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary, #116e20);
+  color: var(--color-on-primary, #eaffe2);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 6px 14px -4px rgba(0, 0, 0, 0.35);
+}
+
+:host ::ng-deep .picker-marker__pin .material-symbols-outlined {
+  font-size: 22px;
+  line-height: 1;
+}
+
+:host ::ng-deep .picker-marker__tail {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 12px;
+  height: 10px;
+  transform: translateX(-50%);
+  fill: var(--color-primary, #116e20);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.18));
+}
