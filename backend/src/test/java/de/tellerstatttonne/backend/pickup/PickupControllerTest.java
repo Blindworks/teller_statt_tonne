@@ -11,10 +11,14 @@ import de.tellerstatttonne.backend.user.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -54,6 +58,30 @@ class PickupControllerTest {
         user.setCreatedAt(now);
         user.setUpdatedAt(now);
         memberId = userRepository.save(user).getId();
+
+        UserEntity admin = new UserEntity();
+        admin.setEmail("admin-" + System.nanoTime() + "@example.de");
+        admin.setPasswordHash("dummy");
+        admin.setRole(Role.ADMINISTRATOR);
+        admin.setFirstName("Ada");
+        admin.setLastName("Admin");
+        admin.setOnlineStatus(UserEntity.OnlineStatus.ONLINE);
+        admin.setStatus(UserEntity.Status.ACTIVE);
+        admin.setCreatedAt(now);
+        admin.setUpdatedAt(now);
+        Long adminId = userRepository.save(admin).getId();
+
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                String.valueOf(adminId), null,
+                List.of(new SimpleGrantedAuthority("ROLE_ADMINISTRATOR"))
+            )
+        );
+    }
+
+    @AfterEach
+    void clearSecurity() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test

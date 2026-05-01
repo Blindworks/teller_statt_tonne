@@ -1,8 +1,12 @@
 package de.tellerstatttonne.backend.pickup;
 
+import de.tellerstatttonne.backend.auth.CurrentUser;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
+import de.tellerstatttonne.backend.user.Role;
 import de.tellerstatttonne.backend.user.User;
+import de.tellerstatttonne.backend.user.UserEntity;
+import de.tellerstatttonne.backend.user.UserRepository;
 import de.tellerstatttonne.backend.user.UserService;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -24,37 +28,74 @@ public class PickupService {
 
     private final PickupRepository repository;
     private final PartnerRepository partnerRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
 
     public PickupService(PickupRepository repository,
                          PartnerRepository partnerRepository,
+                         UserRepository userRepository,
                          UserService userService) {
         this.repository = repository;
         this.partnerRepository = partnerRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
     }
 
     @Transactional(readOnly = true)
     public List<Pickup> findBetween(LocalDate from, LocalDate to) {
+        Optional<Set<Long>> filter = currentUserPartnerFilter();
+        if (filter.isPresent() && filter.get().isEmpty()) return List.of();
         List<PickupEntity> entities = repository.findByDateBetweenOrderByDateAscStartTimeAsc(from, to);
-        return mapAll(entities);
+        return mapAll(applyFilter(entities, filter));
     }
 
     @Transactional(readOnly = true)
     public List<Pickup> findRecent() {
-        return mapAll(repository.findTop10ByOrderByDateDescStartTimeDesc());
+        Optional<Set<Long>> filter = currentUserPartnerFilter();
+        if (filter.isPresent() && filter.get().isEmpty()) return List.of();
+        return mapAll(applyFilter(repository.findTop10ByOrderByDateDescStartTimeDesc(), filter));
     }
 
     @Transactional(readOnly = true)
     public List<Pickup> findUpcoming(int limit) {
+        Optional<Set<Long>> filter = currentUserPartnerFilter();
+        if (filter.isPresent() && filter.get().isEmpty()) return List.of();
         int capped = Math.max(1, Math.min(limit, 50));
-        return mapAll(repository.findByStatusAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
-            Pickup.Status.SCHEDULED, LocalDate.now(), PageRequest.of(0, capped)));
+        return mapAll(applyFilter(repository.findByStatusAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
+            Pickup.Status.SCHEDULED, LocalDate.now(), PageRequest.of(0, capped)), filter));
     }
 
     @Transactional(readOnly = true)
     public Optional<Pickup> findById(Long id) {
-        return repository.findById(id).map(e -> PickupMapper.toDto(e, resolveUsers(List.of(e))));
+        Optional<Set<Long>> filter = currentUserPartnerFilter();
+        return repository.findById(id)
+            .filter(e -> filter.isEmpty() || (e.getPartner() != null && filter.get().contains(e.getPartner().getId())))
+            .map(e -> PickupMapper.toDto(e, resolveUsers(List.of(e))));
+    }
+
+    private Optional<Set<Long>> currentUserPartnerFilter() {
+        Long userId;
+        try {
+            userId = CurrentUser.requireId();
+        } catch (IllegalStateException ex) {
+            return Optional.empty();
+        }
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        if (user == null) return Optional.of(Set.of());
+        Role role = user.getRole();
+        if (role == Role.ADMINISTRATOR || role == Role.BOTSCHAFTER) return Optional.empty();
+        if (role == Role.RETTER) {
+            return Optional.of(new HashSet<>(partnerRepository.findIdsByMemberId(userId)));
+        }
+        return Optional.of(Set.of());
+    }
+
+    private static List<PickupEntity> applyFilter(List<PickupEntity> entities, Optional<Set<Long>> filter) {
+        if (filter.isEmpty()) return entities;
+        Set<Long> allowed = filter.get();
+        return entities.stream()
+            .filter(e -> e.getPartner() != null && allowed.contains(e.getPartner().getId()))
+            .toList();
     }
 
     public Pickup create(Pickup pickup) {

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 import { PickupService } from '../pickup.service';
 import { Pickup } from '../pickup.model';
 import { PickupCardComponent } from '../pickup-card/pickup-card';
@@ -25,12 +26,20 @@ type ViewMode = 'WEEK' | 'LIST' | 'MAP';
 })
 export class PickupsComponent {
   private readonly service = inject(PickupService);
+  private readonly auth = inject(AuthService);
 
   readonly loadError = signal<string | null>(null);
+  readonly actionError = signal<string | null>(null);
   readonly pickups = signal<Pickup[]>([]);
   readonly recent = signal<Pickup[]>([]);
   readonly view = signal<ViewMode>('WEEK');
   readonly availableOnly = signal(false);
+
+  readonly currentUserId = computed(() => this.auth.currentUser()?.id ?? null);
+  readonly isRetter = computed(() => this.auth.currentUser()?.role === 'RETTER');
+  readonly cardMode = computed<'PLANNER' | 'RETTER'>(() =>
+    this.isRetter() ? 'RETTER' : 'PLANNER',
+  );
 
   readonly currentWeekStart = signal<Date>(startOfIsoWeek(new Date()));
 
@@ -138,6 +147,37 @@ export class PickupsComponent {
 
   toggleAvailable(): void {
     this.availableOnly.update((v) => !v);
+  }
+
+  signup(pickupId: number): void {
+    this.actionError.set(null);
+    this.service.signup(pickupId).subscribe({
+      next: () => this.reloadWeek(),
+      error: (err) => this.actionError.set(this.errorText(err, 'Eintragen fehlgeschlagen.')),
+    });
+  }
+
+  unassign(pickupId: number): void {
+    this.actionError.set(null);
+    this.service.unassign(pickupId).subscribe({
+      next: () => this.reloadWeek(),
+      error: (err) => this.actionError.set(this.errorText(err, 'Austragen fehlgeschlagen.')),
+    });
+  }
+
+  private reloadWeek(): void {
+    this.service.list(this.weekStartIso(), this.weekEndIso()).subscribe({
+      next: (list) => this.pickups.set(list),
+      error: () => this.loadError.set('Abholungen konnten nicht geladen werden.'),
+    });
+  }
+
+  private errorText(err: unknown, fallback: string): string {
+    const status = (err as { status?: number })?.status;
+    if (status === 403) return 'Du bist diesem Store nicht zugeordnet.';
+    if (status === 409) return 'Slot ist bereits voll.';
+    if (status === 404) return 'Slot wurde nicht gefunden.';
+    return fallback;
   }
 
   setView(view: ViewMode): void {

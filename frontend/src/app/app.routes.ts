@@ -7,6 +7,7 @@ import { roleGuard } from './auth/role.guard';
 import { landingGuard } from './landing/landing.guard';
 
 const plannerRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER']);
+const plannerViewRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER', 'RETTER']);
 
 export const routes: Routes = [
   {
@@ -46,7 +47,7 @@ export const routes: Routes = [
       },
       {
         path: 'pickups',
-        canActivate: [plannerRoles],
+        canActivate: [plannerViewRoles],
         loadComponent: () =>
           import('./pickups/pickups/pickups').then((m) => m.PickupsComponent),
       },

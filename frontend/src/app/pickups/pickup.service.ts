@@ -43,4 +43,12 @@ export class PickupService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  signup(pickupId: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${pickupId}/signup`, {});
+  }
+
+  unassign(pickupId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${pickupId}/signup`);
+  }
 }

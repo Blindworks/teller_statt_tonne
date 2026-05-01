@@ -53,6 +53,13 @@
       {{ loadError() }}
     </div>
   }
+  @if (actionError()) {
+    <div
+      class="mb-6 px-6 py-4 rounded-xl bg-error-container text-on-error-container text-sm font-semibold"
+    >
+      {{ actionError() }}
+    </div>
+  }
 
   <!-- Hero Bento -->
   <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -185,16 +192,25 @@
 
         @if (day.pickups.length > 0) {
           @for (p of day.pickups; track p.id) {
-            <app-pickup-card [pickup]="p" [today]="day.isToday" />
+            <app-pickup-card
+              [pickup]="p"
+              [today]="day.isToday"
+              [mode]="cardMode()"
+              [currentUserId]="currentUserId()"
+              (signupRequested)="signup($event)"
+              (unassignRequested)="unassign($event)"
+            />
           }
-          <a
-            [routerLink]="['/pickups/new']"
-            [queryParams]="{ date: day.iso }"
-            class="flex items-center justify-center gap-1 py-2 rounded-xl border border-dashed border-outline-variant/30 text-xs font-medium text-on-surface-variant hover:border-primary hover:text-primary transition-colors"
-            aria-label="Abholung hinzufügen"
-          >
-            <span class="material-symbols-outlined text-sm">add</span> Hinzufügen
-          </a>
+          @if (!isRetter()) {
+            <a
+              [routerLink]="['/pickups/new']"
+              [queryParams]="{ date: day.iso }"
+              class="flex items-center justify-center gap-1 py-2 rounded-xl border border-dashed border-outline-variant/30 text-xs font-medium text-on-surface-variant hover:border-primary hover:text-primary transition-colors"
+              aria-label="Abholung hinzufügen"
+            >
+              <span class="material-symbols-outlined text-sm">add</span> Hinzufügen
+            </a>
+          }
         } @else if (day.isSunday) {
           <div
             class="py-8 text-center bg-surface-container-low/30 rounded-xl border-2 border-dashed border-outline-variant/10"
@@ -204,7 +220,7 @@
             </span>
             <p class="text-[10px] font-medium text-on-surface-variant px-4">Sonntagsruhe</p>
           </div>
-        } @else {
+        } @else if (!isRetter()) {
           <a
             [routerLink]="['/pickups/new']"
             [queryParams]="{ date: day.iso }"
@@ -219,6 +235,15 @@
               Abholung hinzufügen
             </p>
           </a>
+        } @else {
+          <div
+            class="py-8 text-center bg-surface-container-low/30 rounded-xl border-2 border-dashed border-outline-variant/10"
+          >
+            <span class="material-symbols-outlined text-outline-variant text-3xl mb-2">
+              event_busy
+            </span>
+            <p class="text-[10px] font-medium text-on-surface-variant px-4">Keine Abholungen</p>
+          </div>
         }
       </div>
     }
@@ -238,8 +263,10 @@
       <div class="space-y-3">
         @for (p of recent(); track p.id) {
           <a
-            [routerLink]="['/pickups/edit', p.id]"
-            class="bg-surface-container-lowest p-6 rounded-lg flex items-center gap-6 group hover:translate-x-2 transition-transform cursor-pointer"
+            [routerLink]="isRetter() ? null : ['/pickups/edit', p.id]"
+            class="bg-surface-container-lowest p-6 rounded-lg flex items-center gap-6 group transition-transform"
+            [class.hover:translate-x-2]="!isRetter()"
+            [class.cursor-pointer]="!isRetter()"
           >
             <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-primary-container flex items-center justify-center text-on-primary-container font-bold">
               @if (logAvatar(p); as url) {
@@ -288,11 +315,13 @@
   </section>
 </main>
 
-<!-- Floating Action Button -->
-<a
-  routerLink="/pickups/new"
-  class="fixed bottom-24 right-8 md:bottom-12 md:right-12 w-16 h-16 bg-gradient-to-br from-primary to-primary-dim text-white rounded-full shadow-[0_20px_40px_-10px_rgba(17,110,32,0.4)] flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-40"
-  aria-label="Abholung hinzufügen"
->
-  <span class="material-symbols-outlined text-3xl">add</span>
-</a>
+@if (!isRetter()) {
+  <!-- Floating Action Button -->
+  <a
+    routerLink="/pickups/new"
+    class="fixed bottom-24 right-8 md:bottom-12 md:right-12 w-16 h-16 bg-gradient-to-br from-primary to-primary-dim text-white rounded-full shadow-[0_20px_40px_-10px_rgba(17,110,32,0.4)] flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-40"
+    aria-label="Abholung hinzufügen"
+  >
+    <span class="material-symbols-outlined text-3xl">add</span>
+  </a>
+}

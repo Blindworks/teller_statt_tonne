@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CATEGORY_LABELS, Category } from '../../partners/partner.model';
 import { Pickup } from '../pickup.model';
 
 type Variant = 'FILLED' | 'OPEN' | 'COMPLETED' | 'CANCELLED';
+
+export type PickupCardMode = 'PLANNER' | 'RETTER';
 
 @Component({
   selector: 'app-pickup-card',
@@ -15,6 +17,11 @@ type Variant = 'FILLED' | 'OPEN' | 'COMPLETED' | 'CANCELLED';
 export class PickupCardComponent {
   readonly pickup = input.required<Pickup>();
   readonly today = input<boolean>(false);
+  readonly mode = input<PickupCardMode>('PLANNER');
+  readonly currentUserId = input<number | null>(null);
+
+  readonly signupRequested = output<number>();
+  readonly unassignRequested = output<number>();
 
   readonly categoryLabels = CATEGORY_LABELS;
 
@@ -39,6 +46,49 @@ export class PickupCardComponent {
     const c = this.pickup().partnerCategory;
     return c ? CATEGORY_LABELS[c] : 'Partner';
   });
+
+  readonly isRetter = computed(() => this.mode() === 'RETTER');
+
+  readonly currentUserAssigned = computed(() => {
+    const uid = this.currentUserId();
+    if (uid == null) return false;
+    return this.pickup().assignments.some((a) => a.memberId === uid);
+  });
+
+  readonly canSignup = computed(() => {
+    const p = this.pickup();
+    return (
+      this.isRetter() &&
+      p.status === 'SCHEDULED' &&
+      !this.currentUserAssigned() &&
+      p.assignments.length < p.capacity
+    );
+  });
+
+  readonly canUnassign = computed(() => {
+    const p = this.pickup();
+    return this.isRetter() && p.status === 'SCHEDULED' && this.currentUserAssigned();
+  });
+
+  readonly editLink = computed<unknown[] | null>(() => {
+    if (this.isRetter()) return null;
+    const id = this.pickup().id;
+    return id ? ['/pickups/edit', id] : null;
+  });
+
+  onSignup(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const id = this.pickup().id;
+    if (id != null) this.signupRequested.emit(id);
+  }
+
+  onUnassign(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const id = this.pickup().id;
+    if (id != null) this.unassignRequested.emit(id);
+  }
 }
 
 function chipClass(category: Category | null): string {

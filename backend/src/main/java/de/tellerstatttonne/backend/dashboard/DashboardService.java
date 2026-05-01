@@ -89,16 +89,7 @@ public class DashboardService {
     }
 
     private Set<Long> memberPartnerIds(Long userId) {
-        Set<Long> ids = new HashSet<>();
-        for (PartnerEntity partner : partnerRepository.findAll()) {
-            for (UserEntity m : partner.getMembers()) {
-                if (userId.equals(m.getId())) {
-                    ids.add(partner.getId());
-                    break;
-                }
-            }
-        }
-        return ids;
+        return new HashSet<>(partnerRepository.findIdsByMemberId(userId));
     }
 
     private static String coverageKey(Long partnerId, String startTime, String endTime) {

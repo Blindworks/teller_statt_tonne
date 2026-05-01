@@ -45,7 +45,7 @@ export class AppShellComponent {
 
   readonly isPlanner = computed(() => {
     const role = this.currentUser()?.role;
-    return role === 'ADMINISTRATOR' || role === 'BOTSCHAFTER';
+    return role === 'ADMINISTRATOR' || role === 'BOTSCHAFTER' || role === 'RETTER';
   });
 
   constructor() {
