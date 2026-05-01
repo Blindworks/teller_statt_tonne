@@ -10,8 +10,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import './leaflet-global';
-import * as L from 'leaflet';
+import { L } from './leaflet-global';
 import 'leaflet.markercluster';
 import {
   CATEGORY_ICONS,
