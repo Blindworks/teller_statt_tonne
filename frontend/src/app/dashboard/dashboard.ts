@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
 import { PickupAssignment } from '../pickups/pickup.model';
+import { resolvePhotoUrl } from '../users/photo-url';
 import { Role } from '../users/user.model';
 import { UserProfileDialogService } from '../users/user-profile-dialog/user-profile-dialog.service';
 import { DaySlot } from './day-slot.model';
@@ -176,7 +177,7 @@ export class DashboardComponent {
         filled: !!a,
         memberId: a?.memberId ?? null,
         memberName: a?.memberName ?? null,
-        avatarUrl: a?.memberAvatarUrl ?? null,
+        avatarUrl: resolvePhotoUrl(a?.memberAvatarUrl ?? null),
         initial: this.initial(a?.memberName ?? null),
       });
     }
