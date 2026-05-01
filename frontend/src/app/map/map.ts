@@ -10,6 +10,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import './leaflet-global';
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import {
