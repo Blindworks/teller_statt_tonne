@@ -3,14 +3,15 @@
 
 <a
   [routerLink]="editLink()"
-  class="block bg-surface-container-lowest p-4 rounded-xl shadow-sm transition-all group"
+  class="block p-4 rounded-xl shadow-sm transition-all group"
+  [class.bg-surface-container-lowest]="v === 'COMPLETED' || v === 'CANCELLED'"
+  [class.bg-primary-container/40]="v === 'FILLED'"
+  [class.bg-tertiary-container/30]="v === 'PARTIAL'"
+  [class.bg-error-container/30]="v === 'EMPTY'"
   [class.shadow-md]="today() && v !== 'COMPLETED' && v !== 'CANCELLED'"
   [class.border-t-4]="today() && v !== 'COMPLETED' && v !== 'CANCELLED'"
-  [class.border-primary]="today() && v !== 'COMPLETED' && v !== 'CANCELLED'"
-  [class.border-2]="v === 'OPEN'"
-  [class.border-dashed]="v === 'OPEN'"
-  [class.border-outline-variant]="v === 'OPEN'"
-  [class.cursor-pointer]="!isRetter() && v === 'OPEN'"
+  [class.border-t-primary]="today() && v !== 'COMPLETED' && v !== 'CANCELLED'"
+  [class.cursor-pointer]="!isRetter() && (v === 'PARTIAL' || v === 'EMPTY')"
   [class.hover:shadow-md]="!isRetter() && v === 'FILLED'"
   [class.opacity-60]="v === 'COMPLETED' || v === 'CANCELLED'"
 >
@@ -21,7 +22,7 @@
     >
       {{ chipLabel() }}
     </span>
-    @if (!isRetter() && (v === 'FILLED' || v === 'OPEN')) {
+    @if (!isRetter() && v !== 'COMPLETED' && v !== 'CANCELLED') {
       <span
         class="material-symbols-outlined text-on-surface-variant text-sm group-hover:text-primary transition-colors"
       >

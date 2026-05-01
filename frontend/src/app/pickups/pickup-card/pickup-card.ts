@@ -5,7 +5,7 @@ import { resolvePhotoUrl } from '../../users/photo-url';
 import { UserProfileDialogService } from '../../users/user-profile-dialog/user-profile-dialog.service';
 import { Pickup } from '../pickup.model';
 
-type Variant = 'FILLED' | 'OPEN' | 'COMPLETED' | 'CANCELLED';
+type Variant = 'FILLED' | 'PARTIAL' | 'EMPTY' | 'COMPLETED' | 'CANCELLED';
 
 export type PickupCardMode = 'PLANNER' | 'RETTER';
 
@@ -33,7 +33,9 @@ export class PickupCardComponent {
     const p = this.pickup();
     if (p.status === 'CANCELLED') return 'CANCELLED';
     if (p.status === 'COMPLETED') return 'COMPLETED';
-    return p.assignments.length >= p.capacity ? 'FILLED' : 'OPEN';
+    if (p.assignments.length >= p.capacity) return 'FILLED';
+    if (p.assignments.length > 0) return 'PARTIAL';
+    return 'EMPTY';
   });
 
   readonly remaining = computed(() => {

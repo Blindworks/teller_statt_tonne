@@ -67,6 +67,7 @@ export class DashboardComponent {
   );
 
   readonly userRole = computed<Role | null>(() => this.authService.currentUser()?.role ?? null);
+  readonly firstName = computed<string>(() => this.authService.currentUser()?.firstName ?? '');
   readonly isRetter = computed(() => this.userRole() === 'RETTER');
   readonly isAdminOrAmbassador = computed(() => {
     const role = this.userRole();
