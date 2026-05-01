@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   FormArray,
   FormBuilder,
@@ -12,7 +13,7 @@ import { Observable } from 'rxjs';
 import { UserService } from '../../users/user.service';
 import { User } from '../../users/user.model';
 import { PartnerService } from '../../partners/partner.service';
-import { Partner } from '../../partners/partner.model';
+import { Partner, PickupSlot, Weekday } from '../../partners/partner.model';
 import { PickupService } from '../pickup.service';
 import { Pickup, PickupStatus, emptyPickup } from '../pickup.model';
 
@@ -30,6 +31,23 @@ type PickupForm = FormGroup<{
   notes: FormControl<string>;
   assignments: FormArray<AssignmentForm>;
 }>;
+
+const WEEKDAY_BY_INDEX: Weekday[] = [
+  'SUNDAY',
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY',
+];
+
+function weekdayFromDate(dateIso: string | null | undefined): Weekday | null {
+  if (!dateIso) return null;
+  const d = new Date(dateIso + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return null;
+  return WEEKDAY_BY_INDEX[d.getDay()];
+}
 
 @Component({
   selector: 'app-pickup-edit',
@@ -55,14 +73,75 @@ export class PickupEditComponent {
 
   readonly partners = signal<Partner[]>([]);
   readonly members = signal<User[]>([]);
+  readonly pickupsOnDate = signal<Pickup[]>([]);
 
   readonly statuses: PickupStatus[] = ['SCHEDULED', 'COMPLETED', 'CANCELLED'];
 
   readonly form: PickupForm = this.buildForm();
 
+  private readonly dateValue = toSignal(this.form.controls.date.valueChanges, {
+    initialValue: this.form.controls.date.value,
+  });
+  private readonly partnerIdValue = toSignal(this.form.controls.partnerId.valueChanges, {
+    initialValue: this.form.controls.partnerId.value,
+  });
+  private readonly startTimeValue = toSignal(this.form.controls.startTime.valueChanges, {
+    initialValue: this.form.controls.startTime.value,
+  });
+  private readonly endTimeValue = toSignal(this.form.controls.endTime.valueChanges, {
+    initialValue: this.form.controls.endTime.value,
+  });
+
+  readonly selectedWeekday = computed(() => weekdayFromDate(this.dateValue()));
+
+  private isSlotTaken(partnerId: number, slot: PickupSlot): boolean {
+    const editingId = this.pickupId();
+    return this.pickupsOnDate().some(
+      (p) =>
+        p.partnerId === partnerId &&
+        p.startTime === slot.startTime &&
+        p.endTime === slot.endTime &&
+        p.id !== editingId,
+    );
+  }
+
+  readonly availablePartners = computed<Partner[]>(() => {
+    if (this.isEdit) return this.partners();
+    const wd = this.selectedWeekday();
+    if (!wd) return [];
+    return this.partners().filter((p) => {
+      const slots = (p.pickupSlots ?? []).filter((s) => s.active && s.weekday === wd);
+      if (slots.length === 0) return false;
+      return slots.some((s) => p.id != null && !this.isSlotTaken(p.id, s));
+    });
+  });
+
+  readonly availableSlots = computed<PickupSlot[]>(() => {
+    const wd = this.selectedWeekday();
+    const pid = this.partnerIdValue();
+    if (!wd || pid == null) return [];
+    const partner = this.partners().find((p) => p.id === pid);
+    if (!partner) return [];
+    return (partner.pickupSlots ?? []).filter(
+      (s) => s.active && s.weekday === wd && !this.isSlotTaken(pid, s),
+    );
+  });
+
+  readonly selectedSlotKey = computed<string | null>(() => {
+    const start = this.startTimeValue();
+    const end = this.endTimeValue();
+    if (!start || !end) return null;
+    return `${start}-${end}`;
+  });
+
   constructor() {
     this.partnerService.list().subscribe({
-      next: (list) => this.partners.set(list),
+      next: (list) => {
+        this.partners.set(list);
+        if (!this.isEdit) {
+          this.applyQueryParamDefaults();
+        }
+      },
       error: () => {},
     });
     this.userService.list({}).subscribe({
@@ -78,9 +157,27 @@ export class PickupEditComponent {
         next: (p) => this.patchForm(p),
         error: () => this.errorMessage.set('Abholung konnte nicht geladen werden.'),
       });
-    } else {
-      this.applyQueryParamDefaults();
     }
+
+    this.form.controls.date.valueChanges.subscribe((date) => {
+      this.loadPickupsForDate(date);
+      if (this.isEdit) return;
+      const partners = this.availablePartners();
+      const pid = this.form.controls.partnerId.value;
+      if (pid != null && !partners.some((p) => p.id === pid)) {
+        this.form.patchValue({ partnerId: null });
+        this.clearTimeFields();
+      } else {
+        this.reconcileSlotSelection();
+      }
+    });
+
+    this.loadPickupsForDate(this.form.controls.date.value);
+
+    this.form.controls.partnerId.valueChanges.subscribe(() => {
+      if (this.isEdit) return;
+      this.reconcileSlotSelection();
+    });
   }
 
   private applyQueryParamDefaults(): void {
@@ -95,12 +192,38 @@ export class PickupEditComponent {
       startTime: string;
       endTime: string;
     }> = {};
-    if (partnerId && !Number.isNaN(Number(partnerId))) patch.partnerId = Number(partnerId);
     if (date) patch.date = date;
+    if (partnerId && !Number.isNaN(Number(partnerId))) patch.partnerId = Number(partnerId);
     if (startTime) patch.startTime = startTime;
     if (endTime) patch.endTime = endTime;
     if (Object.keys(patch).length > 0) {
       this.form.patchValue(patch);
+    }
+  }
+
+  private loadPickupsForDate(date: string | null | undefined): void {
+    if (!date) {
+      this.pickupsOnDate.set([]);
+      return;
+    }
+    this.service.list(date, date).subscribe({
+      next: (list) => this.pickupsOnDate.set(list),
+      error: () => this.pickupsOnDate.set([]),
+    });
+  }
+
+  private clearTimeFields(): void {
+    this.form.patchValue({ startTime: '', endTime: '', capacity: 1 });
+  }
+
+  private reconcileSlotSelection(): void {
+    const slots = this.availableSlots();
+    const start = this.form.controls.startTime.value;
+    const end = this.form.controls.endTime.value;
+    if (!start || !end) return;
+    const match = slots.find((s) => s.startTime === start && s.endTime === end);
+    if (!match) {
+      this.clearTimeFields();
     }
   }
 
@@ -110,6 +233,18 @@ export class PickupEditComponent {
 
   get isEdit(): boolean {
     return this.pickupId() !== null;
+  }
+
+  selectSlot(slot: PickupSlot): void {
+    this.form.patchValue({
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      capacity: slot.capacity,
+    });
+  }
+
+  isSlotSelected(slot: PickupSlot): boolean {
+    return this.selectedSlotKey() === `${slot.startTime}-${slot.endTime}`;
   }
 
   addAssignment(): void {
