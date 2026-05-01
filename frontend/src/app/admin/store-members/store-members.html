@@ -141,7 +141,12 @@
               <div
                 class="bg-surface-container-low p-4 rounded-xl flex items-center gap-4 border border-transparent hover:border-primary/20 transition-all"
               >
-                <div class="relative">
+                <button
+                  type="button"
+                  (click)="openProfile(member.id)"
+                  [attr.aria-label]="'Profil von ' + member.firstName + ' ' + member.lastName"
+                  class="relative cursor-pointer"
+                >
                   @if (member.photoUrl) {
                     <img
                       [src]="member.photoUrl | photoUrl"
@@ -159,7 +164,7 @@
                     class="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-surface-container-low"
                     [class]="onlineDotClass(member.onlineStatus)"
                   ></div>
-                </div>
+                </button>
                 <div class="flex-1 min-w-0">
                   <h4 class="font-bold text-on-surface truncate">
                     {{ member.firstName }} {{ member.lastName }}

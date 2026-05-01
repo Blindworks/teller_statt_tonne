@@ -14,6 +14,7 @@ import { StoreMember } from './store-member.model';
 import { StoreMembersService } from './store-members.service';
 import { AssignMemberDialogComponent } from './assign-member-dialog/assign-member-dialog';
 import { PhotoUrlPipe } from '../../users/photo-url.pipe';
+import { UserProfileDialogService } from '../../users/user-profile-dialog/user-profile-dialog.service';
 
 @Component({
   selector: 'app-store-members',
@@ -26,6 +27,7 @@ export class StoreMembersComponent {
   private readonly partnerService = inject(PartnerService);
   private readonly userService = inject(UserService);
   private readonly storeMembersService = inject(StoreMembersService);
+  private readonly profileDialog = inject(UserProfileDialogService);
 
   readonly stores = signal<Partner[]>([]);
   readonly memberCounts = signal<Record<number, number>>({});
@@ -111,6 +113,10 @@ export class StoreMembersComponent {
   memberCount(storeId: number | null): number {
     if (!storeId) return 0;
     return this.memberCounts()[storeId] ?? 0;
+  }
+
+  openProfile(memberId: number): void {
+    this.profileDialog.open(memberId);
   }
 
   initials(member: { firstName: string; lastName: string }): string {

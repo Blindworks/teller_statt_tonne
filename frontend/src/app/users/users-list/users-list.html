@@ -84,8 +84,11 @@
         [class.border-secondary]="user.role === 'NEW_MEMBER'"
       >
         <div class="flex justify-between items-start">
-          <div
-            class="w-20 h-20 rounded-full overflow-hidden ring-4 shadow-lg group-hover:scale-105 transition-transform duration-500"
+          <button
+            type="button"
+            (click)="openProfile(user.id)"
+            [attr.aria-label]="'Profil von ' + user.firstName + ' ' + user.lastName"
+            class="w-20 h-20 rounded-full overflow-hidden ring-4 shadow-lg group-hover:scale-105 transition-transform duration-500 cursor-pointer"
             [class.ring-tertiary-container]="user.role === 'BOTSCHAFTER'"
             [class.ring-primary-container\\/30]="user.role === 'RETTER'"
             [class.ring-secondary-container]="user.role === 'NEW_MEMBER'"
@@ -103,7 +106,7 @@
                 <span class="material-symbols-outlined text-3xl">person</span>
               </div>
             }
-          </div>
+          </button>
           <span
             class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider"
             [class]="roleBadgeClass(user.role)"

@@ -4,6 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
 import { PickupAssignment } from '../pickups/pickup.model';
 import { Role } from '../users/user.model';
+import { UserProfileDialogService } from '../users/user-profile-dialog/user-profile-dialog.service';
 import { DaySlot } from './day-slot.model';
 import { DashboardService } from './dashboard.service';
 
@@ -16,6 +17,7 @@ interface NewsItem {
 
 interface SlotChip {
   filled: boolean;
+  memberId: number | null;
   memberName: string | null;
   avatarUrl: string | null;
   initial: string;
@@ -54,6 +56,7 @@ export class DashboardComponent {
   private readonly dashboardService = inject(DashboardService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly profileDialog = inject(UserProfileDialogService);
 
   private readonly daySlotsSignal = signal<DaySlot[]>([]);
   private readonly errorSignal = signal<string | null>(null);
@@ -104,6 +107,11 @@ export class DashboardComponent {
 
   readonly profileImage =
     'https://lh3.googleusercontent.com/aida-public/AB6AXuAlnI7Jvlz_ItVX5RMs8c1rQ2KnMKp8akokDrB8ge2wAaZPKWb0ZDKUztGT9bQkumnREcvOTokVb7yTetcJwvZJIctkI5SOdI3iYH6EcWu-6h6KRX4XNypVJaFdgZglXJMWHELSUGH_u0Lvqx7Yy0AEwqDJ5KHcNMqF8eTxPtwdDcRpjpv75EulDc28zDPv0eIEFRMS9w0I8Yw0rbYWBF4HU9IFqaNxK5ICJ83u0UqpC-UhY4-fq1vwPvtT02JkgJhBJhKB8gWkHaQu';
+
+  openProfile(memberId: number | null): void {
+    if (memberId == null) return;
+    this.profileDialog.open(memberId);
+  }
 
   openSlot(slot: DisplaySlot): void {
     if (slot.pickupId != null) {
@@ -166,6 +174,7 @@ export class DashboardComponent {
       const a: PickupAssignment | undefined = assignments[i];
       chips.push({
         filled: !!a,
+        memberId: a?.memberId ?? null,
         memberName: a?.memberName ?? null,
         avatarUrl: a?.memberAvatarUrl ?? null,
         initial: this.initial(a?.memberName ?? null),

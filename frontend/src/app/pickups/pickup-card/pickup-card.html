@@ -55,19 +55,26 @@
       @if (v === 'FILLED') {
         <div class="flex -space-x-2">
           @for (a of p.assignments; track a.memberId) {
-            @if (avatarUrl(a.memberAvatarUrl); as src) {
-              <img
-                [src]="src"
-                [alt]="a.memberName ?? 'Mitglied'"
-                class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest object-cover"
-              />
-            } @else {
-              <div
-                class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest bg-primary-container text-on-primary-container text-[9px] font-bold flex items-center justify-center"
-              >
-                {{ (a.memberName ?? '?').charAt(0) }}
-              </div>
-            }
+            <button
+              type="button"
+              (click)="onAvatarClick($event, a.memberId)"
+              [attr.aria-label]="'Profil von ' + (a.memberName ?? 'Mitglied')"
+              class="cursor-pointer"
+            >
+              @if (avatarUrl(a.memberAvatarUrl); as src) {
+                <img
+                  [src]="src"
+                  [alt]="a.memberName ?? 'Mitglied'"
+                  class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest object-cover"
+                />
+              } @else {
+                <div
+                  class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest bg-primary-container text-on-primary-container text-[9px] font-bold flex items-center justify-center"
+                >
+                  {{ (a.memberName ?? '?').charAt(0) }}
+                </div>
+              }
+            </button>
           }
         </div>
         <span class="text-[10px] font-bold text-on-surface-variant">FULL</span>

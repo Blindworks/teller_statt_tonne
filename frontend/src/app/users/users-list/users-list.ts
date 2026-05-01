@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserFilter, UserService } from '../user.service';
 import { Role, RoleOption, User } from '../user.model';
 import { PhotoUrlPipe } from '../photo-url.pipe';
+import { UserProfileDialogService } from '../user-profile-dialog/user-profile-dialog.service';
 
 type FilterChip = { label: string; role: Role | null; activeOnly: boolean };
 
@@ -18,6 +19,7 @@ type FilterChip = { label: string; role: Role | null; activeOnly: boolean };
 })
 export class UsersListComponent {
   private readonly service = inject(UserService);
+  private readonly profileDialog = inject(UserProfileDialogService);
   private readonly reload$ = new Subject<UserFilter>();
 
   readonly users = signal<User[]>([]);
@@ -70,6 +72,11 @@ export class UsersListComponent {
       });
 
     this.triggerReload();
+  }
+
+  openProfile(userId: number | null): void {
+    if (userId == null) return;
+    this.profileDialog.open(userId);
   }
 
   setFilter(index: number): void {

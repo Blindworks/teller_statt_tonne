@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CATEGORY_LABELS, Category } from '../../partners/partner.model';
 import { resolvePhotoUrl } from '../../users/photo-url';
+import { UserProfileDialogService } from '../../users/user-profile-dialog/user-profile-dialog.service';
 import { Pickup } from '../pickup.model';
 
 type Variant = 'FILLED' | 'OPEN' | 'COMPLETED' | 'CANCELLED';
@@ -16,6 +17,8 @@ export type PickupCardMode = 'PLANNER' | 'RETTER';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PickupCardComponent {
+  private readonly profileDialog = inject(UserProfileDialogService);
+
   readonly pickup = input.required<Pickup>();
   readonly today = input<boolean>(false);
   readonly mode = input<PickupCardMode>('PLANNER');
@@ -79,6 +82,12 @@ export class PickupCardComponent {
 
   avatarUrl(url: string | null): string | null {
     return resolvePhotoUrl(url);
+  }
+
+  onAvatarClick(event: MouseEvent, memberId: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.profileDialog.open(memberId);
   }
 
   onSignup(event: MouseEvent): void {

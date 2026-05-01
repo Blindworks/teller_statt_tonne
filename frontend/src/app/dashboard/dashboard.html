@@ -143,8 +143,11 @@
               <div class="flex items-center gap-2 flex-wrap">
                 @for (chip of slot.chips; track $index) {
                   @if (chip.filled) {
-                    <div
-                      class="flex items-center gap-1.5 bg-primary-container/60 text-on-primary-container rounded-full pl-1 pr-2.5 py-0.5"
+                    <button
+                      type="button"
+                      (click)="openProfile(chip.memberId)"
+                      [attr.aria-label]="'Profil von ' + (chip.memberName ?? 'Mitglied')"
+                      class="flex items-center gap-1.5 bg-primary-container/60 text-on-primary-container rounded-full pl-1 pr-2.5 py-0.5 hover:bg-primary-container transition-colors cursor-pointer"
                       [title]="chip.memberName ?? ''"
                     >
                       @if (chip.avatarUrl) {
@@ -162,7 +165,7 @@
                       <span class="text-xs font-medium truncate max-w-[8rem]">{{
                         chip.memberName ?? '—'
                       }}</span>
-                    </div>
+                    </button>
                   } @else if (isAdminOrAmbassador()) {
                     <button
                       type="button"
