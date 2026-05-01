@@ -1,13 +1,21 @@
 package de.tellerstatttonne.backend.partner;
 
+import de.tellerstatttonne.backend.pickup.Pickup;
+import de.tellerstatttonne.backend.pickup.PickupEntity;
+import de.tellerstatttonne.backend.pickup.PickupRepository;
 import de.tellerstatttonne.backend.user.availability.UserAvailabilityService;
 import de.tellerstatttonne.backend.user.availability.UserAvailabilityService.SlotKey;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +26,18 @@ public class PartnerService {
     private final PartnerRepository repository;
     private final GeocodingService geocodingService;
     private final UserAvailabilityService availabilityService;
+    private final PickupRepository pickupRepository;
 
     public PartnerService(
         PartnerRepository repository,
         GeocodingService geocodingService,
-        UserAvailabilityService availabilityService
+        UserAvailabilityService availabilityService,
+        PickupRepository pickupRepository
     ) {
         this.repository = repository;
         this.geocodingService = geocodingService;
         this.availabilityService = availabilityService;
+        this.pickupRepository = pickupRepository;
     }
 
     @Transactional(readOnly = true)
@@ -90,6 +101,7 @@ public class PartnerService {
     public Optional<Partner> update(Long id, Partner partner) {
         return repository.findById(id).map(entity -> {
             validate(partner);
+            checkSlotsNotInUse(id, entity, partner);
             boolean addressChanged = !addressEquals(entity, partner);
             PartnerMapper.applyToEntity(entity, partner);
             if (hasCoordinates(partner)) {
@@ -137,6 +149,52 @@ public class PartnerService {
         return Objects.equals(entity.getStreet(), partner.street())
             && Objects.equals(entity.getPostalCode(), partner.postalCode())
             && Objects.equals(entity.getCity(), partner.city());
+    }
+
+    private void checkSlotsNotInUse(Long partnerId, PartnerEntity existing, Partner incoming) {
+        Set<SlotKey> incomingKeys = incoming.pickupSlots() == null
+            ? Set.of()
+            : incoming.pickupSlots().stream()
+                .map(s -> new SlotKey(s.weekday(), s.startTime(), s.endTime()))
+                .collect(Collectors.toCollection(HashSet::new));
+
+        List<PartnerEntity.PickupSlotEmbeddable> removed = existing.getPickupSlots().stream()
+            .filter(s -> !incomingKeys.contains(new SlotKey(s.getWeekday(), s.getStartTime(), s.getEndTime())))
+            .toList();
+        if (removed.isEmpty()) return;
+
+        List<PickupEntity> futurePickups = pickupRepository
+            .findByPartnerIdAndStatusAndDateGreaterThanEqual(partnerId, Pickup.Status.SCHEDULED, LocalDate.now());
+        if (futurePickups.isEmpty()) return;
+
+        Set<SlotKey> bookedKeys = futurePickups.stream()
+            .map(p -> new SlotKey(toWeekday(p.getDate().getDayOfWeek()), p.getStartTime(), p.getEndTime()))
+            .collect(Collectors.toSet());
+
+        List<String> conflicts = removed.stream()
+            .filter(s -> bookedKeys.contains(new SlotKey(s.getWeekday(), s.getStartTime(), s.getEndTime())))
+            .map(s -> s.getWeekday() + " " + s.getStartTime() + "–" + s.getEndTime())
+            .toList();
+        if (!conflicts.isEmpty()) {
+            throw new SlotInUseException(
+                "Abholzeit wird noch von geplanten Abholungen genutzt: " + String.join(", ", conflicts));
+        }
+    }
+
+    private static Partner.Weekday toWeekday(DayOfWeek dow) {
+        return switch (dow) {
+            case MONDAY -> Partner.Weekday.MONDAY;
+            case TUESDAY -> Partner.Weekday.TUESDAY;
+            case WEDNESDAY -> Partner.Weekday.WEDNESDAY;
+            case THURSDAY -> Partner.Weekday.THURSDAY;
+            case FRIDAY -> Partner.Weekday.FRIDAY;
+            case SATURDAY -> Partner.Weekday.SATURDAY;
+            case SUNDAY -> Partner.Weekday.SUNDAY;
+        };
+    }
+
+    public static class SlotInUseException extends RuntimeException {
+        public SlotInUseException(String message) { super(message); }
     }
 
     private void validate(Partner partner) {

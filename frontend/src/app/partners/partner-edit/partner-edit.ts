@@ -116,6 +116,12 @@ export class PartnerEditComponent {
       },
       error: (err) => {
         this.saving.set(false);
+        if (err?.status === 409) {
+          this.errorMessage.set(
+            typeof err?.error === 'string' ? err.error : 'Abholzeit wird noch genutzt.',
+          );
+          return;
+        }
         this.errorMessage.set(
           typeof err?.error === 'string' ? err.error : 'Speichern fehlgeschlagen.',
         );
@@ -212,16 +218,26 @@ export class PartnerEditComponent {
       contact: partner.contact,
       status: partner.status,
     });
-    const byDay = new Map<Weekday, PickupSlot>(
-      partner.pickupSlots.map((s) => [s.weekday, s]),
+    this.slots.clear();
+    for (const slot of partner.pickupSlots) {
+      this.slots.push(this.slotGroup(slot));
+    }
+  }
+
+  addSlot(): void {
+    this.slots.push(
+      this.slotGroup({
+        weekday: 'MONDAY',
+        startTime: '09:00',
+        endTime: '10:00',
+        active: true,
+        capacity: 1,
+      }),
     );
-    this.slots.controls.forEach((group) => {
-      const weekday = group.controls.weekday.value;
-      const loaded = byDay.get(weekday);
-      if (loaded) {
-        group.patchValue(loaded);
-      }
-    });
+  }
+
+  removeSlot(index: number): void {
+    this.slots.removeAt(index);
   }
 
   private toPartner(): Partner {

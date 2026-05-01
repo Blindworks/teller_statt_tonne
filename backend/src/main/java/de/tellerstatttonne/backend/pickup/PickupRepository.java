@@ -17,6 +17,9 @@ public interface PickupRepository extends JpaRepository<PickupEntity, Long> {
     List<PickupEntity> findByStatusAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
         Pickup.Status status, LocalDate from, Pageable pageable);
 
+    List<PickupEntity> findByPartnerIdAndStatusAndDateGreaterThanEqual(
+        Long partnerId, Pickup.Status status, LocalDate from);
+
     @Query("""
         select a.userId as memberId,
                max(p.date) as lastPickupDate,

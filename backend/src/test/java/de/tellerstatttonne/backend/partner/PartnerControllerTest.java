@@ -1,7 +1,13 @@
 package de.tellerstatttonne.backend.partner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import de.tellerstatttonne.backend.pickup.Pickup;
+import de.tellerstatttonne.backend.pickup.PickupRepository;
+import de.tellerstatttonne.backend.pickup.PickupService;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +25,15 @@ class PartnerControllerTest {
     @Autowired
     private PartnerRepository repository;
 
+    @Autowired
+    private PickupRepository pickupRepository;
+
+    @Autowired
+    private PickupService pickupService;
+
     @BeforeEach
     void cleanSlate() {
+        pickupRepository.deleteAll();
         repository.deleteAll();
     }
 
@@ -64,6 +77,84 @@ class PartnerControllerTest {
         assertThat(updated.name()).isEqualTo("Bäckerei Sonne");
         assertThat(updated.category()).isEqualTo(Partner.Category.CAFE);
         assertThat(updated.status()).isEqualTo(Partner.Status.INACTIVE);
+    }
+
+    @Test
+    void updateAddsAndRemovesSlots() {
+        Partner created = controller.create(new Partner(
+            null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
+            new Partner.Contact("a", "b", "c"),
+            List.of(new Partner.PickupSlot(Partner.Weekday.MONDAY, "09:00", "10:00", true)),
+            Partner.Status.ACTIVE, null, null
+        )).getBody();
+        assertThat(created).isNotNull();
+
+        Partner withTwo = new Partner(
+            created.id(), created.name(), created.category(), created.street(),
+            created.postalCode(), created.city(), created.logoUrl(), created.contact(),
+            List.of(
+                new Partner.PickupSlot(Partner.Weekday.MONDAY, "09:00", "10:00", true),
+                new Partner.PickupSlot(Partner.Weekday.FRIDAY, "17:00", "18:00", true)
+            ),
+            created.status(), null, null
+        );
+        Partner updated = controller.update(created.id(), withTwo).getBody();
+        assertThat(updated).isNotNull();
+        assertThat(updated.pickupSlots()).hasSize(2);
+
+        Partner removed = new Partner(
+            created.id(), created.name(), created.category(), created.street(),
+            created.postalCode(), created.city(), created.logoUrl(), created.contact(),
+            List.of(new Partner.PickupSlot(Partner.Weekday.FRIDAY, "17:00", "18:00", true)),
+            created.status(), null, null
+        );
+        Partner reduced = controller.update(created.id(), removed).getBody();
+        assertThat(reduced).isNotNull();
+        assertThat(reduced.pickupSlots()).hasSize(1);
+        assertThat(reduced.pickupSlots().get(0).weekday()).isEqualTo(Partner.Weekday.FRIDAY);
+    }
+
+    @Test
+    void updateAllowsMultipleSlotsOnSameWeekday() {
+        Partner created = controller.create(new Partner(
+            null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
+            new Partner.Contact("a", "b", "c"),
+            List.of(
+                new Partner.PickupSlot(Partner.Weekday.FRIDAY, "09:00", "10:00", true),
+                new Partner.PickupSlot(Partner.Weekday.FRIDAY, "17:00", "18:00", true)
+            ),
+            Partner.Status.ACTIVE, null, null
+        )).getBody();
+        assertThat(created).isNotNull();
+        assertThat(created.pickupSlots()).hasSize(2);
+    }
+
+    @Test
+    void updateRejectsRemovingSlotWithFutureScheduledPickup() {
+        Partner created = controller.create(new Partner(
+            null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
+            new Partner.Contact("a", "b", "c"),
+            List.of(new Partner.PickupSlot(Partner.Weekday.MONDAY, "09:00", "10:00", true)),
+            Partner.Status.ACTIVE, null, null
+        )).getBody();
+        assertThat(created).isNotNull();
+
+        LocalDate nextMonday = LocalDate.now();
+        while (nextMonday.getDayOfWeek() != DayOfWeek.MONDAY || !nextMonday.isAfter(LocalDate.now())) {
+            nextMonday = nextMonday.plusDays(1);
+        }
+        pickupService.create(new Pickup(
+            null, created.id(), null, null, null, null, null,
+            nextMonday, "09:00", "10:00", Pickup.Status.SCHEDULED, 1, List.of(), null
+        ));
+
+        Partner withoutSlot = new Partner(
+            created.id(), created.name(), created.category(), created.street(),
+            created.postalCode(), created.city(), created.logoUrl(), created.contact(),
+            List.of(), created.status(), null, null
+        );
+        assertThatThrownBy(() -> controller.update(created.id(), withoutSlot))
+            .isInstanceOf(PartnerService.SlotInUseException.class);
     }
 
     @Test
