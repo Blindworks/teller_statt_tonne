@@ -1,0 +1,10 @@
+target/
+uploads/
+.idea/
+*.iml
+.env
+.env.*
+!.env.example
+.mvn/wrapper/maven-wrapper.jar
+.git/
+.gitignore
