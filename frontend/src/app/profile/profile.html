@@ -204,6 +204,19 @@
       </form>
       }
 
+      <!-- Verfügbarkeit -->
+      @if (currentUser()?.id; as uid) {
+        <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-4">
+          <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+            Wann ich Zeit habe
+          </legend>
+          <p class="text-sm text-on-surface-variant">
+            Trage deine wöchentlichen Zeitfenster ein. Diese werden für die Pickup-Planung genutzt.
+          </p>
+          <app-user-availability [userId]="uid" />
+        </fieldset>
+      }
+
       <!-- Passwort -->
       <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()" class="space-y-6">
         <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-6">

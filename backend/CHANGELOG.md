@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-02
+
+### Security
+
+- `UserAvailabilityController` mit `@PreAuthorize` abgesichert: Nutzer dürfen nur die eigene Verfügbarkeit lesen/schreiben, Administrator und Botschafter dürfen alle.
+
 ## [0.1.0] - 2026-05-01
 
 Erste interne Version. Bündelt die bisherige Backend-Entwicklung in einer SemVer-konformen Ausgangsbasis.

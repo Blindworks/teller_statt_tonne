@@ -14,6 +14,7 @@ import { AuthService } from '../auth/auth.service';
 import { UserService } from '../users/user.service';
 import { User } from '../users/user.model';
 import { resolvePhotoUrl } from '../users/photo-url';
+import { UserAvailabilityComponent } from '../users/user-availability/user-availability';
 
 type ProfileForm = FormGroup<{
   firstName: FormControl<string>;
@@ -34,7 +35,7 @@ type PasswordForm = FormGroup<{
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, UserAvailabilityComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
