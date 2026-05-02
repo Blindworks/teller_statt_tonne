@@ -1,0 +1,38 @@
+<section class="mx-auto max-w-3xl p-6 space-y-6">
+  <header class="space-y-1">
+    <a routerLink="/" class="text-sm text-emerald-700 hover:underline">&larr; Zurück</a>
+    <h1 class="text-2xl font-semibold">Über diese App</h1>
+    <p class="text-sm text-gray-600">Teller statt Tonne</p>
+  </header>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div class="rounded border border-gray-200 p-4">
+      <div class="text-xs uppercase tracking-wide text-gray-500">Frontend</div>
+      <div class="mt-1 text-lg font-medium">v{{ frontendVersion }}</div>
+    </div>
+    <div class="rounded border border-gray-200 p-4">
+      <div class="text-xs uppercase tracking-wide text-gray-500">Backend</div>
+      @if (backend(); as b) {
+        <div class="mt-1 text-lg font-medium">v{{ b.version }}</div>
+        @if (b.time) {
+          <div class="text-xs text-gray-500">Build: {{ b.time }}</div>
+        }
+      } @else if (backendError()) {
+        <div class="mt-1 text-sm text-gray-500">{{ backendError() }}</div>
+      } @else {
+        <div class="mt-1 text-sm text-gray-400">Lade…</div>
+      }
+    </div>
+  </div>
+
+  <div>
+    <h2 class="text-lg font-semibold mb-2">Changelog (Frontend)</h2>
+    @if (changelogError()) {
+      <p class="text-sm text-gray-500">{{ changelogError() }}</p>
+    } @else {
+      <pre
+        class="whitespace-pre-wrap rounded bg-gray-50 p-4 text-sm text-gray-800 border border-gray-200 overflow-auto"
+        >{{ changelog() }}</pre>
+    }
+  </div>
+</section>

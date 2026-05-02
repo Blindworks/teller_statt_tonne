@@ -45,3 +45,4 @@ Notes:
 
 - Keep frontend and backend decoupled; don't introduce shared tooling at the repo root without a clear reason.
 - Project name "Teller statt Tonne" (German: "plate instead of bin") suggests a food-waste / food-sharing domain, but product scope is not yet defined — ask the user before assuming requirements.
+- Versioning follows SemVer per app. Track changes under `## [Unreleased]` in `backend/CHANGELOG.md` or `frontend/CHANGELOG.md` (Keep a Changelog format); on release move them into a `## [x.y.z] - YYYY-MM-DD` section and bump the version in `backend/pom.xml` / `frontend/package.json`.

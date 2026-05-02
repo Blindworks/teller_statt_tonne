@@ -25,6 +25,10 @@ export const routes: Routes = [
     loadComponent: () => import('./quiz/quiz').then((m) => m.QuizComponent),
   },
   {
+    path: 'about',
+    loadComponent: () => import('./about/about').then((m) => m.AboutComponent),
+  },
+  {
     path: '',
     component: AppShellComponent,
     canActivate: [authGuard],
