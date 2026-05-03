@@ -178,7 +178,7 @@
 
 <!-- Bottom Navigation (Mobile) -->
 <nav
-  class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-lg flex justify-around items-center py-3 px-6 z-50 border-t border-outline-variant/10"
+  class="md:hidden fixed bottom-0 inset-x-0 bg-surface/95 backdrop-blur-lg flex justify-around items-center px-6 pt-3 pb-[max(env(safe-area-inset-bottom),0.75rem)] z-[1100] border-t border-outline-variant/10"
 >
   <a
     routerLink="/dashboard"
@@ -221,15 +221,123 @@
       <span class="material-symbols-outlined">calendar_today</span>
       <span class="text-[10px]">Planer</span>
     </a>
+  } @else {
+    <a
+      routerLink="/users"
+      routerLinkActive="text-primary font-bold"
+      #membersMob="routerLinkActive"
+      class="flex flex-col items-center gap-1"
+      [class.text-on-surface-variant]="!membersMob.isActive"
+    >
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">group</span>
+      <span class="text-[10px]">Benutzer</span>
+    </a>
   }
-  <a
-    routerLink="/users"
-    routerLinkActive="text-primary font-bold"
-    #membersMob="routerLinkActive"
+  <button
+    type="button"
+    (click)="toggleMore(); $event.stopPropagation()"
     class="flex flex-col items-center gap-1"
-    [class.text-on-surface-variant]="!membersMob.isActive"
+    [class.text-primary]="moreOpen()"
+    [class.font-bold]="moreOpen()"
+    [class.text-on-surface-variant]="!moreOpen()"
   >
-    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">group</span>
-    <span class="text-[10px]">Members</span>
-  </a>
+    <span class="material-symbols-outlined">menu</span>
+    <span class="text-[10px]">Mehr</span>
+  </button>
 </nav>
+
+<!-- "Mehr"-Bottom-Sheet (Mobile) -->
+@if (moreOpen()) {
+  <div
+    class="md:hidden fixed inset-0 bg-black/30 z-[1110]"
+    (click)="closeMore()"
+    aria-hidden="true"
+  ></div>
+  <div
+    class="md:hidden fixed left-0 right-0 bottom-0 z-[1120] bg-surface rounded-t-3xl shadow-2xl ring-1 ring-outline-variant/20 overflow-hidden pb-[max(env(safe-area-inset-bottom),1rem)]"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex justify-center pt-3 pb-1">
+      <span class="block w-10 h-1.5 rounded-full bg-outline-variant/40"></span>
+    </div>
+    <nav class="flex flex-col py-2">
+      @if (isPlanner()) {
+        <a
+          routerLink="/users"
+          (click)="closeMore()"
+          routerLinkActive="text-primary"
+          #membersSheet="routerLinkActive"
+          class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+          [class.text-on-surface]="!membersSheet.isActive"
+        >
+          <span class="material-symbols-outlined">group</span>
+          Benutzer
+        </a>
+      } @else {
+        <a
+          routerLink="/pickups"
+          (click)="closeMore()"
+          routerLinkActive="text-primary"
+          #pickupsSheet="routerLinkActive"
+          class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+          [class.text-on-surface]="!pickupsSheet.isActive"
+        >
+          <span class="material-symbols-outlined">calendar_today</span>
+          Abholung-Planer
+        </a>
+      }
+      <a
+        routerLink="/admin/store-members"
+        (click)="closeMore()"
+        routerLinkActive="text-primary"
+        #storeMembersSheet="routerLinkActive"
+        class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+        [class.text-on-surface]="!storeMembersSheet.isActive"
+      >
+        <span class="material-symbols-outlined">groups</span>
+        Store Zuweisungen
+      </a>
+      @if (isAdmin()) {
+        <a
+          routerLink="/admin/stores/deleted"
+          (click)="closeMore()"
+          routerLinkActive="text-primary"
+          #deletedStoresSheet="routerLinkActive"
+          class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+          [class.text-on-surface]="!deletedStoresSheet.isActive"
+        >
+          <span class="material-symbols-outlined">delete</span>
+          Papierkorb · Partner
+        </a>
+      }
+      <a
+        routerLink="/admin/quiz/questions"
+        (click)="closeMore()"
+        routerLinkActive="text-primary"
+        #quizSheet="routerLinkActive"
+        class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+        [class.text-on-surface]="!quizSheet.isActive"
+      >
+        <span class="material-symbols-outlined">quiz</span>
+        Quiz
+      </a>
+      <div class="border-t border-outline-variant/20 my-2"></div>
+      <a
+        routerLink="/profile"
+        (click)="closeMore()"
+        class="flex items-center gap-4 px-6 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-colors"
+      >
+        <span class="material-symbols-outlined">person</span>
+        Mein Profil
+      </a>
+      <button
+        type="button"
+        (click)="closeMore(); logout()"
+        class="w-full flex items-center gap-4 px-6 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-colors"
+      >
+        <span class="material-symbols-outlined">logout</span>
+        Abmelden
+      </button>
+    </nav>
+  </div>
+}

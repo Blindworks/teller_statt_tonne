@@ -1,19 +1,19 @@
-<main class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+<main class="pt-24 pb-32 md:pb-12 px-4 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen overflow-x-hidden">
   <!-- Page Title -->
   <section class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
     <div>
-      <h3 class="text-4xl font-extrabold text-primary leading-tight tracking-tight">
+      <h3 class="text-2xl md:text-4xl font-extrabold text-primary leading-tight tracking-tight">
         Abholung-Planer
       </h3>
       <p class="text-sm text-on-surface-variant mt-2">
         Plane Pickups für die kommenden Wochen, lege Serien an und behalte freie Slots im Blick.
       </p>
     </div>
-    <div class="flex items-center gap-2 bg-surface-container-low p-1 rounded-full">
+    <div class="flex items-center gap-1 md:gap-2 bg-surface-container-low p-1 rounded-full w-full md:w-auto">
       <button
         type="button"
         (click)="prevWeek()"
-        class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant"
+        class="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant"
         aria-label="Vorherige Woche"
       >
         <span class="material-symbols-outlined">chevron_left</span>
@@ -21,24 +21,24 @@
       <button
         type="button"
         (click)="goToToday()"
-        class="px-4 py-2 rounded-full text-sm font-bold text-on-surface hover:bg-surface-container-high"
+        class="shrink-0 px-3 md:px-4 py-2 rounded-full text-sm font-bold text-on-surface hover:bg-surface-container-high"
       >
         Heute
       </button>
-      <div class="px-4 text-sm font-bold text-on-surface whitespace-nowrap">
+      <div class="hidden md:block px-4 text-sm font-bold text-on-surface whitespace-nowrap">
         {{ weekLabel() }}
       </div>
       <input
         type="date"
         [value]="weekStartInputValue()"
         (change)="onWeekDateChange($any($event.target).value)"
-        class="bg-transparent text-sm text-on-surface-variant outline-none cursor-pointer"
+        class="flex-1 min-w-0 bg-transparent text-sm text-on-surface-variant outline-none cursor-pointer"
         aria-label="Woche wählen"
       />
       <button
         type="button"
         (click)="nextWeek()"
-        class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant"
+        class="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant"
         aria-label="Nächste Woche"
       >
         <span class="material-symbols-outlined">chevron_right</span>
@@ -175,11 +175,11 @@
   </div>
 
   <!-- Recent Pickup Logs -->
-  <section class="mt-16 bg-surface-container-low p-8 rounded-xl">
-    <div class="flex justify-between items-center mb-8">
-      <h3 class="text-2xl font-black tracking-tight">Letzte Abholungen</h3>
-      <button type="button" class="text-primary font-bold text-sm hover:underline">
-        Report herunterladen
+  <section class="mt-16 bg-surface-container-low p-4 md:p-8 rounded-xl">
+    <div class="flex justify-between items-center gap-4 mb-8">
+      <h3 class="text-xl md:text-2xl font-black tracking-tight">Letzte Abholungen</h3>
+      <button type="button" class="shrink-0 text-primary font-bold text-xs md:text-sm hover:underline">
+        Report
       </button>
     </div>
     @if (recent().length === 0) {
@@ -189,7 +189,7 @@
         @for (p of recent(); track p.id) {
           <a
             [routerLink]="isRetter() ? null : ['/pickups/edit', p.id]"
-            class="bg-surface-container-lowest p-6 rounded-lg flex items-center gap-6 group transition-transform"
+            class="bg-surface-container-lowest p-4 md:p-6 rounded-lg flex items-center gap-3 md:gap-6 group transition-transform"
             [class.hover:translate-x-2]="!isRetter()"
             [class.cursor-pointer]="!isRetter()"
           >
@@ -200,8 +200,8 @@
                 {{ logMemberName(p).charAt(0) }}
               }
             </div>
-            <div class="flex-1">
-              <p class="text-sm font-medium">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium break-words">
                 <span class="font-bold">{{ logMemberName(p) }}</span>
                 {{ logActionLabel(p) }}
                 <span class="font-bold">{{ p.partnerName }}</span>
@@ -212,7 +212,7 @@
             </div>
             @if (p.status === 'COMPLETED') {
               <div
-                class="flex items-center gap-1 px-3 py-1 bg-primary-container text-on-primary-container rounded-full text-[10px] font-bold"
+                class="shrink-0 flex items-center gap-1 px-3 py-1 bg-primary-container text-on-primary-container rounded-full text-[10px] font-bold"
               >
                 <span
                   class="material-symbols-outlined text-[12px]"
@@ -222,13 +222,13 @@
               </div>
             } @else if (p.status === 'CANCELLED') {
               <div
-                class="flex items-center gap-1 px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase"
+                class="shrink-0 flex items-center gap-1 px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase"
               >
                 Offen
               </div>
             } @else {
               <div
-                class="flex items-center gap-1 px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-[10px] font-bold uppercase"
+                class="shrink-0 flex items-center gap-1 px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-[10px] font-bold uppercase"
               >
                 Geplant
               </div>

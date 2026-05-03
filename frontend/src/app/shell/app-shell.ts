@@ -42,6 +42,7 @@ export class AppShellComponent {
   });
 
   readonly menuOpen = signal(false);
+  readonly moreOpen = signal(false);
 
   readonly isPlanner = computed(() => {
     const role = this.currentUser()?.role;
@@ -52,7 +53,10 @@ export class AppShellComponent {
 
   constructor() {
     this.router.events.subscribe((e) => {
-      if (e instanceof NavigationStart) this.menuOpen.set(false);
+      if (e instanceof NavigationStart) {
+        this.menuOpen.set(false);
+        this.moreOpen.set(false);
+      }
     });
   }
 
@@ -64,12 +68,21 @@ export class AppShellComponent {
     this.menuOpen.set(false);
   }
 
+  toggleMore(): void {
+    this.moreOpen.update((v) => !v);
+  }
+
+  closeMore(): void {
+    this.moreOpen.set(false);
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.menuOpen()) return;
+    if (!this.menuOpen() && !this.moreOpen()) return;
     const target = event.target as Node;
     if (!this.host.nativeElement.contains(target)) {
       this.menuOpen.set(false);
+      this.moreOpen.set(false);
     }
   }
 

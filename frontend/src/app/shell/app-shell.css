@@ -1,4 +1,13 @@
 :host {
   display: block;
   min-height: 100vh;
+  /* Platz für die fixierte Mobile-Bottom-Nav (Höhe + iOS-Safe-Area).
+     Auf >=md (Sidebar-Layout) entfällt das Padding wieder. */
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 768px) {
+  :host {
+    padding-bottom: 0;
+  }
 }

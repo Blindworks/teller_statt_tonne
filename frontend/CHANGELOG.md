@@ -7,9 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-03
+
 ### Added
 
 - Schulungstext zum Aufnahme-Quiz wird im Startscreen als aufklappbares Akkordeon angezeigt (8 thematische Abschnitte: Motivation, Verantwortung, Zusammenarbeit mit Betrieben, Vorbereitung & Hygiene, Weitergabe, Zuverlässigkeit, Grenzfälle, Rolle des Vereins).
+- Mobile Bottom-Navigation: Alle Menüeinträge der Desktop-Sidebar sind auf Mobile erreichbar. Die Bottom-Bar zeigt 4 primäre Tabs (Übersicht, Stores, Karte, Planer bzw. Benutzer je nach Rolle) plus einen **Mehr**-Button, der ein Bottom-Sheet mit den restlichen Einträgen (Benutzer/Planer Gegenstück, Store Zuweisungen, Papierkorb für Admins, Quiz, Profil, Abmelden) öffnet.
 
 ## [0.2.6] - 2026-05-03
 
