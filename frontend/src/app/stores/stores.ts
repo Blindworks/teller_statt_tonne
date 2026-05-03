@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { RouterLink } from '@angular/router';
 import { PartnerService } from '../partners/partner.service';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Partner } from '../partners/partner.model';
+import { StoreDetailDialogService } from './store-detail-dialog/store-detail-dialog.service';
 
 @Component({
   selector: 'app-stores',
@@ -12,6 +13,7 @@ import { CATEGORY_ICONS, CATEGORY_LABELS, Partner } from '../partners/partner.mo
 })
 export class StoresComponent {
   private readonly service = inject(PartnerService);
+  private readonly detailDialog = inject(StoreDetailDialogService);
 
   readonly partners = signal<Partner[]>([]);
   readonly loadError = signal<string | null>(null);
@@ -37,6 +39,10 @@ export class StoresComponent {
     return partner.pickupSlots
       .filter((s) => s.active)
       .reduce((sum, s) => sum + (s.availableMemberCount ?? 0), 0);
+  }
+
+  openDetail(partner: Partner): void {
+    this.detailDialog.open(partner);
   }
 
   totalCapacity(partner: Partner): number {

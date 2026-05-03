@@ -1,0 +1,203 @@
+@if (partner(); as p) {
+  <div
+    (click)="onBackdrop($event)"
+    class="fixed inset-0 z-50 bg-on-surface/40 backdrop-blur-sm flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-surface-container-lowest rounded-xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+    >
+      <header
+        class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30"
+      >
+        <h3 class="text-lg font-bold text-on-surface">Partnerdetails</h3>
+        <button
+          type="button"
+          (click)="close()"
+          class="p-2 rounded-full hover:bg-surface-container-high transition-colors"
+          title="Schließen"
+          aria-label="Schließen"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <div class="p-6 overflow-y-auto">
+        <div class="flex items-start gap-4">
+          <div
+            class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center text-primary overflow-hidden shrink-0"
+          >
+            @if (p.logoUrl) {
+              <img [src]="p.logoUrl" [alt]="p.name" class="w-full h-full object-cover" />
+            } @else {
+              <span class="material-symbols-outlined text-3xl">{{
+                categoryIcons[p.category]
+              }}</span>
+            }
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-2xl font-extrabold text-on-surface break-words">{{ p.name }}</h4>
+            <p class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mt-1">
+              {{ categoryLabels[p.category] }}
+            </p>
+            <div class="mt-2">
+              @if (p.status === 'ACTIVE') {
+                <span
+                  class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary-container"
+                  >Aktiv</span
+                >
+              } @else {
+                <span
+                  class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-surface-container-high text-on-surface-variant"
+                  >Inaktiv</span
+                >
+              }
+            </div>
+          </div>
+        </div>
+
+        <section class="mt-6">
+          <h5
+            class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mb-2"
+          >
+            Adresse
+          </h5>
+          <p class="text-sm text-on-surface flex items-start gap-2">
+            <span class="material-symbols-outlined text-base text-on-surface-variant"
+              >location_on</span
+            >
+            <span>
+              {{ p.street }}<br />
+              {{ p.postalCode }} {{ p.city }}
+            </span>
+          </p>
+        </section>
+
+        <section class="mt-6">
+          <h5
+            class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mb-2"
+          >
+            Lage
+          </h5>
+          @if (hasCoords()) {
+            <div
+              #mapContainer
+              class="h-48 w-full rounded-lg overflow-hidden border border-outline-variant/30"
+            ></div>
+          } @else {
+            <p
+              class="text-sm text-on-surface-variant bg-surface-container-low rounded-lg px-4 py-3 flex items-center gap-2"
+            >
+              <span class="material-symbols-outlined text-base text-secondary">warning</span>
+              Adresse nicht auf Karte verortet.
+            </p>
+          }
+        </section>
+
+        <section class="mt-6">
+          <h5
+            class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mb-2"
+          >
+            Abholzeiten
+          </h5>
+
+          @if (activeSlots().length > 0) {
+            <ul class="space-y-2">
+              @for (slot of activeSlots(); track $index) {
+                <li
+                  class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg bg-surface-container-low"
+                >
+                  <div class="flex items-center gap-3 min-w-0">
+                    <span class="material-symbols-outlined text-primary">schedule</span>
+                    <div class="min-w-0">
+                      <p class="text-sm font-bold text-on-surface">
+                        {{ weekdayLabel(slot.weekday) }}
+                      </p>
+                      <p class="text-xs text-on-surface-variant">
+                        {{ slot.startTime }} – {{ slot.endTime }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs text-on-surface-variant shrink-0">
+                    <span
+                      class="flex items-center gap-1"
+                      [title]="'Kapazität'"
+                    >
+                      <span class="material-symbols-outlined text-xs">groups</span>
+                      {{ slot.capacity }}
+                    </span>
+                    <span
+                      class="flex items-center gap-1"
+                      [title]="'Verfügbare Retter'"
+                    >
+                      <span class="material-symbols-outlined text-xs">volunteer_activism</span>
+                      {{ slot.availableMemberCount ?? 0 }}
+                    </span>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="text-sm text-on-surface-variant py-2">Keine aktiven Abholzeiten.</p>
+          }
+
+          @if (inactiveSlots().length > 0) {
+            <p
+              class="text-[11px] uppercase tracking-wider text-on-surface-variant/70 font-bold mt-4 mb-2"
+            >
+              Inaktiv
+            </p>
+            <ul class="space-y-2 opacity-60">
+              @for (slot of inactiveSlots(); track $index) {
+                <li
+                  class="flex items-center justify-between gap-3 px-4 py-2 rounded-lg bg-surface-container-low/60"
+                >
+                  <div class="flex items-center gap-3 min-w-0">
+                    <span class="material-symbols-outlined text-on-surface-variant"
+                      >schedule</span
+                    >
+                    <div class="min-w-0">
+                      <p class="text-sm font-medium text-on-surface line-through">
+                        {{ weekdayLabel(slot.weekday) }}
+                      </p>
+                      <p class="text-xs text-on-surface-variant">
+                        {{ slot.startTime }} – {{ slot.endTime }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs text-on-surface-variant shrink-0">
+                    <span class="flex items-center gap-1">
+                      <span class="material-symbols-outlined text-xs">groups</span>
+                      {{ slot.capacity }}
+                    </span>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+
+      <footer
+        class="flex items-center justify-end gap-2 px-6 py-4 border-t border-outline-variant/30 bg-surface-container-low"
+      >
+        <button
+          type="button"
+          (click)="close()"
+          class="px-4 py-2 rounded-full text-sm font-bold text-on-surface hover:bg-surface-container-high transition-colors"
+        >
+          Schließen
+        </button>
+        @if (p.id != null) {
+          <a
+            [routerLink]="['/stores/edit', p.id]"
+            (click)="close()"
+            class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-primary-dim transition-colors shadow-md shadow-primary/20"
+          >
+            <span class="material-symbols-outlined text-base">edit</span>
+            Bearbeiten
+          </a>
+        }
+      </footer>
+    </div>
+  </div>
+}

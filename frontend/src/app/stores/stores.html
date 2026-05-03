@@ -46,7 +46,12 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     @for (partner of partners(); track partner.id) {
       <div
-        class="bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-6 flex flex-col justify-between group"
+        (click)="openDetail(partner)"
+        (keydown.enter)="openDetail(partner)"
+        (keydown.space)="openDetail(partner); $event.preventDefault()"
+        role="button"
+        tabindex="0"
+        class="bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-6 flex flex-col justify-between group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         <div class="flex justify-between items-start mb-6">
           <div
@@ -60,7 +65,7 @@
               }}</span>
             }
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
             @if (partner.status === 'ACTIVE') {
               <span
                 class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary-container"
