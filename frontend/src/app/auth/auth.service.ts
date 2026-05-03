@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, of, tap } from 'rxjs';
+import { Observable, catchError, finalize, of, shareReplay, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthResponse, User } from './auth.models';
 
@@ -15,6 +15,7 @@ export class AuthService {
   private readonly accessTokenSignal = signal<string | null>(this.readStorage(ACCESS_KEY));
   private readonly refreshTokenSignal = signal<string | null>(this.readStorage(REFRESH_KEY));
   private readonly currentUserSignal = signal<User | null>(null);
+  private refreshInFlight: Observable<AuthResponse | null> | null = null;
 
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
@@ -29,6 +30,29 @@ export class AuthService {
     return this.accessTokenSignal();
   }
 
+  isAccessTokenExpired(): boolean {
+    const token = this.accessTokenSignal();
+    if (!token) return true;
+    const exp = this.readJwtExp(token);
+    if (exp === null) return false;
+    return Date.now() / 1000 >= exp;
+  }
+
+  clearSession(): void {
+    this.clearTokens();
+  }
+
+  private readJwtExp(token: string): number | null {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    try {
+      const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return typeof payload.exp === 'number' ? payload.exp : null;
+    } catch {
+      return null;
+    }
+  }
+
   getRefreshToken(): string | null {
     return this.refreshTokenSignal();
   }
@@ -40,26 +64,39 @@ export class AuthService {
   }
 
   refresh(): Observable<AuthResponse | null> {
+    if (this.refreshInFlight) {
+      return this.refreshInFlight;
+    }
     const refreshToken = this.refreshTokenSignal();
     if (!refreshToken) {
       return of(null);
     }
-    return this.http
+    this.refreshInFlight = this.http
       .post<AuthResponse>(`${this.baseUrl}/refresh`, { refreshToken })
       .pipe(
         tap((res) => this.handleAuthResponse(res)),
-        catchError(() => {
-          this.clearTokens();
-          return of(null);
+        catchError((err) => {
+          if (err?.status === 401 || err?.status === 403) {
+            this.clearTokens();
+            return of(null);
+          }
+          return throwError(() => err);
         }),
+        finalize(() => {
+          this.refreshInFlight = null;
+        }),
+        shareReplay({ bufferSize: 1, refCount: false }),
       );
+    return this.refreshInFlight;
   }
 
   me(): Observable<User | null> {
     return this.http.get<User>(`${this.baseUrl}/me`).pipe(
       tap((user) => this.currentUserSignal.set(user)),
-      catchError(() => {
-        this.currentUserSignal.set(null);
+      catchError((err) => {
+        if (err?.status === 401 || err?.status === 403) {
+          this.currentUserSignal.set(null);
+        }
         return of(null);
       }),
     );

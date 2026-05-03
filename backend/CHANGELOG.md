@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-03
+
+### Fixed
+
+- Race-Condition beim parallelen `/api/auth/refresh`: Statt das alte Refresh-Token per `update ... set revoked=true` zu markieren (was unter Last zu MariaDB-Fehler „Record has changed since last read" führte), wird die Zeile jetzt atomar via `delete ... where id = ? and revoked = false` entfernt. Konkurrierende Refreshes erhalten sauber 401 statt 500.
+
 ## [0.2.0] - 2026-05-02
 
 ### Security

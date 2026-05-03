@@ -35,6 +35,10 @@ public class DashboardService {
     }
 
     public List<DaySlot> findDaySlots(LocalDate date, Long currentUserId) {
+        return findRangeSlots(date, date, currentUserId);
+    }
+
+    public List<DaySlot> findRangeSlots(LocalDate from, LocalDate to, Long currentUserId) {
         UserEntity user = userRepository.findById(currentUserId).orElse(null);
         if (user == null || user.getRole() == Role.NEW_MEMBER) {
             return List.of();
@@ -43,7 +47,7 @@ public class DashboardService {
         boolean isRetter = user.getRole() == Role.RETTER;
         Set<Long> allowedPartnerIds = isRetter ? memberPartnerIds(user.getId()) : null;
 
-        List<Pickup> pickups = pickupService.findBetween(date, date);
+        List<Pickup> pickups = pickupService.findBetween(from, to);
         List<DaySlot> result = new ArrayList<>();
         Set<String> covered = new HashSet<>();
 
@@ -58,32 +62,37 @@ public class DashboardService {
                 p.capacity(), p.assignments() == null ? List.of() : p.assignments(),
                 false, assigned
             ));
-            covered.add(coverageKey(p.partnerId(), p.startTime(), p.endTime()));
+            covered.add(coverageKey(p.date(), p.partnerId(), p.startTime(), p.endTime()));
         }
 
         if (!isRetter) {
-            Partner.Weekday weekday = toWeekday(date.getDayOfWeek());
-            for (PartnerEntity partner : partnerRepository.findAll()) {
-                if (partner.getStatus() != Partner.Status.ACTIVE) continue;
-                if (partner.getPickupSlots() == null) continue;
-                for (PartnerEntity.PickupSlotEmbeddable slot : partner.getPickupSlots()) {
-                    if (!slot.isActive()) continue;
-                    if (slot.getWeekday() != weekday) continue;
-                    String key = coverageKey(partner.getId(), slot.getStartTime(), slot.getEndTime());
-                    if (covered.contains(key)) continue;
-                    result.add(new DaySlot(
-                        null, partner.getId(), partner.getName(), partner.getCategory(),
-                        partner.getStreet(), partner.getCity(), partner.getLogoUrl(),
-                        date, slot.getStartTime(), slot.getEndTime(),
-                        slot.getCapacity(), List.of(),
-                        true, false
-                    ));
+            List<PartnerEntity> activePartners = partnerRepository.findAll().stream()
+                .filter(pa -> pa.getStatus() == Partner.Status.ACTIVE)
+                .filter(pa -> pa.getPickupSlots() != null)
+                .toList();
+            for (LocalDate d = from; !d.isAfter(to); d = d.plusDays(1)) {
+                Partner.Weekday weekday = toWeekday(d.getDayOfWeek());
+                for (PartnerEntity partner : activePartners) {
+                    for (PartnerEntity.PickupSlotEmbeddable slot : partner.getPickupSlots()) {
+                        if (!slot.isActive()) continue;
+                        if (slot.getWeekday() != weekday) continue;
+                        String key = coverageKey(d, partner.getId(), slot.getStartTime(), slot.getEndTime());
+                        if (covered.contains(key)) continue;
+                        result.add(new DaySlot(
+                            null, partner.getId(), partner.getName(), partner.getCategory(),
+                            partner.getStreet(), partner.getCity(), partner.getLogoUrl(),
+                            d, slot.getStartTime(), slot.getEndTime(),
+                            slot.getCapacity(), List.of(),
+                            true, false
+                        ));
+                    }
                 }
             }
         }
 
         result.sort(Comparator
-            .comparing(DaySlot::startTime, Comparator.nullsLast(String::compareTo))
+            .comparing(DaySlot::date, Comparator.nullsLast(LocalDate::compareTo))
+            .thenComparing(DaySlot::startTime, Comparator.nullsLast(String::compareTo))
             .thenComparing(DaySlot::partnerName, Comparator.nullsLast(String::compareTo)));
         return result;
     }
@@ -92,8 +101,8 @@ public class DashboardService {
         return new HashSet<>(partnerRepository.findIdsByMemberId(userId));
     }
 
-    private static String coverageKey(Long partnerId, String startTime, String endTime) {
-        return partnerId + "|" + startTime + "|" + endTime;
+    private static String coverageKey(LocalDate date, Long partnerId, String startTime, String endTime) {
+        return date + "|" + partnerId + "|" + startTime + "|" + endTime;
     }
 
     private static Partner.Weekday toWeekday(DayOfWeek dow) {

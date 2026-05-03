@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
@@ -34,6 +35,7 @@ interface DisplaySlot {
   date: string;
   startTime: string;
   endTime: string;
+  dateLabel: string;
   badgeLabel: string;
   isTemplate: boolean;
   categoryIcon: string;
@@ -48,7 +50,7 @@ interface DisplaySlot {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [NgTemplateOutlet],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,6 +66,22 @@ export class DashboardComponent {
 
   readonly displaySlots = computed<DisplaySlot[]>(() =>
     this.daySlotsSignal().map((s, idx) => this.toDisplay(s, idx)),
+  );
+
+  readonly mySlots = computed<DisplaySlot[]>(() =>
+    this.displaySlots().filter((s) => s.currentUserAssigned),
+  );
+
+  readonly availableSlots = computed<DisplaySlot[]>(() =>
+    this.displaySlots().filter(
+      (s) => !s.isTemplate && !s.currentUserAssigned && s.freeCount > 0,
+    ),
+  );
+
+  readonly fullSlots = computed<DisplaySlot[]>(() =>
+    this.displaySlots().filter(
+      (s) => !s.isTemplate && !s.currentUserAssigned && s.freeCount === 0,
+    ),
   );
 
   readonly userRole = computed<Role | null>(() => this.authService.currentUser()?.role ?? null);
@@ -149,7 +167,7 @@ export class DashboardComponent {
   }
 
   private loadSlots(): void {
-    this.dashboardService.day().subscribe({
+    this.dashboardService.range().subscribe({
       next: (slots) => this.daySlotsSignal.set(slots),
       error: () => this.daySlotsSignal.set([]),
     });
@@ -186,7 +204,7 @@ export class DashboardComponent {
     const freeCount = Math.max(0, capacity - assignments.length);
 
     return {
-      key: `${s.pickupId ?? 't'}-${s.partnerId}-${s.startTime}-${idx}`,
+      key: `${s.pickupId ?? 't'}-${s.partnerId}-${s.date}-${s.startTime}-${idx}`,
       pickupId: s.pickupId,
       partnerId: s.partnerId,
       partnerName: s.partnerName,
@@ -195,6 +213,7 @@ export class DashboardComponent {
       date: s.date,
       startTime: s.startTime,
       endTime: s.endTime,
+      dateLabel: this.formatDateLabel(s.date),
       badgeLabel: s.isTemplate ? 'Slot frei' : categoryLabel,
       isTemplate: s.isTemplate,
       categoryIcon,
@@ -212,5 +231,20 @@ export class DashboardComponent {
     if (!name) return '?';
     const trimmed = name.trim();
     return trimmed.length > 0 ? trimmed.charAt(0).toUpperCase() : '?';
+  }
+
+  private formatDateLabel(isoDate: string): string {
+    const parsed = new Date(isoDate + 'T00:00:00');
+    if (Number.isNaN(parsed.getTime())) return isoDate;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diffDays = Math.round((parsed.getTime() - today.getTime()) / 86_400_000);
+    if (diffDays === 0) return 'Heute';
+    if (diffDays === 1) return 'Morgen';
+    return parsed.toLocaleDateString('de-DE', {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+    });
   }
 }

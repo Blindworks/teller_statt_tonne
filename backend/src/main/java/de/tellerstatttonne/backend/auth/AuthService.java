@@ -63,8 +63,11 @@ public class AuthService {
         UserEntity user = userRepository.findById(stored.getUserId())
             .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
 
-        stored.setRevoked(true);
-        refreshTokenRepository.save(stored);
+        int deleted = refreshTokenRepository.deleteByIdAndRevokedFalse(stored.getId());
+        if (deleted == 0) {
+            throw new BadCredentialsException("Invalid refresh token");
+        }
+        refreshTokenRepository.flush();
 
         return buildAuthResponse(user);
     }

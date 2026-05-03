@@ -15,6 +15,13 @@ export class DashboardService {
     return this.http.get<DaySlot[]>(`${this.baseUrl}/dashboard/day`, { params });
   }
 
+  range(from?: string, to?: string): Observable<DaySlot[]> {
+    let params = new HttpParams();
+    if (from) params = params.set('from', from);
+    if (to) params = params.set('to', to);
+    return this.http.get<DaySlot[]>(`${this.baseUrl}/dashboard/range`, { params });
+  }
+
   signup(pickupId: number): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/pickups/${pickupId}/signup`, {});
   }

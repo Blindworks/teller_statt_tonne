@@ -20,7 +20,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(addToken(req, auth.getAccessToken())).pipe(
     catchError((err: HttpErrorResponse) => {
-      if (err.status !== 401 || !auth.getRefreshToken()) {
+      if (err.status !== 401) {
+        return throwError(() => err);
+      }
+      if (!auth.getRefreshToken()) {
+        auth.clearSession();
+        router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
         return throwError(() => err);
       }
       return auth.refresh().pipe(
