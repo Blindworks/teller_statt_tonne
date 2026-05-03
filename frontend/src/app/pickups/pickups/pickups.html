@@ -25,16 +25,9 @@
       >
         Heute
       </button>
-      <div class="hidden md:block px-4 text-sm font-bold text-on-surface whitespace-nowrap">
+      <div class="flex-1 px-2 md:px-4 text-sm font-bold text-on-surface whitespace-nowrap text-center">
         {{ weekLabel() }}
       </div>
-      <input
-        type="date"
-        [value]="weekStartInputValue()"
-        (change)="onWeekDateChange($any($event.target).value)"
-        class="flex-1 min-w-0 bg-transparent text-sm text-on-surface-variant outline-none cursor-pointer"
-        aria-label="Woche wählen"
-      />
       <button
         type="button"
         (click)="nextWeek()"

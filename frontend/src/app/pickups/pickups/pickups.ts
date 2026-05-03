@@ -61,8 +61,6 @@ export class PickupsComponent {
     return `KW ${week} · ${fmt(start)} – ${fmt(end)}`;
   });
 
-  readonly weekStartInputValue = computed(() => this.weekStartIso());
-
   readonly days = computed<DayColumn[]>(() => {
     const filter = this.availableOnly();
     const byDate = new Map<string, Pickup[]>();
@@ -194,13 +192,6 @@ export class PickupsComponent {
 
   goToToday(): void {
     this.currentWeekStart.set(startOfIsoWeek(new Date()));
-  }
-
-  onWeekDateChange(value: string): void {
-    if (!value) return;
-    const d = new Date(`${value}T00:00:00`);
-    if (isNaN(d.getTime())) return;
-    this.currentWeekStart.set(startOfIsoWeek(d));
   }
 
   private shiftWeek(days: number): void {

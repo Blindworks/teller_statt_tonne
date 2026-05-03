@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-05-03
+
+### Changed
+
+- Pickups-Wochenwähler: Datums-Input (Startdatum) entfernt; KW-Label nun auch auf Mobile sichtbar. Navigation erfolgt über Pfeile und „Heute"-Button.
+
 ## [0.5.2] - 2026-05-03
 
 ### Changed
