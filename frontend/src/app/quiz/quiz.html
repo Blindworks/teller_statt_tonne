@@ -8,6 +8,161 @@
     </header>
 
     @if (step() === 'intro') {
+      <section class="bg-surface-container rounded-3xl p-8 shadow-md space-y-3 mb-6">
+        <h2 class="text-xl font-bold text-on-surface">
+          🎓 Schulungstext &mdash; bitte vor dem Quiz lesen
+        </h2>
+        <p class="text-on-surface text-sm">
+          Bevor du den Aufnahme-Quiz bearbeitest, ist es wichtig zu verstehen, wie wir bei „Teller
+          statt Tonne" arbeiten und welche Verantwortung du dabei übernimmst. Klappe die Abschnitte
+          unten auf, um die einzelnen Themen zu lesen.
+        </p>
+
+        <details class="border-t border-outline-variant pt-2">
+          <summary class="font-medium text-on-surface cursor-pointer py-2 hover:text-primary">
+            Worum es geht &mdash; Motivation &amp; Lebensmittelrettung
+          </summary>
+          <div class="text-sm text-on-surface-variant pl-4 pb-3 space-y-2">
+            <p>
+              Viele Menschen interessieren sich für das Thema, aber bei uns geht es nicht darum,
+              möglichst unkompliziert an Lebensmittel zu kommen oder den eigenen Bedarf zu decken.
+              Bei „Teller statt Tonne" machst du mit, weil du aktiv dazu beitragen möchtest,
+              Lebensmittelverschwendung zu reduzieren und dich für einen nachhaltigen Umgang mit
+              Ressourcen interessierst.
+            </p>
+            <p>
+              Lebensmittelrettung bedeutet, dass Lebensmittel vor der Entsorgung bewahrt werden und
+              gleichzeitig ein verantwortungsvoller Umgang mit Lebensmitteln und Ressourcen im
+              Vordergrund steht. Es geht also nicht darum, sich möglichst viel zu sichern oder
+              Vorteile daraus zu ziehen, sondern darum, bewusst und verantwortungsvoll zu handeln.
+            </p>
+          </div>
+        </details>
+
+        <details class="border-t border-outline-variant pt-2">
+          <summary class="font-medium text-on-surface cursor-pointer py-2 hover:text-primary">
+            Verantwortung für die Weitergabe
+          </summary>
+          <div class="text-sm text-on-surface-variant pl-4 pb-3 space-y-2">
+            <p>
+              Wenn du Lebensmittel rettest, übernimmst du auch Verantwortung für deren Weitergabe.
+              Das bedeutet, dass du mit den Lebensmitteln fair umgehst, nicht bevorzugt für dich
+              selbst auswählst und darauf achtest, dass möglichst nichts verdirbt. Wenn du mehr
+              Lebensmittel erhältst, als du selbst verbrauchen kannst, gibst du diese im Rahmen der
+              Vereinsregeln weiter &mdash; zum Beispiel über einen Verteilerkreis &mdash; oder an
+              Personen bzw. Organisationen, die sie sinnvoll nutzen können.
+            </p>
+          </div>
+        </details>
+
+        <details class="border-t border-outline-variant pt-2">
+          <summary class="font-medium text-on-surface cursor-pointer py-2 hover:text-primary">
+            Zusammenarbeit mit Betrieben &mdash; Vertrauen &amp; Auftreten
+          </summary>
+          <div class="text-sm text-on-surface-variant pl-4 pb-3 space-y-2">
+            <p>
+              Unsere Zusammenarbeit mit Betrieben basiert auf Vertrauen. Die Betriebe verlassen sich
+              darauf, dass wir zuverlässig arbeiten und uns an Absprachen halten. Deshalb ist es
+              wichtig, dass wir so auftreten, dass der Betrieb sich auf uns verlassen kann und dass
+              Vertrauen aufgebaut und erhalten wird. Im Betrieb selbst verhalten wir uns ruhig,
+              respektvoll, freundlich und möglichst unauffällig.
+            </p>
+            <p>
+              Du meldest dich beim Personal und hältst dich an die bestehenden Absprachen. Du
+              handelst nicht eigenmächtig und entscheidest nicht allein, sondern stimmst dich mit
+              dem Betrieb ab und gehst ruhig und abgestimmt vor.
+            </p>
+          </div>
+        </details>
+
+        <details class="border-t border-outline-variant pt-2">
+          <summary class="font-medium text-on-surface cursor-pointer py-2 hover:text-primary">
+            Vorbereitung &amp; Hygiene
+          </summary>
+          <div class="text-sm text-on-surface-variant pl-4 pb-3 space-y-2">
+            <p>
+              Eine gute Vorbereitung ist wichtig. Dazu gehört, dass du dich vorab über aktuelle
+              Abläufe oder Hinweise informierst und geeignete Behälter sowie Transportmöglichkeiten
+              mitbringst.
+            </p>
+            <p>
+              Beim Umgang mit Lebensmitteln ist Hygiene ein zentraler Punkt. Du arbeitest sauber
+              und achtest auf hygienische Bedingungen. Lebensmittel werden sorgfältig geprüft und
+              im Zweifel aussortiert. Das Ziel ist nicht, alles weiterzugeben, sondern
+              verantwortungsvoll zu entscheiden, was noch unbedenklich ist.
+            </p>
+          </div>
+        </details>
+
+        <details class="border-t border-outline-variant pt-2">
+          <summary class="font-medium text-on-surface cursor-pointer py-2 hover:text-primary">
+            Weitergabe ohne Gegenleistung
+          </summary>
+          <div class="text-sm text-on-surface-variant pl-4 pb-3 space-y-2">
+            <p>
+              Die Weitergabe der Lebensmittel erfolgt grundsätzlich ohne Gegenleistung. Du darfst
+              die Lebensmittel selbst nutzen oder verschenken, aber nicht verkaufen oder gegen eine
+              Gegenleistung weitergeben.
+            </p>
+          </div>
+        </details>
+
+        <details class="border-t border-outline-variant pt-2">
+          <summary class="font-medium text-on-surface cursor-pointer py-2 hover:text-primary">
+            Zuverlässigkeit &amp; Kommunikation
+          </summary>
+          <div class="text-sm text-on-surface-variant pl-4 pb-3 space-y-2">
+            <p>
+              Zuverlässigkeit ist für die Zusammenarbeit mit Betrieben entscheidend. Abläufe im
+              Betrieb sind oft auf feste Zeiten abgestimmt. Wenn Abholungen verspätet stattfinden
+              oder ausfallen, kann das Auswirkungen auf den Betrieb haben. Deshalb ist es wichtig,
+              dass du dich an vereinbarte Zeiten hältst.
+            </p>
+            <p>
+              Wenn du dich verspätest, informierst du dein Team rechtzeitig und &mdash; wenn
+              notwendig &mdash; auch den Betrieb. Kommunikation ist hier entscheidend.
+            </p>
+          </div>
+        </details>
+
+        <details class="border-t border-outline-variant pt-2">
+          <summary class="font-medium text-on-surface cursor-pointer py-2 hover:text-primary">
+            Grenzfälle &amp; Unsicherheit
+          </summary>
+          <div class="text-sm text-on-surface-variant pl-4 pb-3 space-y-2">
+            <p>
+              Wenn du dir unsicher bist, ob bestimmte Lebensmittel zur Abholung gehören, klärst du
+              die Situation immer mit dem Personal oder der zuständigen Person. Du entscheidest
+              nicht nach Gefühl und handelst nicht eigenständig.
+            </p>
+            <p>
+              Bei Grenzfällen, zum Beispiel bei beschädigten Verpackungen, prüfst du den Zustand
+              sorgfältig und entscheidest im Zweifel gegen eine Weitergabe. Es ist wichtiger,
+              verantwortungsvoll zu handeln, als jedes einzelne Lebensmittel zu retten.
+            </p>
+            <p>
+              Bei der Weitergabe von Lebensmitteln ist es wichtig, den Zustand realistisch
+              einzuschätzen und transparent zu kommunizieren. Im Zweifel entscheidest du
+              verantwortungsvoll und sortierst Lebensmittel aus, anstatt das Risiko weiterzugeben
+              oder die Verantwortung auf andere zu übertragen.
+            </p>
+          </div>
+        </details>
+
+        <details class="border-t border-outline-variant pt-2">
+          <summary class="font-medium text-on-surface cursor-pointer py-2 hover:text-primary">
+            Rolle des Vereins nach außen
+          </summary>
+          <div class="text-sm text-on-surface-variant pl-4 pb-3 space-y-2">
+            <p>
+              Neben der eigentlichen Lebensmittelrettung hat der Verein auch eine wichtige Rolle
+              nach außen. Dazu gehört es, Bewusstsein für Lebensmittelverschwendung zu schaffen und
+              als Vorbild im Umgang mit Ressourcen zu handeln.
+            </p>
+          </div>
+        </details>
+      </section>
+
       <section class="bg-surface-container rounded-3xl p-8 shadow-md space-y-5">
         <p class="text-on-surface">
           Schön, dass du dich für eine Mitgliedschaft interessierst! Bitte beantworte die folgenden
