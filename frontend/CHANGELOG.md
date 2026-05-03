@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-03
+
+### Changed
+
+- Dashboard-Sidebar-Kachel „Slots heute" wurde rollenabhängig umgebaut: Retter sehen jetzt den nächsten freien Slot in einem ihrer zugeordneten Stores (Datum, Uhrzeit, Partnername, Anzahl freier Plätze als Badge); Klick auf die Kachel öffnet den Pickup. Ohne freien Slot in den nächsten 7 Tagen erscheint ein Empty State. Admin/Botschafter sehen die Anzahl der Slots heute mit mindestens einem freien Platz. NEW_MEMBER sehen die Kachel nicht.
+
 ## [0.4.0] - 2026-05-03
 
 ### Changed

@@ -305,6 +305,7 @@ export class DashboardComponent {
     const diffDays = Math.round((parsed.getTime() - today.getTime()) / 86_400_000);
     if (diffDays === 0) return 'Heute';
     if (diffDays === 1) return 'Morgen';
+    if (diffDays === 2) return 'Übermorgen';
     return parsed.toLocaleDateString('de-DE', {
       weekday: 'short',
       day: '2-digit',
