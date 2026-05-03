@@ -113,13 +113,15 @@
                 >Inaktiv</span
               >
             }
-            <a
-              [routerLink]="['/stores/edit', partner.id]"
-              class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-primary-container text-on-surface-variant hover:text-on-primary-container transition-colors"
-              aria-label="Partner bearbeiten"
-            >
-              <span class="material-symbols-outlined text-base">edit</span>
-            </a>
+            @if (!isRetter()) {
+              <a
+                [routerLink]="['/stores/edit', partner.id]"
+                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-primary-container text-on-surface-variant hover:text-on-primary-container transition-colors"
+                aria-label="Partner bearbeiten"
+              >
+                <span class="material-symbols-outlined text-base">edit</span>
+              </a>
+            }
           </div>
         </div>
         <div>

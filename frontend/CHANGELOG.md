@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-05-03
+
+### Changed
+
+- Stores-Übersicht: Edit-Button (Stift-Icon) auf den Partner-Kacheln wird für Retter ausgeblendet. Admin/Botschafter sehen den Button unverändert.
+
 ## [0.5.0] - 2026-05-03
 
 ### Changed
