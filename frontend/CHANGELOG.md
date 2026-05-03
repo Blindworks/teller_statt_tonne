@@ -11,6 +11,30 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 - Schulungstext zum Aufnahme-Quiz wird im Startscreen als aufklappbares Akkordeon angezeigt (8 thematische Abschnitte: Motivation, Verantwortung, Zusammenarbeit mit Betrieben, Vorbereitung & Hygiene, Weitergabe, Zuverlässigkeit, Grenzfälle, Rolle des Vereins).
 
+## [0.2.6] - 2026-05-03
+
+### Changed
+
+- Pickups (Rolle Retter): Buttons **Eintragen** / **Austragen** sind für Pickups in der Vergangenheit (Datum vor heute) ausgeblendet, vergangene Slots werden in der Wochenansicht abgedunkelt. Backend-Aufrufe für vergangene Pickups werden mit HTTP 410 abgewiesen und in der UI als Hinweis angezeigt.
+
+## [0.2.5] - 2026-05-03
+
+### Fixed
+
+- Reload mit abgelaufenem Access-Token, aber noch gültigem Refresh-Token führt nicht mehr zum Logout: Der `authGuard` lässt geschützte Routen jetzt auch durch, wenn nur ein Refresh-Token vorhanden ist — der HTTP-Interceptor holt den neuen Access-Token beim ersten Request transparent nach.
+
+## [0.2.4] - 2026-05-03
+
+### Changed
+
+- Pickups: Hero-Bento (Weekly Harvest Impact / Nächste Abholung) vorübergehend ausgeblendet. Die zugehörigen Signals/Methoden in der Komponente bleiben erhalten.
+
+## [0.2.3] - 2026-05-03
+
+### Fixed
+
+- Im Pickups-Wochenkalender lassen sich jetzt auch sonntags Abholungen anlegen. Der bisherige "Sonntagsruhe"-Sonderzweig blockierte das Hinzufügen fälschlich; Sonntag verhält sich nun wie jeder andere Wochentag.
+
 ## [0.2.2] - 2026-05-03
 
 ### Fixed

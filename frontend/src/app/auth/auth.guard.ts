@@ -12,7 +12,10 @@ export const authGuard: CanActivateFn = (_route, state) => {
   if (accessToken && !auth.isAccessTokenExpired()) {
     return true;
   }
-  if (accessToken && auth.isAccessTokenExpired() && !auth.getRefreshToken()) {
+  if (auth.getRefreshToken()) {
+    return true;
+  }
+  if (accessToken) {
     auth.clearSession();
   }
   return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });

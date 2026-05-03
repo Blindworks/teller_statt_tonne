@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-05-03
+
+### Changed
+
+- `POST/DELETE /api/pickups/{id}/signup`: Pickups deren Datum vor dem aktuellen Tag liegt können nicht mehr ein- oder ausgetragen werden. Beide Endpoints antworten in diesem Fall mit HTTP `410 Gone` (neuer `Result.PICKUP_PAST` im `PickupSignupService`).
+
 ## [0.2.1] - 2026-05-03
 
 ### Fixed

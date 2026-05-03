@@ -13,7 +13,7 @@
   [class.border-t-primary]="today() && v !== 'COMPLETED' && v !== 'CANCELLED'"
   [class.cursor-pointer]="!isRetter() && (v === 'PARTIAL' || v === 'EMPTY')"
   [class.hover:shadow-md]="!isRetter() && v === 'FILLED'"
-  [class.opacity-60]="v === 'COMPLETED' || v === 'CANCELLED'"
+  [class.opacity-60]="v === 'COMPLETED' || v === 'CANCELLED' || (isRetter() && isPast())"
 >
   <div class="flex justify-between items-start mb-3">
     <span

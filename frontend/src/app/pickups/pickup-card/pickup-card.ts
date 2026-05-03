@@ -61,11 +61,19 @@ export class PickupCardComponent {
     return this.pickup().assignments.some((a) => a.memberId === uid);
   });
 
+  readonly isPast = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const d = new Date(`${this.pickup().date}T00:00:00`);
+    return d.getTime() < today.getTime();
+  });
+
   readonly canSignup = computed(() => {
     const p = this.pickup();
     return (
       this.isRetter() &&
       p.status === 'SCHEDULED' &&
+      !this.isPast() &&
       !this.currentUserAssigned() &&
       p.assignments.length < p.capacity
     );
@@ -73,7 +81,9 @@ export class PickupCardComponent {
 
   readonly canUnassign = computed(() => {
     const p = this.pickup();
-    return this.isRetter() && p.status === 'SCHEDULED' && this.currentUserAssigned();
+    return (
+      this.isRetter() && p.status === 'SCHEDULED' && !this.isPast() && this.currentUserAssigned()
+    );
   });
 
   readonly editLink = computed<unknown[] | null>(() => {

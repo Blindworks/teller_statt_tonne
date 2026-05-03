@@ -129,6 +129,31 @@ class PickupSignupServiceTest {
         assertThat(result).isEqualTo(PickupSignupService.Result.NOT_ASSIGNED);
     }
 
+    @Test
+    void signupRejectedForPastPickup() {
+        PickupEntity pickup = pickupRepository.findById(pickupId).orElseThrow();
+        pickup.setDate(LocalDate.now().minusDays(1));
+        pickupRepository.save(pickup);
+
+        PickupSignupService.Result result = signupService.signup(pickupId, memberId);
+
+        assertThat(result).isEqualTo(PickupSignupService.Result.PICKUP_PAST);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).isEmpty();
+    }
+
+    @Test
+    void unassignRejectedForPastPickup() {
+        signupService.signup(pickupId, memberId);
+        PickupEntity pickup = pickupRepository.findById(pickupId).orElseThrow();
+        pickup.setDate(LocalDate.now().minusDays(1));
+        pickupRepository.save(pickup);
+
+        PickupSignupService.Result result = signupService.unassign(pickupId, memberId);
+
+        assertThat(result).isEqualTo(PickupSignupService.Result.PICKUP_PAST);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).hasSize(1);
+    }
+
     private UserEntity createUser(String prefix) {
         UserEntity user = new UserEntity();
         user.setEmail(prefix + "-" + System.nanoTime() + "@example.de");

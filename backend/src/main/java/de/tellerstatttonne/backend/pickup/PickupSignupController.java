@@ -37,6 +37,7 @@ public class PickupSignupController {
             case PICKUP_NOT_FOUND, USER_NOT_FOUND, NOT_ASSIGNED -> ResponseEntity.notFound().build();
             case NOT_MEMBER -> ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             case CAPACITY_FULL -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+            case PICKUP_PAST -> ResponseEntity.status(HttpStatus.GONE).build();
         };
     }
 }

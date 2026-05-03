@@ -12,7 +12,6 @@ interface DayColumn {
   shortLabel: string;
   dayOfMonth: number;
   isToday: boolean;
-  isSunday: boolean;
   pickups: Pickup[];
 }
 
@@ -88,7 +87,6 @@ export class PickupsComponent {
         shortLabel: SHORT_WEEKDAYS[i],
         dayOfMonth: d.getDate(),
         isToday: d.getTime() === today.getTime(),
-        isSunday: i === 6,
         pickups: byDate.get(iso) ?? [],
       });
     }
@@ -177,6 +175,7 @@ export class PickupsComponent {
     const status = (err as { status?: number })?.status;
     if (status === 403) return 'Du bist diesem Store nicht zugeordnet.';
     if (status === 409) return 'Slot ist bereits voll.';
+    if (status === 410) return 'Vergangene Pickups können nicht geändert werden.';
     if (status === 404) return 'Slot wurde nicht gefunden.';
     return fallback;
   }

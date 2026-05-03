@@ -3,6 +3,7 @@ package de.tellerstatttonne.backend.pickup;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
+import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PickupSignupService {
 
-    public enum Result { OK, PICKUP_NOT_FOUND, USER_NOT_FOUND, NOT_MEMBER, CAPACITY_FULL, NOT_ASSIGNED }
+    public enum Result { OK, PICKUP_NOT_FOUND, USER_NOT_FOUND, NOT_MEMBER, CAPACITY_FULL, NOT_ASSIGNED, PICKUP_PAST }
 
     private final PickupRepository pickupRepository;
     private final UserRepository userRepository;
@@ -29,6 +30,8 @@ public class PickupSignupService {
 
         PickupEntity pickup = pickupOpt.get();
         UserEntity user = userOpt.get();
+
+        if (pickup.getDate().isBefore(LocalDate.now())) return Result.PICKUP_PAST;
 
         PartnerEntity partner = pickup.getPartner();
         boolean isMember = partner.getMembers().stream()
@@ -55,6 +58,7 @@ public class PickupSignupService {
         if (pickupOpt.isEmpty()) return Result.PICKUP_NOT_FOUND;
 
         PickupEntity pickup = pickupOpt.get();
+        if (pickup.getDate().isBefore(LocalDate.now())) return Result.PICKUP_PAST;
         boolean removed = pickup.getAssignments().removeIf(a -> userId.equals(a.getUserId()));
         if (!removed) return Result.NOT_ASSIGNED;
         pickupRepository.save(pickup);

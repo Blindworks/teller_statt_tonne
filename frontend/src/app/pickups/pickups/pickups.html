@@ -61,72 +61,6 @@
     </div>
   }
 
-  <!-- Hero Bento -->
-  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-    <div
-      class="md:col-span-2 bg-gradient-to-br from-primary to-primary-dim p-8 rounded-xl text-white relative overflow-hidden flex flex-col justify-between min-h-[240px]"
-    >
-      <div class="z-10">
-        <h3 class="text-3xl font-extrabold mb-2 leading-tight">Weekly Harvest Impact</h3>
-        <p class="text-primary-container/80 max-w-md mb-6">
-          Ihr habt diese Woche {{ kgSaved() }}&nbsp;kg gerettet. Es warten
-          {{ openSlotCount() }} offene Slots auf Helden.
-        </p>
-      </div>
-      <div class="z-10 flex items-center gap-4 flex-wrap">
-        <button
-          type="button"
-          class="bg-surface-container-lowest text-primary px-6 py-3 rounded-full font-bold text-sm shadow-md hover:scale-105 transition-transform"
-        >
-          Impact-Karte ansehen
-        </button>
-        <div class="flex -space-x-3">
-          @for (url of avatarStack; track url) {
-            <img
-              [src]="url"
-              alt="Mitglied"
-              class="w-10 h-10 rounded-full border-4 border-primary object-cover"
-            />
-          }
-          <div
-            class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container border-4 border-primary flex items-center justify-center text-xs font-bold"
-          >
-            +18
-          </div>
-        </div>
-      </div>
-      <div
-        class="absolute -right-12 -bottom-12 w-64 h-64 bg-primary-container/20 rounded-full blur-3xl pointer-events-none"
-      ></div>
-    </div>
-
-    <div
-      class="bg-secondary-container p-8 rounded-xl flex flex-col justify-between shadow-sm min-h-[240px]"
-    >
-      <div>
-        <div
-          class="w-12 h-12 bg-on-secondary-container/10 rounded-2xl flex items-center justify-center mb-6"
-        >
-          <span class="material-symbols-outlined text-on-secondary-container">alarm</span>
-        </div>
-        <h4 class="text-on-secondary-container font-bold text-xl">Nächste Abholung</h4>
-        <p class="text-on-secondary-container/70 text-sm mt-1">
-          {{ nextPickup()?.partnerName ?? 'Keine geplant' }}
-        </p>
-      </div>
-      <div>
-        <div class="text-4xl font-black text-on-secondary-container mb-1">
-          {{ nextPickupLabel() }}
-        </div>
-        @if (nextPickup(); as np) {
-          <div class="text-on-secondary-container/80 font-bold">
-            {{ np.startTime }} — {{ np.endTime }}
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
   <!-- View Toggle & Filters -->
   <div
     class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8"
@@ -211,15 +145,6 @@
               <span class="material-symbols-outlined text-sm">add</span> Hinzufügen
             </a>
           }
-        } @else if (day.isSunday) {
-          <div
-            class="py-8 text-center bg-surface-container-low/30 rounded-xl border-2 border-dashed border-outline-variant/10"
-          >
-            <span class="material-symbols-outlined text-outline-variant text-3xl mb-2">
-              nightlight
-            </span>
-            <p class="text-[10px] font-medium text-on-surface-variant px-4">Sonntagsruhe</p>
-          </div>
         } @else if (!isRetter()) {
           <a
             [routerLink]="['/pickups/new']"
