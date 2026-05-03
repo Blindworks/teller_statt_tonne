@@ -1,5 +1,12 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
@@ -63,6 +70,7 @@ export class DashboardComponent {
 
   private readonly daySlotsSignal = signal<DaySlot[]>([]);
   private readonly errorSignal = signal<string | null>(null);
+  private readonly nowSignal = signal<number>(Date.now());
 
   readonly displaySlots = computed<DisplaySlot[]>(() =>
     this.daySlotsSignal().map((s, idx) => this.toDisplay(s, idx)),
@@ -84,6 +92,46 @@ export class DashboardComponent {
     ),
   );
 
+  readonly nextOwnPickup = computed<DisplaySlot | null>(() => {
+    const now = this.nowSignal();
+    const cutoff = now - 60 * 60 * 1000;
+    const upcoming = this.mySlots()
+      .filter((s) => this.parseSlotStart(s) >= cutoff)
+      .sort((a, b) => this.parseSlotStart(a) - this.parseSlotStart(b));
+    return upcoming[0] ?? null;
+  });
+
+  readonly nextAvailableSlot = computed<DisplaySlot | null>(() => {
+    const now = this.nowSignal();
+    const upcoming = this.availableSlots()
+      .filter((s) => this.parseSlotStart(s) >= now)
+      .sort((a, b) => this.parseSlotStart(a) - this.parseSlotStart(b));
+    return upcoming[0] ?? null;
+  });
+
+  readonly todayOpenSlotsCount = computed<number>(() => {
+    const today = this.todayIso();
+    return this.displaySlots().filter((s) => s.date === today && s.freeCount > 0).length;
+  });
+
+  readonly nextPickupCountdown = computed<{
+    days: number;
+    hours: number;
+    minutes: number;
+    isPast: boolean;
+  } | null>(() => {
+    const slot = this.nextOwnPickup();
+    if (!slot) return null;
+    const start = this.parseSlotStart(slot);
+    const diff = start - this.nowSignal();
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, isPast: true };
+    const totalMinutes = Math.floor(diff / 60000);
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const minutes = totalMinutes % 60;
+    return { days, hours, minutes, isPast: false };
+  });
+
   readonly userRole = computed<Role | null>(() => this.authService.currentUser()?.role ?? null);
   readonly firstName = computed<string>(() => this.authService.currentUser()?.firstName ?? '');
   readonly isRetter = computed(() => this.userRole() === 'RETTER');
@@ -96,6 +144,8 @@ export class DashboardComponent {
 
   constructor() {
     this.loadSlots();
+    const tickHandle = setInterval(() => this.nowSignal.set(Date.now()), 30_000);
+    inject(DestroyRef).onDestroy(() => clearInterval(tickHandle));
   }
 
   readonly news: NewsItem[] = [
@@ -225,6 +275,20 @@ export class DashboardComponent {
       currentUserAssigned: s.currentUserAssigned,
       canSignup: !s.isTemplate && !s.currentUserAssigned && freeCount > 0,
     };
+  }
+
+  private todayIso(): string {
+    void this.nowSignal();
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private parseSlotStart(slot: DisplaySlot): number {
+    const parsed = new Date(`${slot.date}T${slot.startTime}`);
+    return parsed.getTime();
   }
 
   private initial(name: string | null): string {

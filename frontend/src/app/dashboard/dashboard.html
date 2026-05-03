@@ -119,20 +119,46 @@
 
     <!-- News Feed -->
     <div class="space-y-6">
-      <div
-        class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-6"
+      @let nextPickup = nextOwnPickup();
+      @let countdown = nextPickupCountdown();
+      <button
+        type="button"
+        (click)="nextPickup && openSlot(nextPickup)"
+        [disabled]="!nextPickup"
+        class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-6 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
       >
-        <div class="flex justify-between items-start">
+        <div class="flex justify-between items-start gap-2">
           <span class="p-3 bg-primary-container text-on-primary-container rounded-full">
-            <span class="material-symbols-outlined">group</span>
+            <span class="material-symbols-outlined">schedule</span>
           </span>
-          <span class="text-primary text-xs font-bold">+12%</span>
+          @if (nextPickup) {
+            <span class="text-primary text-xs font-bold text-right">
+              {{ nextPickup.dateLabel }} · {{ nextPickup.startTime }}
+            </span>
+          }
         </div>
         <div>
-          <p class="text-4xl font-black text-on-surface">42</p>
-          <p class="text-on-surface-variant text-sm font-medium">Active Members</p>
+          @if (countdown) {
+            @if (countdown.isPast) {
+              <p class="text-3xl font-black text-tertiary">Läuft jetzt</p>
+            } @else {
+              <p class="text-4xl font-black text-on-surface">
+                @if (countdown.days > 0) {
+                  <span>{{ countdown.days }}T </span>
+                }
+                <span>{{ countdown.hours }}h </span>
+                <span>{{ countdown.minutes }}m</span>
+              </p>
+            }
+            <p class="text-on-surface-variant text-sm font-medium truncate">
+              {{ nextPickup!.partnerName }}
+            </p>
+          } @else {
+            <p class="text-4xl font-black text-on-surface">–</p>
+            <p class="text-on-surface-variant text-sm font-medium">Kein anstehender Pickup</p>
+          }
         </div>
-      </div>
+      </button>
 
       <div
         class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-6"

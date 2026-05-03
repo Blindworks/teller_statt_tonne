@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-03
+
+### Changed
+
+- Dashboard: Die Kachel „Active Members" (statisch „42 / +12%") wurde durch eine Kachel „Nächster Pickup" ersetzt. Sie zeigt für die eingeloggte Person den nächsten eigenen Pickup mit Countdown (`Td Hh Mm`, Update alle 30 s), Datum, Uhrzeit und Partnername. Klick auf die Kachel öffnet den Pickup. Ohne anstehenden Pickup erscheint ein Empty State.
+
 ## [0.3.0] - 2026-05-03
 
 ### Added
