@@ -48,6 +48,13 @@ public class PartnerService {
     }
 
     @Transactional(readOnly = true)
+    public List<Partner> findAllForMember(Long userId) {
+        List<Partner> partners = repository.findAllByMemberIdAndStatusNot(userId, Partner.Status.DELETED).stream()
+            .map(PartnerMapper::toDto).toList();
+        return enrichWithAvailability(partners);
+    }
+
+    @Transactional(readOnly = true)
     public List<Partner> findAllDeleted() {
         return repository.findAllByStatus(Partner.Status.DELETED).stream()
             .map(PartnerMapper::toDto).toList();

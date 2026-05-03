@@ -65,7 +65,7 @@ class PartnerControllerTest {
         assertThat(fetched.category()).isEqualTo(Partner.Category.BAKERY);
         assertThat(fetched.pickupSlots().get(0).weekday()).isEqualTo(Partner.Weekday.MONDAY);
 
-        assertThat(controller.list()).hasSize(1);
+        assertThat(controller.list(false)).hasSize(1);
 
         Partner updatedPayload = new Partner(
             created.id(), "Bäckerei Sonne", Partner.Category.CAFE,

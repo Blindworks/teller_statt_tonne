@@ -10,6 +10,9 @@ public interface PartnerRepository extends JpaRepository<PartnerEntity, Long> {
 
     List<PartnerEntity> findAllByStatus(Partner.Status status);
 
+    @Query("select distinct p from PartnerEntity p join p.members m where p.status <> :excluded and m.id = :userId")
+    List<PartnerEntity> findAllByMemberIdAndStatusNot(Long userId, Partner.Status excluded);
+
     @Query("select p.id as partnerId, size(p.members) as memberCount from PartnerEntity p where p.status <> :excluded")
     List<MemberCountRow> countMembersGroupedByPartnerExcluding(Partner.Status excluded);
 

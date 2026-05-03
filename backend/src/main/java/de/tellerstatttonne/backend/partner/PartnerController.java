@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import de.tellerstatttonne.backend.auth.CurrentUser;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,7 +31,12 @@ public class PartnerController {
     }
 
     @GetMapping
-    public List<Partner> list() {
+    public List<Partner> list(
+        @RequestParam(value = "mine", required = false, defaultValue = "false") boolean mine
+    ) {
+        if (mine) {
+            return service.findAllForMember(CurrentUser.requireId());
+        }
         return service.findAll();
     }
 

@@ -17,8 +17,9 @@ export class PartnerService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/partners`;
 
-  list(): Observable<Partner[]> {
-    return this.http.get<Partner[]>(this.baseUrl);
+  list(mine = false): Observable<Partner[]> {
+    const options = mine ? { params: { mine: 'true' } } : {};
+    return this.http.get<Partner[]>(this.baseUrl, options);
   }
 
   listDeleted(): Observable<Partner[]> {
