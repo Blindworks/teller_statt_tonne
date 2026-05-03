@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-05-03
+
+### Changed
+
+- Partner-Detail-Dialog: „Bearbeiten"-Button im Footer wird für Retter ausgeblendet. Admin/Botschafter sehen den Button unverändert.
+
 ## [0.5.1] - 2026-05-03
 
 ### Changed

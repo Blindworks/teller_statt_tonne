@@ -19,6 +19,7 @@ import {
   WEEKDAYS,
   Weekday,
 } from '../../partners/partner.model';
+import { AuthService } from '../../auth/auth.service';
 import { StoreDetailDialogService } from './store-detail-dialog.service';
 
 const WEEKDAY_LABELS: Record<Weekday, string> = WEEKDAYS.reduce(
@@ -45,8 +46,10 @@ const WEEKDAY_ORDER: Record<Weekday, number> = WEEKDAYS.reduce(
 })
 export class StoreDetailDialogComponent implements AfterViewInit, OnDestroy {
   private readonly dialogService = inject(StoreDetailDialogService);
+  private readonly auth = inject(AuthService);
 
   readonly partner = this.dialogService.partner;
+  readonly isRetter = computed(() => this.auth.currentUser()?.role === 'RETTER');
   readonly categoryLabels = CATEGORY_LABELS;
   readonly categoryIcons = CATEGORY_ICONS;
 
