@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-05-04
+
+### Added
+
+- Neuer Endpoint `POST /api/push/test`, der eine Test-Push-Benachrichtigung an den aufrufenden User sendet.
+
 ## [0.3.0] - 2026-05-04
 
 ### Added

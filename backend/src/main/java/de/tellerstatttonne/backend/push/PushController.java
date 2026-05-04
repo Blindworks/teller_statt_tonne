@@ -43,4 +43,15 @@ public class PushController {
         service.unsubscribe(CurrentUser.requireId(), req.endpoint());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/test")
+    public ResponseEntity<Void> sendTest() {
+        PushPayload payload = PushPayload.of(
+            "Test-Benachrichtigung",
+            "Wenn du das siehst, funktioniert Web Push 🎉",
+            "/profil"
+        );
+        service.sendToUser(CurrentUser.requireId(), payload);
+        return ResponseEntity.noContent().build();
+    }
 }

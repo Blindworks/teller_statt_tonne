@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-05-04
+
+### Added
+
+- Profil: Knopf „Test-Push senden" im Push-Benachrichtigungen-Block, der über `POST /api/push/test` eine Test-Notification an den aktuellen User schickt.
+
 ## [0.6.0] - 2026-05-04
 
 ### Added

@@ -253,6 +253,21 @@ export class ProfileComponent {
     }
   }
 
+  async sendTestPush(): Promise<void> {
+    this.pushError.set(null);
+    this.pushMessage.set(null);
+    this.pushBusy.set(true);
+    try {
+      await this.push.sendTest();
+      this.pushMessage.set('Test-Benachrichtigung gesendet.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Test-Push fehlgeschlagen.';
+      this.pushError.set(msg);
+    } finally {
+      this.pushBusy.set(false);
+    }
+  }
+
   private patchForm(user: User): void {
     this.form.patchValue({
       firstName: user.firstName,

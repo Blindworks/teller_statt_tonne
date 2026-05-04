@@ -62,6 +62,12 @@ export class PushNotificationService {
     );
   }
 
+  async sendTest(): Promise<void> {
+    await firstValueFrom(
+      this.http.post<void>(`${environment.apiBaseUrl}/api/push/test`, {}),
+    );
+  }
+
   async unsubscribe(): Promise<void> {
     const sub = this.currentSubscription();
     if (!sub) return;
