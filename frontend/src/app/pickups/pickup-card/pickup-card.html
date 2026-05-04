@@ -15,7 +15,7 @@
   [class.hover:shadow-md]="!isRetter() && v === 'FILLED'"
   [class.opacity-60]="v === 'COMPLETED' || v === 'CANCELLED' || (isRetter() && isPast())"
 >
-  <div class="flex justify-between items-start mb-3">
+  <div class="flex flex-wrap justify-between items-start gap-1 mb-3">
     <span
       class="text-[10px] font-bold uppercase tracking-tighter px-2 py-0.5 rounded-full"
       [class]="chipClasses()"

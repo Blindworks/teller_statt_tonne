@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-05-03
+
+### Fixed
+
+- Pickup-Kachel (Wochenansicht): „Eingetragen"-Badge sprengte bei Retter-Sicht die Kachelbreite. Header-Row darf jetzt umbrechen (`flex-wrap` + `gap-1`), sodass der Badge bei schmalen Spalten unter den Kategorie-Chip rutscht statt überzulaufen.
+
 ## [0.5.3] - 2026-05-03
 
 ### Changed
