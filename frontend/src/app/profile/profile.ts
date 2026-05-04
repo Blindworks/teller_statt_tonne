@@ -15,6 +15,7 @@ import { UserService } from '../users/user.service';
 import { User } from '../users/user.model';
 import { resolvePhotoUrl } from '../users/photo-url';
 import { UserAvailabilityComponent } from '../users/user-availability/user-availability';
+import { PushNotificationService } from '../push/push-notification.service';
 
 type ProfileForm = FormGroup<{
   firstName: FormControl<string>;
@@ -44,6 +45,14 @@ export class ProfileComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly userService = inject(UserService);
+  private readonly push = inject(PushNotificationService);
+
+  readonly pushSupported = this.push.isSupported;
+  readonly pushSubscribed = this.push.isSubscribed;
+  readonly pushPermission = this.push.permissionState;
+  readonly pushBusy = signal(false);
+  readonly pushError = signal<string | null>(null);
+  readonly pushMessage = signal<string | null>(null);
 
   readonly currentUser = this.auth.currentUser;
   readonly hasProfile = computed(() => !!this.currentUser());
@@ -222,6 +231,26 @@ export class ProfileComponent {
         this.passwordError.set(msg);
       },
     });
+  }
+
+  async togglePush(enable: boolean): Promise<void> {
+    this.pushError.set(null);
+    this.pushMessage.set(null);
+    this.pushBusy.set(true);
+    try {
+      if (enable) {
+        await this.push.subscribe();
+        this.pushMessage.set('Benachrichtigungen aktiviert.');
+      } else {
+        await this.push.unsubscribe();
+        this.pushMessage.set('Benachrichtigungen deaktiviert.');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Aktion fehlgeschlagen.';
+      this.pushError.set(msg);
+    } finally {
+      this.pushBusy.set(false);
+    }
   }
 
   private patchForm(user: User): void {

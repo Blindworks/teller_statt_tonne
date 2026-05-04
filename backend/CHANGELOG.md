@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-04
+
+### Added
+
+- Web Push (VAPID): Neue Endpoints unter `/api/push/*` zur Verwaltung von Push-Subscriptions (`GET /vapid-public-key` öffentlich, `POST/DELETE /subscriptions` authentifiziert). Subscriptions werden in Tabelle `push_subscription` (Liquibase-Changeset 006) persistiert und an `app_user` gekoppelt (Cascade-Delete). Versand erfolgt asynchron über `PushSubscriptionService` mit der Bibliothek `nl.martijndwars:web-push`; abgelaufene Subscriptions (HTTP 404/410) werden automatisch entfernt. VAPID-Schlüssel und Subject werden ausschließlich aus `application.properties` (`app.vapid.*`) bezogen.
+
 ## [0.2.2] - 2026-05-03
 
 ### Changed

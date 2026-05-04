@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>de.tellerstatttonne</groupId>
 	<artifactId>backend</artifactId>
-	<version>0.2.2</version>
+	<version>0.3.0</version>
 	<name>backend</name>
 	<description>Teller statt Tonne backend</description>
 	<url/>
@@ -82,6 +82,17 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>nl.martijndwars</groupId>
+			<artifactId>web-push</artifactId>
+			<version>5.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
+			<version>1.78</version>
 		</dependency>
 
 		<dependency>

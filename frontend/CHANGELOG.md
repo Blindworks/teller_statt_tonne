@@ -7,6 +7,13 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-05-04
+
+### Added
+
+- PWA-Unterstützung: Angular-Service-Worker (`@angular/service-worker`) wird in Production registriert, neues `manifest.webmanifest` und `ngsw-config.json` erlauben Installation auf Android/iOS-Homescreen.
+- Web Push (VAPID): Neuer `PushNotificationService` (`src/app/push/`) kapselt Abonnement, Abbestellen und Permission-Status; integriert mit `SwPush.notificationClicks` für Deep-Links. Im Profil gibt es jetzt einen Block „Push-Benachrichtigungen" zum Aktivieren/Deaktivieren. VAPID Public Key wird aus `environment.vapidPublicKey` (Fallback: `GET /api/push/vapid-public-key`) bezogen, Subscriptions werden via `POST/DELETE /api/push/subscriptions` synchronisiert.
+
 ## [0.5.4] - 2026-05-03
 
 ### Fixed

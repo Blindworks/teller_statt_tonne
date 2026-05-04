@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/logout").permitAll()
                 .requestMatchers("/api/version").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/push/vapid-public-key").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )

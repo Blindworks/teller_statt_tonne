@@ -10,5 +10,6 @@
     <include file="db/changelog/changes/003-merge-user-member.xml"/>
     <include file="db/changelog/changes/004-add-user-address.xml"/>
     <include file="db/changelog/changes/005-quiz-applicant-lock.xml"/>
+    <include file="db/changelog/changes/006-push-subscription.xml"/>
 
 </databaseChangeLog>

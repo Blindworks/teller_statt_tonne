@@ -217,6 +217,56 @@
         </fieldset>
       }
 
+      <!-- Push-Benachrichtigungen -->
+      <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-4">
+        <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+          Push-Benachrichtigungen
+        </legend>
+        @if (!pushSupported) {
+          <p class="text-sm text-on-surface-variant">
+            Dieses Gerät unterstützt keine Web-Push-Benachrichtigungen. Auf iOS muss die App über
+            „Zum Home-Bildschirm hinzufügen" installiert sein.
+          </p>
+        } @else {
+          <p class="text-sm text-on-surface-variant">
+            Erhalte Hinweise zu neuen Pickups und Slot-Freigaben — auch wenn die App geschlossen ist.
+          </p>
+          <div class="flex items-center gap-4">
+            @if (pushSubscribed()) {
+              <button
+                type="button"
+                [disabled]="pushBusy()"
+                (click)="togglePush(false)"
+                class="bg-error-container text-on-error-container px-6 py-3 rounded-full font-bold disabled:opacity-60 active:scale-95 transition-transform"
+              >
+                {{ pushBusy() ? 'Bitte warten…' : 'Benachrichtigungen deaktivieren' }}
+              </button>
+              <span class="text-sm font-semibold text-tertiary">Aktiviert</span>
+            } @else {
+              <button
+                type="button"
+                [disabled]="pushBusy() || pushPermission() === 'denied'"
+                (click)="togglePush(true)"
+                class="bg-primary text-on-primary px-6 py-3 rounded-full font-bold shadow-lg shadow-primary/20 disabled:opacity-60 active:scale-95 transition-transform"
+              >
+                {{ pushBusy() ? 'Bitte warten…' : 'Benachrichtigungen aktivieren' }}
+              </button>
+              @if (pushPermission() === 'denied') {
+                <span class="text-sm text-error font-semibold">
+                  Im Browser blockiert — bitte in den Browser-Einstellungen erlauben.
+                </span>
+              }
+            }
+          </div>
+          @if (pushError()) {
+            <p class="text-sm text-error font-semibold">{{ pushError() }}</p>
+          }
+          @if (pushMessage()) {
+            <p class="text-sm text-tertiary font-semibold">{{ pushMessage() }}</p>
+          }
+        }
+      </fieldset>
+
       <!-- Passwort -->
       <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()" class="space-y-6">
         <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-6">
