@@ -9,9 +9,13 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [0.3.2] - 2026-05-06
 
+### Fixed
+
+- Apple Web Push (`web.push.apple.com`) lehnte VAPID-JWTs mit `403 BadAuthorizationHeader` ab. Ursache war das von `nl.martijndwars:web-push:5.1.1` transitiv mitgelieferte `jose4j 0.7.0`, das ES256-Signaturen in einem von Apple nicht akzeptierten Format ausgibt. `jose4j` ist jetzt explizit auf `0.9.6` angehoben (transitiver Eintrag wird ausgeschlossen).
+
 ### Changed
 
-- Web Push Diagnose: Beim Start loggt `WebPushConfig` ob VAPID-Keys konfiguriert sind (maskierter Public-Key, Subject) bzw. eine Warnung, falls Keys fehlen. Bei einem Push-Fehler ≥ 400 (z. B. Apple `403`) wird jetzt zusätzlich der Response-Body des Push-Services als Reason geloggt, damit Ursachen wie `BadJwtSignature`, `JwtTokenExpired` oder `BadSubject` direkt sichtbar sind. Subscriptions werden bei `403` bewusst nicht gelöscht (Server-Misskonfiguration soll nicht alle Geräte abmelden).
+- Web Push Diagnose: Beim Start loggt `WebPushConfig` ob VAPID-Keys konfiguriert sind (maskierter Public-Key, Subject) bzw. eine Warnung, falls Keys fehlen. Bei einem Push-Fehler ≥ 400 wird jetzt zusätzlich der Response-Body des Push-Services als Reason geloggt, damit Ursachen wie `BadJwtSignature`, `JwtTokenExpired` oder `BadSubject` direkt sichtbar sind. Subscriptions werden bei `403` bewusst nicht gelöscht (Server-Misskonfiguration soll nicht alle Geräte abmelden).
 
 ## [0.3.1] - 2026-05-04
 
