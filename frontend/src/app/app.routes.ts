@@ -29,6 +29,16 @@ export const routes: Routes = [
     loadComponent: () => import('./about/about').then((m) => m.AboutComponent),
   },
   {
+    path: 'impressum',
+    loadComponent: () =>
+      import('./legal/imprint/imprint').then((m) => m.ImprintComponent),
+  },
+  {
+    path: 'datenschutz',
+    loadComponent: () =>
+      import('./legal/privacy/privacy').then((m) => m.PrivacyComponent),
+  },
+  {
     path: '',
     component: AppShellComponent,
     canActivate: [authGuard],

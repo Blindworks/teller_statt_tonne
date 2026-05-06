@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-05-06
+
+### Added
+
+- Öffentliche Rechtsseiten `/impressum` und `/datenschutz` (Lazy-Loaded Standalone-Components unter `src/app/legal/`). Vorlagen gemäß § 5 DDG / § 18 MStV bzw. Art. 13 DSGVO mit klar markierten Platzhaltern (`{{…}}`) für vereinsspezifische Angaben (Anschrift, Vorstand, Vereinsregister, Hoster). Footer-Links auf der Landing-Seite verweisen jetzt auf diese Routen.
+
 ## [0.6.1] - 2026-05-04
 
 ### Added
