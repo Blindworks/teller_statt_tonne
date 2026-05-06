@@ -66,7 +66,7 @@ export class PartnerEditComponent {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
 
-  readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMINISTRATOR');
+  readonly isAdmin = computed(() => !!this.auth.currentUser()?.roles?.includes('ADMINISTRATOR'));
   readonly partnerStatus = signal<Status | null>(null);
   readonly partnerName = signal<string>('');
   readonly isDeleted = computed(() => this.partnerStatus() === 'DELETED');

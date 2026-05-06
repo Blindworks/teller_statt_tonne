@@ -63,7 +63,7 @@
                 {{ member.firstName }} {{ member.lastName }}
               </p>
               <p class="text-[11px] text-on-surface-variant uppercase tracking-wider">
-                {{ member.role }}
+                {{ member.roles?.[0] ?? '' }}
               </p>
             </div>
             <span class="material-symbols-outlined text-primary text-xl">add</span>

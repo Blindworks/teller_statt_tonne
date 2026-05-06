@@ -1,9 +1,14 @@
 package de.tellerstatttonne.backend.user;
 
+import de.tellerstatttonne.backend.role.RoleEntity;
+import de.tellerstatttonne.backend.role.RoleRepository;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,10 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository repository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -32,13 +40,14 @@ public class UserService {
         if (request.lastName() == null || request.lastName().isBlank()) {
             throw new IllegalArgumentException("lastName is required");
         }
-        if (request.role() == null) {
-            throw new IllegalArgumentException("role is required");
+        if (request.roleNames() == null || request.roleNames().isEmpty()) {
+            throw new IllegalArgumentException("at least one role is required");
         }
+        Set<RoleEntity> roles = resolveRoles(request.roleNames());
         UserEntity entity = new UserEntity();
         entity.setEmail(email);
         entity.setPasswordHash(passwordEncoder.encode(request.password()));
-        entity.setRole(request.role());
+        entity.setRoles(roles);
         entity.setFirstName(request.firstName().trim());
         entity.setLastName(request.lastName().trim());
         entity.setPhone(request.phone());
@@ -50,11 +59,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findAll(Role role, boolean activeOnly, String search) {
+    public List<User> findAll(String roleName, boolean activeOnly, String search) {
         Specification<UserEntity> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (role != null) {
-                predicates.add(cb.equal(root.get("role"), role));
+            if (roleName != null && !roleName.isBlank()) {
+                Join<UserEntity, RoleEntity> rolesJoin = root.join("roles");
+                predicates.add(cb.equal(rolesJoin.get("name"), roleName));
+                if (query != null) {
+                    query.distinct(true);
+                }
             }
             if (activeOnly) {
                 predicates.add(cb.equal(root.get("onlineStatus"), UserEntity.OnlineStatus.ONLINE));
@@ -81,6 +94,7 @@ public class UserService {
         return repository.findById(id).map(entity -> {
             validateProfile(user);
             UserMapper.applyProfileToEntity(entity, user);
+            entity.setRoles(resolveRoles(new HashSet<>(user.roles())));
             return UserMapper.toDto(repository.save(entity));
         });
     }
@@ -112,8 +126,22 @@ public class UserService {
         if (user.lastName() == null || user.lastName().isBlank()) {
             throw new IllegalArgumentException("lastName is required");
         }
-        if (user.role() == null) {
-            throw new IllegalArgumentException("role is required");
+        if (user.roles() == null || user.roles().isEmpty()) {
+            throw new IllegalArgumentException("at least one role is required");
         }
+    }
+
+    private Set<RoleEntity> resolveRoles(Set<String> roleNames) {
+        Set<RoleEntity> resolved = new HashSet<>();
+        for (String name : roleNames) {
+            if (name == null || name.isBlank()) continue;
+            RoleEntity role = roleRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown role: " + name));
+            resolved.add(role);
+        }
+        if (resolved.isEmpty()) {
+            throw new IllegalArgumentException("at least one role is required");
+        }
+        return resolved;
     }
 }

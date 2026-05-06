@@ -45,11 +45,11 @@ export class AppShellComponent {
   readonly moreOpen = signal(false);
 
   readonly isPlanner = computed(() => {
-    const role = this.currentUser()?.role;
-    return role === 'ADMINISTRATOR' || role === 'BOTSCHAFTER' || role === 'RETTER';
+    const roles = this.currentUser()?.roles ?? [];
+    return roles.some((r) => r === 'ADMINISTRATOR' || r === 'BOTSCHAFTER' || r === 'RETTER');
   });
 
-  readonly isAdmin = computed(() => this.currentUser()?.role === 'ADMINISTRATOR');
+  readonly isAdmin = computed(() => !!this.currentUser()?.roles?.includes('ADMINISTRATOR'));
 
   constructor() {
     this.router.events.subscribe((e) => {

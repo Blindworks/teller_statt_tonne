@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerService;
-import de.tellerstatttonne.backend.user.Role;
+import de.tellerstatttonne.backend.role.RoleRepository;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ class PickupControllerTest {
     @Autowired private PickupRepository pickupRepository;
     @Autowired private PartnerService partnerService;
     @Autowired private UserRepository userRepository;
+    @Autowired private RoleRepository roleRepository;
 
     private Long partnerId;
     private Long memberId;
@@ -47,7 +49,7 @@ class PickupControllerTest {
         UserEntity user = new UserEntity();
         user.setEmail("lisa-" + System.nanoTime() + "@example.de");
         user.setPasswordHash("dummy");
-        user.setRole(Role.RETTER);
+        user.setRoles(Set.of(roleRepository.findByName("RETTER").orElseThrow()));
         user.setFirstName("Lisa");
         user.setLastName("Muster");
         user.setPhone("+49 30 222");
@@ -62,7 +64,7 @@ class PickupControllerTest {
         UserEntity admin = new UserEntity();
         admin.setEmail("admin-" + System.nanoTime() + "@example.de");
         admin.setPasswordHash("dummy");
-        admin.setRole(Role.ADMINISTRATOR);
+        admin.setRoles(Set.of(roleRepository.findByName("ADMINISTRATOR").orElseThrow()));
         admin.setFirstName("Ada");
         admin.setLastName("Admin");
         admin.setOnlineStatus(UserEntity.OnlineStatus.ONLINE);

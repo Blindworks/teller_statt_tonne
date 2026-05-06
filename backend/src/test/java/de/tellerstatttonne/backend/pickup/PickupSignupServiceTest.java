@@ -6,12 +6,13 @@ import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
 import de.tellerstatttonne.backend.partner.PartnerService;
-import de.tellerstatttonne.backend.user.Role;
+import de.tellerstatttonne.backend.role.RoleRepository;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ class PickupSignupServiceTest {
     @Autowired private PartnerRepository partnerRepository;
     @Autowired private PartnerService partnerService;
     @Autowired private UserRepository userRepository;
+    @Autowired private RoleRepository roleRepository;
 
     private Long partnerId;
     private Long memberId;
@@ -158,7 +160,7 @@ class PickupSignupServiceTest {
         UserEntity user = new UserEntity();
         user.setEmail(prefix + "-" + System.nanoTime() + "@example.de");
         user.setPasswordHash("dummy");
-        user.setRole(Role.RETTER);
+        user.setRoles(Set.of(roleRepository.findByName("RETTER").orElseThrow()));
         user.setFirstName("First");
         user.setLastName("Last");
         user.setOnlineStatus(UserEntity.OnlineStatus.OFFLINE);

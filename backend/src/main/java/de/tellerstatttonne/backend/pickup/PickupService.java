@@ -3,7 +3,6 @@ package de.tellerstatttonne.backend.pickup;
 import de.tellerstatttonne.backend.auth.CurrentUser;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
-import de.tellerstatttonne.backend.user.Role;
 import de.tellerstatttonne.backend.user.User;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
@@ -82,9 +81,8 @@ public class PickupService {
         }
         UserEntity user = userRepository.findById(userId).orElse(null);
         if (user == null) return Optional.of(Set.of());
-        Role role = user.getRole();
-        if (role == Role.ADMINISTRATOR || role == Role.BOTSCHAFTER) return Optional.empty();
-        if (role == Role.RETTER) {
+        if (user.hasRole("ADMINISTRATOR") || user.hasRole("BOTSCHAFTER")) return Optional.empty();
+        if (user.hasRole("RETTER")) {
             return Optional.of(new HashSet<>(partnerRepository.findIdsByMemberId(userId)));
         }
         return Optional.of(Set.of());

@@ -23,7 +23,7 @@ export class StoresComponent {
   readonly categoryIcons = CATEGORY_ICONS;
   readonly categoryLabels = CATEGORY_LABELS;
 
-  readonly isRetter = computed(() => this.auth.currentUser()?.role === 'RETTER');
+  readonly isRetter = computed(() => !!this.auth.currentUser()?.roles?.includes('RETTER'));
   readonly showOnlyMine = signal(this.isRetter());
 
   readonly mapImage =

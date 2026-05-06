@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="007-create-role" author="teller-statt-tonne">
+        <createTable tableName="role">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_role_name"/>
+            </column>
+            <column name="label" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="sort_order" type="INT" defaultValueNumeric="100">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="007-seed-system-roles" author="teller-statt-tonne">
+        <sql>
+            INSERT INTO role (name, label, description, sort_order, enabled, created_at, updated_at)
+            VALUES ('ADMINISTRATOR', 'Administrator',
+                'Vollzugriff inklusive Benutzer- und Rollenverwaltung.',
+                10, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        </sql>
+        <sql>
+            INSERT INTO role (name, label, description, sort_order, enabled, created_at, updated_at)
+            VALUES ('BOTSCHAFTER', 'Botschafter',
+                'Koordiniert Stores und Retter im zugewiesenen Bereich.',
+                20, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        </sql>
+        <sql>
+            INSERT INTO role (name, label, description, sort_order, enabled, created_at, updated_at)
+            VALUES ('RETTER', 'Retter',
+                'Tr&#228;gt sich in Pickup-Slots ein und holt Lebensmittel ab.',
+                30, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        </sql>
+        <sql>
+            INSERT INTO role (name, label, description, sort_order, enabled, created_at, updated_at)
+            VALUES ('NEW_MEMBER', 'Neues Mitglied',
+                'Standardrolle f&#252;r frisch registrierte Mitglieder ohne weitere Berechtigungen.',
+                40, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        </sql>
+    </changeSet>
+
+    <changeSet id="007-create-user-role" author="teller-statt-tonne">
+        <createTable tableName="user_role">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="user_role" columnNames="user_id, role_id"
+                       constraintName="pk_user_role"/>
+        <addForeignKeyConstraint baseTableName="user_role" baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_user_role_user" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="user_role" baseColumnNames="role_id"
+                                 referencedTableName="role" referencedColumnNames="id"
+                                 constraintName="fk_user_role_role" onDelete="CASCADE"/>
+        <createIndex tableName="user_role" indexName="idx_user_role_role">
+            <column name="role_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="007-migrate-app-user-role-to-user-role" author="teller-statt-tonne">
+        <sql>
+            INSERT INTO user_role (user_id, role_id)
+            SELECT u.id, r.id
+            FROM app_user u
+            JOIN role r ON r.name = u.role
+        </sql>
+    </changeSet>
+
+    <changeSet id="007-drop-app-user-role-column" author="teller-statt-tonne">
+        <dropColumn tableName="app_user" columnName="role"/>
+    </changeSet>
+
+</databaseChangeLog>

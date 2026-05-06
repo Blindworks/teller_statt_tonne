@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -39,9 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtService.parse(token);
                 String userId = claims.getSubject();
-                String role = claims.get("role", String.class);
-                List<SimpleGrantedAuthority> authorities =
-                    role == null ? List.of() : List.of(new SimpleGrantedAuthority("ROLE_" + role));
+                List<SimpleGrantedAuthority> authorities = extractAuthorities(claims);
                 UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -51,5 +50,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private List<SimpleGrantedAuthority> extractAuthorities(Claims claims) {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        Object rolesClaim = claims.get("roles");
+        if (rolesClaim instanceof List<?> list) {
+            for (Object item : list) {
+                if (item != null) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + item.toString()));
+                }
+            }
+        }
+        if (authorities.isEmpty()) {
+            // Backward compatibility: pre-0.4.0 tokens carried a single-string "role" claim.
+            String legacyRole = claims.get("role", String.class);
+            if (legacyRole != null) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + legacyRole));
+            }
+        }
+        return authorities;
     }
 }

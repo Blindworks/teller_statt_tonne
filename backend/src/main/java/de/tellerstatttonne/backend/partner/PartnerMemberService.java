@@ -84,7 +84,7 @@ public class PartnerMemberService {
             u.getId(),
             u.getFirstName(),
             u.getLastName(),
-            u.getRole(),
+            u.getRoleNames(),
             u.getEmail(),
             u.getCity(),
             u.getPhotoUrl(),

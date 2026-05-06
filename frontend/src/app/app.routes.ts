@@ -97,6 +97,30 @@ export const routes: Routes = [
         loadComponent: () => import('./profile/profile').then((m) => m.ProfileComponent),
       },
       {
+        path: 'admin',
+        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        loadComponent: () =>
+          import('./admin/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboardComponent),
+      },
+      {
+        path: 'admin/roles',
+        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        loadComponent: () =>
+          import('./admin/roles/roles-list/roles-list').then((m) => m.RolesListComponent),
+      },
+      {
+        path: 'admin/roles/new',
+        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        loadComponent: () =>
+          import('./admin/roles/role-form/role-form').then((m) => m.RoleFormComponent),
+      },
+      {
+        path: 'admin/roles/:id',
+        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        loadComponent: () =>
+          import('./admin/roles/role-form/role-form').then((m) => m.RoleFormComponent),
+      },
+      {
         path: 'admin/store-members',
         loadComponent: () =>
           import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),

@@ -1,9 +1,12 @@
-export type Role = 'ADMINISTRATOR' | 'BOTSCHAFTER' | 'RETTER' | 'NEW_MEMBER';
+export type RoleName = string;
+/** @deprecated use RoleName (string) directly */
+export type Role = RoleName;
+
 export type OnlineStatus = 'ONLINE' | 'AWAY' | 'ON_BREAK' | 'OFFLINE';
 export type UserStatus = 'ACTIVE' | 'PENDING' | 'INACTIVE';
 
 export interface RoleOption {
-  value: Role;
+  value: RoleName;
   label: string;
 }
 
@@ -11,7 +14,7 @@ export interface User {
   id: number | null;
   firstName: string;
   lastName: string;
-  role: Role;
+  roles: RoleName[];
   email: string;
   phone: string | null;
   street: string | null;
@@ -40,12 +43,12 @@ export const USER_STATUS_LABELS: Record<UserStatus, string> = {
 export const ONLINE_STATUSES: OnlineStatus[] = ['ONLINE', 'AWAY', 'ON_BREAK', 'OFFLINE'];
 export const USER_STATUSES: UserStatus[] = ['ACTIVE', 'PENDING', 'INACTIVE'];
 
-export function emptyUser(defaultRole: Role = 'RETTER'): User {
+export function emptyUser(defaultRole: RoleName = 'RETTER'): User {
   return {
     id: null,
     firstName: '',
     lastName: '',
-    role: defaultRole,
+    roles: [defaultRole],
     email: '',
     phone: '',
     street: '',
@@ -57,4 +60,12 @@ export function emptyUser(defaultRole: Role = 'RETTER'): User {
     status: 'ACTIVE',
     tags: [],
   };
+}
+
+export function primaryRole(user: { roles: RoleName[] } | null | undefined): RoleName | null {
+  return user?.roles?.[0] ?? null;
+}
+
+export function hasRole(user: { roles: RoleName[] } | null | undefined, role: RoleName): boolean {
+  return !!user?.roles?.includes(role);
 }

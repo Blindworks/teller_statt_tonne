@@ -4,11 +4,11 @@ import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserFilter, UserService } from '../user.service';
-import { Role, RoleOption, User } from '../user.model';
+import { RoleName, RoleOption, User } from '../user.model';
 import { PhotoUrlPipe } from '../photo-url.pipe';
 import { UserProfileDialogService } from '../user-profile-dialog/user-profile-dialog.service';
 
-type FilterChip = { label: string; role: Role | null; activeOnly: boolean };
+type FilterChip = { label: string; role: RoleName | null; activeOnly: boolean };
 
 @Component({
   selector: 'app-users-list',
@@ -89,7 +89,11 @@ export class UsersListComponent {
     this.triggerReload();
   }
 
-  roleBadgeClass(role: Role): string {
+  primaryRole(user: User): RoleName | null {
+    return user.roles?.[0] ?? null;
+  }
+
+  roleBadgeClass(role: RoleName | null): string {
     switch (role) {
       case 'ADMINISTRATOR':
         return 'bg-error-container text-on-error-container';
@@ -104,7 +108,8 @@ export class UsersListComponent {
     }
   }
 
-  roleLabel(role: Role): string {
+  roleLabel(role: RoleName | null): string {
+    if (!role) return '—';
     return this.roles().find((r) => r.value === role)?.label ?? role;
   }
 

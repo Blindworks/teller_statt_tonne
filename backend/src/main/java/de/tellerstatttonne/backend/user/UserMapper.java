@@ -11,7 +11,7 @@ public final class UserMapper {
         return new User(
             e.getId(),
             e.getEmail(),
-            e.getRole(),
+            e.getRoleNames(),
             e.getFirstName(),
             e.getLastName(),
             e.getPhone(),
@@ -26,10 +26,13 @@ public final class UserMapper {
         );
     }
 
+    /**
+     * Updates non-role profile fields. Role assignment is handled separately
+     * by {@code UserService} so it can resolve role names to entities.
+     */
     public static void applyProfileToEntity(UserEntity target, User src) {
         target.setFirstName(src.firstName());
         target.setLastName(src.lastName());
-        target.setRole(src.role());
         if (src.email() != null) {
             target.setEmail(src.email());
         }

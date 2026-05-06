@@ -5,7 +5,7 @@ import java.util.List;
 public record User(
     Long id,
     String email,
-    Role role,
+    List<String> roles,
     String firstName,
     String lastName,
     String phone,
@@ -19,7 +19,7 @@ public record User(
     List<String> tags
 ) {
     public User withId(Long newId) {
-        return new User(newId, email, role, firstName, lastName, phone,
+        return new User(newId, email, roles, firstName, lastName, phone,
             street, postalCode, city, country,
             photoUrl, onlineStatus, status, tags);
     }

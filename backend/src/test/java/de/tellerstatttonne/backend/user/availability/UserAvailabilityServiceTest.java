@@ -4,11 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.tellerstatttonne.backend.partner.Partner;
-import de.tellerstatttonne.backend.user.Role;
+import de.tellerstatttonne.backend.role.RoleRepository;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class UserAvailabilityServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @BeforeEach
     void cleanSlate() {
@@ -128,7 +132,7 @@ class UserAvailabilityServiceTest {
         UserEntity u = new UserEntity();
         u.setEmail(UUID.randomUUID() + "@example.com");
         u.setPasswordHash("dummy");
-        u.setRole(Role.RETTER);
+        u.setRoles(Set.of(roleRepository.findByName("RETTER").orElseThrow()));
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setStatus(status);

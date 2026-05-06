@@ -132,14 +132,17 @@ export class DashboardComponent {
     return { days, hours, minutes, isPast: false };
   });
 
-  readonly userRole = computed<Role | null>(() => this.authService.currentUser()?.role ?? null);
+  readonly userRoles = computed<Role[]>(() => this.authService.currentUser()?.roles ?? []);
   readonly firstName = computed<string>(() => this.authService.currentUser()?.firstName ?? '');
-  readonly isRetter = computed(() => this.userRole() === 'RETTER');
+  readonly isRetter = computed(() => this.userRoles().includes('RETTER'));
   readonly isAdminOrAmbassador = computed(() => {
-    const role = this.userRole();
-    return role === 'ADMINISTRATOR' || role === 'BOTSCHAFTER';
+    const roles = this.userRoles();
+    return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
   });
-  readonly isNewMember = computed(() => this.userRole() === 'NEW_MEMBER');
+  readonly isNewMember = computed(() => {
+    const roles = this.userRoles();
+    return roles.length === 0 || (roles.length === 1 && roles[0] === 'NEW_MEMBER');
+  });
   readonly errorMessage = this.errorSignal.asReadonly();
 
   constructor() {

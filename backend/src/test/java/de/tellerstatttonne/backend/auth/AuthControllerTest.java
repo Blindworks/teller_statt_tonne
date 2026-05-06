@@ -8,11 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.tellerstatttonne.backend.user.Role;
+import de.tellerstatttonne.backend.role.RoleRepository;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import jakarta.servlet.Filter;
 import java.time.Instant;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ class AuthControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
@@ -61,11 +65,11 @@ class AuthControllerTest {
         userRepository.deleteAll();
     }
 
-    private void createUser(String email, String password, Role role) {
+    private void createUser(String email, String password, String roleName) {
         UserEntity user = new UserEntity();
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(password));
-        user.setRole(role);
+        user.setRoles(Set.of(roleRepository.findByName(roleName).orElseThrow()));
         user.setFirstName("Alice");
         user.setLastName("Test");
         Instant now = Instant.now();
@@ -76,7 +80,7 @@ class AuthControllerTest {
 
     @Test
     void login_me_refresh_logout_flow() throws Exception {
-        createUser("alice@example.de", "secret123", Role.RETTER);
+        createUser("alice@example.de", "secret123", "RETTER");
 
         String loginBody = """
             {"email":"alice@example.de","password":"secret123"}
@@ -88,7 +92,7 @@ class AuthControllerTest {
             .andExpect(jsonPath("$.accessToken").isNotEmpty())
             .andExpect(jsonPath("$.refreshToken").isNotEmpty())
             .andExpect(jsonPath("$.user.email").value("alice@example.de"))
-            .andExpect(jsonPath("$.user.role").value("RETTER"))
+            .andExpect(jsonPath("$.user.roles[0]").value("RETTER"))
             .andReturn();
 
         JsonNode logJson = objectMapper.readTree(logged.getResponse().getContentAsString());

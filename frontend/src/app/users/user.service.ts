@@ -2,10 +2,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Role, RoleOption, User } from './user.model';
+import { RoleName, RoleOption, User } from './user.model';
 
 export interface UserFilter {
-  role?: Role | null;
+  role?: RoleName | null;
   activeOnly?: boolean;
   q?: string;
 }
@@ -15,7 +15,7 @@ export interface AdminCreateUserRequest {
   password: string;
   firstName: string;
   lastName: string;
-  role: Role;
+  roleNames: RoleName[];
   phone?: string | null;
   street?: string | null;
   postalCode?: string | null;
@@ -65,6 +65,10 @@ export class UserService {
     return this.http.post<User>(`${this.baseUrl}/${id}/photo`, form);
   }
 
+  /**
+   * Returns role options as `{value, label}` pairs.
+   * Backend returns `{value: roleName, label: humanLabel}` from `GET /api/users/roles`.
+   */
   roles(): Observable<RoleOption[]> {
     if (!this.roles$) {
       this.roles$ = this.http
@@ -72,5 +76,10 @@ export class UserService {
         .pipe(shareReplay({ bufferSize: 1, refCount: false }));
     }
     return this.roles$;
+  }
+
+  /** Reset cached role list (e.g. after admin creates/deletes a role). */
+  invalidateRolesCache(): void {
+    this.roles$ = undefined;
   }
 }

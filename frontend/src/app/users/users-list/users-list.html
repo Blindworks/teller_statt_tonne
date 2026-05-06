@@ -80,8 +80,8 @@
     @for (user of users(); track user.id) {
       <div
         class="bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-6 shadow-[0_20px_50px_rgba(48,52,40,0.04)] hover:shadow-xl transition-all duration-500 group"
-        [class.border-l-8]="user.role === 'NEW_MEMBER'"
-        [class.border-secondary]="user.role === 'NEW_MEMBER'"
+        [class.border-l-8]="primaryRole(user) === 'NEW_MEMBER'"
+        [class.border-secondary]="primaryRole(user) === 'NEW_MEMBER'"
       >
         <div class="flex justify-between items-start">
           <button
@@ -89,9 +89,9 @@
             (click)="openProfile(user.id)"
             [attr.aria-label]="'Profil von ' + user.firstName + ' ' + user.lastName"
             class="w-20 h-20 rounded-full overflow-hidden ring-4 shadow-lg group-hover:scale-105 transition-transform duration-500 cursor-pointer"
-            [class.ring-tertiary-container]="user.role === 'BOTSCHAFTER'"
-            [class.ring-primary-container\\/30]="user.role === 'RETTER'"
-            [class.ring-secondary-container]="user.role === 'NEW_MEMBER'"
+            [class.ring-tertiary-container]="primaryRole(user) === 'BOTSCHAFTER'"
+            [class.ring-primary-container\\/30]="primaryRole(user) === 'RETTER'"
+            [class.ring-secondary-container]="primaryRole(user) === 'NEW_MEMBER'"
           >
             @if (user.photoUrl) {
               <img
@@ -109,9 +109,9 @@
           </button>
           <span
             class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider"
-            [class]="roleBadgeClass(user.role)"
+            [class]="roleBadgeClass(primaryRole(user))"
           >
-            {{ roleLabel(user.role) }}
+            {{ roleLabel(primaryRole(user)) }}
           </span>
         </div>
 

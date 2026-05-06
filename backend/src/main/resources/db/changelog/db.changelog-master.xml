@@ -11,5 +11,7 @@
     <include file="db/changelog/changes/004-add-user-address.xml"/>
     <include file="db/changelog/changes/005-quiz-applicant-lock.xml"/>
     <include file="db/changelog/changes/006-push-subscription.xml"/>
+    <include file="db/changelog/changes/007-roles.xml"/>
+    <include file="db/changelog/changes/008-ensure-admin-role-assignment.xml"/>
 
 </databaseChangeLog>

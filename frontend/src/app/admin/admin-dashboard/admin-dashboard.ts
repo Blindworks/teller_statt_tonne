@@ -1,0 +1,19 @@
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-admin-dashboard',
+  imports: [RouterLink],
+  templateUrl: './admin-dashboard.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AdminDashboardComponent {
+  readonly cards = [
+    {
+      title: 'Rollen',
+      description: 'Rollen anlegen, bearbeiten oder deaktivieren.',
+      icon: 'badge',
+      link: '/admin/roles',
+    },
+  ];
+}

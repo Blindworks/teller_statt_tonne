@@ -7,6 +7,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-05-06
+
+### Added
+
+- Neuer Admin-Bereich `/admin` (lazy-loaded, geschützt durch `roleGuard(['ADMINISTRATOR'])`) mit Übersichts-Dashboard. Erstes Modul: Rollenverwaltung unter `/admin/roles` (CRUD-Tabelle mit Inline-Lösch-Confirm) und `/admin/roles/new` bzw. `/admin/roles/:id` für ein Reactive-Form. Eintrag „Administration" in Sidebar und Mobile-Sheet (Material-Icon `admin_panel_settings`).
+- Service `RoleService` (`src/app/admin/roles/role.service.ts`) und Modell-Typen für die neuen `/api/roles`-Endpoints. `UserService` cached `GET /api/users/roles` und kann den Cache invalidieren, wenn der Admin Rollen anlegt/löscht.
+
+### Changed
+
+- User-Datenmodell: `User.role: Role` → `User.roles: string[]`. `Role` ist jetzt ein String-Alias (`RoleName`), Rollennamen sind dynamisch und nicht mehr hartkodierte Literal-Union. `roleGuard`, `isAdmin`/`isPlanner` und alle Komponenten, die Rollen prüfen, nutzen `roles.includes(...)`. Die Bestandsanzeige in Benutzerliste/-edit zeigt vorerst die erste Rolle des Users (`roles[0]`); Mehrfach-Zuweisung über UI ist Folge-Arbeit.
+- `AdminCreateUserRequest` sendet jetzt `roleNames: string[]` statt `role: string` (passend zum Backend).
+
 ## [0.7.1] - 2026-05-06
 
 ### Added

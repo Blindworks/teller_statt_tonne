@@ -40,7 +40,7 @@ export class PickupsComponent {
   readonly availableOnly = signal(false);
 
   readonly currentUserId = computed(() => this.auth.currentUser()?.id ?? null);
-  readonly isRetter = computed(() => this.auth.currentUser()?.role === 'RETTER');
+  readonly isRetter = computed(() => !!this.auth.currentUser()?.roles?.includes('RETTER'));
   readonly cardMode = computed<'PLANNER' | 'RETTER'>(() =>
     this.isRetter() ? 'RETTER' : 'PLANNER',
   );

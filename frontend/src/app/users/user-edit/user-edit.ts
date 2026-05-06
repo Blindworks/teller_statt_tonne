@@ -16,7 +16,7 @@ import {
   ONLINE_STATUSES,
   ONLINE_STATUS_LABELS,
   OnlineStatus,
-  Role,
+  RoleName,
   RoleOption,
   USER_STATUSES,
   USER_STATUS_LABELS,
@@ -28,7 +28,7 @@ import {
 type UserForm = FormGroup<{
   firstName: FormControl<string>;
   lastName: FormControl<string>;
-  role: FormControl<Role>;
+  role: FormControl<RoleName>;
   email: FormControl<string>;
   password: FormControl<string>;
   phone: FormControl<string>;
@@ -67,7 +67,7 @@ export class UserEditComponent {
   readonly deleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
-  readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMINISTRATOR');
+  readonly isAdmin = computed(() => !!this.auth.currentUser()?.roles?.includes('ADMINISTRATOR'));
 
   readonly form: UserForm = this.buildForm();
 
@@ -169,7 +169,7 @@ export class UserEditComponent {
     return this.fb.group({
       firstName: this.fb.nonNullable.control(defaults.firstName, Validators.required),
       lastName: this.fb.nonNullable.control(defaults.lastName, Validators.required),
-      role: this.fb.nonNullable.control<Role>(defaults.role, Validators.required),
+      role: this.fb.nonNullable.control<RoleName>(defaults.roles[0] ?? '', Validators.required),
       email: this.fb.nonNullable.control(defaults.email, [Validators.required, Validators.email]),
       password: this.fb.nonNullable.control(''),
       phone: this.fb.nonNullable.control(defaults.phone ?? ''),
@@ -188,7 +188,7 @@ export class UserEditComponent {
     this.form.patchValue({
       firstName: user.firstName,
       lastName: user.lastName,
-      role: user.role,
+      role: user.roles[0] ?? '',
       email: user.email ?? '',
       phone: user.phone ?? '',
       street: user.street ?? '',
@@ -211,7 +211,7 @@ export class UserEditComponent {
       id: this.userId(),
       firstName: raw.firstName,
       lastName: raw.lastName,
-      role: raw.role,
+      roles: [raw.role],
       email: raw.email,
       phone: raw.phone || null,
       street: raw.street || null,
@@ -232,7 +232,7 @@ export class UserEditComponent {
       password: raw.password,
       firstName: raw.firstName,
       lastName: raw.lastName,
-      role: raw.role,
+      roleNames: [raw.role],
       phone: raw.phone || null,
       street: raw.street || null,
       postalCode: raw.postalCode || null,

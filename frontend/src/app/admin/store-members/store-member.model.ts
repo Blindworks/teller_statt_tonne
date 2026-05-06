@@ -1,10 +1,10 @@
-import { OnlineStatus, Role, UserStatus } from '../../users/user.model';
+import { OnlineStatus, RoleName, UserStatus } from '../../users/user.model';
 
 export interface StoreMember {
   id: number;
   firstName: string;
   lastName: string;
-  role: Role;
+  roles: RoleName[];
   email: string | null;
   city: string | null;
   photoUrl: string | null;

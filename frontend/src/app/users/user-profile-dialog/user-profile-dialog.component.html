@@ -57,9 +57,9 @@
               <h4 class="text-2xl font-extrabold text-on-surface">{{ fullName() }}</h4>
               <span
                 class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider"
-                [class]="roleBadgeClass(u.role)"
+                [class]="roleBadgeClass(u.roles?.[0] ?? null)"
               >
-                {{ u.role }}
+                {{ u.roles?.[0] ?? '' }}
               </span>
             </div>
           </div>

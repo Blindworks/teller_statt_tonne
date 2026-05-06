@@ -1,7 +1,8 @@
 package de.tellerstatttonne.backend.user;
 
+import de.tellerstatttonne.backend.role.Role;
+import de.tellerstatttonne.backend.role.RoleService;
 import jakarta.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,18 +26,21 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService service;
+    private final RoleService roleService;
     private final PhotoStorageService photoStorageService;
 
-    public UserController(UserService service, PhotoStorageService photoStorageService) {
+    public UserController(UserService service, RoleService roleService,
+                          PhotoStorageService photoStorageService) {
         this.service = service;
+        this.roleService = roleService;
         this.photoStorageService = photoStorageService;
     }
 
-    public record RoleOption(Role value, String label) {}
+    public record RoleOption(String value, String label) {}
 
     @GetMapping
     public List<User> list(
-        @RequestParam(required = false) Role role,
+        @RequestParam(required = false) String role,
         @RequestParam(name = "activeOnly", required = false, defaultValue = "false") boolean activeOnly,
         @RequestParam(name = "q", required = false) String search
     ) {
@@ -45,8 +49,8 @@ public class UserController {
 
     @GetMapping("/roles")
     public List<RoleOption> roles() {
-        return Arrays.stream(Role.values())
-            .map(r -> new RoleOption(r, r.getLabel()))
+        return roleService.list(false).stream()
+            .map(r -> new RoleOption(r.name(), r.label()))
             .toList();
     }
 
@@ -75,7 +79,7 @@ public class UserController {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/{id}/photo")
+    @PostMapping("/{id}/photo")
     public ResponseEntity<User> uploadPhoto(
         @PathVariable Long id,
         @RequestPart("file") MultipartFile file,
@@ -99,7 +103,7 @@ public class UserController {
 
     private boolean isAuthorizedForUser(Authentication authentication, Long userId) {
         boolean isAdmin = authentication.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRATOR"));
+            .anyMatch(a -> a.getAuthority().equals("ROLE_" + Role.ADMIN_ROLE_NAME));
         if (isAdmin) return true;
         try {
             return userId.equals(Long.parseLong(authentication.getName()));

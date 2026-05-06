@@ -5,7 +5,6 @@ import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
 import de.tellerstatttonne.backend.pickup.Pickup;
 import de.tellerstatttonne.backend.pickup.PickupService;
-import de.tellerstatttonne.backend.user.Role;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import java.time.DayOfWeek;
@@ -40,11 +39,15 @@ public class DashboardService {
 
     public List<DaySlot> findRangeSlots(LocalDate from, LocalDate to, Long currentUserId) {
         UserEntity user = userRepository.findById(currentUserId).orElse(null);
-        if (user == null || user.getRole() == Role.NEW_MEMBER) {
+        if (user == null) {
             return List.of();
         }
-
-        boolean isRetter = user.getRole() == Role.RETTER;
+        boolean isAdmin = user.hasRole("ADMINISTRATOR");
+        boolean isBotschafter = user.hasRole("BOTSCHAFTER");
+        boolean isRetter = user.hasRole("RETTER");
+        if (!isAdmin && !isBotschafter && !isRetter) {
+            return List.of();
+        }
         Set<Long> allowedPartnerIds = isRetter ? memberPartnerIds(user.getId()) : null;
 
         List<Pickup> pickups = pickupService.findBetween(from, to);

@@ -97,7 +97,7 @@ export class UserProfileDialogComponent {
     }
   }
 
-  roleBadgeClass(role: User['role'] | undefined): string {
+  roleBadgeClass(role: string | null | undefined): string {
     switch (role) {
       case 'ADMINISTRATOR':
         return 'bg-error-container text-on-error-container';

@@ -7,6 +7,20 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-06
+
+### Added
+
+- Rollen werden jetzt in der Datenbank verwaltet: neue Tabelle `role` (Liquibase-Changeset 007) plus Join-Tabelle `user_role`. Die vier bisherigen Rollen (`ADMINISTRATOR`, `BOTSCHAFTER`, `RETTER`, `NEW_MEMBER`) werden initial geseedet, bestehende `app_user.role`-Zuordnungen migriert, anschließend wird die Spalte gedroppt. Ein User kann mehrere Rollen tragen (`Set<RoleEntity>`).
+- Neue REST-Endpoints unter `/api/roles` für Auflisten/Anlegen/Bearbeiten/Löschen von Rollen (Mutations `@PreAuthorize("hasRole('ADMINISTRATOR')")`). Lösch-/Deaktivierungsversuch der `ADMINISTRATOR`-Rolle wird mit HTTP 409 abgelehnt, da sie hartkodiert in `@PreAuthorize`-Ausdrücken referenziert ist.
+- Liquibase-Changeset 008 als Sicherheitsnetz: stellt idempotent sicher, dass die bekannten Admin-Konten `admin@example.de` (Prod) und `admin@local` (Dev) nach der Rollen-Migration die `ADMINISTRATOR`-Rolle besitzen. Verhindert „kein Admin mehr im System"-Situationen, falls die 007-Migration einen Account ohne Alt-Rolle vorgefunden hat.
+
+### Changed
+
+- JWT-Access-Token enthält künftig den Claim `roles: string[]` statt `role: string`. Der `JwtAuthenticationFilter` liest die Liste und legt pro Eintrag eine `ROLE_<name>`-Authority an. Tokens mit altem `role`-Claim werden eine Release lang als Fallback weiter akzeptiert.
+- `User`-DTO und `LoginResponse` liefern `roles: string[]` statt `role: string`. `AdminCreateUserRequest` erwartet jetzt `roleNames: Set<String>`.
+- `GET /api/users/roles` liest die Optionen aus der DB statt aus dem Java-Enum (Antwort-Shape `{value, label}` bleibt).
+
 ### Fixed
 
 - Apple Web Push funktioniert wieder: `PushSubscriptionService` rief `pushService.send(notification)` ohne Encoding-Argument auf — die Bibliothek fiel dadurch auf das veraltete `AESGCM`-Format (draft-04) zurück, das nur Chrome/Firefox akzeptieren. Apple lehnt das mit `403 BadAuthorizationHeader` ab und verlangt `AES128GCM` (RFC 8291). Versand erfolgt jetzt explizit mit `Encoding.AES128GCM`.
