@@ -25,6 +25,17 @@
     </div>
   }
 
+  @if (holiday(); as h) {
+    <div
+      class="mb-6 px-6 py-4 rounded-xl bg-tertiary-container text-on-tertiary-container text-sm font-semibold flex items-center gap-3"
+    >
+      <span class="material-symbols-outlined">event_busy</span>
+      <span>
+        Achtung: {{ h.name }} ({{ h.region }}) — gesetzlicher Feiertag, ggf. Store geschlossen.
+      </span>
+    </div>
+  }
+
   <form [formGroup]="form" (ngSubmit)="submit()" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <div class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-8 shadow-sm">
       <h4 class="text-xl font-bold mb-6 text-primary flex items-center gap-2">

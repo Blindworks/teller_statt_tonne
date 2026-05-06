@@ -7,6 +7,13 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-05-06
+
+### Added
+
+- Pickups-Wochenansicht: gesetzliche Feiertage (bundesweit + NRW: Fronleichnam, Allerheiligen) werden im Tageskopf als Label angezeigt und der Tagesblock farblich hervorgehoben. Daten kommen aus dem neuen Backend-Endpoint `GET /api/holidays`.
+- Pickup-Erstellung/-Bearbeitung: Hinweisbox erscheint, wenn das gewählte Datum auf einen Feiertag fällt (Hinweis auf möglicherweise geschlossenen Store).
+
 ## [0.7.0] - 2026-05-06
 
 ### Added

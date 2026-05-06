@@ -5,6 +5,7 @@ import { resolvePhotoUrl } from '../../users/photo-url';
 import { PickupService } from '../pickup.service';
 import { Pickup } from '../pickup.model';
 import { PickupCardComponent } from '../pickup-card/pickup-card';
+import { Holiday, HolidayService } from '../../holidays/holiday.service';
 
 interface DayColumn {
   date: Date;
@@ -13,6 +14,7 @@ interface DayColumn {
   dayOfMonth: number;
   isToday: boolean;
   pickups: Pickup[];
+  holiday: Holiday | null;
 }
 
 type ViewMode = 'WEEK' | 'LIST' | 'MAP';
@@ -26,11 +28,13 @@ type ViewMode = 'WEEK' | 'LIST' | 'MAP';
 })
 export class PickupsComponent {
   private readonly service = inject(PickupService);
+  private readonly holidayService = inject(HolidayService);
   private readonly auth = inject(AuthService);
 
   readonly loadError = signal<string | null>(null);
   readonly actionError = signal<string | null>(null);
   readonly pickups = signal<Pickup[]>([]);
+  readonly holidays = signal<Holiday[]>([]);
   readonly recent = signal<Pickup[]>([]);
   readonly view = signal<ViewMode>('WEEK');
   readonly availableOnly = signal(false);
@@ -71,6 +75,10 @@ export class PickupsComponent {
       list.push(p);
       byDate.set(p.date, list);
     }
+    const holidayByDate = new Map<string, Holiday>();
+    for (const h of this.holidays()) {
+      holidayByDate.set(h.date, h);
+    }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const start = this.currentWeekStart();
@@ -86,6 +94,7 @@ export class PickupsComponent {
         dayOfMonth: d.getDate(),
         isToday: d.getTime() === today.getTime(),
         pickups: byDate.get(iso) ?? [],
+        holiday: holidayByDate.get(iso) ?? null,
       });
     }
     return result;
@@ -133,6 +142,10 @@ export class PickupsComponent {
       this.service.list(from, to).subscribe({
         next: (list) => this.pickups.set(list),
         error: () => this.loadError.set('Abholungen konnten nicht geladen werden.'),
+      });
+      this.holidayService.list(from, to).subscribe({
+        next: (list) => this.holidays.set(list),
+        error: () => this.holidays.set([]),
       });
     });
 

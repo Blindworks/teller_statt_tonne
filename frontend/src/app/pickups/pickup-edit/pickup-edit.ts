@@ -16,6 +16,7 @@ import { PartnerService } from '../../partners/partner.service';
 import { Partner, PickupSlot, Weekday } from '../../partners/partner.model';
 import { PickupService } from '../pickup.service';
 import { Pickup, PickupStatus, emptyPickup } from '../pickup.model';
+import { Holiday, HolidayService } from '../../holidays/holiday.service';
 
 type AssignmentForm = FormGroup<{
   memberId: FormControl<number>;
@@ -61,12 +62,14 @@ export class PickupEditComponent {
   private readonly service = inject(PickupService);
   private readonly partnerService = inject(PartnerService);
   private readonly userService = inject(UserService);
+  private readonly holidayService = inject(HolidayService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   readonly pickupId = signal<number | null>(null);
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly holiday = signal<Holiday | null>(null);
 
   readonly recurring = signal(false);
   readonly recurringUntil = signal<string>('');
@@ -161,6 +164,7 @@ export class PickupEditComponent {
 
     this.form.controls.date.valueChanges.subscribe((date) => {
       this.loadPickupsForDate(date);
+      this.loadHolidayForDate(date);
       if (this.isEdit) return;
       const partners = this.availablePartners();
       const pid = this.form.controls.partnerId.value;
@@ -173,6 +177,7 @@ export class PickupEditComponent {
     });
 
     this.loadPickupsForDate(this.form.controls.date.value);
+    this.loadHolidayForDate(this.form.controls.date.value);
 
     this.form.controls.partnerId.valueChanges.subscribe(() => {
       if (this.isEdit) return;
@@ -209,6 +214,17 @@ export class PickupEditComponent {
     this.service.list(date, date).subscribe({
       next: (list) => this.pickupsOnDate.set(list),
       error: () => this.pickupsOnDate.set([]),
+    });
+  }
+
+  private loadHolidayForDate(date: string | null | undefined): void {
+    if (!date) {
+      this.holiday.set(null);
+      return;
+    }
+    this.holidayService.list(date, date).subscribe({
+      next: (list) => this.holiday.set(list[0] ?? null),
+      error: () => this.holiday.set(null),
     });
   }
 

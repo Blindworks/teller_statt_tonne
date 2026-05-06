@@ -7,6 +7,16 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Apple Web Push funktioniert wieder: `PushSubscriptionService` rief `pushService.send(notification)` ohne Encoding-Argument auf — die Bibliothek fiel dadurch auf das veraltete `AESGCM`-Format (draft-04) zurück, das nur Chrome/Firefox akzeptieren. Apple lehnt das mit `403 BadAuthorizationHeader` ab und verlangt `AES128GCM` (RFC 8291). Versand erfolgt jetzt explizit mit `Encoding.AES128GCM`.
+
+## [0.3.3] - 2026-05-06
+
+### Added
+
+- Neuer Endpoint `GET /api/holidays?from=YYYY-MM-DD&to=YYYY-MM-DD` liefert deutsche gesetzliche Feiertage (bundesweit + NRW-Spezifika: Fronleichnam, Allerheiligen). Bewegliche Feiertage werden über die Gauß'sche Osterformel berechnet, das Feld `region` (`"DE"` oder `"NRW"`) erlaubt eine spätere Erweiterung auf weitere Bundesländer.
+
 ## [0.3.2] - 2026-05-06
 
 ### Fixed
