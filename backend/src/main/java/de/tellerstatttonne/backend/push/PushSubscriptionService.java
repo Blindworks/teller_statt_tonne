@@ -2,6 +2,7 @@ package de.tellerstatttonne.backend.push;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import nl.martijndwars.webpush.Encoding;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
@@ -67,7 +68,10 @@ public class PushSubscriptionService {
             Subscription.Keys keys = new Subscription.Keys(entity.getP256dh(), entity.getAuth());
             Subscription subscription = new Subscription(entity.getEndpoint(), keys);
             Notification notification = new Notification(subscription, body);
-            HttpResponse response = pushService.send(notification);
+            // AES128GCM (RFC 8291) ist Pflicht für Apple Web Push.
+            // pushService.send(notification) ohne Encoding fällt sonst auf das veraltete AESGCM zurück,
+            // das Apple mit "BadAuthorizationHeader" ablehnt.
+            HttpResponse response = pushService.send(notification, Encoding.AES128GCM);
             int status = response.getStatusLine().getStatusCode();
             if (status == 404 || status == 410) {
                 log.info("Push subscription gone (status={}), removing endpoint={}", status, entity.getEndpoint());
