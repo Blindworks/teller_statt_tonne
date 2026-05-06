@@ -41,6 +41,8 @@ Wichtig in `.env`:
 - `JWT_SECRET`: mindestens 32 Zeichen, z.B. `openssl rand -base64 48`.
 - `CORS_ALLOWED_ORIGINS`: die oeffentliche HTTPS-URL (z.B. `https://teller-statt-tonne.example.de`).
 - `ADMIN_EMAIL`/`ADMIN_PASSWORD`: Initial-Admin (wird beim ersten Start angelegt).
+- `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`: Web-Push-Schluessel, einmalig per `npx web-push generate-vapid-keys` erzeugen. Der Public-Key muss byte-genau zur FE-Konstante in `frontend/src/environments/environment.prod.ts` passen.
+- `VAPID_SUBJECT`: `mailto:<betreuende-mail>` (Apple verlangt eine valide `mailto:`- oder `https://`-URL).
 
 ### 3. Container starten
 
