@@ -1,10 +1,13 @@
 package de.tellerstatttonne.backend.push;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -70,10 +73,22 @@ public class PushSubscriptionService {
                 log.info("Push subscription gone (status={}), removing endpoint={}", status, entity.getEndpoint());
                 repository.deleteByEndpoint(entity.getEndpoint());
             } else if (status >= 400) {
-                log.warn("Push send failed (status={}) for endpoint={}", status, entity.getEndpoint());
+                String reason = readBody(response.getEntity());
+                log.warn("Push send failed (status={}) for endpoint={} reason={}",
+                    status, entity.getEndpoint(), reason);
             }
         } catch (Exception e) {
             log.error("Push send error for endpoint={}: {}", entity.getEndpoint(), e.getMessage(), e);
+        }
+    }
+
+    private static String readBody(HttpEntity httpEntity) {
+        if (httpEntity == null) return "<no body>";
+        try {
+            String body = EntityUtils.toString(httpEntity, StandardCharsets.UTF_8);
+            return body == null || body.isBlank() ? "<empty>" : body.trim();
+        } catch (Exception e) {
+            return "<read failed: " + e.getMessage() + ">";
         }
     }
 

@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-05-06
+
+### Changed
+
+- Web Push Diagnose: Beim Start loggt `WebPushConfig` ob VAPID-Keys konfiguriert sind (maskierter Public-Key, Subject) bzw. eine Warnung, falls Keys fehlen. Bei einem Push-Fehler ≥ 400 (z. B. Apple `403`) wird jetzt zusätzlich der Response-Body des Push-Services als Reason geloggt, damit Ursachen wie `BadJwtSignature`, `JwtTokenExpired` oder `BadSubject` direkt sichtbar sind. Subscriptions werden bei `403` bewusst nicht gelöscht (Server-Misskonfiguration soll nicht alle Geräte abmelden).
+
 ## [0.3.1] - 2026-05-04
 
 ### Added
