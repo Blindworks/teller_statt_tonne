@@ -1,8 +1,5 @@
 package de.tellerstatttonne.backend.push;
 
-import java.security.Security;
-import nl.martijndwars.webpush.PushService;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,12 +11,6 @@ public class WebPushConfig {
 
     private static final Logger log = LoggerFactory.getLogger(WebPushConfig.class);
 
-    static {
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
-
     @Value("${app.vapid.public-key:}")
     private String publicKey;
 
@@ -30,18 +21,15 @@ public class WebPushConfig {
     private String subject;
 
     @Bean
-    public PushService pushService() throws Exception {
+    public WebPushSender webPushSender() throws Exception {
         if (publicKey == null || publicKey.isBlank() || privateKey == null || privateKey.isBlank()) {
             log.warn("Web Push deaktiviert: VAPID-Keys fehlen (app.vapid.public-key/private-key nicht gesetzt).");
-            return new PushService();
+            return new WebPushSender(null);
         }
+        WebPushKeys keys = WebPushKeys.parse(publicKey.trim(), privateKey.trim(), subject.trim());
         log.info("Web Push aktiv. VAPID public-key={} (len={}), subject={}",
             maskKey(publicKey), publicKey.length(), subject);
-        PushService service = new PushService();
-        service.setPublicKey(publicKey);
-        service.setPrivateKey(privateKey);
-        service.setSubject(subject);
-        return service;
+        return new WebPushSender(keys);
     }
 
     public String getPublicKey() {

@@ -2,13 +2,6 @@ package de.tellerstatttonne.backend.push;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import nl.martijndwars.webpush.Encoding;
-import nl.martijndwars.webpush.Notification;
-import nl.martijndwars.webpush.PushService;
-import nl.martijndwars.webpush.Subscription;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -19,13 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class PushSubscriptionService {
 
     private static final Logger log = LoggerFactory.getLogger(PushSubscriptionService.class);
+    private static final int DEFAULT_TTL_SECONDS = 60 * 60 * 24; // 24h
 
     private final PushSubscriptionRepository repository;
-    private final PushService pushService;
+    private final WebPushSender sender;
 
-    public PushSubscriptionService(PushSubscriptionRepository repository, PushService pushService) {
+    public PushSubscriptionService(PushSubscriptionRepository repository, WebPushSender sender) {
         this.repository = repository;
-        this.pushService = pushService;
+        this.sender = sender;
     }
 
     @Transactional
@@ -48,7 +42,7 @@ public class PushSubscriptionService {
     @Async
     public void sendToUser(Long userId, PushPayload payload) {
         List<PushSubscriptionEntity> subs = repository.findAllByUserId(userId);
-        String body = serialize(payload);
+        byte[] body = serialize(payload).getBytes(StandardCharsets.UTF_8);
         for (PushSubscriptionEntity sub : subs) {
             send(sub, body);
         }
@@ -57,43 +51,43 @@ public class PushSubscriptionService {
     @Async
     public void sendToAll(PushPayload payload) {
         List<PushSubscriptionEntity> subs = repository.findAll();
-        String body = serialize(payload);
+        byte[] body = serialize(payload).getBytes(StandardCharsets.UTF_8);
         for (PushSubscriptionEntity sub : subs) {
             send(sub, body);
         }
     }
 
-    private void send(PushSubscriptionEntity entity, String body) {
+    private void send(PushSubscriptionEntity entity, byte[] body) {
+        if (!sender.isEnabled()) {
+            log.warn("Web Push übersprungen: kein VAPID-Key konfiguriert.");
+            return;
+        }
         try {
-            Subscription.Keys keys = new Subscription.Keys(entity.getP256dh(), entity.getAuth());
-            Subscription subscription = new Subscription(entity.getEndpoint(), keys);
-            Notification notification = new Notification(subscription, body);
-            // AES128GCM (RFC 8291) ist Pflicht für Apple Web Push.
-            // pushService.send(notification) ohne Encoding fällt sonst auf das veraltete AESGCM zurück,
-            // das Apple mit "BadAuthorizationHeader" ablehnt.
-            HttpResponse response = pushService.send(notification, Encoding.AES128GCM);
-            int status = response.getStatusLine().getStatusCode();
+            WebPushSender.Result result = sender.send(
+                entity.getEndpoint(),
+                entity.getP256dh(),
+                entity.getAuth(),
+                body,
+                DEFAULT_TTL_SECONDS
+            );
+            int status = result.status();
             if (status == 404 || status == 410) {
                 log.info("Push subscription gone (status={}), removing endpoint={}", status, entity.getEndpoint());
                 repository.deleteByEndpoint(entity.getEndpoint());
             } else if (status >= 400) {
-                String reason = readBody(response.getEntity());
                 log.warn("Push send failed (status={}) for endpoint={} reason={}",
-                    status, entity.getEndpoint(), reason);
+                    status, entity.getEndpoint(), shortBody(result.body()));
             }
         } catch (Exception e) {
             log.error("Push send error for endpoint={}: {}", entity.getEndpoint(), e.getMessage(), e);
         }
     }
 
-    private static String readBody(HttpEntity httpEntity) {
-        if (httpEntity == null) return "<no body>";
-        try {
-            String body = EntityUtils.toString(httpEntity, StandardCharsets.UTF_8);
-            return body == null || body.isBlank() ? "<empty>" : body.trim();
-        } catch (Exception e) {
-            return "<read failed: " + e.getMessage() + ">";
-        }
+    private static String shortBody(String body) {
+        if (body == null) return "<no body>";
+        String trimmed = body.trim();
+        if (trimmed.isEmpty()) return "<empty>";
+        return trimmed.length() > 500 ? trimmed.substring(0, 500) + "…" : trimmed;
     }
 
     private String serialize(PushPayload payload) {
