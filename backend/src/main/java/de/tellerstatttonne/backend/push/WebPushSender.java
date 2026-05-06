@@ -22,7 +22,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
@@ -86,12 +87,16 @@ public class WebPushSender {
 
     private String buildVapidJwt(String audience) {
         Instant now = Instant.now();
+        // Apple verlangt aud als String, nicht als Array. jjwt-builder.audience().add(...)
+        // erzeugt eine Audience-Collection und kann je nach Version ["..."] ausgeben.
+        // Daher die Claims direkt als Map setzen, damit aud garantiert ein String ist.
+        Map<String, Object> claims = new LinkedHashMap<>();
+        claims.put("aud", audience);
+        claims.put("exp", now.plus(JWT_TTL).getEpochSecond());
+        claims.put("sub", keys.subject());
         return Jwts.builder()
             .header().add("typ", "JWT").and()
-            .audience().add(audience).and()
-            .subject(keys.subject())
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plus(JWT_TTL)))
+            .claims(claims)
             .signWith(keys.privateKey(), Jwts.SIG.ES256)
             .compact();
     }
