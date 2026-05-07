@@ -194,6 +194,29 @@
                 <span class="material-symbols-outlined text-base">edit</span>
               </a>
             }
+            @if (canApply() && partner.id != null) {
+              @if (isMyMember(partner.id)) {
+                <span
+                  class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary-container"
+                  title="Du bist diesem Betrieb bereits zugeordnet"
+                  >Mein Betrieb</span
+                >
+              } @else if (hasPendingApplication(partner.id)) {
+                <span
+                  class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container"
+                  title="Bewerbung läuft"
+                  >Bewerbung offen</span
+                >
+              } @else {
+                <button
+                  type="button"
+                  (click)="openApplyDialog(partner, $event)"
+                  class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary hover:bg-primary-dim transition-colors"
+                >
+                  Bewerben
+                </button>
+              }
+            }
           </div>
         </div>
         <div>
@@ -242,4 +265,5 @@
     }
   </div>
 
+  <app-apply-to-store-dialog />
 </main>

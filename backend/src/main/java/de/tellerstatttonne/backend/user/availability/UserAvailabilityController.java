@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users/{userId}/availabilities")
-@PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER') or principal == #userId.toString()")
+@PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER') or principal == #userId.toString()")
 public class UserAvailabilityController {
 
     private final UserAvailabilityService service;

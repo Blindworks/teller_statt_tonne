@@ -7,6 +7,16 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-05-07
+
+### Added
+
+- Bewerbungen auf Betriebe: Retter (auch `NEW_MEMBER`) können sich über `POST /api/partner-applications` auf einen Betrieb bewerben; Admin/Teamleitung genehmigen via `POST /api/partner-applications/{id}/approve` (fügt User in `partner_user` ein) oder lehnen mit Begründung ab via `POST /api/partner-applications/{id}/reject`. Retter ziehen eigene `PENDING`-Bewerbungen via `DELETE /api/partner-applications/{id}` zurück. Listen unter `GET /api/partners/{partnerId}/applications` (Admin/Teamleitung) und `GET /api/users/me/partner-applications` (Eigene). Neue Entity `PartnerApplicationEntity` mit Status `PENDING`/`APPROVED`/`REJECTED`/`WITHDRAWN`; Liquibase-Changeset 013 legt Tabelle `partner_application` an. SSE-Notifications: neuer Bewerbungs-Eingang an Admin/Teamleitung, Entscheidung an Retter (`PARTNER_APPLICATION_RECEIVED`/`APPROVED`/`REJECTED`).
+
+### Changed
+
+- Rolle `BOTSCHAFTER` umbenannt zu `TEAMLEITER` (Label "Teamleitung"). Liquibase-Changeset 012 aktualisiert die Datenbank-Zeile in `role`. Alle `@PreAuthorize`-Strings, Tests und `hasRole`-Checks im Code wurden angepasst. Bestehende Migrationen (`007-roles.xml`) bleiben aus Historiengründen unverändert.
+
 ## [0.7.0] - 2026-05-07
 
 ### Added

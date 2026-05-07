@@ -32,7 +32,7 @@ class RoleServiceTest {
     void seededRolesAreListed() {
         List<Role> roles = service.list(false);
         assertThat(roles).extracting(Role::name)
-            .contains("ADMINISTRATOR", "BOTSCHAFTER", "RETTER", "NEW_MEMBER");
+            .contains("ADMINISTRATOR", "TEAMLEITER", "RETTER", "NEW_MEMBER");
     }
 
     @Test

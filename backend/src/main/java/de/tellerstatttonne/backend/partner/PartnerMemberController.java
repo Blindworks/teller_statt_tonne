@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/partners/{partnerId}/members")
-@PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+@PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
 public class PartnerMemberController {
 
     private final PartnerMemberService service;

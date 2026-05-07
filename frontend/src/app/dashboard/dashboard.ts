@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
 import { PickupAssignment } from '../pickups/pickup.model';
@@ -60,7 +60,7 @@ const UNASSIGN_CUTOFF_MS = 2 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgTemplateOutlet],
+  imports: [NgTemplateOutlet, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -143,7 +143,7 @@ export class DashboardComponent {
   readonly isRetter = computed(() => this.userRoles().includes('RETTER'));
   readonly isAdminOrAmbassador = computed(() => {
     const roles = this.userRoles();
-    return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
+    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
   });
   readonly isNewMember = computed(() => {
     const roles = this.userRoles();

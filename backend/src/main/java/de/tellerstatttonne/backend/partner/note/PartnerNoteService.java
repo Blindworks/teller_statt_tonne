@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PartnerNoteService {
 
     private static final String ROLE_ADMIN = "ADMINISTRATOR";
-    private static final String ROLE_BOTSCHAFTER = "BOTSCHAFTER";
+    private static final String ROLE_TEAMLEITER = "TEAMLEITER";
 
     private final PartnerNoteRepository repository;
     private final PartnerRepository partnerRepository;
@@ -65,7 +65,7 @@ public class PartnerNoteService {
         UserEntity user = userRepository.findById(actingUserId)
             .orElseThrow(() -> new EntityNotFoundException("user not found: " + actingUserId));
         if (!canSeeAll(user)) {
-            throw new AccessDeniedException("only Admin or Botschafter may delete notes");
+            throw new AccessDeniedException("only Admin or Teamleiter may delete notes");
         }
         return repository.findById(noteId).map(entity -> {
             if (entity.getDeletedAt() != null) return true;
@@ -77,10 +77,10 @@ public class PartnerNoteService {
     }
 
     private static boolean canSeeAll(UserEntity user) {
-        return user.hasRole(ROLE_ADMIN) || user.hasRole(ROLE_BOTSCHAFTER);
+        return user.hasRole(ROLE_ADMIN) || user.hasRole(ROLE_TEAMLEITER);
     }
 
     private static boolean canPostInternal(UserEntity user) {
-        return user.hasRole(ROLE_ADMIN) || user.hasRole(ROLE_BOTSCHAFTER);
+        return user.hasRole(ROLE_ADMIN) || user.hasRole(ROLE_TEAMLEITER);
     }
 }

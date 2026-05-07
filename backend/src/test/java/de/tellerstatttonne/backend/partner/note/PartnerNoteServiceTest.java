@@ -32,7 +32,7 @@ class PartnerNoteServiceTest {
     @Test
     void createPersistsNote() {
         Long partnerId = createPartner().getId();
-        Long authorId = createUser("BOTSCHAFTER").getId();
+        Long authorId = createUser("TEAMLEITER").getId();
 
         PartnerNote saved = service.create(
             partnerId,
@@ -51,31 +51,31 @@ class PartnerNoteServiceTest {
         Long partnerId = createPartner().getId();
         Long retterA = createUser("RETTER").getId();
         Long retterB = createUser("RETTER").getId();
-        Long botschafter = createUser("BOTSCHAFTER").getId();
+        Long teamleiter = createUser("TEAMLEITER").getId();
 
-        service.create(partnerId, new CreatePartnerNoteRequest("Botschafter intern", Visibility.INTERNAL), botschafter);
-        service.create(partnerId, new CreatePartnerNoteRequest("Botschafter shared", Visibility.SHARED), botschafter);
+        service.create(partnerId, new CreatePartnerNoteRequest("Teamleiter intern", Visibility.INTERNAL), teamleiter);
+        service.create(partnerId, new CreatePartnerNoteRequest("Teamleiter shared", Visibility.SHARED), teamleiter);
         service.create(partnerId, new CreatePartnerNoteRequest("Retter A eigene", Visibility.SHARED), retterA);
         service.create(partnerId, new CreatePartnerNoteRequest("Retter B eigene", Visibility.SHARED), retterB);
 
         List<PartnerNote> visibleToA = service.listForUser(partnerId, retterA);
         assertThat(visibleToA).extracting(PartnerNote::body)
-            .containsExactlyInAnyOrder("Botschafter shared", "Retter A eigene", "Retter B eigene");
+            .containsExactlyInAnyOrder("Teamleiter shared", "Retter A eigene", "Retter B eigene");
         assertThat(visibleToA).extracting(PartnerNote::body)
-            .doesNotContain("Botschafter intern");
+            .doesNotContain("Teamleiter intern");
     }
 
     @Test
-    void botschafterAndAdminSeeAllUndeleted() {
+    void teamleiterAndAdminSeeAllUndeleted() {
         Long partnerId = createPartner().getId();
-        Long botschafter = createUser("BOTSCHAFTER").getId();
+        Long teamleiter = createUser("TEAMLEITER").getId();
         Long admin = createUser("ADMINISTRATOR").getId();
         Long retter = createUser("RETTER").getId();
 
-        service.create(partnerId, new CreatePartnerNoteRequest("intern", Visibility.INTERNAL), botschafter);
+        service.create(partnerId, new CreatePartnerNoteRequest("intern", Visibility.INTERNAL), teamleiter);
         service.create(partnerId, new CreatePartnerNoteRequest("shared", Visibility.SHARED), retter);
 
-        assertThat(service.listForUser(partnerId, botschafter)).hasSize(2);
+        assertThat(service.listForUser(partnerId, teamleiter)).hasSize(2);
         assertThat(service.listForUser(partnerId, admin)).hasSize(2);
     }
 
@@ -96,9 +96,9 @@ class PartnerNoteServiceTest {
     @Test
     void retterCannotDelete() {
         Long partnerId = createPartner().getId();
-        Long botschafter = createUser("BOTSCHAFTER").getId();
+        Long teamleiter = createUser("TEAMLEITER").getId();
         Long retter = createUser("RETTER").getId();
-        PartnerNote note = service.create(partnerId, new CreatePartnerNoteRequest("x", Visibility.SHARED), botschafter);
+        PartnerNote note = service.create(partnerId, new CreatePartnerNoteRequest("x", Visibility.SHARED), teamleiter);
 
         assertThatThrownBy(() -> service.softDelete(note.id(), retter))
             .isInstanceOf(AccessDeniedException.class);
@@ -107,13 +107,13 @@ class PartnerNoteServiceTest {
     @Test
     void softDeletedNoteHiddenFromList() {
         Long partnerId = createPartner().getId();
-        Long botschafter = createUser("BOTSCHAFTER").getId();
-        PartnerNote note = service.create(partnerId, new CreatePartnerNoteRequest("zu löschen", Visibility.INTERNAL), botschafter);
+        Long teamleiter = createUser("TEAMLEITER").getId();
+        PartnerNote note = service.create(partnerId, new CreatePartnerNoteRequest("zu löschen", Visibility.INTERNAL), teamleiter);
 
-        boolean ok = service.softDelete(note.id(), botschafter);
+        boolean ok = service.softDelete(note.id(), teamleiter);
         assertThat(ok).isTrue();
 
-        assertThat(service.listForUser(partnerId, botschafter)).isEmpty();
+        assertThat(service.listForUser(partnerId, teamleiter)).isEmpty();
         assertThat(noteRepository.findById(note.id())).isPresent();
         assertThat(noteRepository.findById(note.id()).orElseThrow().getDeletedAt()).isNotNull();
     }

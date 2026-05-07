@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { ConfirmDialogService } from '../../shared/confirm-dialog/confirm-dialog.service';
 import { QuizService } from '../quiz.service';
 import { COLOR_EMOJI, QuizApplicantStatus, QuizAttempt } from '../quiz.model';
 
@@ -22,6 +23,7 @@ interface AttemptGroup {
 export class QuizAttemptsComponent {
   private readonly service = inject(QuizService);
   private readonly router = inject(Router);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly attempts = signal<QuizAttempt[]>([]);
   readonly applicants = signal<QuizApplicantStatus[]>([]);
@@ -82,10 +84,14 @@ export class QuizAttemptsComponent {
     });
   }
 
-  unlock(applicant: QuizApplicantStatus): void {
-    if (!confirm(`Bewerber ${applicant.email} wirklich entsperren?`)) {
-      return;
-    }
+  async unlock(applicant: QuizApplicantStatus): Promise<void> {
+    const ok = await this.confirmDialog.ask({
+      title: 'Bewerber entsperren',
+      message: `Bewerber ${applicant.email} wirklich entsperren?`,
+      confirmLabel: 'Entsperren',
+      tone: 'primary',
+    });
+    if (!ok) return;
     this.unlockingEmail.set(applicant.email);
     this.service.unlockApplicant(applicant.email).subscribe({
       next: () => {

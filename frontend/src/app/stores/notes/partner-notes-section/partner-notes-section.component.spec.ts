@@ -79,12 +79,12 @@ describe('PartnerNotesSectionComponent', () => {
     expect(fixture.componentInstance.canDelete()).toBe(false);
 
     const html = (fixture.nativeElement as HTMLElement).innerHTML;
-    expect(html).not.toContain('Intern (Botschafter/Admin)');
+    expect(html).not.toContain('Intern (Teamleitung/Admin)');
     expect(html).not.toContain('Notiz löschen');
   });
 
-  it('zeigt Visibility-Auswahl und Lösch-Button für Botschafter', async () => {
-    auth.setRoles(['BOTSCHAFTER']);
+  it('zeigt Visibility-Auswahl und Lösch-Button für Teamleitung', async () => {
+    auth.setRoles(['TEAMLEITER']);
     const fixture = TestBed.createComponent(PartnerNotesSectionComponent);
     fixture.componentRef.setInput('partnerId', 42);
     fixture.detectChanges();
@@ -98,11 +98,11 @@ describe('PartnerNotesSectionComponent', () => {
     expect(fixture.componentInstance.canDelete()).toBe(true);
 
     const html = (fixture.nativeElement as HTMLElement).innerHTML;
-    expect(html).toContain('Intern (Botschafter/Admin)');
+    expect(html).toContain('Intern (Teamleitung/Admin)');
   });
 
   it('postet Notiz mit gewählter Sichtbarkeit', async () => {
-    auth.setRoles(['BOTSCHAFTER']);
+    auth.setRoles(['TEAMLEITER']);
     const fixture = TestBed.createComponent(PartnerNotesSectionComponent);
     fixture.componentRef.setInput('partnerId', 42);
     fixture.detectChanges();

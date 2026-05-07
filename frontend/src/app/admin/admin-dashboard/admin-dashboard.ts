@@ -15,5 +15,11 @@ export class AdminDashboardComponent {
       icon: 'badge',
       link: '/admin/roles',
     },
+    {
+      title: 'Bewerbungen',
+      description: 'Bewerbungen von Retter:innen auf Betriebe annehmen oder ablehnen.',
+      icon: 'how_to_reg',
+      link: '/admin/applications',
+    },
   ];
 }

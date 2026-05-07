@@ -26,7 +26,7 @@ export class UsersListComponent {
 
   readonly canEditUsers = computed(() => {
     const roles = this.auth.currentUser()?.roles ?? [];
-    return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
+    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
   });
 
   readonly users = signal<User[]>([]);
@@ -104,7 +104,7 @@ export class UsersListComponent {
     switch (role) {
       case 'ADMINISTRATOR':
         return 'bg-error-container text-on-error-container';
-      case 'BOTSCHAFTER':
+      case 'TEAMLEITER':
         return 'bg-tertiary-container text-on-tertiary-fixed';
       case 'RETTER':
         return 'bg-primary-container text-on-primary-container';

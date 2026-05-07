@@ -40,9 +40,9 @@ public class DashboardService {
             return List.of();
         }
         boolean isAdmin = user.hasRole("ADMINISTRATOR");
-        boolean isBotschafter = user.hasRole("BOTSCHAFTER");
+        boolean isTeamleiter = user.hasRole("TEAMLEITER");
         boolean isRetter = user.hasRole("RETTER");
-        if (!isAdmin && !isBotschafter && !isRetter) {
+        if (!isAdmin && !isTeamleiter && !isRetter) {
             return List.of();
         }
         Set<Long> allowedPartnerIds = isRetter ? memberPartnerIds(user.getId()) : null;

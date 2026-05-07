@@ -52,13 +52,13 @@ public class PickupController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<Pickup> create(@RequestBody Pickup pickup) {
         return ResponseEntity.ok(service.create(pickup));
     }
 
     @PostMapping("/series")
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<List<Pickup>> createSeries(
         @RequestBody Pickup pickup,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate until
@@ -67,7 +67,7 @@ public class PickupController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<Pickup> update(@PathVariable Long id, @RequestBody Pickup pickup) {
         return service.update(id, pickup)
             .map(ResponseEntity::ok)
@@ -75,7 +75,7 @@ public class PickupController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }

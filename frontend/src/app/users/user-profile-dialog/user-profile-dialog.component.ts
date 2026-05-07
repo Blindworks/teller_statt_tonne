@@ -101,7 +101,7 @@ export class UserProfileDialogComponent {
     switch (role) {
       case 'ADMINISTRATOR':
         return 'bg-error-container text-on-error-container';
-      case 'BOTSCHAFTER':
+      case 'TEAMLEITER':
         return 'bg-tertiary-container text-on-tertiary-fixed';
       case 'RETTER':
         return 'bg-primary-container text-on-primary-container';

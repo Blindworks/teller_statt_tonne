@@ -7,6 +7,17 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-05-07
+
+### Added
+
+- Bewerbungen auf Betriebe: In der Betriebe-Übersicht (`/stores`) erscheint für Retter und neue Mitglieder pro Betriebs-Karte ein „Bewerben"-Button. Bei bereits laufender Bewerbung steht „Bewerbung offen", bei bestehender Mitgliedschaft „Mein Betrieb" — der Button erscheint dann nicht. Dialog `apply-to-store-dialog` mit optionaler Nachricht (max. 1000 Zeichen). Neue Route `/my-applications` für die Retter-Sicht (Status, Begründung, Zurückziehen). Neue Route `/admin/applications` für Admin/Teamleitung mit Status-Filter, Annehmen-/Ablehnen-Buttons und Begründungs-Textfeld bei Ablehnung. Karte „Bewerbungen" auf dem Admin-Dashboard. Hinweis-Sektion auf dem Retter-Dashboard mit Direkt-Links für `NEW_MEMBER`. Neuer `PartnerApplicationsService`.
+
+### Changed
+
+- Browser-`window.confirm`-Aufrufe (7 Stellen) durch eigene `ConfirmDialogComponent` ersetzt — eingebunden global in `app.html`, gesteuert über `ConfirmDialogService.ask({title, message, confirmLabel, cancelLabel, tone})`. Betroffen: Bewerbung annehmen/ablehnen/zurückziehen, Nutzer löschen, Quiz-Bewerber entsperren, Quiz-Frage löschen, Quiz-Kategorie löschen, Notiz entfernen.
+- Begriff „Botschafter" durchgängig in „Teamleiter/Teamleitung" umbenannt (Rolle, UI-Texte, Methodennamen wie `isAdminOrTeamleiter`, Role-Guards und Badge-Klassen). Sichtbar in Dashboard-Hint, Privacy-Seite, Nutzerliste, Nutzer-Edit, Notizen-Komponente.
+
 ## [0.12.0] - 2026-05-07
 
 ### Added

@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<User> create(@Valid @RequestBody AdminCreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.adminCreate(request));
     }
@@ -68,7 +68,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
         return service.update(id, user)
             .map(ResponseEntity::ok)
@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }

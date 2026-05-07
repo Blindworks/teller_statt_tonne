@@ -58,7 +58,7 @@ public class NotificationEventListener {
         String body = actorName + " hat sich aus der Abholung bei " + partner.getName()
             + " am " + when + " ausgetragen.";
 
-        List<Long> recipients = collectRetterAndBotschafter(partner);
+        List<Long> recipients = collectRetterAndTeamleiter(partner);
         notificationService.create(
             recipients,
             NotificationType.PICKUP_UNASSIGNED,
@@ -96,7 +96,7 @@ public class NotificationEventListener {
             body = "Die Abholung bei " + partner.getName() + " am " + when + " wurde abgeschlossen.";
         }
 
-        List<Long> recipients = collectRetterAndBotschafter(partner);
+        List<Long> recipients = collectRetterAndTeamleiter(partner);
         notificationService.create(
             recipients,
             type,
@@ -108,9 +108,9 @@ public class NotificationEventListener {
         );
     }
 
-    private List<Long> collectRetterAndBotschafter(PartnerEntity partner) {
+    private List<Long> collectRetterAndTeamleiter(PartnerEntity partner) {
         return partner.getMembers().stream()
-            .filter(u -> u.hasRole("RETTER") || u.hasRole("BOTSCHAFTER"))
+            .filter(u -> u.hasRole("RETTER") || u.hasRole("TEAMLEITER"))
             .map(UserEntity::getId)
             .toList();
     }

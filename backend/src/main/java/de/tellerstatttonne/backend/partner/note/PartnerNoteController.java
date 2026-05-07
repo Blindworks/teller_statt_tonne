@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/partners/{partnerId}/notes")
-@PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER','RETTER')")
+@PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER','RETTER')")
 public class PartnerNoteController {
 
     private final PartnerNoteService service;
@@ -41,7 +41,7 @@ public class PartnerNoteController {
     }
 
     @DeleteMapping("/{noteId}")
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<Void> delete(@PathVariable Long partnerId, @PathVariable Long noteId) {
         boolean ok = service.softDelete(noteId, CurrentUser.requireId());
         return ok ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();

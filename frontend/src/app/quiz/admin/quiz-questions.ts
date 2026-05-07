@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ConfirmDialogService } from '../../shared/confirm-dialog/confirm-dialog.service';
 import { QuizService } from '../quiz.service';
 import { QuizQuestion } from '../quiz.model';
 
@@ -11,6 +12,7 @@ import { QuizQuestion } from '../quiz.model';
 })
 export class QuizQuestionsComponent {
   private readonly service = inject(QuizService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly questions = signal<QuizQuestion[]>([]);
   readonly errorMessage = signal<string | null>(null);
@@ -26,8 +28,14 @@ export class QuizQuestionsComponent {
     });
   }
 
-  delete(id: number): void {
-    if (!confirm('Frage wirklich löschen?')) return;
+  async delete(id: number): Promise<void> {
+    const ok = await this.confirmDialog.ask({
+      title: 'Frage löschen',
+      message: 'Frage wirklich löschen?',
+      confirmLabel: 'Löschen',
+      tone: 'danger',
+    });
+    if (!ok) return;
     this.service.deleteQuestion(id).subscribe({
       next: () => this.load(),
       error: () => this.errorMessage.set('Frage konnte nicht gelöscht werden.'),

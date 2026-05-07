@@ -10,6 +10,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../auth/auth.service';
+import { ConfirmDialogService } from '../../shared/confirm-dialog/confirm-dialog.service';
 import { AdminCreateUserRequest, UserService } from '../user.service';
 import { UserAvailabilityComponent } from '../user-availability/user-availability';
 import {
@@ -53,6 +54,7 @@ export class UserEditComponent {
   private readonly fb = inject(FormBuilder);
   private readonly service = inject(UserService);
   private readonly auth = inject(AuthService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -147,10 +149,16 @@ export class UserEditComponent {
     });
   }
 
-  delete(): void {
+  async delete(): Promise<void> {
     const id = this.userId();
     if (!id) return;
-    if (!confirm('Nutzer wirklich löschen?')) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'Nutzer löschen',
+      message: 'Nutzer wirklich löschen? Die Aktion kann nicht rückgängig gemacht werden.',
+      confirmLabel: 'Löschen',
+      tone: 'danger',
+    });
+    if (!ok) return;
     this.deleting.set(true);
     this.service.delete(id).subscribe({
       next: () => {

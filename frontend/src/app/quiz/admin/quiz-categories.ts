@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ConfirmDialogService } from '../../shared/confirm-dialog/confirm-dialog.service';
 import { QuizService } from '../quiz.service';
 import { COLOR_LABELS, QuizColor, QuizResultCategory, emptyCategory } from '../quiz.model';
 
@@ -12,6 +13,7 @@ import { COLOR_LABELS, QuizColor, QuizResultCategory, emptyCategory } from '../q
 })
 export class QuizCategoriesComponent {
   private readonly service = inject(QuizService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly categories = signal<QuizResultCategory[]>([]);
   readonly errorMessage = signal<string | null>(null);
@@ -57,8 +59,14 @@ export class QuizCategoriesComponent {
     });
   }
 
-  delete(id: number): void {
-    if (!confirm('Kategorie löschen?')) return;
+  async delete(id: number): Promise<void> {
+    const ok = await this.confirmDialog.ask({
+      title: 'Kategorie löschen',
+      message: 'Kategorie wirklich löschen?',
+      confirmLabel: 'Löschen',
+      tone: 'danger',
+    });
+    if (!ok) return;
     this.service.deleteCategory(id).subscribe({
       next: () => this.load(),
       error: () => this.errorMessage.set('Löschen fehlgeschlagen.'),

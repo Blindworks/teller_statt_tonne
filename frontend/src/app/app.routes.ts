@@ -6,10 +6,10 @@ import { authGuard } from './auth/auth.guard';
 import { roleGuard } from './auth/role.guard';
 import { landingGuard } from './landing/landing.guard';
 
-const plannerRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER']);
-const plannerViewRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER', 'RETTER']);
-const userEditRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER']);
-const quizAdminRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER']);
+const plannerRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER']);
+const plannerViewRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER', 'RETTER']);
+const userEditRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER']);
+const quizAdminRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER']);
 
 export const routes: Routes = [
   {
@@ -126,9 +126,24 @@ export const routes: Routes = [
       },
       {
         path: 'admin/store-members',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER'])],
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
         loadComponent: () =>
           import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),
+      },
+      {
+        path: 'admin/applications',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import('./partner-applications/admin-applications/admin-applications.component').then(
+            (m) => m.AdminApplicationsComponent,
+          ),
+      },
+      {
+        path: 'my-applications',
+        loadComponent: () =>
+          import('./partner-applications/my-applications/my-applications.component').then(
+            (m) => m.MyApplicationsComponent,
+          ),
       },
       {
         path: 'admin/stores/deleted',

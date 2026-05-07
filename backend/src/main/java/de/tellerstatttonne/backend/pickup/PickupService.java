@@ -87,7 +87,7 @@ public class PickupService {
         }
         UserEntity user = userRepository.findById(userId).orElse(null);
         if (user == null) return Optional.of(Set.of());
-        if (user.hasRole("ADMINISTRATOR") || user.hasRole("BOTSCHAFTER")) return Optional.empty();
+        if (user.hasRole("ADMINISTRATOR") || user.hasRole("TEAMLEITER")) return Optional.empty();
         if (user.hasRole("RETTER")) {
             return Optional.of(new HashSet<>(partnerRepository.findIdsByMemberId(userId)));
         }

@@ -10,7 +10,7 @@
           Empowering <span class="text-primary italic">{{ totalCount() }} Seelen</span> die Ernte retten.
         </h3>
         <p class="text-on-surface-variant text-lg max-w-xl leading-relaxed">
-          Unsere Nutzer sind das Herz der Pantry. Von Botschaftern bis zu täglichen
+          Unsere Nutzer sind das Herz der Pantry. Von Teamleitungen bis zu täglichen
           Rettern — jeder Beitrag zählt für Zero Waste.
         </p>
       </div>
@@ -89,7 +89,7 @@
             (click)="openProfile(user.id)"
             [attr.aria-label]="'Profil von ' + user.firstName + ' ' + user.lastName"
             class="w-20 h-20 rounded-full overflow-hidden ring-4 shadow-lg group-hover:scale-105 transition-transform duration-500 cursor-pointer"
-            [class.ring-tertiary-container]="primaryRole(user) === 'BOTSCHAFTER'"
+            [class.ring-tertiary-container]="primaryRole(user) === 'TEAMLEITER'"
             [class.ring-primary-container\\/30]="primaryRole(user) === 'RETTER'"
             [class.ring-secondary-container]="primaryRole(user) === 'NEW_MEMBER'"
           >

@@ -51,19 +51,19 @@ export class AppShellComponent {
 
   readonly isPlanner = computed(() => {
     const roles = this.currentUser()?.roles ?? [];
-    return roles.some((r) => r === 'ADMINISTRATOR' || r === 'BOTSCHAFTER' || r === 'RETTER');
+    return roles.some((r) => r === 'ADMINISTRATOR' || r === 'TEAMLEITER' || r === 'RETTER');
   });
 
   readonly isAdmin = computed(() => !!this.currentUser()?.roles?.includes('ADMINISTRATOR'));
 
   readonly canSeeQuizAdmin = computed(() => {
     const roles = this.currentUser()?.roles ?? [];
-    return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
+    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
   });
 
   readonly canSeeStoreMembers = computed(() => {
     const roles = this.currentUser()?.roles ?? [];
-    return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
+    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
   });
 
   constructor() {

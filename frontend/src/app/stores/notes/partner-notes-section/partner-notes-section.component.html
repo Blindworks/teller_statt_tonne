@@ -41,7 +41,7 @@
           [class.text-on-surface-variant]="draftVisibility() !== 'INTERNAL'"
           class="px-3 py-1 rounded-full font-bold transition-colors"
         >
-          Intern (Botschafter/Admin)
+          Intern (Teamleitung/Admin)
         </button>
       </div>
     }
@@ -76,7 +76,7 @@
               <span class="font-bold text-on-surface truncate">{{ note.authorDisplayName }}</span>
               <span aria-hidden="true">·</span>
               <time [attr.title]="note.createdAt">{{ note.createdAt | date: 'dd.MM.yyyy HH:mm' }}</time>
-              @if (isAdminOrBotschafter() && note.visibility === 'INTERNAL') {
+              @if (isAdminOrTeamleiter() && note.visibility === 'INTERNAL') {
                 <span
                   class="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container"
                   >Intern</span
