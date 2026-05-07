@@ -9,6 +9,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [0.6.1] - 2026-05-07
 
+### Fixed
+
+- Dashboard zeigte für Admin/Botschafter nicht verplante Tage als Template-Slots auf Basis wiederkehrender Partner-Slots an (z.B. Sonntag 10.05., obwohl im Abholung-Planer kein Pickup angelegt war). `DashboardService.findRangeSlots` liefert nun ausschließlich tatsächlich angelegte `Pickup`-Datensätze — Dashboard und Planer sind dadurch konsistent.
+
+## [0.6.0] - 2026-05-07
+
 ### Changed
 
 - **Breaking:** `Partner.Status` ersetzt das bisherige Lifecycle-Enum (`ACTIVE`/`INACTIVE`/`DELETED`) durch sieben Kooperationsstatus: `KEIN_KONTAKT` (Default für neu angelegte Betriebe), `VERHANDLUNGEN_LAUFEN`, `WILL_NICHT_KOOPERIEREN`, `KOOPERIERT`, `KOOPERIERT_FOODSHARING`, `SPENDET_AN_TAFEL`, `EXISTIERT_NICHT_MEHR`. `EXISTIERT_NICHT_MEHR` übernimmt die Soft-Delete-Rolle (Filterung in `findAll`/`findAllForMember`, `delete`/`restore`, `countMembersGroupedByPartner`). `restore` setzt einen wiederhergestellten Betrieb auf `KEIN_KONTAKT`. Liquibase-Changeset 010 erweitert `partner.status` auf `VARCHAR(32)` und mappt Bestandsdaten (`ACTIVE`→`KOOPERIERT`, `INACTIVE`→`VERHANDLUNGEN_LAUFEN`, `DELETED`→`EXISTIERT_NICHT_MEHR`).
