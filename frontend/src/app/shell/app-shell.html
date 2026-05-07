@@ -111,18 +111,20 @@
         Papierkorb · Partner
       </a>
     }
-    <a
-      routerLink="/admin/quiz/questions"
-      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
-      #quizLink="routerLinkActive"
-      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
-      [class.text-on-surface]="!quizLink.isActive"
-      [class.hover:bg-surface-container]="!quizLink.isActive"
-      [class.hover:translate-x-1]="!quizLink.isActive"
-    >
-      <span class="material-symbols-outlined">quiz</span>
-      Quiz
-    </a>
+    @if (canSeeQuizAdmin()) {
+      <a
+        routerLink="/admin/quiz/questions"
+        routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+        #quizLink="routerLinkActive"
+        class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+        [class.text-on-surface]="!quizLink.isActive"
+        [class.hover:bg-surface-container]="!quizLink.isActive"
+        [class.hover:translate-x-1]="!quizLink.isActive"
+      >
+        <span class="material-symbols-outlined">quiz</span>
+        Quiz
+      </a>
+    }
   </nav>
 </aside>
 
@@ -335,17 +337,19 @@
           Papierkorb · Partner
         </a>
       }
-      <a
-        routerLink="/admin/quiz/questions"
-        (click)="closeMore()"
-        routerLinkActive="text-primary"
-        #quizSheet="routerLinkActive"
-        class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
-        [class.text-on-surface]="!quizSheet.isActive"
-      >
-        <span class="material-symbols-outlined">quiz</span>
-        Quiz
-      </a>
+      @if (canSeeQuizAdmin()) {
+        <a
+          routerLink="/admin/quiz/questions"
+          (click)="closeMore()"
+          routerLinkActive="text-primary"
+          #quizSheet="routerLinkActive"
+          class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+          [class.text-on-surface]="!quizSheet.isActive"
+        >
+          <span class="material-symbols-outlined">quiz</span>
+          Quiz
+        </a>
+      }
       <div class="border-t border-outline-variant/20 my-2"></div>
       <a
         routerLink="/profile"

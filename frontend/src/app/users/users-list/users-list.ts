@@ -7,6 +7,7 @@ import { UserFilter, UserService } from '../user.service';
 import { RoleName, RoleOption, User } from '../user.model';
 import { PhotoUrlPipe } from '../photo-url.pipe';
 import { UserProfileDialogService } from '../user-profile-dialog/user-profile-dialog.service';
+import { AuthService } from '../../auth/auth.service';
 
 type FilterChip = { label: string; role: RoleName | null; activeOnly: boolean };
 
@@ -20,7 +21,13 @@ type FilterChip = { label: string; role: RoleName | null; activeOnly: boolean };
 export class UsersListComponent {
   private readonly service = inject(UserService);
   private readonly profileDialog = inject(UserProfileDialogService);
+  private readonly auth = inject(AuthService);
   private readonly reload$ = new Subject<UserFilter>();
+
+  readonly canEditUsers = computed(() => {
+    const roles = this.auth.currentUser()?.roles ?? [];
+    return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
+  });
 
   readonly users = signal<User[]>([]);
   readonly loadError = signal<string | null>(null);

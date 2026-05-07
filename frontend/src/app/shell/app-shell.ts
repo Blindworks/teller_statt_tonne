@@ -51,6 +51,11 @@ export class AppShellComponent {
 
   readonly isAdmin = computed(() => !!this.currentUser()?.roles?.includes('ADMINISTRATOR'));
 
+  readonly canSeeQuizAdmin = computed(() => {
+    const roles = this.currentUser()?.roles ?? [];
+    return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
+  });
+
   constructor() {
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationStart) {

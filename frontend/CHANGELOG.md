@@ -7,6 +7,24 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-05-07
+
+### Changed
+
+- Partnerdetails-Dialog: Karten-Marker nutzt jetzt denselben Kategorie-Pin wie die Hauptkarte (statt Leaflet-Default-Marker). Marker-Styles sind nach `styles.css` gewandert und werden vom neuen Helper `map-marker-icon.ts` gebaut.
+
+## [0.8.2] - 2026-05-07
+
+### Changed
+
+- Sidebar und Mehr-Sheet: Menüpunkt „Quiz" (`/admin/quiz/questions`) ist nur noch für `ADMINISTRATOR` und `BOTSCHAFTER` sichtbar. Die Routen `/admin/quiz/**` sind durch `roleGuard(['ADMINISTRATOR','BOTSCHAFTER'])` geschützt; Retter werden bei Direktaufruf umgeleitet.
+
+## [0.8.1] - 2026-05-07
+
+### Changed
+
+- UsersView: Edit-Stift an Nutzerkarten und „Den Kreis erweitern"-Karte sind nur noch für `ADMINISTRATOR` und `BOTSCHAFTER` sichtbar. Routen `/users/new` und `/users/edit/:id` sind durch `roleGuard(['ADMINISTRATOR','BOTSCHAFTER'])` geschützt; Retter sehen die Liste weiterhin read-only.
+
 ## [0.8.0] - 2026-05-06
 
 ### Added

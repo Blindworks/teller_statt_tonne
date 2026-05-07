@@ -8,6 +8,8 @@ import { landingGuard } from './landing/landing.guard';
 
 const plannerRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER']);
 const plannerViewRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER', 'RETTER']);
+const userEditRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER']);
+const quizAdminRoles = roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER']);
 
 export const routes: Routes = [
   {
@@ -84,11 +86,13 @@ export const routes: Routes = [
       },
       {
         path: 'users/new',
+        canActivate: [userEditRoles],
         loadComponent: () =>
           import('./users/user-edit/user-edit').then((m) => m.UserEditComponent),
       },
       {
         path: 'users/edit/:id',
+        canActivate: [userEditRoles],
         loadComponent: () =>
           import('./users/user-edit/user-edit').then((m) => m.UserEditComponent),
       },
@@ -133,26 +137,31 @@ export const routes: Routes = [
       },
       {
         path: 'admin/quiz/questions',
+        canActivate: [quizAdminRoles],
         loadComponent: () =>
           import('./quiz/admin/quiz-questions').then((m) => m.QuizQuestionsComponent),
       },
       {
         path: 'admin/quiz/questions/new',
+        canActivate: [quizAdminRoles],
         loadComponent: () =>
           import('./quiz/admin/question-edit').then((m) => m.QuestionEditComponent),
       },
       {
         path: 'admin/quiz/questions/edit/:id',
+        canActivate: [quizAdminRoles],
         loadComponent: () =>
           import('./quiz/admin/question-edit').then((m) => m.QuestionEditComponent),
       },
       {
         path: 'admin/quiz/categories',
+        canActivate: [quizAdminRoles],
         loadComponent: () =>
           import('./quiz/admin/quiz-categories').then((m) => m.QuizCategoriesComponent),
       },
       {
         path: 'admin/quiz/attempts',
+        canActivate: [quizAdminRoles],
         loadComponent: () =>
           import('./quiz/admin/quiz-attempts').then((m) => m.QuizAttemptsComponent),
       },

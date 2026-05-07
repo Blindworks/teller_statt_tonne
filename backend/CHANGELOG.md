@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-05-07
+
+### Changed
+
+- `UserController`: `POST`, `PUT` und `DELETE` auf `/api/users` sind jetzt durch `@PreAuthorize("hasAnyRole('ADMINISTRATOR','BOTSCHAFTER')")` geschützt. Bisher waren `PUT` und `DELETE` ohne Rollencheck — jeder authentifizierte Nutzer (auch Retter) konnte Stammdaten ändern oder löschen. `POST /{id}/photo` bleibt unverändert (Self-Upload + Admin via `isAuthorizedForUser`).
+
 ## [0.4.0] - 2026-05-06
 
 ### Added

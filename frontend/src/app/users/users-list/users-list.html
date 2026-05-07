@@ -164,33 +164,37 @@
               >{{ onlineLabel(user.onlineStatus) }}</span
             >
           </div>
-          <a
-            [routerLink]="['/users/edit', user.id]"
-            class="p-2 rounded-full bg-surface-container hover:bg-primary hover:text-on-primary transition-all"
-            aria-label="Nutzer bearbeiten"
-          >
-            <span class="material-symbols-outlined">edit</span>
-          </a>
+          @if (canEditUsers()) {
+            <a
+              [routerLink]="['/users/edit', user.id]"
+              class="p-2 rounded-full bg-surface-container hover:bg-primary hover:text-on-primary transition-all"
+              aria-label="Nutzer bearbeiten"
+            >
+              <span class="material-symbols-outlined">edit</span>
+            </a>
+          }
         </div>
       </div>
     }
 
-    <!-- Add Member CTA Card -->
-    <a
-      routerLink="/users/new"
-      class="bg-white/40 border-4 border-dashed border-primary-container/50 p-8 rounded-xl flex flex-col items-center justify-center text-center gap-4 hover:bg-primary-container/10 transition-all group cursor-pointer min-h-[280px]"
-    >
-      <div
-        class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container group-hover:scale-110 transition-transform"
+    @if (canEditUsers()) {
+      <!-- Add Member CTA Card -->
+      <a
+        routerLink="/users/new"
+        class="bg-white/40 border-4 border-dashed border-primary-container/50 p-8 rounded-xl flex flex-col items-center justify-center text-center gap-4 hover:bg-primary-container/10 transition-all group cursor-pointer min-h-[280px]"
       >
-        <span class="material-symbols-outlined text-3xl">add</span>
-      </div>
-      <div>
-        <h4 class="font-bold text-lg text-on-surface">Den Kreis erweitern</h4>
-        <p class="text-sm text-on-surface-variant">
-          Lade einen neuen Nutzer zur 'Teller statt Tonne'-Mission ein.
-        </p>
-      </div>
-    </a>
+        <div
+          class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container group-hover:scale-110 transition-transform"
+        >
+          <span class="material-symbols-outlined text-3xl">add</span>
+        </div>
+        <div>
+          <h4 class="font-bold text-lg text-on-surface">Den Kreis erweitern</h4>
+          <p class="text-sm text-on-surface-variant">
+            Lade einen neuen Nutzer zur 'Teller statt Tonne'-Mission ein.
+          </p>
+        </div>
+      </a>
+    }
   </div>
 </main>

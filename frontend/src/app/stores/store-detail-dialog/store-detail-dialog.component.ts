@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { L } from '../../map/leaflet-global';
+import { buildPartnerMarkerIcon } from '../../map/map-marker-icon';
 import {
   CATEGORY_ICONS,
   CATEGORY_LABELS,
@@ -155,10 +156,12 @@ export class StoreDetailDialogComponent implements AfterViewInit, OnDestroy {
       this.map.setView(coords, 15);
     }
 
+    const icon = buildPartnerMarkerIcon(p);
     if (this.marker) {
       this.marker.setLatLng(coords);
+      this.marker.setIcon(icon);
     } else {
-      this.marker = L.marker(coords).addTo(this.map);
+      this.marker = L.marker(coords, { icon }).addTo(this.map);
     }
 
     setTimeout(() => this.map?.invalidateSize(), 0);
