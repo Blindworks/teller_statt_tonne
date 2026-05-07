@@ -7,6 +7,20 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-05-07
+
+### Added
+
+- Auto-Notiz bei Status-Änderung eines Betriebs: `PartnerService.update`, `delete` und `restore` legen automatisch eine interne Notiz (`Visibility.INTERNAL`) im Notiz-Verlauf des Betriebs an, sobald sich `Partner.Status` ändert. Body-Format: `Status geändert: <alt> → <neu>` mit deutschsprachigen Status-Labels. Author ist der ausführende User (`CurrentUser.requireId()`).
+
+## [0.9.0] - 2026-05-07
+
+### Added
+
+- Erwartete Menge in Kilogramm pro Betriebs-Slot: `PartnerEntity.PickupSlotEmbeddable` und DTO `Partner.PickupSlot` haben das neue Feld `expectedKg` (BigDecimal, nullable). Liquibase-Changeset 014 fügt Spalte `expected_kg` zu `partner_pickup_slot` hinzu.
+- Beim Anlegen eines Pickups (`POST /api/pickups`) wird `savedKg` jetzt im DTO `Pickup` exposed und – falls nicht explizit gesetzt – aus dem zum Termin (Wochentag, Start-/Endzeit) passenden Slot übernommen.
+- Globaler Statistik-Endpoint `GET /api/stats/overview` (Rollen ADMINISTRATOR/TEAMLEITER): liefert Gesamt-`savedKg`, Anzahl abgeschlossener Pickups, Top-10-Betriebe und Top-10-Retter (jeweils Summe `savedKg` und Pickup-Anzahl).
+
 ## [0.8.0] - 2026-05-07
 
 ### Added

@@ -1,5 +1,9 @@
 package de.tellerstatttonne.backend.partner;
 
+import de.tellerstatttonne.backend.auth.CurrentUser;
+import de.tellerstatttonne.backend.partner.note.CreatePartnerNoteRequest;
+import de.tellerstatttonne.backend.partner.note.PartnerNoteService;
+import de.tellerstatttonne.backend.partner.note.Visibility;
 import de.tellerstatttonne.backend.pickup.Pickup;
 import de.tellerstatttonne.backend.pickup.PickupEntity;
 import de.tellerstatttonne.backend.pickup.PickupRepository;
@@ -8,6 +12,7 @@ import de.tellerstatttonne.backend.user.availability.UserAvailabilityService.Slo
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,17 +32,32 @@ public class PartnerService {
     private final GeocodingService geocodingService;
     private final UserAvailabilityService availabilityService;
     private final PickupRepository pickupRepository;
+    private final PartnerNoteService partnerNoteService;
 
     public PartnerService(
         PartnerRepository repository,
         GeocodingService geocodingService,
         UserAvailabilityService availabilityService,
-        PickupRepository pickupRepository
+        PickupRepository pickupRepository,
+        PartnerNoteService partnerNoteService
     ) {
         this.repository = repository;
         this.geocodingService = geocodingService;
         this.availabilityService = availabilityService;
         this.pickupRepository = pickupRepository;
+        this.partnerNoteService = partnerNoteService;
+    }
+
+    private static final Map<Partner.Status, String> STATUS_LABELS;
+    static {
+        STATUS_LABELS = new EnumMap<>(Partner.Status.class);
+        STATUS_LABELS.put(Partner.Status.KEIN_KONTAKT, "Kein Kontakt");
+        STATUS_LABELS.put(Partner.Status.VERHANDLUNGEN_LAUFEN, "Verhandlungen laufen");
+        STATUS_LABELS.put(Partner.Status.WILL_NICHT_KOOPERIEREN, "Will nicht kooperieren");
+        STATUS_LABELS.put(Partner.Status.KOOPERIERT, "Kooperiert mit uns");
+        STATUS_LABELS.put(Partner.Status.KOOPERIERT_FOODSHARING, "Kooperiert mit Foodsharing");
+        STATUS_LABELS.put(Partner.Status.SPENDET_AN_TAFEL, "Spendet an Tafel etc.");
+        STATUS_LABELS.put(Partner.Status.EXISTIERT_NICHT_MEHR, "Existiert nicht mehr");
     }
 
     @Transactional(readOnly = true)
@@ -89,7 +109,7 @@ public class PartnerService {
                 Integer count = counts.get(new SlotKey(s.weekday(), s.startTime(), s.endTime()));
                 return new Partner.PickupSlot(
                     s.weekday(), s.startTime(), s.endTime(), s.active(),
-                    s.capacity(), count != null ? count : 0
+                    s.capacity(), s.expectedKg(), count != null ? count : 0
                 );
             })
             .toList();
@@ -116,6 +136,7 @@ public class PartnerService {
         return repository.findById(id).map(entity -> {
             validate(partner);
             checkSlotsNotInUse(id, entity, partner);
+            Partner.Status oldStatus = entity.getStatus();
             boolean addressChanged = !addressEquals(entity, partner);
             PartnerMapper.applyToEntity(entity, partner);
             if (hasCoordinates(partner)) {
@@ -124,7 +145,9 @@ public class PartnerService {
             } else if (addressChanged || entity.getLatitude() == null || entity.getLongitude() == null) {
                 applyForwardGeocoding(entity);
             }
-            return PartnerMapper.toDto(repository.save(entity));
+            PartnerEntity saved = repository.save(entity);
+            recordStatusChange(id, oldStatus, saved.getStatus());
+            return PartnerMapper.toDto(saved);
         });
     }
 
@@ -137,17 +160,37 @@ public class PartnerService {
 
     public boolean delete(Long id) {
         return repository.findById(id).map(entity -> {
+            Partner.Status oldStatus = entity.getStatus();
             entity.setStatus(Partner.Status.EXISTIERT_NICHT_MEHR);
             repository.save(entity);
+            recordStatusChange(id, oldStatus, Partner.Status.EXISTIERT_NICHT_MEHR);
             return true;
         }).orElse(false);
     }
 
     public Optional<Partner> restore(Long id) {
         return repository.findById(id).map(entity -> {
+            Partner.Status oldStatus = entity.getStatus();
             entity.setStatus(Partner.Status.KEIN_KONTAKT);
-            return PartnerMapper.toDto(repository.save(entity));
+            PartnerEntity saved = repository.save(entity);
+            recordStatusChange(id, oldStatus, Partner.Status.KEIN_KONTAKT);
+            return PartnerMapper.toDto(saved);
         });
+    }
+
+    private void recordStatusChange(Long partnerId, Partner.Status oldStatus, Partner.Status newStatus) {
+        if (oldStatus == newStatus) return;
+        String body = "Status geändert: " + label(oldStatus) + " → " + label(newStatus);
+        partnerNoteService.create(
+            partnerId,
+            new CreatePartnerNoteRequest(body, Visibility.INTERNAL),
+            CurrentUser.requireId()
+        );
+    }
+
+    private static String label(Partner.Status status) {
+        String label = STATUS_LABELS.get(status);
+        return label != null ? label : status.name();
     }
 
     private static boolean hasCoordinates(Partner partner) {
