@@ -38,6 +38,7 @@ public class PickupSignupController {
             case NOT_MEMBER -> ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             case CAPACITY_FULL -> ResponseEntity.status(HttpStatus.CONFLICT).build();
             case PICKUP_PAST -> ResponseEntity.status(HttpStatus.GONE).build();
+            case UNASSIGN_TOO_LATE -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         };
     }
 }

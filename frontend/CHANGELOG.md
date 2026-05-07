@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.7] - 2026-05-07
+
+### Changed
+
+- Pickup-Karte: Der „Austragen"-Button wird ab 2 Stunden vor Pickup-Beginn ausgegraut und deaktiviert; ein Tooltip erklärt „Austragen ist nur bis 2 Stunden vor Beginn möglich.". Bei direktem Austragungs-Versuch (HTTP 422) wird ein passender Fehlertext in der Wochenansicht angezeigt.
+
 ## [0.8.6] - 2026-05-07
 
 ### Fixed

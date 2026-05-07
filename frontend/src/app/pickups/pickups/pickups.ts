@@ -187,6 +187,7 @@ export class PickupsComponent {
     if (status === 403) return 'Du bist diesem Store nicht zugeordnet.';
     if (status === 409) return 'Slot ist bereits voll.';
     if (status === 410) return 'Vergangene Pickups können nicht geändert werden.';
+    if (status === 422) return 'Austragen ist weniger als 2 Stunden vor Beginn nicht mehr möglich.';
     if (status === 404) return 'Slot wurde nicht gefunden.';
     return fallback;
   }

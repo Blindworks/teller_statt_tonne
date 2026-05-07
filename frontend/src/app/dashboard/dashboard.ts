@@ -53,7 +53,10 @@ interface DisplaySlot {
   chips: SlotChip[];
   currentUserAssigned: boolean;
   canSignup: boolean;
+  unassignDisabled: boolean;
 }
+
+const UNASSIGN_CUTOFF_MS = 2 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-dashboard',
@@ -72,9 +75,12 @@ export class DashboardComponent {
   private readonly errorSignal = signal<string | null>(null);
   private readonly nowSignal = signal<number>(Date.now());
 
-  readonly displaySlots = computed<DisplaySlot[]>(() =>
-    this.daySlotsSignal().map((s, idx) => this.toDisplay(s, idx)),
-  );
+  readonly displaySlots = computed<DisplaySlot[]>(() => {
+    const now = this.nowSignal();
+    return this.daySlotsSignal().map((s, idx) => this.toDisplay(s, idx, now));
+  });
+
+  readonly unassignDisabledReason = 'Austragen ist nur bis 2 Stunden vor Beginn möglich.';
 
   readonly mySlots = computed<DisplaySlot[]>(() =>
     this.displaySlots().filter((s) => s.currentUserAssigned),
@@ -231,10 +237,12 @@ export class DashboardComponent {
     if (status === 403) return 'Du bist diesem Store nicht zugeordnet.';
     if (status === 409) return 'Slot ist bereits voll.';
     if (status === 404) return 'Slot wurde nicht gefunden.';
+    if (status === 410) return 'Vergangene Pickups können nicht geändert werden.';
+    if (status === 422) return 'Austragen ist weniger als 2 Stunden vor Beginn nicht mehr möglich.';
     return fallback;
   }
 
-  private toDisplay(s: DaySlot, idx: number): DisplaySlot {
+  private toDisplay(s: DaySlot, idx: number, now: number): DisplaySlot {
     const category: Category | null = s.partnerCategory;
     const categoryIcon = category ? CATEGORY_ICONS[category] : 'storefront';
     const categoryLabel = category ? CATEGORY_LABELS[category] : 'Pickup';
@@ -277,6 +285,10 @@ export class DashboardComponent {
       chips,
       currentUserAssigned: s.currentUserAssigned,
       canSignup: !s.isTemplate && !s.currentUserAssigned && freeCount > 0,
+      unassignDisabled:
+        !s.isTemplate &&
+        s.currentUserAssigned &&
+        new Date(`${s.date}T${s.startTime}:00`).getTime() - now < UNASSIGN_CUTOFF_MS,
     };
   }
 

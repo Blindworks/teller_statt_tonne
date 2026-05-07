@@ -405,7 +405,10 @@
           <button
             type="button"
             (click)="unassign(slot)"
-            class="px-4 py-1.5 rounded-full bg-error-container text-on-error-container text-xs font-bold hover:bg-error hover:text-on-error transition-colors"
+            [disabled]="slot.unassignDisabled"
+            [attr.title]="slot.unassignDisabled ? unassignDisabledReason : null"
+            [attr.aria-disabled]="slot.unassignDisabled ? 'true' : null"
+            class="px-4 py-1.5 rounded-full bg-error-container text-on-error-container text-xs font-bold transition-colors hover:bg-error hover:text-on-error disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-error-container disabled:hover:text-on-error-container"
           >
             Austragen
           </button>

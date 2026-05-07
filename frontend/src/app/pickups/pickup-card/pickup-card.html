@@ -127,7 +127,10 @@
       <button
         type="button"
         (click)="onUnassign($event)"
-        class="mt-3 w-full px-3 py-2 rounded-full border border-outline-variant text-on-surface text-xs font-bold hover:bg-surface-container-high transition-colors"
+        [disabled]="unassignDisabled()"
+        [attr.title]="unassignDisabled() ? unassignDisabledReason : null"
+        [attr.aria-disabled]="unassignDisabled() ? 'true' : null"
+        class="mt-3 w-full px-3 py-2 rounded-full border border-outline-variant text-on-surface text-xs font-bold transition-colors hover:bg-surface-container-high disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         Austragen
       </button>

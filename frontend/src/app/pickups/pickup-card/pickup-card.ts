@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CATEGORY_LABELS, Category } from '../../partners/partner.model';
 import { resolvePhotoUrl } from '../../users/photo-url';
@@ -18,6 +27,13 @@ export type PickupCardMode = 'PLANNER' | 'RETTER';
 })
 export class PickupCardComponent {
   private readonly profileDialog = inject(UserProfileDialogService);
+
+  private readonly nowMs = signal(Date.now());
+
+  constructor() {
+    const intervalId = setInterval(() => this.nowMs.set(Date.now()), 30_000);
+    inject(DestroyRef).onDestroy(() => clearInterval(intervalId));
+  }
 
   readonly pickup = input.required<Pickup>();
   readonly today = input<boolean>(false);
@@ -79,12 +95,23 @@ export class PickupCardComponent {
     );
   });
 
+  readonly isWithinUnassignCutoff = computed(() => {
+    const p = this.pickup();
+    const start = new Date(`${p.date}T${p.startTime}:00`);
+    return start.getTime() - this.nowMs() < 2 * 60 * 60 * 1000;
+  });
+
   readonly canUnassign = computed(() => {
     const p = this.pickup();
     return (
       this.isRetter() && p.status === 'SCHEDULED' && !this.isPast() && this.currentUserAssigned()
     );
   });
+
+  readonly unassignDisabled = computed(() => this.isWithinUnassignCutoff());
+
+  readonly unassignDisabledReason =
+    'Austragen ist nur bis 2 Stunden vor Beginn möglich.';
 
   readonly editLink = computed<unknown[] | null>(() => {
     if (this.isRetter()) return null;

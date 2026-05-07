@@ -11,6 +11,8 @@ import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,9 +58,10 @@ class PickupSignupServiceTest {
 
         PickupEntity pickup = new PickupEntity();
         pickup.setPartner(partnerEntity);
-        pickup.setDate(LocalDate.of(2026, 5, 4));
-        pickup.setStartTime("18:00");
-        pickup.setEndTime("19:00");
+        LocalDateTime futureStart = LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0).withNano(0);
+        pickup.setDate(futureStart.toLocalDate());
+        pickup.setStartTime(futureStart.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        pickup.setEndTime(futureStart.plusHours(1).toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
         pickup.setCapacity(2);
         pickupId = pickupRepository.save(pickup).getId();
     }
@@ -154,6 +157,38 @@ class PickupSignupServiceTest {
 
         assertThat(result).isEqualTo(PickupSignupService.Result.PICKUP_PAST);
         assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).hasSize(1);
+    }
+
+    @Test
+    void unassignRejectedWhenWithinTwoHourCutoff() {
+        signupService.signup(pickupId, memberId);
+        PickupEntity pickup = pickupRepository.findById(pickupId).orElseThrow();
+        LocalDateTime soon = LocalDateTime.now().plusHours(1);
+        pickup.setDate(soon.toLocalDate());
+        pickup.setStartTime(soon.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        pickup.setEndTime(soon.plusHours(1).toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        pickupRepository.save(pickup);
+
+        PickupSignupService.Result result = signupService.unassign(pickupId, memberId);
+
+        assertThat(result).isEqualTo(PickupSignupService.Result.UNASSIGN_TOO_LATE);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).hasSize(1);
+    }
+
+    @Test
+    void unassignAllowedJustOutsideCutoff() {
+        signupService.signup(pickupId, memberId);
+        PickupEntity pickup = pickupRepository.findById(pickupId).orElseThrow();
+        LocalDateTime later = LocalDateTime.now().plusHours(3);
+        pickup.setDate(later.toLocalDate());
+        pickup.setStartTime(later.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        pickup.setEndTime(later.plusHours(1).toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        pickupRepository.save(pickup);
+
+        PickupSignupService.Result result = signupService.unassign(pickupId, memberId);
+
+        assertThat(result).isEqualTo(PickupSignupService.Result.OK);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).isEmpty();
     }
 
     private UserEntity createUser(String prefix) {

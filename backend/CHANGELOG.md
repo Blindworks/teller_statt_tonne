@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-05-07
+
+### Changed
+
+- `DELETE /api/pickups/{id}/signup`: Retter können sich nur noch bis 2 Stunden vor `startTime` aus einem Pickup austragen. Innerhalb dieser Frist antwortet der Endpoint mit HTTP `422 Unprocessable Entity` (neuer `Result.UNASSIGN_TOO_LATE` im `PickupSignupService`). Eintragen (`POST`) bleibt unverändert.
+
 ## [0.4.1] - 2026-05-07
 
 ### Changed
