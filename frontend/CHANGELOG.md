@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.10] - 2026-05-07
+
+### Fixed
+
+- Store-Detail-Dialog erschien hinter der Leaflet-Karte (deren Popup-Pane bei `z-index: 700` liegt). Z-Index des Dialog-Overlays auf `z-[1200]` erhöht, damit der Dialog auch beim Öffnen aus dem Map-Popup vor der Karte und über der mobilen Navigation liegt.
+
 ## [0.8.9] - 2026-05-07
 
 ### Changed
