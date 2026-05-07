@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-05-07
+
+### Added
+
+- Notiz-Sektion im Betrieb-Editor (`PartnerNotesSectionComponent`, neben dem Hauptansprechpartner-Block): Append-only Notizverlauf pro Betrieb mit Eingabefeld, Sichtbarkeits-Toggle (`Sichtbar für alle` / `Intern`) für Botschafter & Admin, Lösch-Button (Soft-Delete) für Botschafter & Admin. Retter sehen nur eigene Notizen plus alle als `Sichtbar für alle` markierten und können selbst nur sichtbar-für-alle posten. Neuer `PartnerNotesService` ruft `/api/partners/{id}/notes` auf.
+
 ## [0.10.0] - 2026-05-07
 
 ### Changed

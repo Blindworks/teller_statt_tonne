@@ -16,6 +16,7 @@ import {
   LocationPickerDialogComponent,
 } from '../location-picker/location-picker-dialog';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog';
+import { PartnerNotesSectionComponent } from '../../stores/notes/partner-notes-section/partner-notes-section.component';
 import {
   CATEGORY_LABELS,
   Category,
@@ -56,7 +57,7 @@ type PartnerForm = FormGroup<{
 
 @Component({
   selector: 'app-partner-edit',
-  imports: [ReactiveFormsModule, RouterLink, DecimalPipe, LocationPickerDialogComponent, ConfirmDialogComponent],
+  imports: [ReactiveFormsModule, RouterLink, DecimalPipe, LocationPickerDialogComponent, ConfirmDialogComponent, PartnerNotesSectionComponent],
   templateUrl: './partner-edit.html',
   styleUrl: './partner-edit.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

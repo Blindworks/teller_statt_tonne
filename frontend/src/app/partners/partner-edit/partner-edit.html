@@ -188,7 +188,7 @@
     <!-- Kontakt -->
     <div
       formGroupName="contact"
-      class="lg:col-span-5 bg-surface-container-lowest rounded-xl p-8 shadow-sm"
+      class="lg:col-span-5 bg-surface-container-lowest rounded-xl p-8 shadow-sm self-start"
     >
       <h4 class="text-xl font-bold mb-6 text-secondary flex items-center gap-2">
         <span class="material-symbols-outlined">contact_phone</span>
@@ -227,6 +227,17 @@
         </label>
       </div>
     </div>
+
+    <!-- Notizen -->
+    @if (isEdit && partnerId() !== null) {
+      <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-8 shadow-sm self-start">
+        <h4 class="text-xl font-bold mb-6 text-secondary flex items-center gap-2">
+          <span class="material-symbols-outlined">sticky_note_2</span>
+          Notizen
+        </h4>
+        <app-partner-notes-section [partnerId]="partnerId()!" />
+      </div>
+    }
 
     <!-- Abholzeiten -->
     <div class="lg:col-span-12 bg-surface-container-high rounded-xl p-8">

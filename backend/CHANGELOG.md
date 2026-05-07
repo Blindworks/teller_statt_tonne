@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-05-07
+
+### Added
+
+- Notiz-Funktion für Betriebe (`PartnerNoteEntity`): Append-only Notizen pro Betrieb mit Sichtbarkeits-Flag (`INTERNAL` nur für Admin/Botschafter, `SHARED` zusätzlich für Retter) und Soft-Delete (nur Admin/Botschafter). Endpunkte unter `/api/partners/{partnerId}/notes` (GET/POST), Soft-Delete via `DELETE /{noteId}`. Liquibase-Changeset 011 legt Tabelle `partner_note` an.
+
 ## [0.6.1] - 2026-05-07
 
 ### Fixed
