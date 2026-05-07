@@ -7,6 +7,8 @@ Für die technische Detailansicht siehe [`backend/CHANGELOG.md`](backend/CHANGEL
 
 ## 07.05.2026
 
+> 🚀 **Live ausgerollt am 07.05.2026** — die folgenden Änderungen sind in der Produktiv-App verfügbar.
+
 ### Neu
 
 - **Erwartete Kilogramm pro Abholzeit.** Im Betrieb-Editor lässt sich pro Slot (z. B. Montag 18:30–19:00) eine erwartete Menge in Kilogramm hinterlegen — optional, leer ist erlaubt. Beim Anlegen einer neuen Abholung wird der Wert als Vorschlag für „Gerettet (kg)" übernommen und kann dort überschrieben werden. *Was heißt das fürs Team?* Wir haben endlich eine realistische Datenbasis für „Wieviel haben wir gerettet?", ohne dass jemand bei jeder Abholung von Hand wiegen müsste.
