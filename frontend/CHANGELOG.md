@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.8] - 2026-05-07
+
+### Changed
+
+- Map-Popup: Der „Bearbeiten →"-Link wird für Nutzer mit der Rolle `RETTER` ausgeblendet. Retter sehen im Popup nur die Store-Details (Name, Status, Kategorie, Adresse). Administratoren und Botschafter sehen den Link unverändert.
+
 ## [0.8.7] - 2026-05-07
 
 ### Changed

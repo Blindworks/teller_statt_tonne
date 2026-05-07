@@ -21,6 +21,7 @@ import {
   Weekday,
 } from '../partners/partner.model';
 import { PartnerService } from '../partners/partner.service';
+import { AuthService } from '../auth/auth.service';
 import { buildPartnerMarkerIcon } from './map-marker-icon';
 
 type DayFilter = 'ALL' | Weekday;
@@ -39,6 +40,7 @@ const DEFAULT_ZOOM = 13;
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly service = inject(PartnerService);
+  private readonly auth = inject(AuthService);
 
   @ViewChild('mapContainer', { static: true })
   private mapContainerRef!: ElementRef<HTMLDivElement>;
@@ -197,6 +199,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         ? '<span class="map-popup__badge map-popup__badge--active">Aktiv</span>'
         : '<span class="map-popup__badge">Inaktiv</span>';
     const editHref = `/stores/edit/${p.id}`;
+    const isRetter = !!this.auth.currentUser()?.roles?.includes('RETTER');
+    const editLink = isRetter
+      ? ''
+      : `<a class="map-popup__link" href="${editHref}">Bearbeiten →</a>`;
     const escape = (s: string) =>
       s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     return `
@@ -204,7 +210,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         <div class="map-popup__title">${escape(p.name)} ${statusBadge}</div>
         <div class="map-popup__category">${escape(CATEGORY_LABELS[p.category])}</div>
         <div class="map-popup__address">${escape(p.street ?? '')}, ${escape(p.postalCode ?? '')} ${escape(p.city ?? '')}</div>
-        <a class="map-popup__link" href="${editHref}">Bearbeiten →</a>
+        ${editLink}
       </div>
     `;
   }
