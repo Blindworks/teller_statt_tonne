@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="009-create-notification" author="teller-statt-tonne">
+        <createTable tableName="notification">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="recipient_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="related_pickup_id" type="BIGINT"/>
+            <column name="related_partner_id" type="BIGINT"/>
+            <column name="actor_user_id" type="BIGINT"/>
+            <column name="created_at" type="DATETIME(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="read_at" type="DATETIME(6)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="notification" baseColumnNames="recipient_user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_notification_recipient" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="notification" baseColumnNames="related_pickup_id"
+                                 referencedTableName="pickup" referencedColumnNames="id"
+                                 constraintName="fk_notification_pickup" onDelete="SET NULL"/>
+        <addForeignKeyConstraint baseTableName="notification" baseColumnNames="related_partner_id"
+                                 referencedTableName="partner" referencedColumnNames="id"
+                                 constraintName="fk_notification_partner" onDelete="SET NULL"/>
+        <addForeignKeyConstraint baseTableName="notification" baseColumnNames="actor_user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_notification_actor" onDelete="SET NULL"/>
+
+        <createIndex tableName="notification" indexName="idx_notification_recipient_created">
+            <column name="recipient_user_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

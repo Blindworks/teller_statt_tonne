@@ -13,5 +13,6 @@
     <include file="db/changelog/changes/006-push-subscription.xml"/>
     <include file="db/changelog/changes/007-roles.xml"/>
     <include file="db/changelog/changes/008-ensure-admin-role-assignment.xml"/>
+    <include file="db/changelog/changes/009-notification.xml"/>
 
 </databaseChangeLog>

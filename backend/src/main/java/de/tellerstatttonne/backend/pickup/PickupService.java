@@ -1,6 +1,7 @@
 package de.tellerstatttonne.backend.pickup;
 
 import de.tellerstatttonne.backend.auth.CurrentUser;
+import de.tellerstatttonne.backend.notification.event.PickupStatusChangedEvent;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
 import de.tellerstatttonne.backend.user.User;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,15 +31,18 @@ public class PickupService {
     private final PartnerRepository partnerRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PickupService(PickupRepository repository,
                          PartnerRepository partnerRepository,
                          UserRepository userRepository,
-                         UserService userService) {
+                         UserService userService,
+                         ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
         this.partnerRepository = partnerRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -135,10 +140,25 @@ public class PickupService {
         return repository.findById(id).map(entity -> {
             validate(pickup);
             PartnerEntity partner = loadPartner(pickup.partnerId());
+            Pickup.Status oldStatus = entity.getStatus();
             PickupMapper.applyToEntity(entity, pickup, partner);
             PickupEntity saved = repository.save(entity);
+            Pickup.Status newStatus = saved.getStatus();
+            if (oldStatus != newStatus) {
+                Long actorId = currentUserIdOrNull();
+                eventPublisher.publishEvent(new PickupStatusChangedEvent(
+                    saved.getId(), oldStatus, newStatus, actorId));
+            }
             return PickupMapper.toDto(saved, resolveUsers(List.of(saved)));
         });
+    }
+
+    private static Long currentUserIdOrNull() {
+        try {
+            return CurrentUser.requireId();
+        } catch (IllegalStateException ex) {
+            return null;
+        }
     }
 
     public boolean delete(Long id) {

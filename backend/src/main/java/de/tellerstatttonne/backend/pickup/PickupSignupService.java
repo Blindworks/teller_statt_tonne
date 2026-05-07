@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.pickup;
 
+import de.tellerstatttonne.backend.notification.event.PickupUnassignedEvent;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
@@ -7,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +22,14 @@ public class PickupSignupService {
 
     private final PickupRepository pickupRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public PickupSignupService(PickupRepository pickupRepository, UserRepository userRepository) {
+    public PickupSignupService(PickupRepository pickupRepository,
+                               UserRepository userRepository,
+                               ApplicationEventPublisher eventPublisher) {
         this.pickupRepository = pickupRepository;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public Result signup(Long pickupId, Long userId) {
@@ -69,6 +75,7 @@ public class PickupSignupService {
         boolean removed = pickup.getAssignments().removeIf(a -> userId.equals(a.getUserId()));
         if (!removed) return Result.NOT_ASSIGNED;
         pickupRepository.save(pickup);
+        eventPublisher.publishEvent(new PickupUnassignedEvent(pickup.getId(), userId));
         return Result.OK;
     }
 }

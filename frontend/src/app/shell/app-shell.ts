@@ -10,11 +10,13 @@ import {
 } from '@angular/core';
 import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { NotificationBellComponent } from '../notifications/notification-bell/notification-bell';
+import { NotificationService } from '../notifications/notification.service';
 import { resolvePhotoUrl } from '../users/photo-url';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +25,7 @@ export class AppShellComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly notifications = inject(NotificationService);
 
   readonly currentUser = this.auth.currentUser;
   readonly showShell = computed(() => this.auth.isAuthenticated());
@@ -74,6 +77,15 @@ export class AppShellComponent {
     effect(() => {
       if (!this.auth.isAuthenticated() && !this.auth.getAccessToken()) {
         this.router.navigate(['/login']);
+      }
+    });
+
+    effect(() => {
+      if (this.auth.isAuthenticated()) {
+        this.notifications.connect();
+        this.notifications.load().subscribe();
+      } else {
+        this.notifications.disconnect();
       }
     });
   }

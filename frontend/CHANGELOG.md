@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-05-07
+
+### Added
+
+- Nachrichtensystem (Phase 1): neue `NotificationService` (Signals `notifications`, `unreadCount`) und `NotificationBellComponent` ersetzen den statischen Glocken-Block in `app-shell.html`. Der Service lädt initial via `GET /api/notifications`, verbindet sich mit `GET /api/notifications/stream` über fetch+ReadableStream (mit `Authorization`-Header) und fängt `notification`/`unread-count`-Events live ab; bei Verbindungsabbruch reconnectet er mit Backoff (1/2/5/10/30 s). Glocke zeigt Unread-Badge, Dropdown listet die letzten 10 Nachrichten mit relativem Zeitstempel; Klick markiert als gelesen und navigiert (falls vorhanden) zur zugehörigen Pickup-Detailseite. „Alle gelesen"-Button für Massen-Mark-Read. Stream-Lifecycle ist in `app-shell` an `auth.isAuthenticated()` gekoppelt.
+
 ## [0.8.10] - 2026-05-07
 
 ### Fixed

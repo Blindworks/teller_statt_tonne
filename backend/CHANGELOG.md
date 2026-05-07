@@ -7,6 +7,13 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-07
+
+### Added
+
+- Nachrichtensystem (Phase 1, System-Meldungen): neues `notification`-Paket mit `NotificationEntity`, `NotificationService`, `NotificationController` unter `/api/notifications` (`GET`, `GET /unread-count`, `GET /stream` als Server-Sent-Events, `PATCH /{id}/read`, `POST /read-all`). Meldungen entstehen automatisch via Spring `ApplicationEvent`s (`PickupUnassignedEvent`, `PickupStatusChangedEvent`); `NotificationEventListener` (`@TransactionalEventListener` AFTER_COMMIT) verteilt sie an alle Retter und Botschafter des betroffenen Partners ausser dem Auslöser. Echtzeit-Push pro User über `NotificationStreamService` (`SseEmitter`-Map mit 25-s-Heartbeat). Liquibase-Changeset 009 legt die `notification`-Tabelle inkl. FKs auf `app_user`/`pickup`/`partner` an.
+- `@EnableScheduling` in `BackendApplication` für den SSE-Heartbeat.
+
 ## [0.4.2] - 2026-05-07
 
 ### Changed
