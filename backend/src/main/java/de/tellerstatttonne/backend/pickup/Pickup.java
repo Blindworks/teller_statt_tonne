@@ -1,6 +1,7 @@
 package de.tellerstatttonne.backend.pickup;
 
 import de.tellerstatttonne.backend.partner.Partner;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,7 +19,8 @@ public record Pickup(
     Status status,
     int capacity,
     List<Assignment> assignments,
-    String notes
+    String notes,
+    BigDecimal savedKg
 ) {
     public enum Status { SCHEDULED, COMPLETED, CANCELLED }
 
@@ -27,6 +29,6 @@ public record Pickup(
     public Pickup withId(Long newId) {
         return new Pickup(newId, partnerId, partnerName, partnerCategory,
             partnerStreet, partnerCity, partnerLogoUrl, date,
-            startTime, endTime, status, capacity, assignments, notes);
+            startTime, endTime, status, capacity, assignments, notes, savedKg);
     }
 }

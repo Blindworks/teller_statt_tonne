@@ -7,6 +7,14 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-05-07
+
+### Added
+
+- Pro Slot eines Betriebs (`/stores/edit/:id` → Abholzeiten) lässt sich jetzt eine erwartete Menge in Kilogramm pflegen (optional, leer erlaubt). Wert wird beim Anlegen einer neuen Abholung als Default für „Gerettet (kg)" übernommen und kann dort überschrieben werden.
+- Neue Route `/statistik` (Admin/Teamleitung): zeigt insgesamt gerettete Kilogramm, Anzahl abgeschlossener Abholungen sowie Top-10-Betriebe und Top-10-Retter. Navigation in der Seitenleiste neben „Abholung-Planer".
+- Neuer `StatsService` (`/api/stats/overview`).
+
 ## [0.13.0] - 2026-05-07
 
 ### Added

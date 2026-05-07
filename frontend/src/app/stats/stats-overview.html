@@ -1,0 +1,93 @@
+<section class="max-w-6xl mx-auto p-6 space-y-6">
+  <header class="flex items-center gap-3">
+    <span class="material-symbols-outlined text-primary text-3xl">insights</span>
+    <h1 class="text-2xl font-bold text-on-surface">Statistik</h1>
+  </header>
+
+  @if (loading()) {
+    <p class="text-on-surface-variant">Lädt …</p>
+  } @else if (errorMessage()) {
+    <p class="text-error">{{ errorMessage() }}</p>
+  } @else if (data(); as d) {
+    <div class="grid gap-4 md:grid-cols-2">
+      <div class="bg-surface-container-high rounded-xl p-6">
+        <div class="text-xs uppercase tracking-wider text-on-surface-variant font-bold">
+          Insgesamt gerettet
+        </div>
+        <div class="mt-2 text-4xl font-bold text-primary">
+          {{ d.totalSavedKg | number: '1.0-2' }} kg
+        </div>
+      </div>
+      <div class="bg-surface-container-high rounded-xl p-6">
+        <div class="text-xs uppercase tracking-wider text-on-surface-variant font-bold">
+          Abgeschlossene Abholungen
+        </div>
+        <div class="mt-2 text-4xl font-bold text-on-surface">
+          {{ d.completedPickupCount }}
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-surface-container-high rounded-xl p-6">
+      <h2 class="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined">storefront</span>
+        Top-Betriebe
+      </h2>
+      @if (d.topPartners.length === 0) {
+        <p class="text-on-surface-variant text-sm">Noch keine Daten.</p>
+      } @else {
+        <table class="w-full text-sm">
+          <thead class="text-on-surface-variant text-xs uppercase tracking-wider">
+            <tr>
+              <th class="text-left py-2">Betrieb</th>
+              <th class="text-right py-2">Gerettet (kg)</th>
+              <th class="text-right py-2">Abholungen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of d.topPartners; track p.partnerId) {
+              <tr class="border-t border-outline-variant/30">
+                <td class="py-2 text-on-surface">{{ p.partnerName ?? '–' }}</td>
+                <td class="py-2 text-right font-bold">
+                  {{ p.savedKg | number: '1.0-2' }}
+                </td>
+                <td class="py-2 text-right">{{ p.pickupCount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="bg-surface-container-high rounded-xl p-6">
+      <h2 class="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined">volunteer_activism</span>
+        Top-Retter
+      </h2>
+      @if (d.topMembers.length === 0) {
+        <p class="text-on-surface-variant text-sm">Noch keine Daten.</p>
+      } @else {
+        <table class="w-full text-sm">
+          <thead class="text-on-surface-variant text-xs uppercase tracking-wider">
+            <tr>
+              <th class="text-left py-2">Retter</th>
+              <th class="text-right py-2">Gerettet (kg)</th>
+              <th class="text-right py-2">Abholungen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of d.topMembers; track m.memberId) {
+              <tr class="border-t border-outline-variant/30">
+                <td class="py-2 text-on-surface">{{ m.memberName ?? '–' }}</td>
+                <td class="py-2 text-right font-bold">
+                  {{ m.savedKg | number: '1.0-2' }}
+                </td>
+                <td class="py-2 text-right">{{ m.pickupCount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+</section>

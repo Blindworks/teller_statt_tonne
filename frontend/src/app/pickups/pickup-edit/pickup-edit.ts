@@ -30,6 +30,7 @@ type PickupForm = FormGroup<{
   status: FormControl<PickupStatus>;
   capacity: FormControl<number>;
   notes: FormControl<string>;
+  savedKg: FormControl<number | null>;
   assignments: FormArray<AssignmentForm>;
 }>;
 
@@ -252,11 +253,15 @@ export class PickupEditComponent {
   }
 
   selectSlot(slot: PickupSlot): void {
-    this.form.patchValue({
+    const patch: Partial<{ startTime: string; endTime: string; capacity: number; savedKg: number | null }> = {
       startTime: slot.startTime,
       endTime: slot.endTime,
       capacity: slot.capacity,
-    });
+    };
+    if (!this.isEdit && this.form.controls.savedKg.value == null && slot.expectedKg != null) {
+      patch.savedKg = slot.expectedKg;
+    }
+    this.form.patchValue(patch);
   }
 
   isSlotSelected(slot: PickupSlot): boolean {
@@ -337,6 +342,7 @@ export class PickupEditComponent {
         Validators.min(1),
       ]),
       notes: this.fb.nonNullable.control(defaults.notes ?? ''),
+      savedKg: this.fb.control<number | null>(defaults.savedKg, [Validators.min(0)]),
       assignments: this.fb.array<AssignmentForm>([]),
     }) as PickupForm;
   }
@@ -350,6 +356,7 @@ export class PickupEditComponent {
       status: p.status,
       capacity: p.capacity,
       notes: p.notes ?? '',
+      savedKg: p.savedKg,
     });
     this.assignments.clear();
     for (const a of p.assignments) {
@@ -377,6 +384,7 @@ export class PickupEditComponent {
       status: raw.status,
       capacity: raw.capacity,
       notes: raw.notes?.trim() ? raw.notes.trim() : null,
+      savedKg: raw.savedKg != null && !Number.isNaN(raw.savedKg) ? raw.savedKg : null,
       assignments: raw.assignments.map((a) => ({
         memberId: a.memberId,
         memberName: null,

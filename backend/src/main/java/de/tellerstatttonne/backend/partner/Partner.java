@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.partner;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record Partner(
@@ -38,13 +39,18 @@ public record Partner(
         String endTime,
         boolean active,
         int capacity,
+        BigDecimal expectedKg,
         Integer availableMemberCount
     ) {
         public PickupSlot(Weekday weekday, String startTime, String endTime, boolean active) {
-            this(weekday, startTime, endTime, active, 1, null);
+            this(weekday, startTime, endTime, active, 1, null, null);
         }
         public PickupSlot(Weekday weekday, String startTime, String endTime, boolean active, int capacity) {
-            this(weekday, startTime, endTime, active, capacity, null);
+            this(weekday, startTime, endTime, active, capacity, null, null);
+        }
+        public PickupSlot(Weekday weekday, String startTime, String endTime, boolean active,
+                          int capacity, BigDecimal expectedKg) {
+            this(weekday, startTime, endTime, active, capacity, expectedKg, null);
         }
     }
 

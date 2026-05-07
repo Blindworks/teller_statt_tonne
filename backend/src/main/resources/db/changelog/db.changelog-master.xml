@@ -18,5 +18,6 @@
     <include file="db/changelog/changes/011-partner-note.xml"/>
     <include file="db/changelog/changes/012-rename-botschafter-to-teamleiter.xml"/>
     <include file="db/changelog/changes/013-partner-application.xml"/>
+    <include file="db/changelog/changes/014-partner-slot-expected-kg.xml"/>
 
 </databaseChangeLog>

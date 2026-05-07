@@ -111,9 +111,31 @@ public class PickupService {
         }
         PickupEntity entity = new PickupEntity();
         PickupMapper.applyToEntity(entity, pickup, partner);
+        if (entity.getSavedKg() == null) {
+            entity.setSavedKg(resolveSlotExpectedKg(partner, pickup));
+        }
         PickupEntity saved = repository.save(entity);
         return PickupMapper.toDto(saved, resolveUsers(List.of(saved)));
     }
+
+    private static java.math.BigDecimal resolveSlotExpectedKg(PartnerEntity partner, Pickup pickup) {
+        if (partner.getPickupSlots() == null || pickup.date() == null) return null;
+        Partner.Weekday weekday = WEEKDAY_BY_DAY_OF_WEEK[pickup.date().getDayOfWeek().getValue() - 1];
+        return partner.getPickupSlots().stream()
+            .filter(s -> s.getWeekday() == weekday)
+            .filter(s -> java.util.Objects.equals(s.getStartTime(), pickup.startTime()))
+            .filter(s -> java.util.Objects.equals(s.getEndTime(), pickup.endTime()))
+            .map(PartnerEntity.PickupSlotEmbeddable::getExpectedKg)
+            .filter(java.util.Objects::nonNull)
+            .findFirst()
+            .orElse(null);
+    }
+
+    private static final Partner.Weekday[] WEEKDAY_BY_DAY_OF_WEEK = {
+        Partner.Weekday.MONDAY, Partner.Weekday.TUESDAY, Partner.Weekday.WEDNESDAY,
+        Partner.Weekday.THURSDAY, Partner.Weekday.FRIDAY, Partner.Weekday.SATURDAY,
+        Partner.Weekday.SUNDAY
+    };
 
     public List<Pickup> createSeries(Pickup template, LocalDate until) {
         if (template.date() == null) {
@@ -133,7 +155,7 @@ public class PickupService {
                 null, template.partnerId(), template.partnerName(), template.partnerCategory(),
                 template.partnerStreet(), template.partnerCity(), template.partnerLogoUrl(),
                 cursor, template.startTime(), template.endTime(), template.status(),
-                template.capacity(), template.assignments(), template.notes()
+                template.capacity(), template.assignments(), template.notes(), template.savedKg()
             );
             created.add(create(occurrence));
             cursor = cursor.plusWeeks(1);

@@ -39,7 +39,8 @@ final class PickupMapper {
             e.getStatus(),
             e.getCapacity(),
             assignments,
-            e.getNotes()
+            e.getNotes(),
+            e.getSavedKg()
         );
     }
 
@@ -51,6 +52,7 @@ final class PickupMapper {
         target.setStatus(src.status() != null ? src.status() : Pickup.Status.SCHEDULED);
         target.setCapacity(src.capacity());
         target.setNotes(src.notes());
+        target.setSavedKg(src.savedKg());
 
         target.getAssignments().clear();
         if (src.assignments() != null) {

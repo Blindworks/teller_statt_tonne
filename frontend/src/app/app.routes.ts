@@ -101,6 +101,12 @@ export const routes: Routes = [
         loadComponent: () => import('./profile/profile').then((m) => m.ProfileComponent),
       },
       {
+        path: 'statistik',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import('./stats/stats-overview').then((m) => m.StatsOverviewComponent),
+      },
+      {
         path: 'admin',
         canActivate: [roleGuard(['ADMINISTRATOR'])],
         loadComponent: () =>

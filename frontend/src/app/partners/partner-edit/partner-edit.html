@@ -292,6 +292,21 @@
               />
               <span class="w-10">Plätze</span>
             </label>
+            <label
+              class="flex items-center gap-2 text-xs text-on-surface-variant shrink-0"
+              [title]="'Erwartete Menge in Kilogramm pro Termin (optional, wird als Default für gerettete kg verwendet)'"
+            >
+              <span class="material-symbols-outlined text-xs">scale</span>
+              <input
+                type="number"
+                min="0"
+                step="0.5"
+                formControlName="expectedKg"
+                placeholder="–"
+                class="w-16 bg-surface-container-low border-none rounded px-2 py-1 text-sm outline-none text-center"
+              />
+              <span class="w-6">kg</span>
+            </label>
             <span
               class="ml-auto w-24 px-2 py-1 rounded-full text-[11px] font-bold flex items-center justify-center gap-1 whitespace-nowrap shrink-0"
               [class.bg-secondary-container]="slot.controls.availableMemberCount.value != null"

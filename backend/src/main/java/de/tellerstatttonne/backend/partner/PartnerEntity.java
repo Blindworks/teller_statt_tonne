@@ -132,6 +132,8 @@ public class PartnerEntity {
         private boolean active;
         @Column(nullable = false)
         private int capacity = 1;
+        @Column(name = "expected_kg", precision = 10, scale = 2)
+        private java.math.BigDecimal expectedKg;
 
         public Partner.Weekday getWeekday() { return weekday; }
         public void setWeekday(Partner.Weekday weekday) { this.weekday = weekday; }
@@ -143,5 +145,7 @@ public class PartnerEntity {
         public void setActive(boolean active) { this.active = active; }
         public int getCapacity() { return capacity; }
         public void setCapacity(int capacity) { this.capacity = capacity; }
+        public java.math.BigDecimal getExpectedKg() { return expectedKg; }
+        public void setExpectedKg(java.math.BigDecimal expectedKg) { this.expectedKg = expectedKg; }
     }
 }

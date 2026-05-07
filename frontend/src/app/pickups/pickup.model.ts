@@ -23,6 +23,7 @@ export interface Pickup {
   capacity: number;
   assignments: PickupAssignment[];
   notes: string | null;
+  savedKg: number | null;
 }
 
 export const PICKUP_STATUS_LABELS: Record<PickupStatus, string> = {
@@ -47,5 +48,6 @@ export function emptyPickup(): Pickup {
     capacity: 2,
     assignments: [],
     notes: null,
+    savedKg: null,
   };
 }

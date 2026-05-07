@@ -93,7 +93,8 @@ class PickupControllerTest {
             LocalDate.of(2026, 4, 21), "19:30", "20:00",
             Pickup.Status.SCHEDULED, 2,
             List.of(new Pickup.Assignment(memberId, null, null)),
-            "Bitte Rückseite benutzen"
+            "Bitte Rückseite benutzen",
+            null
         );
 
         Pickup created = controller.create(payload).getBody();
@@ -113,7 +114,7 @@ class PickupControllerTest {
         Pickup updatedPayload = new Pickup(
             created.id(), partnerId, null, null, null, null, null,
             created.date(), "19:30", "20:00",
-            Pickup.Status.COMPLETED, 2, created.assignments(), "done"
+            Pickup.Status.COMPLETED, 2, created.assignments(), "done", null
         );
         Pickup updated = controller.update(created.id(), updatedPayload).getBody();
         assertThat(updated).isNotNull();
@@ -129,7 +130,7 @@ class PickupControllerTest {
         Pickup bad = new Pickup(
             null, partnerId, null, null, null, null, null,
             LocalDate.of(2026, 4, 21), "20:00", "19:00",
-            Pickup.Status.SCHEDULED, 1, List.of(), null
+            Pickup.Status.SCHEDULED, 1, List.of(), null, null
         );
         assertThatThrownBy(() -> controller.create(bad))
             .isInstanceOf(IllegalArgumentException.class);
@@ -145,6 +146,7 @@ class PickupControllerTest {
                 new Pickup.Assignment(memberId, null, null),
                 new Pickup.Assignment(memberId, null, null)
             ),
+            null,
             null
         );
         assertThatThrownBy(() -> controller.create(bad))
@@ -156,7 +158,7 @@ class PickupControllerTest {
         Pickup payload = new Pickup(
             -1L, partnerId, null, null, null, null, null,
             LocalDate.of(2026, 4, 21), "10:00", "10:30",
-            Pickup.Status.SCHEDULED, 1, List.of(), null
+            Pickup.Status.SCHEDULED, 1, List.of(), null, null
         );
         assertThat(controller.update(-1L, payload).getStatusCode().value()).isEqualTo(404);
     }

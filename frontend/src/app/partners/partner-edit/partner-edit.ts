@@ -36,6 +36,7 @@ type SlotForm = FormGroup<{
   endTime: FormControl<string>;
   active: FormControl<boolean>;
   capacity: FormControl<number>;
+  expectedKg: FormControl<number | null>;
   availableMemberCount: FormControl<number | null>;
 }>;
 
@@ -173,6 +174,7 @@ export class PartnerEditComponent {
         Validators.required,
         Validators.min(0),
       ]),
+      expectedKg: this.fb.control<number | null>(slot.expectedKg ?? null, [Validators.min(0)]),
       availableMemberCount: this.fb.control<number | null>(slot.availableMemberCount ?? null),
     });
   }
@@ -287,6 +289,7 @@ export class PartnerEditComponent {
         endTime: '10:00',
         active: true,
         capacity: 1,
+        expectedKg: null,
       }),
     );
   }
@@ -312,6 +315,7 @@ export class PartnerEditComponent {
         endTime: s.endTime,
         active: s.active,
         capacity: s.capacity ?? 1,
+        expectedKg: s.expectedKg != null && !Number.isNaN(s.expectedKg) ? s.expectedKg : null,
       })),
       status: raw.status,
       latitude: this.latitude(),

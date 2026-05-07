@@ -28,6 +28,7 @@ export interface PickupSlot {
   endTime: string;
   active: boolean;
   capacity: number;
+  expectedKg: number | null;
   availableMemberCount?: number;
 }
 

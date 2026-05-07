@@ -22,7 +22,8 @@ final class PartnerMapper {
                 ? List.of()
                 : e.getPickupSlots().stream()
                     .map(s -> new Partner.PickupSlot(
-                        s.getWeekday(), s.getStartTime(), s.getEndTime(), s.isActive(), s.getCapacity()))
+                        s.getWeekday(), s.getStartTime(), s.getEndTime(), s.isActive(),
+                        s.getCapacity(), s.getExpectedKg(), null))
                     .toList(),
             e.getStatus(),
             e.getLatitude(),
@@ -58,6 +59,9 @@ final class PartnerMapper {
                 e.setEndTime(slot.endTime());
                 e.setActive(slot.active());
                 e.setCapacity(Math.max(0, slot.capacity()));
+                e.setExpectedKg(slot.expectedKg() != null && slot.expectedKg().signum() >= 0
+                    ? slot.expectedKg()
+                    : null);
                 target.getPickupSlots().add(e);
             }
         }
