@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.9] - 2026-05-07
+
+### Changed
+
+- Map-Popup: Retter sehen statt „Bearbeiten →" einen Link „Details ansehen →", der den schreibgeschützten Store-Detail-Dialog öffnet. Administratoren und Botschafter sehen weiterhin den Bearbeiten-Link.
+
 ## [0.8.8] - 2026-05-07
 
 ### Changed

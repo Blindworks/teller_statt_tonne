@@ -22,6 +22,7 @@ import {
 } from '../partners/partner.model';
 import { PartnerService } from '../partners/partner.service';
 import { AuthService } from '../auth/auth.service';
+import { StoreDetailDialogService } from '../stores/store-detail-dialog/store-detail-dialog.service';
 import { buildPartnerMarkerIcon } from './map-marker-icon';
 
 type DayFilter = 'ALL' | Weekday;
@@ -41,6 +42,7 @@ const DEFAULT_ZOOM = 13;
 export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly service = inject(PartnerService);
   private readonly auth = inject(AuthService);
+  private readonly detailDialog = inject(StoreDetailDialogService);
 
   @ViewChild('mapContainer', { static: true })
   private mapContainerRef!: ElementRef<HTMLDivElement>;
@@ -166,6 +168,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         icon: this.buildIcon(p, day === 'ALL' ? null : idx + 1),
       });
       marker.bindPopup(this.buildPopup(p));
+      marker.on('popupopen', (e: L.PopupEvent) => {
+        const el = e.popup.getElement()?.querySelector<HTMLElement>('[data-detail-id]');
+        if (!el) return;
+        el.onclick = (ev) => {
+          ev.preventDefault();
+          this.detailDialog.open(p);
+          marker.closePopup();
+        };
+      });
       markers.push(marker);
     });
     markers.forEach((m) => this.cluster!.addLayer(m));
@@ -200,8 +211,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         : '<span class="map-popup__badge">Inaktiv</span>';
     const editHref = `/stores/edit/${p.id}`;
     const isRetter = !!this.auth.currentUser()?.roles?.includes('RETTER');
-    const editLink = isRetter
-      ? ''
+    const actionLink = isRetter
+      ? `<a class="map-popup__link" href="#" data-detail-id="${p.id}">Details ansehen →</a>`
       : `<a class="map-popup__link" href="${editHref}">Bearbeiten →</a>`;
     const escape = (s: string) =>
       s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -210,7 +221,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         <div class="map-popup__title">${escape(p.name)} ${statusBadge}</div>
         <div class="map-popup__category">${escape(CATEGORY_LABELS[p.category])}</div>
         <div class="map-popup__address">${escape(p.street ?? '')}, ${escape(p.postalCode ?? '')} ${escape(p.city ?? '')}</div>
-        ${editLink}
+        ${actionLink}
       </div>
     `;
   }
