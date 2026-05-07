@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-05-07
+
+### Fixed
+
+- `AuthorizationDeniedException: Access Denied` auf Async-Dispatches (insbesondere SSE `/api/notifications/stream`): Der `JwtAuthenticationFilter` (extends `OncePerRequestFilter`) lief per Default nicht auf `ASYNC`/`ERROR`-Dispatches, sodass beim erneuten Durchlauf der Security-Filter-Chain im Stateless-Modus (kein `SecurityContextRepository`) der `SecurityContextHolder` leer war und `AuthorizationFilter` (läuft in Spring Security 7 auf allen Dispatch-Typen) den Re-Dispatch ablehnte. Filter überschreibt jetzt `shouldNotFilterAsyncDispatch()` und `shouldNotFilterErrorDispatch()` mit `false`, parst das Bearer-Token erneut aus dem mitgesendeten `Authorization`-Header und befüllt den Context.
+
 ## [0.10.0] - 2026-05-07
 
 ### Added
