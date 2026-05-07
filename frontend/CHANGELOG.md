@@ -7,6 +7,13 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-05-07
+
+### Changed
+
+- Sidebar und Mehr-Sheet: Menüpunkt „Store Zuweisungen" (`/admin/store-members`) ist nur noch für `ADMINISTRATOR` und `BOTSCHAFTER` sichtbar. Die Route ist durch `roleGuard(['ADMINISTRATOR','BOTSCHAFTER'])` geschützt; Retter werden bei Direktaufruf umgeleitet.
+- Partnerdetails-Dialog: Schließen-Button hat jetzt feste 40×40 Box mit Flex-Zentrierung, sodass der Hover-Hintergrund tatsächlich rund ist.
+
 ## [0.8.3] - 2026-05-07
 
 ### Changed

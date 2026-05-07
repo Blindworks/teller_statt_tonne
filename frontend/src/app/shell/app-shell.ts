@@ -56,6 +56,11 @@ export class AppShellComponent {
     return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
   });
 
+  readonly canSeeStoreMembers = computed(() => {
+    const roles = this.currentUser()?.roles ?? [];
+    return roles.includes('ADMINISTRATOR') || roles.includes('BOTSCHAFTER');
+  });
+
   constructor() {
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationStart) {

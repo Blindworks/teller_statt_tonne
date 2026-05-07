@@ -126,6 +126,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin/store-members',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'BOTSCHAFTER'])],
         loadComponent: () =>
           import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),
       },
