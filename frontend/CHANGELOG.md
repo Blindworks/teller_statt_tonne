@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.6] - 2026-05-07
+
+### Fixed
+
+- Build-Warnungen `NG8107` und `NG8102` in `assign-member-dialog.html` und `user-profile-dialog.component.html` beseitigt: überflüssige `?.`- und `??`-Operatoren auf `roles[0]` entfernt (`roles` ist als nicht-nullable `RoleName[]` typisiert). Verhalten unverändert.
+
 ## [0.8.5] - 2026-05-07
 
 ### Fixed
