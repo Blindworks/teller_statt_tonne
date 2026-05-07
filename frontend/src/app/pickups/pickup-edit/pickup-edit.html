@@ -5,7 +5,7 @@
         {{ isEdit ? 'Abholung bearbeiten' : 'Neue Abholung anlegen' }}
       </h3>
       <p class="text-on-surface-variant mt-1 max-w-2xl">
-        Plant eine konkrete Abholung bei einem Partner und weist Mitglieder zu.
+        Plant eine konkrete Abholung bei einem Betrieb und weist Mitglieder zu.
       </p>
     </div>
     <a
@@ -31,7 +31,7 @@
     >
       <span class="material-symbols-outlined">event_busy</span>
       <span>
-        Achtung: {{ h.name }} ({{ h.region }}) — gesetzlicher Feiertag, ggf. Store geschlossen.
+        Achtung: {{ h.name }} ({{ h.region }}) — gesetzlicher Feiertag, ggf. Betrieb geschlossen.
       </span>
     </div>
   }
@@ -68,7 +68,7 @@
         </label>
         <label class="md:col-span-2 flex flex-col gap-2">
           <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">
-            Partner *
+            Betrieb *
           </span>
           @if (!isEdit && !selectedWeekday()) {
             <p class="text-sm text-on-surface-variant px-1 py-2">
@@ -76,14 +76,14 @@
             </p>
           } @else if (!isEdit && availablePartners().length === 0) {
             <p class="text-sm text-on-surface-variant px-1 py-2">
-              An diesem Tag bietet kein Store Abholzeiten an.
+              An diesem Tag bietet kein Betrieb Abholzeiten an.
             </p>
           } @else {
             <select
               formControlName="partnerId"
               class="bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary appearance-none transition-all outline-none"
             >
-              <option [ngValue]="null" disabled>Partner wählen…</option>
+              <option [ngValue]="null" disabled>Betrieb wählen…</option>
               @for (p of availablePartners(); track p.id) {
                 <option [ngValue]="p.id">{{ p.name }}</option>
               }
@@ -124,11 +124,11 @@
             </div>
           } @else if (form.controls.partnerId.value == null) {
             <p class="text-sm text-on-surface-variant px-1 py-2">
-              Bitte zuerst einen Partner wählen.
+              Bitte zuerst einen Betrieb wählen.
             </p>
           } @else if (availableSlots().length === 0) {
             <p class="text-sm text-on-surface-variant px-1 py-2">
-              Dieser Store hat an diesem Tag keine Abholzeiten.
+              Dieser Betrieb hat an diesem Tag keine Abholzeiten.
             </p>
           } @else {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

@@ -21,6 +21,8 @@ import {
   Category,
   Partner,
   PickupSlot,
+  STATUS_LABELS,
+  STATUS_ORDER,
   Status,
   WEEKDAYS,
   Weekday,
@@ -69,13 +71,15 @@ export class PartnerEditComponent {
   readonly isAdmin = computed(() => !!this.auth.currentUser()?.roles?.includes('ADMINISTRATOR'));
   readonly partnerStatus = signal<Status | null>(null);
   readonly partnerName = signal<string>('');
-  readonly isDeleted = computed(() => this.partnerStatus() === 'DELETED');
+  readonly isDeleted = computed(() => this.partnerStatus() === 'EXISTIERT_NICHT_MEHR');
   readonly deleteDialogOpen = signal(false);
   readonly deleting = signal(false);
 
   readonly weekdays = WEEKDAYS;
   readonly categoryLabels = CATEGORY_LABELS;
   readonly categories: Category[] = ['BAKERY', 'SUPERMARKET', 'CAFE', 'RESTAURANT'];
+  readonly statusLabels = STATUS_LABELS;
+  readonly statuses = STATUS_ORDER;
 
   readonly partnerId = signal<number | null>(null);
   readonly saving = signal(false);
@@ -95,7 +99,7 @@ export class PartnerEditComponent {
       this.partnerId.set(id);
       this.service.get(id).subscribe({
         next: (partner) => this.patchForm(partner),
-        error: () => this.errorMessage.set('Partner konnte nicht geladen werden.'),
+        error: () => this.errorMessage.set('Betrieb konnte nicht geladen werden.'),
       });
     }
   }

@@ -1,5 +1,12 @@
 export type Category = 'BAKERY' | 'SUPERMARKET' | 'CAFE' | 'RESTAURANT';
-export type Status = 'ACTIVE' | 'INACTIVE' | 'DELETED';
+export type Status =
+  | 'KEIN_KONTAKT'
+  | 'VERHANDLUNGEN_LAUFEN'
+  | 'WILL_NICHT_KOOPERIEREN'
+  | 'KOOPERIERT'
+  | 'KOOPERIERT_FOODSHARING'
+  | 'SPENDET_AN_TAFEL'
+  | 'EXISTIERT_NICHT_MEHR';
 export type Weekday =
   | 'MONDAY'
   | 'TUESDAY'
@@ -63,6 +70,26 @@ export const CATEGORY_ICONS: Record<Category, string> = {
   RESTAURANT: 'local_mall',
 };
 
+export const STATUS_LABELS: Record<Status, string> = {
+  KEIN_KONTAKT: 'Kein Kontakt',
+  VERHANDLUNGEN_LAUFEN: 'Verhandlungen laufen',
+  WILL_NICHT_KOOPERIEREN: 'Will nicht kooperieren',
+  KOOPERIERT: 'Kooperiert mit uns',
+  KOOPERIERT_FOODSHARING: 'Kooperiert mit Foodsharing',
+  SPENDET_AN_TAFEL: 'Spendet an Tafel etc.',
+  EXISTIERT_NICHT_MEHR: 'Existiert nicht mehr',
+};
+
+export const STATUS_ORDER: ReadonlyArray<Status> = [
+  'KEIN_KONTAKT',
+  'VERHANDLUNGEN_LAUFEN',
+  'WILL_NICHT_KOOPERIEREN',
+  'KOOPERIERT',
+  'KOOPERIERT_FOODSHARING',
+  'SPENDET_AN_TAFEL',
+  'EXISTIERT_NICHT_MEHR',
+];
+
 export function emptyPartner(): Partner {
   return {
     id: null,
@@ -74,7 +101,7 @@ export function emptyPartner(): Partner {
     logoUrl: null,
     contact: { name: '', email: '', phone: '' },
     pickupSlots: [],
-    status: 'ACTIVE',
+    status: 'KEIN_KONTAKT',
     latitude: null,
     longitude: null,
   };

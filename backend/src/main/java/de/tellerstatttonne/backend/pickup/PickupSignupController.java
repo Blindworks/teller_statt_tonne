@@ -39,6 +39,7 @@ public class PickupSignupController {
             case CAPACITY_FULL -> ResponseEntity.status(HttpStatus.CONFLICT).build();
             case PICKUP_PAST -> ResponseEntity.status(HttpStatus.GONE).build();
             case UNASSIGN_TOO_LATE -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+            case PARTNER_NOT_COOPERATING -> ResponseEntity.status(HttpStatus.CONFLICT).build();
         };
     }
 }

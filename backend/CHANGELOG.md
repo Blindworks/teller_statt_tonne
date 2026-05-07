@@ -7,6 +7,17 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-05-07
+
+### Changed
+
+- **Breaking:** `Partner.Status` ersetzt das bisherige Lifecycle-Enum (`ACTIVE`/`INACTIVE`/`DELETED`) durch sieben Kooperationsstatus: `KEIN_KONTAKT` (Default für neu angelegte Betriebe), `VERHANDLUNGEN_LAUFEN`, `WILL_NICHT_KOOPERIEREN`, `KOOPERIERT`, `KOOPERIERT_FOODSHARING`, `SPENDET_AN_TAFEL`, `EXISTIERT_NICHT_MEHR`. `EXISTIERT_NICHT_MEHR` übernimmt die Soft-Delete-Rolle (Filterung in `findAll`/`findAllForMember`, `delete`/`restore`, `countMembersGroupedByPartner`). `restore` setzt einen wiederhergestellten Betrieb auf `KEIN_KONTAKT`. Liquibase-Changeset 010 erweitert `partner.status` auf `VARCHAR(32)` und mappt Bestandsdaten (`ACTIVE`→`KOOPERIERT`, `INACTIVE`→`VERHANDLUNGEN_LAUFEN`, `DELETED`→`EXISTIERT_NICHT_MEHR`).
+- `DashboardService.getDaySlots` zeigt Slot-Templates nur noch für Betriebe mit Status `KOOPERIERT`.
+
+### Added
+
+- Pickup-Restriktion: `PickupService.create` lehnt das Anlegen von Pickups mit `IllegalArgumentException` ab, wenn der Betrieb nicht den Status `KOOPERIERT` hat. `PickupSignupService.signup` liefert den neuen `Result.PARTNER_NOT_COOPERATING` (HTTP `409 Conflict`) zurück, wenn ein Retter sich für einen Pickup eines nicht (mehr) kooperierenden Betriebs eintragen möchte.
+
 ## [0.5.0] - 2026-05-07
 
 ### Added

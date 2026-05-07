@@ -1,13 +1,10 @@
 package de.tellerstatttonne.backend.dashboard;
 
-import de.tellerstatttonne.backend.partner.Partner;
-import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
 import de.tellerstatttonne.backend.pickup.Pickup;
 import de.tellerstatttonne.backend.pickup.PickupService;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -52,7 +49,6 @@ public class DashboardService {
 
         List<Pickup> pickups = pickupService.findBetween(from, to);
         List<DaySlot> result = new ArrayList<>();
-        Set<String> covered = new HashSet<>();
 
         for (Pickup p : pickups) {
             if (isRetter && !allowedPartnerIds.contains(p.partnerId())) continue;
@@ -65,32 +61,6 @@ public class DashboardService {
                 p.capacity(), p.assignments() == null ? List.of() : p.assignments(),
                 false, assigned
             ));
-            covered.add(coverageKey(p.date(), p.partnerId(), p.startTime(), p.endTime()));
-        }
-
-        if (!isRetter) {
-            List<PartnerEntity> activePartners = partnerRepository.findAll().stream()
-                .filter(pa -> pa.getStatus() == Partner.Status.ACTIVE)
-                .filter(pa -> pa.getPickupSlots() != null)
-                .toList();
-            for (LocalDate d = from; !d.isAfter(to); d = d.plusDays(1)) {
-                Partner.Weekday weekday = toWeekday(d.getDayOfWeek());
-                for (PartnerEntity partner : activePartners) {
-                    for (PartnerEntity.PickupSlotEmbeddable slot : partner.getPickupSlots()) {
-                        if (!slot.isActive()) continue;
-                        if (slot.getWeekday() != weekday) continue;
-                        String key = coverageKey(d, partner.getId(), slot.getStartTime(), slot.getEndTime());
-                        if (covered.contains(key)) continue;
-                        result.add(new DaySlot(
-                            null, partner.getId(), partner.getName(), partner.getCategory(),
-                            partner.getStreet(), partner.getCity(), partner.getLogoUrl(),
-                            d, slot.getStartTime(), slot.getEndTime(),
-                            slot.getCapacity(), List.of(),
-                            true, false
-                        ));
-                    }
-                }
-            }
         }
 
         result.sort(Comparator
@@ -102,13 +72,5 @@ public class DashboardService {
 
     private Set<Long> memberPartnerIds(Long userId) {
         return new HashSet<>(partnerRepository.findIdsByMemberId(userId));
-    }
-
-    private static String coverageKey(LocalDate date, Long partnerId, String startTime, String endTime) {
-        return date + "|" + partnerId + "|" + startTime + "|" + endTime;
-    }
-
-    private static Partner.Weekday toWeekday(DayOfWeek dow) {
-        return Partner.Weekday.values()[dow.getValue() - 1];
     }
 }

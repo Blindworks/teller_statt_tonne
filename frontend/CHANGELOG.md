@@ -7,6 +7,13 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-05-07
+
+### Changed
+
+- **Breaking:** `Partner.Status` ersetzt das bisherige Lifecycle-Enum (`ACTIVE`/`INACTIVE`/`DELETED`) durch sieben deutsche Kooperationsstatus (`KEIN_KONTAKT` als Default, `VERHANDLUNGEN_LAUFEN`, `WILL_NICHT_KOOPERIEREN`, `KOOPERIERT`, `KOOPERIERT_FOODSHARING`, `SPENDET_AN_TAFEL`, `EXISTIERT_NICHT_MEHR`). Neue `STATUS_LABELS`/`STATUS_ORDER`-Exports in `partner.model.ts`. Status-Dropdown in `partner-edit` listet alle sieben Werte; Status-Badge in Stores-Liste, Detail-Dialog und Karten-Popup zeigt das deutsche Label. `partner-edit.isDeleted` und `map`-Filter (`activeOnly`, Marker-Style, `findAllDeleted`-Konsumenten) prüfen jetzt `KOOPERIERT` bzw. `EXISTIERT_NICHT_MEHR`.
+- Sichtbare UI-Texte verwenden ab sofort die deutsche Bezeichnung **Betrieb / Betriebe** statt "Store(s)" oder "Partner". Betroffen: Sidebar, Mobile-Navigation, Stores-Übersicht, Betrieb-Editor, Betriebsdetails, Mitglieder-↔-Betriebe-Verwaltung, Papierkorb, Pickup-Editor, Karte, Dashboard, Verfügbarkeiten, Datenschutzerklärung. Code-Pfade (`stores/`, `partners/`) und API-Endpoints bleiben unverändert.
+
 ## [0.9.1] - 2026-05-07
 
 ### Fixed

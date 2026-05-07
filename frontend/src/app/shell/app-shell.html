@@ -84,7 +84,7 @@
         [class.hover:translate-x-1]="!storeMembersLink.isActive"
       >
         <span class="material-symbols-outlined">groups</span>
-        Store Zuweisungen
+        Mitglieder ↔ Betriebe
       </a>
     }
     @if (isAdmin()) {
@@ -111,7 +111,7 @@
         [class.hover:translate-x-1]="!deletedStoresLink.isActive"
       >
         <span class="material-symbols-outlined">delete</span>
-        Papierkorb · Partner
+        Papierkorb · Betriebe
       </a>
     }
     @if (canSeeQuizAdmin()) {
@@ -211,7 +211,7 @@
     [class.text-on-surface-variant]="!storesMob.isActive"
   >
     <span class="material-symbols-outlined">storefront</span>
-    <span class="text-[10px]">Stores</span>
+    <span class="text-[10px]">Betriebe</span>
   </a>
   <a
     routerLink="/map"
@@ -309,7 +309,7 @@
           [class.text-on-surface]="!storeMembersSheet.isActive"
         >
           <span class="material-symbols-outlined">groups</span>
-          Store Zuweisungen
+          Mitglieder ↔ Betriebe
         </a>
       }
       @if (isAdmin()) {
@@ -334,7 +334,7 @@
           [class.text-on-surface]="!deletedStoresSheet.isActive"
         >
           <span class="material-symbols-outlined">delete</span>
-          Papierkorb · Partner
+          Papierkorb · Betriebe
         </a>
       }
       @if (canSeeQuizAdmin()) {

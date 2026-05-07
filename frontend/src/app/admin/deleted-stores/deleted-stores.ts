@@ -26,7 +26,7 @@ export class DeletedStoresComponent {
   private reload(): void {
     this.service.listDeleted().subscribe({
       next: (list) => this.partners.set(list),
-      error: () => this.loadError.set('Gelöschte Partner konnten nicht geladen werden.'),
+      error: () => this.loadError.set('Geschlossene Betriebe konnten nicht geladen werden.'),
     });
   }
 

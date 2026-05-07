@@ -60,8 +60,8 @@ public class PartnerEntity {
     private List<PickupSlotEmbeddable> pickupSlots = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 16)
-    private Partner.Status status = Partner.Status.ACTIVE;
+    @Column(nullable = false, length = 32)
+    private Partner.Status status = Partner.Status.KEIN_KONTAKT;
 
     private Double latitude;
 

@@ -1,9 +1,9 @@
 <main class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
   <section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
     <div>
-      <h3 class="text-4xl font-extrabold text-on-surface leading-tight">Papierkorb · Partner</h3>
+      <h3 class="text-4xl font-extrabold text-on-surface leading-tight">Papierkorb · Betriebe</h3>
       <p class="text-on-surface-variant mt-1">
-        {{ partners().length }} gelöschte Partner. Wiederhergestellte Partner werden direkt wieder aktiv.
+        {{ partners().length }} geschlossene Betriebe. Wiederhergestellte Betriebe starten im Status »Kein Kontakt«.
       </p>
     </div>
     <a
@@ -36,8 +36,8 @@
       class="bg-surface-container-low rounded-xl p-12 text-center text-on-surface-variant"
     >
       <span class="material-symbols-outlined text-5xl text-primary mb-4">delete</span>
-      <p class="text-lg font-bold text-on-surface">Keine gelöschten Partner</p>
-      <p class="mt-1">Alle Partner sind aktiv oder inaktiv — der Papierkorb ist leer.</p>
+      <p class="text-lg font-bold text-on-surface">Keine geschlossenen Betriebe</p>
+      <p class="mt-1">Der Papierkorb ist leer.</p>
     </div>
   }
 

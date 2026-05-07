@@ -1,6 +1,7 @@
 package de.tellerstatttonne.backend.pickup;
 
 import de.tellerstatttonne.backend.notification.event.PickupUnassignedEvent;
+import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PickupSignupService {
 
-    public enum Result { OK, PICKUP_NOT_FOUND, USER_NOT_FOUND, NOT_MEMBER, CAPACITY_FULL, NOT_ASSIGNED, PICKUP_PAST, UNASSIGN_TOO_LATE }
+    public enum Result { OK, PICKUP_NOT_FOUND, USER_NOT_FOUND, NOT_MEMBER, CAPACITY_FULL, NOT_ASSIGNED, PICKUP_PAST, UNASSIGN_TOO_LATE, PARTNER_NOT_COOPERATING }
 
     private static final long UNASSIGN_CUTOFF_HOURS = 2;
 
@@ -44,6 +45,9 @@ public class PickupSignupService {
         if (pickup.getDate().isBefore(LocalDate.now())) return Result.PICKUP_PAST;
 
         PartnerEntity partner = pickup.getPartner();
+        if (partner.getStatus() != Partner.Status.KOOPERIERT) {
+            return Result.PARTNER_NOT_COOPERATING;
+        }
         boolean isMember = partner.getMembers().stream()
             .anyMatch(m -> userId.equals(m.getId()));
         if (!isMember) return Result.NOT_MEMBER;

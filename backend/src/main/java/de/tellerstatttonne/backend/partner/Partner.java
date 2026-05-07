@@ -18,7 +18,15 @@ public record Partner(
 ) {
     public enum Category { BAKERY, SUPERMARKET, CAFE, RESTAURANT }
 
-    public enum Status { ACTIVE, INACTIVE, DELETED }
+    public enum Status {
+        KEIN_KONTAKT,
+        VERHANDLUNGEN_LAUFEN,
+        WILL_NICHT_KOOPERIEREN,
+        KOOPERIERT,
+        KOOPERIERT_FOODSHARING,
+        SPENDET_AN_TAFEL,
+        EXISTIERT_NICHT_MEHR
+    }
 
     public enum Weekday { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY }
 

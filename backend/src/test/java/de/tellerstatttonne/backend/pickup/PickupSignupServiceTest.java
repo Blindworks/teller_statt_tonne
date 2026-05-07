@@ -45,7 +45,7 @@ class PickupSignupServiceTest {
             null, "Bio-Markt Sonne", Partner.Category.SUPERMARKET,
             "Hauptstraße 1", "10115", "Berlin", null,
             new Partner.Contact("Ina", "ina@example.de", "+49 30 111"),
-            List.of(), Partner.Status.ACTIVE, null, null
+            List.of(), Partner.Status.KOOPERIERT, null, null
         ));
         partnerId = partner.id();
 
@@ -173,6 +173,18 @@ class PickupSignupServiceTest {
 
         assertThat(result).isEqualTo(PickupSignupService.Result.UNASSIGN_TOO_LATE);
         assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).hasSize(1);
+    }
+
+    @Test
+    void signupRejectedWhenPartnerNotCooperating() {
+        PartnerEntity partnerEntity = partnerRepository.findById(partnerId).orElseThrow();
+        partnerEntity.setStatus(Partner.Status.VERHANDLUNGEN_LAUFEN);
+        partnerRepository.save(partnerEntity);
+
+        PickupSignupService.Result result = signupService.signup(pickupId, memberId);
+
+        assertThat(result).isEqualTo(PickupSignupService.Result.PARTNER_NOT_COOPERATING);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).isEmpty();
     }
 
     @Test

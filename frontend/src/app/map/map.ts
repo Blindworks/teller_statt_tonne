@@ -17,6 +17,7 @@ import {
   CATEGORY_LABELS,
   Category,
   Partner,
+  STATUS_LABELS,
   WEEKDAYS,
   Weekday,
 } from '../partners/partner.model';
@@ -65,7 +66,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const day = this.selectedDay();
     return this.partners().filter((p) => {
       if (!cats.has(p.category)) return false;
-      if (onlyActive && p.status !== 'ACTIVE') return false;
+      if (onlyActive && p.status !== 'KOOPERIERT') return false;
       if (day !== 'ALL') {
         const slot = p.pickupSlots.find((s) => s.weekday === day && s.active);
         if (!slot) return false;
@@ -85,7 +86,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   constructor() {
     this.service.list().subscribe({
       next: (list) => this.partners.set(list),
-      error: () => this.loadError.set('Partner konnten nicht geladen werden.'),
+      error: () => this.loadError.set('Betriebe konnten nicht geladen werden.'),
     });
 
     effect(() => {
@@ -206,9 +207,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private buildPopup(p: Partner): string {
     const statusBadge =
-      p.status === 'ACTIVE'
-        ? '<span class="map-popup__badge map-popup__badge--active">Aktiv</span>'
-        : '<span class="map-popup__badge">Inaktiv</span>';
+      p.status === 'KOOPERIERT'
+        ? `<span class="map-popup__badge map-popup__badge--active">${STATUS_LABELS[p.status]}</span>`
+        : `<span class="map-popup__badge">${STATUS_LABELS[p.status]}</span>`;
     const editHref = `/stores/edit/${p.id}`;
     const isRetter = !!this.auth.currentUser()?.roles?.includes('RETTER');
     const actionLink = isRetter

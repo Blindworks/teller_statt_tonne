@@ -2,6 +2,7 @@ package de.tellerstatttonne.backend.pickup;
 
 import de.tellerstatttonne.backend.auth.CurrentUser;
 import de.tellerstatttonne.backend.notification.event.PickupStatusChangedEvent;
+import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
 import de.tellerstatttonne.backend.user.User;
@@ -104,6 +105,10 @@ public class PickupService {
     public Pickup create(Pickup pickup) {
         validate(pickup);
         PartnerEntity partner = loadPartner(pickup.partnerId());
+        if (partner.getStatus() != Partner.Status.KOOPERIERT) {
+            throw new IllegalArgumentException(
+                "Pickups können nur für kooperierende Betriebe angelegt werden");
+        }
         PickupEntity entity = new PickupEntity();
         PickupMapper.applyToEntity(entity, pickup, partner);
         PickupEntity saved = repository.save(entity);

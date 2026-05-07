@@ -42,7 +42,7 @@ class PickupControllerTest {
             null, "Bio-Markt Sonne", Partner.Category.SUPERMARKET,
             "Hauptstraße 1", "10115", "Berlin", null,
             new Partner.Contact("Ina", "ina@example.de", "+49 30 111"),
-            List.of(), Partner.Status.ACTIVE, null, null
+            List.of(), Partner.Status.KOOPERIERT, null, null
         ));
         partnerId = partner.id();
 

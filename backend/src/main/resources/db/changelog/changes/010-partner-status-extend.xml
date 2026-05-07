@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="010-partner-status-extend" author="teller-statt-tonne">
+        <modifyDataType tableName="partner" columnName="status" newDataType="VARCHAR(32)"/>
+        <addNotNullConstraint tableName="partner" columnName="status" columnDataType="VARCHAR(32)"/>
+
+        <update tableName="partner">
+            <column name="status" value="KOOPERIERT"/>
+            <where>status = 'ACTIVE'</where>
+        </update>
+        <update tableName="partner">
+            <column name="status" value="VERHANDLUNGEN_LAUFEN"/>
+            <where>status = 'INACTIVE'</where>
+        </update>
+        <update tableName="partner">
+            <column name="status" value="EXISTIERT_NICHT_MEHR"/>
+            <where>status = 'DELETED'</where>
+        </update>
+
+        <rollback>
+            <update tableName="partner">
+                <column name="status" value="ACTIVE"/>
+                <where>status = 'KOOPERIERT'</where>
+            </update>
+            <update tableName="partner">
+                <column name="status" value="INACTIVE"/>
+                <where>status = 'VERHANDLUNGEN_LAUFEN'</where>
+            </update>
+            <update tableName="partner">
+                <column name="status" value="DELETED"/>
+                <where>status = 'EXISTIERT_NICHT_MEHR'</where>
+            </update>
+            <update tableName="partner">
+                <column name="status" value="ACTIVE"/>
+                <where>status IN ('KEIN_KONTAKT', 'WILL_NICHT_KOOPERIEREN', 'KOOPERIERT_FOODSHARING', 'SPENDET_AN_TAFEL')</where>
+            </update>
+            <modifyDataType tableName="partner" columnName="status" newDataType="VARCHAR(16)"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

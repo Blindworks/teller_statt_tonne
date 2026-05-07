@@ -17,7 +17,7 @@ public interface PartnerRepository extends JpaRepository<PartnerEntity, Long> {
     List<MemberCountRow> countMembersGroupedByPartnerExcluding(Partner.Status excluded);
 
     default List<MemberCountRow> countMembersGroupedByPartner() {
-        return countMembersGroupedByPartnerExcluding(Partner.Status.DELETED);
+        return countMembersGroupedByPartnerExcluding(Partner.Status.EXISTIERT_NICHT_MEHR);
     }
 
     @Query("select p.id from PartnerEntity p join p.members m where m.id = :userId")

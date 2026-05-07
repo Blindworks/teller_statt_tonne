@@ -49,7 +49,7 @@ class PartnerControllerTest {
             null,
             new Partner.Contact("Maren Müller", "maren@example.de", "+49 176 1234567"),
             List.of(new Partner.PickupSlot(Partner.Weekday.MONDAY, "18:30", "19:00", true)),
-            Partner.Status.ACTIVE,
+            Partner.Status.KOOPERIERT,
             null,
             null
         );
@@ -70,13 +70,13 @@ class PartnerControllerTest {
         Partner updatedPayload = new Partner(
             created.id(), "Bäckerei Sonne", Partner.Category.CAFE,
             "Hauptstraße 42", "10115", "Berlin", null,
-            payload.contact(), payload.pickupSlots(), Partner.Status.INACTIVE, null, null
+            payload.contact(), payload.pickupSlots(), Partner.Status.VERHANDLUNGEN_LAUFEN, null, null
         );
         Partner updated = controller.update(created.id(), updatedPayload).getBody();
         assertThat(updated).isNotNull();
         assertThat(updated.name()).isEqualTo("Bäckerei Sonne");
         assertThat(updated.category()).isEqualTo(Partner.Category.CAFE);
-        assertThat(updated.status()).isEqualTo(Partner.Status.INACTIVE);
+        assertThat(updated.status()).isEqualTo(Partner.Status.VERHANDLUNGEN_LAUFEN);
     }
 
     @Test
@@ -85,7 +85,7 @@ class PartnerControllerTest {
             null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
             new Partner.Contact("a", "b", "c"),
             List.of(new Partner.PickupSlot(Partner.Weekday.MONDAY, "09:00", "10:00", true)),
-            Partner.Status.ACTIVE, null, null
+            Partner.Status.KOOPERIERT, null, null
         )).getBody();
         assertThat(created).isNotNull();
 
@@ -123,7 +123,7 @@ class PartnerControllerTest {
                 new Partner.PickupSlot(Partner.Weekday.FRIDAY, "09:00", "10:00", true),
                 new Partner.PickupSlot(Partner.Weekday.FRIDAY, "17:00", "18:00", true)
             ),
-            Partner.Status.ACTIVE, null, null
+            Partner.Status.KOOPERIERT, null, null
         )).getBody();
         assertThat(created).isNotNull();
         assertThat(created.pickupSlots()).hasSize(2);
@@ -135,7 +135,7 @@ class PartnerControllerTest {
             null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
             new Partner.Contact("a", "b", "c"),
             List.of(new Partner.PickupSlot(Partner.Weekday.MONDAY, "09:00", "10:00", true)),
-            Partner.Status.ACTIVE, null, null
+            Partner.Status.KOOPERIERT, null, null
         )).getBody();
         assertThat(created).isNotNull();
 
@@ -160,7 +160,7 @@ class PartnerControllerTest {
     @Test
     void updateMissingReturns404() {
         Partner partner = new Partner(999L, "X", Partner.Category.CAFE, "s", "p", "c",
-            null, new Partner.Contact("a", "b", "c"), List.of(), Partner.Status.ACTIVE, null, null);
+            null, new Partner.Contact("a", "b", "c"), List.of(), Partner.Status.KOOPERIERT, null, null);
         assertThat(controller.update(999L, partner).getStatusCode().value()).isEqualTo(404);
     }
 }

@@ -37,7 +37,7 @@ final class PartnerMapper {
         target.setPostalCode(src.postalCode());
         target.setCity(src.city());
         target.setLogoUrl(src.logoUrl());
-        target.setStatus(src.status() != null ? src.status() : Partner.Status.ACTIVE);
+        target.setStatus(src.status() != null ? src.status() : Partner.Status.KEIN_KONTAKT);
 
         PartnerEntity.ContactEmbeddable contact = target.getContact() != null
             ? target.getContact()

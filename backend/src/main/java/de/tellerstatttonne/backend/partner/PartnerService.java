@@ -42,21 +42,21 @@ public class PartnerService {
 
     @Transactional(readOnly = true)
     public List<Partner> findAll() {
-        List<Partner> partners = repository.findAllByStatusNot(Partner.Status.DELETED).stream()
+        List<Partner> partners = repository.findAllByStatusNot(Partner.Status.EXISTIERT_NICHT_MEHR).stream()
             .map(PartnerMapper::toDto).toList();
         return enrichWithAvailability(partners);
     }
 
     @Transactional(readOnly = true)
     public List<Partner> findAllForMember(Long userId) {
-        List<Partner> partners = repository.findAllByMemberIdAndStatusNot(userId, Partner.Status.DELETED).stream()
+        List<Partner> partners = repository.findAllByMemberIdAndStatusNot(userId, Partner.Status.EXISTIERT_NICHT_MEHR).stream()
             .map(PartnerMapper::toDto).toList();
         return enrichWithAvailability(partners);
     }
 
     @Transactional(readOnly = true)
     public List<Partner> findAllDeleted() {
-        return repository.findAllByStatus(Partner.Status.DELETED).stream()
+        return repository.findAllByStatus(Partner.Status.EXISTIERT_NICHT_MEHR).stream()
             .map(PartnerMapper::toDto).toList();
     }
 
@@ -137,7 +137,7 @@ public class PartnerService {
 
     public boolean delete(Long id) {
         return repository.findById(id).map(entity -> {
-            entity.setStatus(Partner.Status.DELETED);
+            entity.setStatus(Partner.Status.EXISTIERT_NICHT_MEHR);
             repository.save(entity);
             return true;
         }).orElse(false);
@@ -145,7 +145,7 @@ public class PartnerService {
 
     public Optional<Partner> restore(Long id) {
         return repository.findById(id).map(entity -> {
-            entity.setStatus(Partner.Status.ACTIVE);
+            entity.setStatus(Partner.Status.KEIN_KONTAKT);
             return PartnerMapper.toDto(repository.save(entity));
         });
     }

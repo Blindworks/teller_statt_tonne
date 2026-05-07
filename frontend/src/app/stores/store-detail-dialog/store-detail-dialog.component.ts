@@ -17,6 +17,7 @@ import {
   CATEGORY_ICONS,
   CATEGORY_LABELS,
   PickupSlot,
+  STATUS_LABELS,
   WEEKDAYS,
   Weekday,
 } from '../../partners/partner.model';
@@ -53,6 +54,7 @@ export class StoreDetailDialogComponent implements AfterViewInit, OnDestroy {
   readonly isRetter = computed(() => !!this.auth.currentUser()?.roles?.includes('RETTER'));
   readonly categoryLabels = CATEGORY_LABELS;
   readonly categoryIcons = CATEGORY_ICONS;
+  readonly statusLabels = STATUS_LABELS;
 
   readonly activeSlots = computed<PickupSlot[]>(() => {
     const p = this.partner();

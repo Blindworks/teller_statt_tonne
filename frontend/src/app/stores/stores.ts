@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PartnerService } from '../partners/partner.service';
-import { CATEGORY_ICONS, CATEGORY_LABELS, Partner } from '../partners/partner.model';
+import { CATEGORY_ICONS, CATEGORY_LABELS, Partner, STATUS_LABELS } from '../partners/partner.model';
 import { StoreDetailDialogService } from './store-detail-dialog/store-detail-dialog.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -22,6 +22,7 @@ export class StoresComponent {
   readonly city = 'Bad Vilbel';
   readonly categoryIcons = CATEGORY_ICONS;
   readonly categoryLabels = CATEGORY_LABELS;
+  readonly statusLabels = STATUS_LABELS;
 
   readonly isRetter = computed(() => !!this.auth.currentUser()?.roles?.includes('RETTER'));
   readonly showOnlyMine = signal(this.isRetter());
@@ -42,7 +43,7 @@ export class StoresComponent {
     this.loadError.set(null);
     this.service.list(this.showOnlyMine()).subscribe({
       next: (list) => this.partners.set(list),
-      error: () => this.loadError.set('Partner konnten nicht geladen werden.'),
+      error: () => this.loadError.set('Betriebe konnten nicht geladen werden.'),
     });
   }
 

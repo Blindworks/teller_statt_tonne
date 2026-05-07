@@ -6,7 +6,7 @@ export function buildPartnerMarkerIcon(
   order: number | null = null,
 ): L.DivIcon {
   const symbol = CATEGORY_ICONS[partner.category];
-  const inactive = partner.status === 'INACTIVE' ? ' is-inactive' : '';
+  const inactive = partner.status !== 'KOOPERIERT' ? ' is-inactive' : '';
   const categoryClass = ` map-marker--${partner.category.toLowerCase()}`;
   const badge =
     order != null ? `<span class="map-marker__badge">${order}</span>` : '';
