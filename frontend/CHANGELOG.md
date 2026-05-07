@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-05-07
+
+### Fixed
+
+- Benachrichtigungs-Dropdown ragte über den linken Viewport-Rand hinaus, weil es per `absolute right-0` an der Glocke ankerte (die selbst nicht am rechten Rand sitzt). Das Panel ist jetzt grundsätzlich `fixed top-16 right-2`, am Viewport ausgerichtet: auf Mobile spannt es zwischen `left-2` und `right-2`, ab `md` ist es 320 px breit und am rechten Viewport-Rand verankert.
+
 ## [0.9.0] - 2026-05-07
 
 ### Added
