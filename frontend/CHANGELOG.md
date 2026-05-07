@@ -7,6 +7,16 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-05-07
+
+### Added
+
+- Filterleiste in der Betriebe-Übersicht (`/stores`): Textsuche über Name/Straße/PLZ/Stadt sowie Dropdown-Filter für Kategorie und Kooperationsstatus. Filter wirken clientseitig auf die geladene Liste und kombinieren sich UND-verknüpft; ein „Filter zurücksetzen"-Button erscheint, sobald ein Filter aktiv ist. Bei aktivem Filter zeigt die Kopfzeile zusätzlich `X von Y Betriebe`. Eigener Empty-State, wenn kein Treffer übrig bleibt.
+
+### Removed
+
+- Statische „Interactive Map"-Promo-Kachel am Ende der Betriebe-Übersicht (verlinkte ohnehin nur auf `/map`, deren Eintrag in der Sidebar weiterhin existiert). Die ungenutzte `mapImage`-Konstante in `stores.ts` wurde mitentfernt.
+
 ## [0.11.0] - 2026-05-07
 
 ### Added

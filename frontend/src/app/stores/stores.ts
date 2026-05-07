@@ -1,7 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PartnerService } from '../partners/partner.service';
-import { CATEGORY_ICONS, CATEGORY_LABELS, Partner, STATUS_LABELS } from '../partners/partner.model';
+import {
+  CATEGORY_ICONS,
+  CATEGORY_LABELS,
+  Category,
+  Partner,
+  STATUS_LABELS,
+  STATUS_ORDER,
+  Status,
+} from '../partners/partner.model';
 import { StoreDetailDialogService } from './store-detail-dialog/store-detail-dialog.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -27,11 +35,59 @@ export class StoresComponent {
   readonly isRetter = computed(() => !!this.auth.currentUser()?.roles?.includes('RETTER'));
   readonly showOnlyMine = signal(this.isRetter());
 
-  readonly mapImage =
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuAMqXeSyG_8qK9d_1xvLbIwbKbGx8Kt_G4BsEqUYmOLyqDSpDWCLGu_6ZSf3Q3TIL3T2aaJmaiHgC4CsYRjsQKc4iDg4_RK-1T4sK8xlbqP7mCNr3DbPNyl1-5JBg_qWehzQQCIG9W39xhnXjy3IiCVrmqUzwooBQzG1f_jPzqrOOLJ4BfOMn565V3PsrDMdU36MN4OWaxMsCL5UBhl72rrQT78UIqzIY6KgAPyZkHRzEOUNHWlmIQHTs1_O6QOgsvLm0LtQjy3cQYR';
+  readonly searchTerm = signal('');
+  readonly categoryFilter = signal<Category | 'ALL'>('ALL');
+  readonly statusFilter = signal<Status | 'ALL'>('ALL');
+
+  readonly categoryOptions: ReadonlyArray<{ value: Category; label: string }> = (
+    Object.keys(CATEGORY_LABELS) as Category[]
+  ).map((value) => ({ value, label: CATEGORY_LABELS[value] }));
+  readonly statusOptions: ReadonlyArray<{ value: Status; label: string }> = STATUS_ORDER.map(
+    (value) => ({ value, label: STATUS_LABELS[value] }),
+  );
+
+  readonly hasActiveFilters = computed(
+    () =>
+      this.searchTerm().trim().length > 0 ||
+      this.categoryFilter() !== 'ALL' ||
+      this.statusFilter() !== 'ALL',
+  );
+
+  readonly filteredPartners = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const category = this.categoryFilter();
+    const status = this.statusFilter();
+    return this.partners().filter((p) => {
+      if (category !== 'ALL' && p.category !== category) return false;
+      if (status !== 'ALL' && p.status !== status) return false;
+      if (term.length > 0) {
+        const haystack = `${p.name} ${p.street} ${p.postalCode} ${p.city}`.toLowerCase();
+        if (!haystack.includes(term)) return false;
+      }
+      return true;
+    });
+  });
 
   constructor() {
     this.loadPartners();
+  }
+
+  onSearchInput(event: Event): void {
+    this.searchTerm.set((event.target as HTMLInputElement).value);
+  }
+
+  onCategoryChange(event: Event): void {
+    this.categoryFilter.set((event.target as HTMLSelectElement).value as Category | 'ALL');
+  }
+
+  onStatusChange(event: Event): void {
+    this.statusFilter.set((event.target as HTMLSelectElement).value as Status | 'ALL');
+  }
+
+  resetFilters(): void {
+    this.searchTerm.set('');
+    this.categoryFilter.set('ALL');
+    this.statusFilter.set('ALL');
   }
 
   toggleMineFilter(): void {
