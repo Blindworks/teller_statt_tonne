@@ -95,7 +95,7 @@ export class AuthService {
       tap((user) => this.currentUserSignal.set(user)),
       catchError((err) => {
         if (err?.status === 401 || err?.status === 403) {
-          this.currentUserSignal.set(null);
+          this.clearTokens();
         }
         return of(null);
       }),

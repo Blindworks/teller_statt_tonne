@@ -4,6 +4,7 @@ import {
   ElementRef,
   HostListener,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -24,6 +25,7 @@ export class AppShellComponent {
   private readonly host = inject(ElementRef<HTMLElement>);
 
   readonly currentUser = this.auth.currentUser;
+  readonly showShell = computed(() => this.auth.isAuthenticated());
 
   readonly photoSrc = computed(() => resolvePhotoUrl(this.currentUser()?.photoUrl ?? null));
   readonly initials = computed(() => {
@@ -66,6 +68,12 @@ export class AppShellComponent {
       if (e instanceof NavigationStart) {
         this.menuOpen.set(false);
         this.moreOpen.set(false);
+      }
+    });
+
+    effect(() => {
+      if (!this.auth.isAuthenticated() && !this.auth.getAccessToken()) {
+        this.router.navigate(['/login']);
       }
     });
   }

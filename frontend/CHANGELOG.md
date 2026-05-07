@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.8.5] - 2026-05-07
+
+### Fixed
+
+- Session-Verlust führt nun zuverlässig zum Login-Screen: `authGuard` akzeptiert kein bloßes Refresh-Token mehr und wartet bei vorhandenem Access-Token auf `me()`, bevor die Shell freigegeben wird. `AuthService.me()` verwirft bei 401/403 alle Tokens. `AppShellComponent` reagiert reaktiv auf Auth-Verlust (Effect → Redirect zu `/login`) und rendert ihre interne UI nur, solange der User authentifiziert ist — kein Aufblitzen von Sidebar/Topbar nach Logout oder abgelaufener Session.
+
 ## [0.8.4] - 2026-05-07
 
 ### Changed
