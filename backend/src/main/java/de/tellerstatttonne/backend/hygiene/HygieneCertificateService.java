@@ -5,6 +5,8 @@ import de.tellerstatttonne.backend.notification.NotificationType;
 import de.tellerstatttonne.backend.role.RoleEntity;
 import de.tellerstatttonne.backend.role.RoleRepository;
 import de.tellerstatttonne.backend.storage.DocumentStorageService;
+import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
+import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,6 +14,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,19 +34,22 @@ public class HygieneCertificateService {
     private final RoleRepository roleRepository;
     private final DocumentStorageService storage;
     private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public HygieneCertificateService(
         HygieneCertificateRepository repository,
         UserRepository userRepository,
         RoleRepository roleRepository,
         DocumentStorageService storage,
-        NotificationService notificationService
+        NotificationService notificationService,
+        ApplicationEventPublisher eventPublisher
     ) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.storage = storage;
         this.notificationService = notificationService;
+        this.eventPublisher = eventPublisher;
     }
 
     public HygieneCertificateDto submit(Long userId, MultipartFile file, LocalDate issuedDate) {
@@ -135,6 +141,11 @@ public class HygieneCertificateService {
             null,
             decider.getId()
         );
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.HYGIENE_CERTIFICATE_APPROVED)
+            .actor(decider.getId(), decider.getEmail())
+            .target("HYGIENE_CERTIFICATE", saved.getId())
+            .message("Hygienezertifikat von " + user.getEmail() + " genehmigt")
+            .build());
         return HygieneCertificateMapper.toDto(saved);
     }
 
@@ -161,6 +172,11 @@ public class HygieneCertificateService {
             null,
             decider.getId()
         );
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.HYGIENE_CERTIFICATE_REJECTED)
+            .actor(decider.getId(), decider.getEmail())
+            .target("HYGIENE_CERTIFICATE", saved.getId())
+            .message("Hygienezertifikat von " + entity.getUser().getEmail() + " abgelehnt: " + trimmed)
+            .build());
         return HygieneCertificateMapper.toDto(saved);
     }
 

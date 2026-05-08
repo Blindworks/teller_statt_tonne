@@ -21,5 +21,6 @@
     <include file="db/changelog/changes/014-partner-slot-expected-kg.xml"/>
     <include file="db/changelog/changes/015-hygiene-certificate.xml"/>
     <include file="db/changelog/changes/016-password-reset-token.xml"/>
+    <include file="db/changelog/changes/017-system-log.xml"/>
 
 </databaseChangeLog>

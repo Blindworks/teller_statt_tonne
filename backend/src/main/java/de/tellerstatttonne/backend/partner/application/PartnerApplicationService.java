@@ -5,11 +5,14 @@ import de.tellerstatttonne.backend.notification.NotificationType;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerMemberService;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
+import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
+import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,19 +29,22 @@ public class PartnerApplicationService {
     private final UserRepository userRepository;
     private final PartnerMemberService memberService;
     private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PartnerApplicationService(
         PartnerApplicationRepository repository,
         PartnerRepository partnerRepository,
         UserRepository userRepository,
         PartnerMemberService memberService,
-        NotificationService notificationService
+        NotificationService notificationService,
+        ApplicationEventPublisher eventPublisher
     ) {
         this.repository = repository;
         this.partnerRepository = partnerRepository;
         this.userRepository = userRepository;
         this.memberService = memberService;
         this.notificationService = notificationService;
+        this.eventPublisher = eventPublisher;
     }
 
     public PartnerApplicationDto apply(Long partnerId, Long userId, String message) {
@@ -93,6 +99,12 @@ public class PartnerApplicationService {
         notifyApplicant(saved, NotificationType.PARTNER_APPLICATION_APPROVED,
             "Bewerbung angenommen",
             "Deine Bewerbung bei " + saved.getPartner().getName() + " wurde angenommen.");
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.PARTNER_APPLICATION_APPROVED)
+            .actor(decider.getId(), decider.getEmail())
+            .target("PARTNER_APPLICATION", saved.getId())
+            .message("Bewerbung von " + saved.getUser().getEmail() + " fuer Betrieb "
+                + saved.getPartner().getName() + " angenommen")
+            .build());
         return PartnerApplicationMapper.toDto(saved);
     }
 
@@ -112,6 +124,13 @@ public class PartnerApplicationService {
         }
         notifyApplicant(saved, NotificationType.PARTNER_APPLICATION_REJECTED,
             "Bewerbung abgelehnt", body);
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.PARTNER_APPLICATION_REJECTED)
+            .actor(decider.getId(), decider.getEmail())
+            .target("PARTNER_APPLICATION", saved.getId())
+            .message("Bewerbung von " + saved.getUser().getEmail() + " fuer Betrieb "
+                + saved.getPartner().getName() + " abgelehnt"
+                + (saved.getDecisionReason() != null ? ": " + saved.getDecisionReason() : ""))
+            .build());
         return PartnerApplicationMapper.toDto(saved);
     }
 

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 class PasswordResetServiceTest {
@@ -43,9 +44,10 @@ class PasswordResetServiceTest {
         passwordEncoder = Mockito.mock(PasswordEncoder.class);
         mailService = Mockito.mock(MailService.class);
         AppProperties props = new AppProperties(new AppProperties.Frontend("http://localhost:4200"));
+        ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         service = new PasswordResetService(
             userRepository, tokenRepository, refreshTokenRepository,
-            passwordEncoder, mailService, props
+            passwordEncoder, mailService, props, eventPublisher
         );
     }
 

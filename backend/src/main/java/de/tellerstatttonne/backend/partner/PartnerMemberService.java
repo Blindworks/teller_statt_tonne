@@ -2,6 +2,8 @@ package de.tellerstatttonne.backend.partner;
 
 import de.tellerstatttonne.backend.pickup.PickupRepository;
 import de.tellerstatttonne.backend.pickup.PickupRepository.MemberPickupStats;
+import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
+import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import java.math.BigDecimal;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,15 +24,26 @@ public class PartnerMemberService {
     private final PartnerRepository partnerRepository;
     private final UserRepository userRepository;
     private final PickupRepository pickupRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PartnerMemberService(
         PartnerRepository partnerRepository,
         UserRepository userRepository,
-        PickupRepository pickupRepository
+        PickupRepository pickupRepository,
+        ApplicationEventPublisher eventPublisher
     ) {
         this.partnerRepository = partnerRepository;
         this.userRepository = userRepository;
         this.pickupRepository = pickupRepository;
+        this.eventPublisher = eventPublisher;
+    }
+
+    private static Long currentActorId() {
+        try {
+            return de.tellerstatttonne.backend.auth.CurrentUser.requireId();
+        } catch (RuntimeException ex) {
+            return null;
+        }
     }
 
     @Transactional(readOnly = true)
@@ -59,9 +73,15 @@ public class PartnerMemberService {
         }
         PartnerEntity partner = partnerOpt.get();
         Set<UserEntity> members = partner.getMembers();
-        boolean added = members.add(userOpt.get());
+        UserEntity user = userOpt.get();
+        boolean added = members.add(user);
         if (added) {
             partnerRepository.save(partner);
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.STORE_MEMBER_ASSIGNED)
+                .actorUserId(currentActorId())
+                .target("PARTNER", partner.getId())
+                .message("Nutzer " + user.getEmail() + " dem Betrieb " + partner.getName() + " zugeordnet")
+                .build());
         }
         return AssignResult.OK;
     }

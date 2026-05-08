@@ -27,5 +27,12 @@ export class AdminDashboardComponent {
       icon: 'verified_user',
       link: '/admin/zertifikate',
     },
+    {
+      title: 'Systemlog',
+      description:
+        'Audit-Log aller systemrelevanten Aktionen: Logins, Passwort-Resets, Admin-Aktionen, Fehler.',
+      icon: 'receipt_long',
+      link: '/admin/system-log',
+    },
   ];
 }

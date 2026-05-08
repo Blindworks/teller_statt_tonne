@@ -2,6 +2,8 @@ package de.tellerstatttonne.backend.user;
 
 import de.tellerstatttonne.backend.role.RoleEntity;
 import de.tellerstatttonne.backend.role.RoleRepository;
+import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
+import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -9,6 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,12 +26,22 @@ public class UserService {
     private final UserRepository repository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     public UserService(UserRepository repository, RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder, ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
+    }
+
+    private static Long currentActorId() {
+        try {
+            return de.tellerstatttonne.backend.auth.CurrentUser.requireId();
+        } catch (RuntimeException ex) {
+            return null;
+        }
     }
 
     public User adminCreate(AdminCreateUserRequest request) {
@@ -55,7 +70,14 @@ public class UserService {
         entity.setPostalCode(request.postalCode());
         entity.setCity(request.city());
         entity.setCountry(request.country());
-        return UserMapper.toDto(repository.save(entity));
+        UserEntity saved = repository.save(entity);
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.USER_CREATED)
+            .actorUserId(currentActorId())
+            .target("USER", saved.getId())
+            .message("Nutzer angelegt: " + saved.getEmail() + " (Rollen: "
+                + String.join(",", saved.getRoleNames()) + ")")
+            .build());
+        return UserMapper.toDto(saved);
     }
 
     @Transactional(readOnly = true)
@@ -93,9 +115,27 @@ public class UserService {
     public Optional<User> update(Long id, User user) {
         return repository.findById(id).map(entity -> {
             validateProfile(user);
+            Set<String> oldRoles = new TreeSet<>(entity.getRoleNames());
             UserMapper.applyProfileToEntity(entity, user);
             entity.setRoles(resolveRoles(new HashSet<>(user.roles())));
-            return UserMapper.toDto(repository.save(entity));
+            UserEntity saved = repository.save(entity);
+            Set<String> newRoles = new TreeSet<>(saved.getRoleNames());
+            if (!oldRoles.equals(newRoles)) {
+                eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.USER_ROLES_CHANGED)
+                    .actorUserId(currentActorId())
+                    .target("USER", saved.getId())
+                    .message("Rollen geaendert fuer " + saved.getEmail() + ": "
+                        + oldRoles.stream().collect(Collectors.joining(",")) + " -> "
+                        + newRoles.stream().collect(Collectors.joining(",")))
+                    .build());
+            } else {
+                eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.USER_UPDATED)
+                    .actorUserId(currentActorId())
+                    .target("USER", saved.getId())
+                    .message("Nutzerprofil aktualisiert: " + saved.getEmail())
+                    .build());
+            }
+            return UserMapper.toDto(saved);
         });
     }
 
@@ -112,10 +152,18 @@ public class UserService {
     }
 
     public boolean delete(Long id) {
-        if (!repository.existsById(id)) {
+        Optional<UserEntity> opt = repository.findById(id);
+        if (opt.isEmpty()) {
             return false;
         }
+        UserEntity user = opt.get();
+        String email = user.getEmail();
         repository.deleteById(id);
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.USER_DELETED)
+            .actorUserId(currentActorId())
+            .target("USER", id)
+            .message("Nutzer geloescht: " + email)
+            .build());
         return true;
     }
 

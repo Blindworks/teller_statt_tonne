@@ -7,6 +7,8 @@ import de.tellerstatttonne.backend.partner.note.Visibility;
 import de.tellerstatttonne.backend.pickup.Pickup;
 import de.tellerstatttonne.backend.pickup.PickupEntity;
 import de.tellerstatttonne.backend.pickup.PickupRepository;
+import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
+import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import de.tellerstatttonne.backend.user.availability.UserAvailabilityService;
 import de.tellerstatttonne.backend.user.availability.UserAvailabilityService.SlotKey;
 import java.time.DayOfWeek;
@@ -21,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,19 +36,30 @@ public class PartnerService {
     private final UserAvailabilityService availabilityService;
     private final PickupRepository pickupRepository;
     private final PartnerNoteService partnerNoteService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PartnerService(
         PartnerRepository repository,
         GeocodingService geocodingService,
         UserAvailabilityService availabilityService,
         PickupRepository pickupRepository,
-        PartnerNoteService partnerNoteService
+        PartnerNoteService partnerNoteService,
+        ApplicationEventPublisher eventPublisher
     ) {
         this.repository = repository;
         this.geocodingService = geocodingService;
         this.availabilityService = availabilityService;
         this.pickupRepository = pickupRepository;
         this.partnerNoteService = partnerNoteService;
+        this.eventPublisher = eventPublisher;
+    }
+
+    private static Long currentActorId() {
+        try {
+            return CurrentUser.requireId();
+        } catch (RuntimeException ex) {
+            return null;
+        }
     }
 
     private static final Map<Partner.Status, String> STATUS_LABELS;
@@ -176,6 +190,11 @@ public class PartnerService {
             entity.setStatus(Partner.Status.EXISTIERT_NICHT_MEHR);
             repository.save(entity);
             recordStatusChange(id, oldStatus, Partner.Status.EXISTIERT_NICHT_MEHR);
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.STORE_DELETED)
+                .actorUserId(currentActorId())
+                .target("PARTNER", id)
+                .message("Betrieb geloescht: " + entity.getName())
+                .build());
             return true;
         }).orElse(false);
     }
@@ -186,6 +205,11 @@ public class PartnerService {
             entity.setStatus(Partner.Status.KEIN_KONTAKT);
             PartnerEntity saved = repository.save(entity);
             recordStatusChange(id, oldStatus, Partner.Status.KEIN_KONTAKT);
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.STORE_RESTORED)
+                .actorUserId(currentActorId())
+                .target("PARTNER", id)
+                .message("Betrieb wiederhergestellt: " + saved.getName())
+                .build());
             return PartnerMapper.toDto(saved);
         });
     }

@@ -7,6 +7,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-05-08
+
+### Added
+
+- Systemlog für Administratoren: Neue Tabelle `system_log` (Liquibase 017) mit Spalten für `event_type`, `severity`, `category`, `actor_user_id`/`actor_email`, `target_type`/`target_id`, `message`, `details`, `ip_address`, `user_agent`. Indizes auf `created_at`, `event_type`, `(category, created_at)`, `actor_user_id`. FK auf `app_user` mit `ON DELETE SET NULL`, sodass Logs eine Nutzer-Löschung überleben.
+- Neuer Endpoint `GET /api/admin/system-log` (nur `ADMINISTRATOR`, via `@PreAuthorize`) mit Pagination (`page`, `size`, default 50, max 200), Sortierung `createdAt DESC`, und Filtern: `category`, `eventType`, `severity`, `actorUserId`, `from`, `to` (ISO-Instants), `search` (Volltext über `message`/`actor_email`).
+- Endpoint `GET /api/admin/system-log/event-types` liefert die zulässigen Enum-Werte für Kategorie-, Severity- und Event-Type-Filter.
+- Erfasste Events: `LOGIN_SUCCESS`/`LOGIN_FAILED`/`LOGOUT`, `PASSWORD_RESET_REQUESTED`/`PASSWORD_RESET_COMPLETED`/`PASSWORD_CHANGED`, `USER_CREATED`/`USER_UPDATED`/`USER_DELETED`/`USER_ROLES_CHANGED`, `ROLE_CREATED`/`ROLE_UPDATED`/`ROLE_DELETED`, `HYGIENE_CERTIFICATE_APPROVED`/`HYGIENE_CERTIFICATE_REJECTED`, `PARTNER_APPLICATION_APPROVED`/`PARTNER_APPLICATION_REJECTED`, `STORE_DELETED`/`STORE_RESTORED`/`STORE_MEMBER_ASSIGNED`, `MAIL_DELIVERY_FAILED`, `UNHANDLED_EXCEPTION`. Veröffentlicht via `ApplicationEventPublisher`, persistiert vom synchronen `SystemLogEventListener` in einer `REQUIRES_NEW`-Transaktion (auch fehlgeschlagene Logins werden so gespeichert).
+- IP-Adresse (mit `X-Forwarded-For`-Beachtung) und `User-Agent` werden aus dem aktuellen HTTP-Request automatisch ergänzt.
+- `GlobalExceptionHandler` (`@RestControllerAdvice` mit niedrigster Priorität) fängt nicht behandelte Exceptions, schreibt sie als `UNHANDLED_EXCEPTION` (mit URI + Stacktrace, max. 4000 Zeichen) und liefert generisches `500`.
+- Auto-Cleanup-Job `SystemLogCleanupJob` löscht Einträge älter als `systemlog.retention-days` (Default 90) per Cron `systemlog.cleanup-cron` (Default `0 0 3 * * *`). Beide Properties via Umgebungsvariablen `SYSTEMLOG_RETENTION_DAYS` und `SYSTEMLOG_CLEANUP_CRON` überschreibbar; `retention-days <= 0` deaktiviert den Cleanup.
+
 ## [0.13.1] - 2026-05-08
 
 ### Fixed

@@ -3,6 +3,8 @@ package de.tellerstatttonne.backend.auth.passwordreset;
 import de.tellerstatttonne.backend.auth.RefreshTokenRepository;
 import de.tellerstatttonne.backend.config.AppProperties;
 import de.tellerstatttonne.backend.mail.MailService;
+import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
+import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import java.net.URLEncoder;
@@ -16,6 +18,7 @@ import java.util.Base64;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,7 @@ public class PasswordResetService {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final AppProperties appProperties;
+    private final ApplicationEventPublisher eventPublisher;
     private final SecureRandom random = new SecureRandom();
 
     public PasswordResetService(
@@ -41,7 +45,8 @@ public class PasswordResetService {
         RefreshTokenRepository refreshTokenRepository,
         PasswordEncoder passwordEncoder,
         MailService mailService,
-        AppProperties appProperties
+        AppProperties appProperties,
+        ApplicationEventPublisher eventPublisher
     ) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
@@ -49,6 +54,7 @@ public class PasswordResetService {
         this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
         this.appProperties = appProperties;
+        this.eventPublisher = eventPublisher;
     }
 
     public void initiate(String email) {
@@ -56,9 +62,18 @@ public class PasswordResetService {
         Optional<UserEntity> userOpt = userRepository.findByEmail(normalized);
         if (userOpt.isEmpty()) {
             log.info("Passwort-Reset angefordert fuer unbekannte Mail (still ignoriert)");
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.PASSWORD_RESET_REQUESTED)
+                .actorEmail(normalized)
+                .message("Passwort-Reset angefordert fuer unbekannte Mail")
+                .build());
             return;
         }
         UserEntity user = userOpt.get();
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.PASSWORD_RESET_REQUESTED)
+            .actor(user.getId(), user.getEmail())
+            .target("USER", user.getId())
+            .message("Passwort-Reset angefordert")
+            .build());
 
         tokenRepository.deleteByUserId(user.getId());
 
@@ -101,6 +116,11 @@ public class PasswordResetService {
 
         refreshTokenRepository.revokeAllForUser(user.getId());
         log.info("Passwort fuer User {} via Reset-Token zurueckgesetzt", user.getId());
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.PASSWORD_RESET_COMPLETED)
+            .actor(user.getId(), user.getEmail())
+            .target("USER", user.getId())
+            .message("Passwort via Reset-Token zurueckgesetzt")
+            .build());
     }
 
     private String buildResetUrl(String rawToken) {

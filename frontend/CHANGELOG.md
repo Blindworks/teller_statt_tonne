@@ -7,6 +7,15 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-05-08
+
+### Added
+
+- Admin-Seite `/admin/system-log` (`roleGuard(['ADMINISTRATOR'])`) zeigt das Backend-Systemlog read-only an. Tabelle mit Spalten Zeitpunkt, Severity (Badge: INFO grau, WARN tertiary, ERROR rot), Kategorie, Event-Typ, Akteur (E-Mail), Meldung, IP. Klick auf eine Zeile blendet Detail-Bereich (Ziel, User-Agent, Details/JSON) ein.
+- Filterleiste: Kategorie, Event-Typ, Severity, Datums-Bereich (von/bis als `<input type="date">`), Volltextsuche über Meldung und Akteur-E-Mail. Pagination mit Zurück/Weiter und 50 Einträgen pro Seite.
+- Neue Karte „Systemlog" auf `/admin`.
+- `SystemLogService` mit `list(filter, page, size)` und `metadata()` (lädt Enum-Werte für Filter-Dropdowns).
+
 ## [0.16.0] - 2026-05-08
 
 ### Added

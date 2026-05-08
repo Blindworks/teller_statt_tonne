@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="017-create-system-log" author="teller-statt-tonne">
+        <createTable tableName="system_log">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_type" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="severity" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actor_user_id" type="BIGINT"/>
+            <column name="actor_email" type="VARCHAR(255)"/>
+            <column name="target_type" type="VARCHAR(64)"/>
+            <column name="target_id" type="BIGINT"/>
+            <column name="message" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="details" type="VARCHAR(4000)"/>
+            <column name="ip_address" type="VARCHAR(45)"/>
+            <column name="user_agent" type="VARCHAR(500)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="system_log" baseColumnNames="actor_user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_system_log_actor_user" onDelete="SET NULL"/>
+
+        <createIndex tableName="system_log" indexName="idx_system_log_created_at">
+            <column name="created_at"/>
+        </createIndex>
+        <createIndex tableName="system_log" indexName="idx_system_log_event_type">
+            <column name="event_type"/>
+        </createIndex>
+        <createIndex tableName="system_log" indexName="idx_system_log_category_created">
+            <column name="category"/>
+            <column name="created_at"/>
+        </createIndex>
+        <createIndex tableName="system_log" indexName="idx_system_log_actor_user">
+            <column name="actor_user_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

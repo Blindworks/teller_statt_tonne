@@ -170,6 +170,12 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'admin/system-log',
+        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        loadComponent: () =>
+          import('./admin/system-log/admin-system-log').then((m) => m.AdminSystemLogComponent),
+      },
+      {
         path: 'admin/stores/deleted',
         canActivate: [roleGuard(['ADMINISTRATOR'])],
         loadComponent: () =>

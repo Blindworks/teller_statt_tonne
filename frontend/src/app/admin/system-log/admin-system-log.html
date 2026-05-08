@@ -1,0 +1,230 @@
+<section class="px-6 md:px-12 py-10 md:pl-80">
+  <header class="flex items-start justify-between gap-4 mb-6 flex-wrap">
+    <div>
+      <a
+        routerLink="/admin"
+        class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-2"
+      >
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Administration
+      </a>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface">Systemlog</h1>
+      <p class="text-sm text-on-surface-variant mt-2">
+        Read-Only-Audit-Log aller systemrelevanten Aktionen. Einträge werden automatisch nach 90
+        Tagen gelöscht.
+      </p>
+    </div>
+    <span class="text-sm text-on-surface-variant">
+      {{ totalElements() }} Einträge
+    </span>
+  </header>
+
+  <div
+    class="bg-surface-container-lowest rounded-2xl shadow-[0_20px_50px_rgba(48,52,40,0.04)] p-4 mb-6"
+  >
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+      <label class="flex flex-col gap-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+        Kategorie
+        <select
+          [ngModel]="filterCategory()"
+          (ngModelChange)="filterCategory.set($event)"
+          class="rounded-lg border border-outline-variant/40 bg-surface px-3 py-2 text-sm font-normal normal-case text-on-surface"
+        >
+          <option value="">Alle</option>
+          @for (c of availableCategories(); track c) {
+            <option [value]="c">{{ categoryLabels[c] }}</option>
+          }
+        </select>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+        Event
+        <select
+          [ngModel]="filterEventType()"
+          (ngModelChange)="filterEventType.set($event)"
+          class="rounded-lg border border-outline-variant/40 bg-surface px-3 py-2 text-sm font-normal normal-case text-on-surface"
+        >
+          <option value="">Alle</option>
+          @for (e of availableEventTypes(); track e) {
+            <option [value]="e">{{ eventTypeLabels[e] }}</option>
+          }
+        </select>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+        Severity
+        <select
+          [ngModel]="filterSeverity()"
+          (ngModelChange)="filterSeverity.set($event)"
+          class="rounded-lg border border-outline-variant/40 bg-surface px-3 py-2 text-sm font-normal normal-case text-on-surface"
+        >
+          <option value="">Alle</option>
+          @for (s of availableSeverities(); track s) {
+            <option [value]="s">{{ severityLabels[s] }}</option>
+          }
+        </select>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+        Von
+        <input
+          type="date"
+          [ngModel]="filterFrom()"
+          (ngModelChange)="filterFrom.set($event)"
+          class="rounded-lg border border-outline-variant/40 bg-surface px-3 py-2 text-sm font-normal normal-case text-on-surface"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+        Bis
+        <input
+          type="date"
+          [ngModel]="filterTo()"
+          (ngModelChange)="filterTo.set($event)"
+          class="rounded-lg border border-outline-variant/40 bg-surface px-3 py-2 text-sm font-normal normal-case text-on-surface"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+        Suche
+        <input
+          type="text"
+          [ngModel]="filterSearch()"
+          (ngModelChange)="filterSearch.set($event)"
+          (keyup.enter)="applyFilter()"
+          placeholder="Meldung oder E-Mail"
+          class="rounded-lg border border-outline-variant/40 bg-surface px-3 py-2 text-sm font-normal normal-case text-on-surface"
+        />
+      </label>
+    </div>
+    <div class="flex items-center justify-end gap-2 mt-4">
+      <button
+        type="button"
+        (click)="resetFilter()"
+        class="rounded-full px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
+      >
+        Zurücksetzen
+      </button>
+      <button
+        type="button"
+        (click)="applyFilter()"
+        class="inline-flex items-center gap-2 rounded-full bg-primary text-on-primary px-5 py-2 text-sm font-bold shadow hover:shadow-lg transition-all"
+      >
+        <span class="material-symbols-outlined text-base">filter_list</span>
+        Anwenden
+      </button>
+    </div>
+  </div>
+
+  @if (loadError()) {
+    <p class="mb-4 rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm">
+      {{ loadError() }}
+    </p>
+  }
+
+  <div
+    class="bg-surface-container-lowest rounded-2xl shadow-[0_20px_50px_rgba(48,52,40,0.04)] overflow-hidden"
+  >
+    <table class="w-full text-sm">
+      <thead class="bg-surface-container">
+        <tr class="text-left text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+          <th class="px-4 py-3">Zeitpunkt</th>
+          <th class="px-4 py-3">Severity</th>
+          <th class="px-4 py-3">Kategorie</th>
+          <th class="px-4 py-3">Event</th>
+          <th class="px-4 py-3">Akteur</th>
+          <th class="px-4 py-3">Meldung</th>
+          <th class="px-4 py-3">IP</th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (entry of entries(); track entry.id) {
+          <tr class="border-t border-outline-variant/20 hover:bg-surface-container/40 cursor-pointer"
+              (click)="toggleExpanded(entry.id)">
+            <td class="px-4 py-3 whitespace-nowrap text-xs tabular-nums text-on-surface-variant">
+              {{ entry.createdAt | date: 'dd.MM.yyyy HH:mm:ss' }}
+            </td>
+            <td class="px-4 py-3">
+              <span
+                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold"
+                [ngClass]="severityClass(entry.severity)"
+              >
+                {{ severityLabels[entry.severity] }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-xs">{{ categoryLabels[entry.category] }}</td>
+            <td class="px-4 py-3 text-xs font-semibold">{{ eventTypeLabels[entry.eventType] }}</td>
+            <td class="px-4 py-3 text-xs">
+              {{ entry.actorEmail || (entry.actorUserId ? '#' + entry.actorUserId : '—') }}
+            </td>
+            <td class="px-4 py-3 text-xs max-w-md truncate">{{ entry.message }}</td>
+            <td class="px-4 py-3 text-xs font-mono text-on-surface-variant">
+              {{ entry.ipAddress || '—' }}
+            </td>
+            <td class="px-4 py-3 text-right">
+              <span class="material-symbols-outlined text-base text-on-surface-variant">
+                {{ expandedId() === entry.id ? 'expand_less' : 'expand_more' }}
+              </span>
+            </td>
+          </tr>
+          @if (expandedId() === entry.id) {
+            <tr class="bg-surface-container/30 border-t border-outline-variant/20">
+              <td colspan="8" class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-xs">
+                  <div class="flex gap-2">
+                    <dt class="font-bold text-on-surface-variant min-w-32">Ziel:</dt>
+                    <dd>
+                      {{ entry.targetType ? entry.targetType + ' #' + entry.targetId : '—' }}
+                    </dd>
+                  </div>
+                  <div class="flex gap-2">
+                    <dt class="font-bold text-on-surface-variant min-w-32">User-Agent:</dt>
+                    <dd class="break-all">{{ entry.userAgent || '—' }}</dd>
+                  </div>
+                  @if (entry.details) {
+                    <div class="md:col-span-2 flex flex-col gap-1">
+                      <dt class="font-bold text-on-surface-variant">Details:</dt>
+                      <dd>
+                        <pre class="whitespace-pre-wrap break-all rounded-lg bg-surface px-3 py-2 text-xs font-mono text-on-surface">{{ entry.details }}</pre>
+                      </dd>
+                    </div>
+                  }
+                </dl>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="8" class="px-6 py-12 text-center text-on-surface-variant">
+              @if (loading()) {
+                Lade Systemlog…
+              } @else {
+                Keine Einträge gefunden.
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex items-center justify-between mt-4 text-sm text-on-surface-variant">
+    <span>
+      Seite {{ page() + 1 }} von {{ totalPages() || 1 }}
+    </span>
+    <div class="flex gap-2">
+      <button
+        type="button"
+        (click)="prev()"
+        [disabled]="!hasPrev() || loading()"
+        class="rounded-full px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Zurück
+      </button>
+      <button
+        type="button"
+        (click)="next()"
+        [disabled]="!hasNext() || loading()"
+        class="rounded-full px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Weiter
+      </button>
+    </div>
+  </div>
+</section>

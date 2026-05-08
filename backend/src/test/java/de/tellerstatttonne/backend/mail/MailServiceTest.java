@@ -15,6 +15,7 @@ import java.util.Properties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -29,7 +30,8 @@ class MailServiceTest {
         Session session = Session.getInstance(new Properties());
         when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(session));
         MailProperties props = new MailProperties("noreply@test.local", "Teller statt Tonne Test");
-        mailService = new MailService(mailSender, props);
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        mailService = new MailService(mailSender, props, publisher);
     }
 
     @Test

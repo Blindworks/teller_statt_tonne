@@ -1,5 +1,7 @@
 package de.tellerstatttonne.backend.mail;
 
+import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
+import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -7,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,10 +23,13 @@ public class MailService {
 
     private final JavaMailSender mailSender;
     private final MailProperties properties;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public MailService(JavaMailSender mailSender, MailProperties properties) {
+    public MailService(JavaMailSender mailSender, MailProperties properties,
+                       ApplicationEventPublisher eventPublisher) {
         this.mailSender = mailSender;
         this.properties = properties;
+        this.eventPublisher = eventPublisher;
     }
 
     @Async("mailExecutor")
@@ -58,6 +64,10 @@ public class MailService {
             log.info("Mail an {} gesendet (Betreff: {})", to, subject);
         } catch (MessagingException | UnsupportedEncodingException | MailException e) {
             log.error("Mail-Versand an {} fehlgeschlagen (Betreff: {}): {}", to, subject, e.getMessage(), e);
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.MAIL_DELIVERY_FAILED)
+                .message("Mail-Versand an " + to + " fehlgeschlagen (Betreff: " + subject + "): "
+                    + (e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()))
+                .build());
         }
     }
 

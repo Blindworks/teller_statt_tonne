@@ -1,5 +1,7 @@
 package de.tellerstatttonne.backend.role;
 
+import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
+import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
 import java.util.Comparator;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +20,21 @@ public class RoleService {
 
     private final RoleRepository repository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public RoleService(RoleRepository repository, UserRepository userRepository) {
+    public RoleService(RoleRepository repository, UserRepository userRepository,
+                       ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
+    }
+
+    private static Long currentActorId() {
+        try {
+            return de.tellerstatttonne.backend.auth.CurrentUser.requireId();
+        } catch (RuntimeException ex) {
+            return null;
+        }
     }
 
     @Transactional(readOnly = true)
@@ -52,7 +66,13 @@ public class RoleService {
         entity.setDescription(request.description());
         entity.setSortOrder(request.sortOrder() != null ? request.sortOrder() : 100);
         entity.setEnabled(request.enabled() == null || request.enabled());
-        return RoleMapper.toDto(repository.save(entity), 0L);
+        RoleEntity saved = repository.save(entity);
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.ROLE_CREATED)
+            .actorUserId(currentActorId())
+            .target("ROLE", saved.getId())
+            .message("Rolle angelegt: " + saved.getName())
+            .build());
+        return RoleMapper.toDto(saved, 0L);
     }
 
     public Role update(Long id, RoleUpdateRequest request) {
@@ -74,8 +94,14 @@ public class RoleService {
         entity.setDescription(request.description());
         if (request.sortOrder() != null) entity.setSortOrder(request.sortOrder());
         if (request.enabled() != null) entity.setEnabled(request.enabled());
-        return RoleMapper.toDto(repository.save(entity),
-            userCountsByRoleId().getOrDefault(entity.getId(), 0L));
+        RoleEntity saved = repository.save(entity);
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.ROLE_UPDATED)
+            .actorUserId(currentActorId())
+            .target("ROLE", saved.getId())
+            .message("Rolle aktualisiert: " + saved.getName())
+            .build());
+        return RoleMapper.toDto(saved,
+            userCountsByRoleId().getOrDefault(saved.getId(), 0L));
     }
 
     public void delete(Long id) {
@@ -92,7 +118,13 @@ public class RoleService {
                 userRepository.save(user);
             }
         }
+        String roleName = entity.getName();
         repository.delete(entity);
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.ROLE_DELETED)
+            .actorUserId(currentActorId())
+            .target("ROLE", id)
+            .message("Rolle geloescht: " + roleName)
+            .build());
     }
 
     private Map<Long, Long> userCountsByRoleId() {
