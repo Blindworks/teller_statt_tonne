@@ -7,6 +7,13 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-05-08
+
+### Added
+
+- Passwort-Reset-Flow: Neue Seiten `/forgot-password` (Mail-Eingabe, sendet an `POST /api/auth/forgot-password`, generischer Erfolgs-Hinweis) und `/reset-password/:token` (neues Passwort + Bestätigung mit Cross-Field-Validator, sendet an `POST /api/auth/reset-password`, Redirect auf `/login` nach Erfolg). Login-Seite zeigt zusätzlich den Link "Passwort vergessen?".
+- `AuthService.forgotPassword(email)` und `AuthService.resetPassword(token, newPassword)`.
+
 ## [0.15.0] - 2026-05-08
 
 ### Added

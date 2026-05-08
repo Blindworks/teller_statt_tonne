@@ -23,6 +23,16 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/login/login').then((m) => m.LoginComponent),
   },
   {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./auth/forgot-password/forgot-password').then((m) => m.ForgotPasswordComponent),
+  },
+  {
+    path: 'reset-password/:token',
+    loadComponent: () =>
+      import('./auth/reset-password/reset-password').then((m) => m.ResetPasswordComponent),
+  },
+  {
     path: 'quiz',
     loadComponent: () => import('./quiz/quiz').then((m) => m.QuizComponent),
   },

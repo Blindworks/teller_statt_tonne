@@ -58,15 +58,65 @@ class MailServiceTest {
     }
 
     @Test
-    void sendHtml_setztHtmlContentType() throws Exception {
-        mailService.sendHtml("html@example.com", "HTML", "<p>Hallo</p>");
+    void sendHtml_versendetMultipartMitHtmlUndPlainAlternative() throws Exception {
+        mailService.sendHtml("html@example.com", "HTML", "<p>Hallo &amp; willkommen</p>");
 
         ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
         verify(mailSender).send(captor.capture());
         MimeMessage sent = captor.getValue();
         sent.saveChanges();
 
-        assertThat(sent.getContentType()).contains("text/html");
+        assertThat(sent.getContentType()).contains("multipart/");
         assertThat(sent.getRecipients(Message.RecipientType.TO)[0].toString()).isEqualTo("html@example.com");
+
+        Object content = sent.getContent();
+        assertThat(content).isInstanceOf(jakarta.mail.Multipart.class);
+        jakarta.mail.Multipart mp = (jakarta.mail.Multipart) content;
+        // Im Spring-MimeMessageHelper wird ein verschachteltes alternative-Multipart erzeugt
+        boolean foundHtml = containsBodyOfType(mp, "text/html");
+        boolean foundPlain = containsBodyOfType(mp, "text/plain");
+        assertThat(foundHtml).as("HTML-Part vorhanden").isTrue();
+        assertThat(foundPlain).as("Plain-Part vorhanden").isTrue();
+    }
+
+    @Test
+    void sendHtml_mitExpliziterPlainAlternative_verwendetDiese() throws Exception {
+        mailService.sendHtml("a@b.de", "Subj", "<p>HTML-Teil</p>", "Plain-Teil");
+
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(mailSender).send(captor.capture());
+        MimeMessage sent = captor.getValue();
+        sent.saveChanges();
+
+        Object content = sent.getContent();
+        assertThat(content).isInstanceOf(jakarta.mail.Multipart.class);
+        jakarta.mail.Multipart mp = (jakarta.mail.Multipart) content;
+        assertThat(extractBodyByType(mp, "text/plain")).contains("Plain-Teil");
+        assertThat(extractBodyByType(mp, "text/html")).contains("HTML-Teil");
+    }
+
+    private static boolean containsBodyOfType(jakarta.mail.Multipart mp, String type) throws Exception {
+        for (int i = 0; i < mp.getCount(); i++) {
+            jakarta.mail.BodyPart bp = mp.getBodyPart(i);
+            if (bp.isMimeType(type)) return true;
+            Object inner = bp.getContent();
+            if (inner instanceof jakarta.mail.Multipart innerMp && containsBodyOfType(innerMp, type)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String extractBodyByType(jakarta.mail.Multipart mp, String type) throws Exception {
+        for (int i = 0; i < mp.getCount(); i++) {
+            jakarta.mail.BodyPart bp = mp.getBodyPart(i);
+            if (bp.isMimeType(type)) return bp.getContent().toString();
+            Object inner = bp.getContent();
+            if (inner instanceof jakarta.mail.Multipart innerMp) {
+                String found = extractBodyByType(innerMp, type);
+                if (found != null) return found;
+            }
+        }
+        return null;
     }
 }

@@ -1,0 +1,163 @@
+package de.tellerstatttonne.backend.auth.passwordreset;
+
+import de.tellerstatttonne.backend.auth.RefreshTokenRepository;
+import de.tellerstatttonne.backend.config.AppProperties;
+import de.tellerstatttonne.backend.mail.MailService;
+import de.tellerstatttonne.backend.user.UserEntity;
+import de.tellerstatttonne.backend.user.UserRepository;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+public class PasswordResetService {
+
+    private static final Logger log = LoggerFactory.getLogger(PasswordResetService.class);
+    private static final Duration TOKEN_TTL = Duration.ofMinutes(30);
+
+    private final UserRepository userRepository;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+    private final AppProperties appProperties;
+    private final SecureRandom random = new SecureRandom();
+
+    public PasswordResetService(
+        UserRepository userRepository,
+        PasswordResetTokenRepository tokenRepository,
+        RefreshTokenRepository refreshTokenRepository,
+        PasswordEncoder passwordEncoder,
+        MailService mailService,
+        AppProperties appProperties
+    ) {
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.mailService = mailService;
+        this.appProperties = appProperties;
+    }
+
+    public void initiate(String email) {
+        String normalized = email == null ? "" : email.trim().toLowerCase();
+        Optional<UserEntity> userOpt = userRepository.findByEmail(normalized);
+        if (userOpt.isEmpty()) {
+            log.info("Passwort-Reset angefordert fuer unbekannte Mail (still ignoriert)");
+            return;
+        }
+        UserEntity user = userOpt.get();
+
+        tokenRepository.deleteByUserId(user.getId());
+
+        String rawToken = generateRawToken();
+        PasswordResetTokenEntity entity = new PasswordResetTokenEntity();
+        entity.setTokenHash(sha256(rawToken));
+        entity.setUserId(user.getId());
+        entity.setExpiresAt(Instant.now().plus(TOKEN_TTL));
+        tokenRepository.save(entity);
+
+        String resetUrl = buildResetUrl(rawToken);
+        String subject = "Passwort zuruecksetzen";
+        String html = renderHtml(user.getFirstName(), resetUrl);
+        String plain = renderPlain(user.getFirstName(), resetUrl);
+        mailService.sendHtml(user.getEmail(), subject, html, plain);
+    }
+
+    public void reset(String rawToken, String newPassword) {
+        if (rawToken == null || rawToken.isBlank()) {
+            throw new InvalidTokenException("Ungueltiger Token");
+        }
+        String hash = sha256(rawToken);
+        PasswordResetTokenEntity token = tokenRepository.findByTokenHash(hash)
+            .orElseThrow(() -> new InvalidTokenException("Ungueltiger oder abgelaufener Token"));
+        if (token.getUsedAt() != null) {
+            throw new InvalidTokenException("Token wurde bereits verwendet");
+        }
+        if (token.getExpiresAt().isBefore(Instant.now())) {
+            throw new InvalidTokenException("Token ist abgelaufen");
+        }
+
+        UserEntity user = userRepository.findById(token.getUserId())
+            .orElseThrow(() -> new InvalidTokenException("Ungueltiger Token"));
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        token.setUsedAt(Instant.now());
+        tokenRepository.save(token);
+
+        refreshTokenRepository.revokeAllForUser(user.getId());
+        log.info("Passwort fuer User {} via Reset-Token zurueckgesetzt", user.getId());
+    }
+
+    private String buildResetUrl(String rawToken) {
+        String base = appProperties.frontend().baseUrl();
+        if (base.endsWith("/")) base = base.substring(0, base.length() - 1);
+        return base + "/reset-password/" + URLEncoder.encode(rawToken, StandardCharsets.UTF_8);
+    }
+
+    private String renderHtml(String firstName, String resetUrl) {
+        String safeName = firstName == null ? "" : firstName;
+        return "<!DOCTYPE html><html><body style=\"font-family:Arial,sans-serif;color:#222;\">"
+            + "<p>Hallo " + escape(safeName) + ",</p>"
+            + "<p>du hast eine Zuruecksetzung deines Passworts fuer <strong>Teller statt Tonne</strong> angefordert.</p>"
+            + "<p>Ueber den folgenden Link kannst du innerhalb von 30 Minuten ein neues Passwort vergeben:</p>"
+            + "<p><a href=\"" + resetUrl + "\" style=\"display:inline-block;padding:10px 16px;"
+            + "background:#4caf50;color:#fff;text-decoration:none;border-radius:6px;\">Passwort zuruecksetzen</a></p>"
+            + "<p>Wenn der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br/>"
+            + "<a href=\"" + resetUrl + "\">" + resetUrl + "</a></p>"
+            + "<p>Falls du diese Anfrage nicht gestellt hast, kannst du diese Mail ignorieren — dein Passwort bleibt unveraendert.</p>"
+            + "<p>Viele Gruesse<br/>Dein Teller-statt-Tonne-Team</p>"
+            + "</body></html>";
+    }
+
+    private String renderPlain(String firstName, String resetUrl) {
+        String safeName = firstName == null ? "" : firstName;
+        return "Hallo " + safeName + ",\n\n"
+            + "du hast eine Zuruecksetzung deines Passworts fuer Teller statt Tonne angefordert.\n\n"
+            + "Ueber den folgenden Link kannst du innerhalb von 30 Minuten ein neues Passwort vergeben:\n"
+            + resetUrl + "\n\n"
+            + "Falls du diese Anfrage nicht gestellt hast, kannst du diese Mail ignorieren - dein Passwort bleibt unveraendert.\n\n"
+            + "Viele Gruesse\n"
+            + "Dein Teller-statt-Tonne-Team\n";
+    }
+
+    private static String escape(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+    }
+
+    private String generateRawToken() {
+        byte[] bytes = new byte[32];
+        random.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private static String sha256(String value) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(value.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
+    }
+
+    public static class InvalidTokenException extends RuntimeException {
+        public InvalidTokenException(String message) {
+            super(message);
+        }
+    }
+}

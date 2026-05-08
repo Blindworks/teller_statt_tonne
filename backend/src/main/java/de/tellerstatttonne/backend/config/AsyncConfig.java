@@ -10,7 +10,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @EnableAsync
-@EnableConfigurationProperties(MailProperties.class)
+@EnableConfigurationProperties({MailProperties.class, AppProperties.class})
 public class AsyncConfig {
 
     @Bean(name = "mailExecutor")

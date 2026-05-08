@@ -7,6 +7,24 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-05-08
+
+### Fixed
+
+- `GET /api/hygiene-certificates` ohne `status`-Param lieferte nur `PENDING`-Einträge zurück (Default im Service). Ohne Filter werden jetzt alle Zertifikate per `findAllByOrderByCreatedAtAsc` zurückgegeben — der „Alle"-Filter in `/admin/zertifikate` zeigt damit auch genehmigte und abgelehnte Einträge.
+
+## [0.13.0] - 2026-05-08
+
+### Added
+
+- Passwort-Reset-Flow: Neue Endpoints `POST /api/auth/forgot-password` (Body `{email}`, antwortet immer `204` — keine User-Enumeration) und `POST /api/auth/reset-password` (Body `{token, newPassword}`, `204` bei Erfolg, `400` bei ungültigem/abgelaufenem Token). Token-Lebensdauer 30 Min, vorhandene Tokens des Users werden bei einer neuen Anfrage gelöscht. Beim erfolgreichen Reset werden alle Refresh-Tokens des Users widerrufen. Mail enthält Link auf `${app.frontend.base-url}/reset-password/{token}`.
+- Liquibase-Changeset 016 legt Tabelle `password_reset_token` (Hash, `expires_at`, `used_at`, FK auf `app_user` mit `ON DELETE CASCADE`) und Index auf `user_id` an.
+- `AppProperties` (`prefix=app`, Sub-Record `Frontend(baseUrl)`); neue Property `app.frontend.base-url` (Default `http://localhost:4200`, Override via `FRONTEND_BASE_URL`) für Link-Erzeugung in Mails.
+
+### Changed
+
+- `MailService.sendHtml` versendet HTML jetzt als Multipart-Mail mit zusätzlichem Plain-Text-Part — entweder explizit übergeben (`sendHtml(to, subject, html, plain)`) oder automatisch aus dem HTML abgeleitet. Verbessert Spam-Score und Lesbarkeit in Text-only-Clients.
+
 ## [0.12.0] - 2026-05-08
 
 ### Added

@@ -9,6 +9,10 @@ Für die technische Detailansicht siehe [`backend/CHANGELOG.md`](backend/CHANGEL
 
 ### Neu
 
+- **Passwort vergessen?** Auf der Login-Seite gibt es jetzt unter dem Anmelden-Button den Link „Passwort vergessen?". Wer ihn anklickt, gibt seine E-Mail ein und bekommt — sofern die Adresse bei uns registriert ist — eine Mail mit einem Reset-Link. Der Link ist 30 Minuten gültig und führt auf eine Seite, auf der ein neues Passwort gesetzt werden kann. Aus Sicherheitsgründen werden nach erfolgreichem Reset alle bestehenden Anmeldungen abgemeldet. *Was heißt das fürs Team?* Niemand muss mehr beim Admin betteln, wenn er sein Passwort vergessen hat — der Self-Service erledigt das.
+
+> Hinweis: Ob die Mail wirklich verschickt wird, hängt davon ab, dass auf dem Server SMTP-Zugangsdaten hinterlegt sind. Falls jemand einen Reset auslöst und keine Mail bekommt, kurz beim Entwicklerteam melden.
+
 - **Logo-Upload für Betriebe.** Im Betrieb-Editor (✏️ Bearbeiten-Button auf einem Betrieb) lässt sich jetzt direkt eine Bilddatei als Logo hochladen — JPG, PNG, WebP oder GIF, bis 5 MB. Das bisherige URL-Feld bleibt parallel bestehen, falls man lieber einen Link einträgt. Hochgeladene Logos erscheinen sofort in der Betriebe-Liste, im Detail-Dialog, im Dashboard und in der Mitglieder-Verwaltung. *Was heißt das fürs Team?* Niemand muss mehr ein Logo erst irgendwo extern hosten — Datei auswählen, fertig.
 
 > Hinweis: Bei einem **neuen** Betrieb erst einmal speichern, dann ist der Upload-Button aktiv.

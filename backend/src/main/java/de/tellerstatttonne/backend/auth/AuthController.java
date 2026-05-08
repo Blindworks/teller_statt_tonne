@@ -4,6 +4,9 @@ import de.tellerstatttonne.backend.auth.AuthDtos.AuthResponse;
 import de.tellerstatttonne.backend.auth.AuthDtos.ChangePasswordRequest;
 import de.tellerstatttonne.backend.auth.AuthDtos.LoginRequest;
 import de.tellerstatttonne.backend.auth.AuthDtos.RefreshRequest;
+import de.tellerstatttonne.backend.auth.passwordreset.PasswordResetDtos.ForgotPasswordRequest;
+import de.tellerstatttonne.backend.auth.passwordreset.PasswordResetDtos.ResetPasswordRequest;
+import de.tellerstatttonne.backend.auth.passwordreset.PasswordResetService;
 import de.tellerstatttonne.backend.user.User;
 import de.tellerstatttonne.backend.user.UserRepository;
 import jakarta.validation.Valid;
@@ -24,10 +27,16 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final PasswordResetService passwordResetService;
 
-    public AuthController(AuthService authService, UserRepository userRepository) {
+    public AuthController(
+        AuthService authService,
+        UserRepository userRepository,
+        PasswordResetService passwordResetService
+    ) {
         this.authService = authService;
         this.userRepository = userRepository;
+        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/login")
@@ -70,6 +79,18 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        passwordResetService.initiate(request.email());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        passwordResetService.reset(request.token(), request.newPassword());
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
@@ -78,5 +99,12 @@ public class AuthController {
     @ExceptionHandler(AuthService.BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentials(AuthService.BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(de.tellerstatttonne.backend.auth.passwordreset.PasswordResetService.InvalidTokenException.class)
+    public ResponseEntity<String> handleInvalidToken(
+        de.tellerstatttonne.backend.auth.passwordreset.PasswordResetService.InvalidTokenException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

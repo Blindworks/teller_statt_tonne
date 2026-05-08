@@ -28,26 +28,52 @@ public class MailService {
 
     @Async("mailExecutor")
     public void sendPlainText(String to, String subject, String body) {
-        send(to, subject, body, false);
+        sendInternal(to, subject, body, null);
     }
 
     @Async("mailExecutor")
     public void sendHtml(String to, String subject, String html) {
-        send(to, subject, html, true);
+        sendInternal(to, subject, htmlToPlain(html), html);
     }
 
-    private void send(String to, String subject, String content, boolean html) {
+    @Async("mailExecutor")
+    public void sendHtml(String to, String subject, String html, String plainText) {
+        sendInternal(to, subject, plainText, html);
+    }
+
+    private void sendInternal(String to, String subject, String plainText, String html) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, false, StandardCharsets.UTF_8.name());
+            boolean multipart = html != null;
+            MimeMessageHelper helper = new MimeMessageHelper(message, multipart, StandardCharsets.UTF_8.name());
             helper.setFrom(new InternetAddress(properties.from(), properties.fromName(), StandardCharsets.UTF_8.name()));
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(content, html);
+            if (multipart) {
+                helper.setText(plainText, html);
+            } else {
+                helper.setText(plainText, false);
+            }
             mailSender.send(message);
             log.info("Mail an {} gesendet (Betreff: {})", to, subject);
         } catch (MessagingException | UnsupportedEncodingException | MailException e) {
             log.error("Mail-Versand an {} fehlgeschlagen (Betreff: {}): {}", to, subject, e.getMessage(), e);
         }
+    }
+
+    private static String htmlToPlain(String html) {
+        if (html == null) return "";
+        String text = html
+            .replaceAll("(?i)<br\\s*/?>", "\n")
+            .replaceAll("(?i)</p\\s*>", "\n\n")
+            .replaceAll("(?i)</li\\s*>", "\n")
+            .replaceAll("<[^>]+>", "")
+            .replace("&nbsp;", " ")
+            .replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'");
+        return text.replaceAll("[ \\t]+\n", "\n").replaceAll("\n{3,}", "\n\n").trim();
     }
 }

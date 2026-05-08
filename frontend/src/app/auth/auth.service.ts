@@ -114,6 +114,14 @@ export class AuthService {
     return this.http.put<void>(`${this.baseUrl}/password`, { oldPassword, newPassword });
   }
 
+  forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/reset-password`, { token, newPassword });
+  }
+
   logout(): Observable<void> {
     const refreshToken = this.refreshTokenSignal();
     this.clearTokens();
