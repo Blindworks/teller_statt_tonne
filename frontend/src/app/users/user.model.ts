@@ -3,7 +3,7 @@ export type RoleName = string;
 export type Role = RoleName;
 
 export type OnlineStatus = 'ONLINE' | 'AWAY' | 'ON_BREAK' | 'OFFLINE';
-export type UserStatus = 'ACTIVE' | 'PENDING' | 'INACTIVE';
+export type UserStatus = 'PENDING' | 'ACTIVE' | 'PAUSED' | 'LEFT' | 'REMOVED';
 
 export interface RoleOption {
   value: RoleName;
@@ -24,6 +24,8 @@ export interface User {
   photoUrl: string | null;
   onlineStatus: OnlineStatus;
   status: UserStatus;
+  introductionCompletedAt: string | null;
+  hygieneApproved: boolean;
   tags: string[];
 }
 
@@ -35,13 +37,15 @@ export const ONLINE_STATUS_LABELS: Record<OnlineStatus, string> = {
 };
 
 export const USER_STATUS_LABELS: Record<UserStatus, string> = {
+  PENDING: 'Im Onboarding',
   ACTIVE: 'Aktiv',
-  PENDING: 'Ausstehend',
-  INACTIVE: 'Inaktiv',
+  PAUSED: 'Pausiert',
+  LEFT: 'Ausgetreten',
+  REMOVED: 'Entfernt',
 };
 
 export const ONLINE_STATUSES: OnlineStatus[] = ['ONLINE', 'AWAY', 'ON_BREAK', 'OFFLINE'];
-export const USER_STATUSES: UserStatus[] = ['ACTIVE', 'PENDING', 'INACTIVE'];
+export const USER_STATUSES: UserStatus[] = ['PENDING', 'ACTIVE', 'PAUSED', 'LEFT', 'REMOVED'];
 
 export function emptyUser(defaultRole: RoleName = 'RETTER'): User {
   return {
@@ -57,7 +61,9 @@ export function emptyUser(defaultRole: RoleName = 'RETTER'): User {
     country: '',
     photoUrl: null,
     onlineStatus: 'OFFLINE',
-    status: 'ACTIVE',
+    status: 'PENDING',
+    introductionCompletedAt: null,
+    hygieneApproved: false,
     tags: [],
   };
 }

@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import {
   FormArray,
@@ -19,7 +20,6 @@ import {
   OnlineStatus,
   RoleName,
   RoleOption,
-  USER_STATUSES,
   USER_STATUS_LABELS,
   User,
   UserStatus,
@@ -39,13 +39,12 @@ type UserForm = FormGroup<{
   country: FormControl<string>;
   photoUrl: FormControl<string>;
   onlineStatus: FormControl<OnlineStatus>;
-  status: FormControl<UserStatus>;
   tags: FormArray<FormControl<string>>;
 }>;
 
 @Component({
   selector: 'app-user-edit',
-  imports: [ReactiveFormsModule, RouterLink, UserAvailabilityComponent],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink, UserAvailabilityComponent],
   templateUrl: './user-edit.html',
   styleUrl: './user-edit.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,15 +60,24 @@ export class UserEditComponent {
   readonly roles = signal<RoleOption[]>([]);
   readonly onlineStatuses = ONLINE_STATUSES;
   readonly onlineStatusLabels = ONLINE_STATUS_LABELS;
-  readonly userStatuses = USER_STATUSES;
   readonly userStatusLabels = USER_STATUS_LABELS;
+  readonly lifecycleSteps: Array<{ status: UserStatus }> = [
+    { status: 'PENDING' },
+    { status: 'ACTIVE' },
+    { status: 'PAUSED' },
+    { status: 'LEFT' },
+    { status: 'REMOVED' },
+  ];
 
   readonly userId = signal<number | null>(null);
   readonly saving = signal(false);
   readonly deleting = signal(false);
+  readonly transitioning = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly currentUser = signal<User | null>(null);
 
   readonly isAdmin = computed(() => !!this.auth.currentUser()?.roles?.includes('ADMINISTRATOR'));
+  readonly isSelf = computed(() => this.auth.currentUser()?.id === this.userId());
 
   readonly form: UserForm = this.buildForm();
 
@@ -92,7 +100,10 @@ export class UserEditComponent {
       this.userId.set(id);
       this.form.controls.password.disable();
       this.service.get(id).subscribe({
-        next: (user) => this.patchForm(user),
+        next: (user) => {
+          this.currentUser.set(user);
+          this.patchForm(user);
+        },
         error: () => this.errorMessage.set('Nutzer konnte nicht geladen werden.'),
       });
     } else {
@@ -149,6 +160,92 @@ export class UserEditComponent {
     });
   }
 
+  statusBadgeClass(status: UserStatus): string {
+    switch (status) {
+      case 'ACTIVE':
+        return 'bg-primary-container text-on-primary-container';
+      case 'PENDING':
+        return 'bg-surface-container-high text-on-surface-variant';
+      case 'PAUSED':
+        return 'bg-tertiary-container text-on-tertiary-container';
+      case 'LEFT':
+      case 'REMOVED':
+        return 'bg-error-container text-on-error-container';
+    }
+  }
+
+  async confirmIntroduction(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'Einführungsgespräch bestätigen',
+      message: 'Hat der Nutzer am Einführungsgespräch teilgenommen?',
+      confirmLabel: 'Bestätigen',
+    });
+    if (!ok) return;
+    this.runTransition(this.service.markIntroductionCompleted(id), 'Einführung konnte nicht bestätigt werden.');
+  }
+
+  async pauseUser(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'Nutzer pausieren',
+      message: 'Nutzer pausieren? Er nimmt dann keine Pickups mehr wahr, kann aber später reaktiviert werden.',
+      confirmLabel: 'Pausieren',
+    });
+    if (!ok) return;
+    this.runTransition(this.service.pause(id), 'Pausieren fehlgeschlagen.');
+  }
+
+  async reactivateUser(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    this.runTransition(this.service.reactivate(id), 'Reaktivieren fehlgeschlagen.');
+  }
+
+  async leaveUser(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'Austritt bestätigen',
+      message: 'Den Nutzer als ausgetreten markieren? Dieser Schritt ist endgültig.',
+      confirmLabel: 'Austritt',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.runTransition(this.service.leave(id), 'Austritt fehlgeschlagen.');
+  }
+
+  async removeUser(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'Nutzer entfernen',
+      message: 'Den Nutzer aus dem Team entfernen? Dieser Schritt ist endgültig.',
+      confirmLabel: 'Entfernen',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.runTransition(this.service.remove(id), 'Entfernen fehlgeschlagen.');
+  }
+
+  private runTransition(req$: ReturnType<UserService['pause']>, errorMsg: string): void {
+    this.transitioning.set(true);
+    this.errorMessage.set(null);
+    req$.subscribe({
+      next: (user) => {
+        this.transitioning.set(false);
+        this.currentUser.set(user);
+        this.patchForm(user);
+      },
+      error: (err) => {
+        this.transitioning.set(false);
+        this.errorMessage.set(typeof err?.error === 'string' && err.error ? err.error : errorMsg);
+      },
+    });
+  }
+
   async delete(): Promise<void> {
     const id = this.userId();
     if (!id) return;
@@ -187,7 +284,6 @@ export class UserEditComponent {
       country: this.fb.nonNullable.control(defaults.country ?? ''),
       photoUrl: this.fb.nonNullable.control(''),
       onlineStatus: this.fb.nonNullable.control<OnlineStatus>(defaults.onlineStatus),
-      status: this.fb.nonNullable.control<UserStatus>(defaults.status),
       tags: this.fb.array<FormControl<string>>([]),
     });
   }
@@ -205,7 +301,6 @@ export class UserEditComponent {
       country: user.country ?? '',
       photoUrl: user.photoUrl ?? '',
       onlineStatus: user.onlineStatus,
-      status: user.status,
     });
     this.tagsArray.clear();
     for (const tag of user.tags ?? []) {
@@ -215,6 +310,7 @@ export class UserEditComponent {
 
   private toUser(): User {
     const raw = this.form.getRawValue();
+    const existing = this.currentUser();
     return {
       id: this.userId(),
       firstName: raw.firstName,
@@ -228,7 +324,9 @@ export class UserEditComponent {
       country: raw.country || null,
       photoUrl: raw.photoUrl?.trim() ? raw.photoUrl.trim() : null,
       onlineStatus: raw.onlineStatus,
-      status: raw.status,
+      status: existing?.status ?? 'PENDING',
+      introductionCompletedAt: existing?.introductionCompletedAt ?? null,
+      hygieneApproved: existing?.hygieneApproved ?? false,
       tags: raw.tags.map((t) => t.trim()).filter((t) => t.length > 0),
     };
   }

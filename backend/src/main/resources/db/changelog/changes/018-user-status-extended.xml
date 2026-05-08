@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="018-add-introduction-completed-at" author="teller-statt-tonne">
+        <addColumn tableName="app_user">
+            <column name="introduction_completed_at" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="018-migrate-user-status-inactive-to-left" author="teller-statt-tonne">
+        <update tableName="app_user">
+            <column name="status" value="LEFT"/>
+            <where>status = 'INACTIVE'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="018-change-user-status-default-to-pending" author="teller-statt-tonne">
+        <addDefaultValue tableName="app_user" columnName="status" defaultValue="PENDING"/>
+    </changeSet>
+
+</databaseChangeLog>

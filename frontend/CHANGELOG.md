@@ -7,6 +7,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-05-08
+
+### Added
+
+- Erweiterter User-Status: `UserStatus` umfasst jetzt `PENDING`, `ACTIVE`, `PAUSED`, `LEFT` und `REMOVED`. Im User-Edit zeigt ein Statusabschnitt ein Status-Badge, bei `PENDING` zusätzlich den Onboarding-Fortschritt mit Häkchen für Einführungsgespräch und Hygienezertifikat.
+- Kontextabhängige Aktions-Buttons im User-Edit (alle über die eigene `ConfirmDialogService`): „Einführung bestätigen", „Pausieren", „Reaktivieren", „Austreten", „Entfernen". Die Buttons rufen die neuen Endpoints `POST /api/users/{id}/introduction-completed`, `/pause`, `/reactivate`, `/leave`, `/remove` auf.
+- `UserService` (Frontend) mit neuen Methoden `markIntroductionCompleted`, `pause`, `reactivate`, `leave`, `remove`. `User` hat zwei neue Felder `introductionCompletedAt` und `hygieneApproved`.
+
+### Changed
+
+- Status-Dropdown im User-Edit-Formular entfernt — Status-Wechsel laufen ausschließlich über die dedizierten Aktions-Buttons.
+
 ## [0.17.0] - 2026-05-08
 
 ### Added

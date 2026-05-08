@@ -22,5 +22,6 @@
     <include file="db/changelog/changes/015-hygiene-certificate.xml"/>
     <include file="db/changelog/changes/016-password-reset-token.xml"/>
     <include file="db/changelog/changes/017-system-log.xml"/>
+    <include file="db/changelog/changes/018-user-status-extended.xml"/>
 
 </databaseChangeLog>

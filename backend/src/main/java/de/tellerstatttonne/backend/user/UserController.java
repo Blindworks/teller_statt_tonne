@@ -82,6 +82,41 @@ public class UserController {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
+    @PostMapping("/{id}/introduction-completed")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
+    public ResponseEntity<User> markIntroductionCompleted(@PathVariable Long id) {
+        return ResponseEntity.ok(service.markIntroductionCompleted(id));
+    }
+
+    @PostMapping("/{id}/pause")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
+    public ResponseEntity<User> pause(@PathVariable Long id) {
+        return ResponseEntity.ok(service.pause(id));
+    }
+
+    @PostMapping("/{id}/reactivate")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
+    public ResponseEntity<User> reactivate(@PathVariable Long id) {
+        return ResponseEntity.ok(service.reactivate(id));
+    }
+
+    @PostMapping("/{id}/leave")
+    public ResponseEntity<User> leave(@PathVariable Long id, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!isAuthorizedForUser(authentication, id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(service.markLeft(id));
+    }
+
+    @PostMapping("/{id}/remove")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
+    public ResponseEntity<User> remove(@PathVariable Long id) {
+        return ResponseEntity.ok(service.remove(id));
+    }
+
     @PostMapping("/{id}/photo")
     public ResponseEntity<User> uploadPhoto(
         @PathVariable Long id,
@@ -118,5 +153,15 @@ public class UserController {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleConflict(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(jakarta.persistence.EntityNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(jakarta.persistence.EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

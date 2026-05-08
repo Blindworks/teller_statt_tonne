@@ -8,6 +8,10 @@ public final class UserMapper {
     private UserMapper() {}
 
     public static User toDto(UserEntity e) {
+        return toDto(e, false);
+    }
+
+    public static User toDto(UserEntity e, boolean hygieneApproved) {
         return new User(
             e.getId(),
             e.getEmail(),
@@ -22,6 +26,8 @@ public final class UserMapper {
             e.getPhotoUrl(),
             e.getOnlineStatus(),
             e.getStatus(),
+            e.getIntroductionCompletedAt(),
+            hygieneApproved,
             e.getTags() == null ? List.of() : List.copyOf(e.getTags())
         );
     }
@@ -29,6 +35,8 @@ public final class UserMapper {
     /**
      * Updates non-role profile fields. Role assignment is handled separately
      * by {@code UserService} so it can resolve role names to entities.
+     * Status changes go through the dedicated transition methods on
+     * {@code UserService} and are intentionally not applied here.
      */
     public static void applyProfileToEntity(UserEntity target, User src) {
         target.setFirstName(src.firstName());
@@ -44,7 +52,6 @@ public final class UserMapper {
         target.setPhotoUrl(src.photoUrl());
         target.setOnlineStatus(
             src.onlineStatus() != null ? src.onlineStatus() : UserEntity.OnlineStatus.OFFLINE);
-        target.setStatus(src.status() != null ? src.status() : UserEntity.Status.ACTIVE);
 
         target.getTags().clear();
         if (src.tags() != null) {

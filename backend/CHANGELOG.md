@@ -7,6 +7,20 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-05-08
+
+### Added
+
+- Erweiterter User-Lebenszyklus: `UserEntity.Status`-Enum auf `PENDING`, `ACTIVE`, `PAUSED`, `LEFT`, `REMOVED` umgestellt. Neue Spalte `app_user.introduction_completed_at` (Liquibase 018) erfasst, wann ein Admin/Teamleiter das Einführungsgespräch bestätigt hat. Liquibase migriert bestehendes `INACTIVE` nach `LEFT` und setzt den Default auf `PENDING`, sodass neu angelegte Konten das Onboarding explizit durchlaufen.
+- Neue dedizierte Übergangs-Endpoints am `UserController` (alle `ADMINISTRATOR`/`TEAMLEITER`-only, `leave` zusätzlich für den Nutzer selbst): `POST /api/users/{id}/introduction-completed`, `/pause`, `/reactivate`, `/leave`, `/remove`. Jeder Übergang validiert den Quell-Status und antwortet bei unzulässigen Wechseln mit `409 Conflict`.
+- `UserService.promoteToActiveIfReady` setzt einen Nutzer automatisch auf `ACTIVE`, sobald `introductionCompletedAt != null` und ein `APPROVED`-Hygienezertifikat vorliegt; aufgerufen aus `markIntroductionCompleted` und nach `HygieneCertificateService.approve`.
+- `UserResponse`-DTO um `introductionCompletedAt` (Instant) und `hygieneApproved` (boolean, abgeleitet aus `HygieneCertificate`) erweitert, damit das Frontend den Onboarding-Fortschritt anzeigen kann.
+- Neuer Systemlog-Eventtyp `USER_STATUS_CHANGED` für jeden Statuswechsel.
+
+### Changed
+
+- `PUT /api/users/{id}` ändert den `status` nicht mehr — Status wird ausschließlich über die dedizierten Übergangs-Endpoints verwaltet.
+
 ## [0.14.0] - 2026-05-08
 
 ### Added

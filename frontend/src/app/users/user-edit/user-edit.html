@@ -145,34 +145,175 @@
     </fieldset>
 
     <!-- Status -->
+    @if (isEdit) {
+      @let cu = currentUser();
+      @if (cu) {
+        <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-6">
+          <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+            Mitgliedsstatus
+          </legend>
+
+          <!-- Aktueller Status + Stepper-Übersicht -->
+          <div class="space-y-4">
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-sm font-semibold text-on-surface-variant">Aktueller Status:</span>
+              <span
+                class="px-4 py-1 rounded-full text-sm font-semibold"
+                [class]="statusBadgeClass(cu.status)"
+              >
+                {{ userStatusLabels[cu.status] }}
+              </span>
+            </div>
+
+            <ol class="flex flex-wrap items-center gap-2 text-xs font-semibold">
+              @for (step of lifecycleSteps; track step.status; let last = $last) {
+                <li class="flex items-center gap-2">
+                  <span
+                    class="px-3 py-1 rounded-full border transition-colors"
+                    [class.bg-primary]="step.status === cu.status"
+                    [class.text-on-primary]="step.status === cu.status"
+                    [class.border-primary]="step.status === cu.status"
+                    [class.bg-surface-container-low]="step.status !== cu.status"
+                    [class.text-on-surface-variant]="step.status !== cu.status"
+                    [class.border-outline-variant]="step.status !== cu.status"
+                  >
+                    {{ userStatusLabels[step.status] }}
+                  </span>
+                  @if (!last) {
+                    <span class="material-symbols-outlined text-base text-on-surface-variant"
+                      >chevron_right</span
+                    >
+                  }
+                </li>
+              }
+            </ol>
+          </div>
+
+          <!-- Onboarding-Fortschritt (immer sichtbar) -->
+          <div class="space-y-3">
+            <p class="text-sm font-semibold text-on-surface-variant">Onboarding</p>
+            <ul class="space-y-2 text-sm">
+              <li class="flex items-center gap-2">
+                <span
+                  class="material-symbols-outlined text-base"
+                  [class.text-primary]="!!cu.introductionCompletedAt"
+                  [class.text-on-surface-variant]="!cu.introductionCompletedAt"
+                >
+                  {{ cu.introductionCompletedAt ? 'check_circle' : 'radio_button_unchecked' }}
+                </span>
+                <span>
+                  Einführungsgespräch
+                  @if (cu.introductionCompletedAt) {
+                    <span class="text-on-surface-variant"
+                      >&nbsp;·&nbsp;{{ cu.introductionCompletedAt | date: 'dd.MM.yyyy' }}</span
+                    >
+                  } @else {
+                    <span class="text-on-surface-variant">&nbsp;·&nbsp;noch offen</span>
+                  }
+                </span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span
+                  class="material-symbols-outlined text-base"
+                  [class.text-primary]="cu.hygieneApproved"
+                  [class.text-on-surface-variant]="!cu.hygieneApproved"
+                >
+                  {{ cu.hygieneApproved ? 'check_circle' : 'radio_button_unchecked' }}
+                </span>
+                <span>
+                  Hygienezertifikat
+                  @if (cu.hygieneApproved) {
+                    <span class="text-on-surface-variant">&nbsp;·&nbsp;genehmigt</span>
+                  } @else {
+                    <span class="text-on-surface-variant">&nbsp;·&nbsp;noch offen</span>
+                  }
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Aktionen -->
+          <div class="pt-2 border-t border-outline-variant/40">
+            <p class="text-sm font-semibold text-on-surface-variant mb-3">Aktionen</p>
+            <div class="flex flex-wrap gap-3">
+              @if (cu.status === 'PENDING' && !cu.introductionCompletedAt) {
+                <button
+                  type="button"
+                  [disabled]="transitioning()"
+                  (click)="confirmIntroduction()"
+                  class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold shadow-md shadow-primary/20 hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">how_to_reg</span>
+                  Einführung bestätigen
+                </button>
+              }
+              @if (cu.status === 'ACTIVE') {
+                <button
+                  type="button"
+                  [disabled]="transitioning()"
+                  (click)="pauseUser()"
+                  class="bg-tertiary-container text-on-tertiary-container px-5 py-2 rounded-full text-sm font-bold shadow-md hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">pause_circle</span>
+                  Pausieren
+                </button>
+              }
+              @if (cu.status === 'PAUSED') {
+                <button
+                  type="button"
+                  [disabled]="transitioning()"
+                  (click)="reactivateUser()"
+                  class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold shadow-md shadow-primary/20 hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">play_circle</span>
+                  Reaktivieren
+                </button>
+              }
+              @if (cu.status === 'PENDING' || cu.status === 'ACTIVE' || cu.status === 'PAUSED') {
+                <button
+                  type="button"
+                  [disabled]="transitioning()"
+                  (click)="leaveUser()"
+                  class="bg-surface-container-low text-error border border-error/60 px-5 py-2 rounded-full text-sm font-bold hover:bg-error/10 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">logout</span>
+                  Austreten
+                </button>
+                <button
+                  type="button"
+                  [disabled]="transitioning()"
+                  (click)="removeUser()"
+                  class="bg-error text-on-error px-5 py-2 rounded-full text-sm font-bold shadow-md shadow-error/20 hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">person_remove</span>
+                  Entfernen
+                </button>
+              }
+              @if (cu.status === 'LEFT' || cu.status === 'REMOVED') {
+                <p class="text-sm text-on-surface-variant italic">
+                  Endzustand erreicht — keine weiteren Statuswechsel möglich.
+                </p>
+              }
+            </div>
+          </div>
+        </fieldset>
+      }
+    }
     <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-6">
       <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
-        Status
+        Online-Status
       </legend>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <label class="flex flex-col gap-2">
-          <span class="text-sm font-semibold text-on-surface-variant">Mitgliedsstatus</span>
-          <select
-            formControlName="status"
-            class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            @for (s of userStatuses; track s) {
-              <option [value]="s">{{ userStatusLabels[s] }}</option>
-            }
-          </select>
-        </label>
-        <label class="flex flex-col gap-2">
-          <span class="text-sm font-semibold text-on-surface-variant">Online-Status</span>
-          <select
-            formControlName="onlineStatus"
-            class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            @for (s of onlineStatuses; track s) {
-              <option [value]="s">{{ onlineStatusLabels[s] }}</option>
-            }
-          </select>
-        </label>
-      </div>
+      <label class="flex flex-col gap-2 max-w-md">
+        <span class="text-sm font-semibold text-on-surface-variant">Online-Status</span>
+        <select
+          formControlName="onlineStatus"
+          class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          @for (s of onlineStatuses; track s) {
+            <option [value]="s">{{ onlineStatusLabels[s] }}</option>
+          }
+        </select>
+      </label>
     </fieldset>
 
     <!-- Tags -->

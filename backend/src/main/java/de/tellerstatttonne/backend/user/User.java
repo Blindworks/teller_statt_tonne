@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.user;
 
+import java.time.Instant;
 import java.util.List;
 
 public record User(
@@ -16,11 +17,13 @@ public record User(
     String photoUrl,
     UserEntity.OnlineStatus onlineStatus,
     UserEntity.Status status,
+    Instant introductionCompletedAt,
+    boolean hygieneApproved,
     List<String> tags
 ) {
     public User withId(Long newId) {
         return new User(newId, email, roles, firstName, lastName, phone,
             street, postalCode, city, country,
-            photoUrl, onlineStatus, status, tags);
+            photoUrl, onlineStatus, status, introductionCompletedAt, hygieneApproved, tags);
     }
 }

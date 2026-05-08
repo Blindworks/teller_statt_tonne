@@ -32,7 +32,7 @@ public class UserEntity {
 
     public enum OnlineStatus { ONLINE, AWAY, ON_BREAK, OFFLINE }
 
-    public enum Status { ACTIVE, PENDING, INACTIVE }
+    public enum Status { PENDING, ACTIVE, PAUSED, LEFT, REMOVED }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,7 +81,10 @@ public class UserEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
-    private Status status = Status.ACTIVE;
+    private Status status = Status.PENDING;
+
+    @Column(name = "introduction_completed_at")
+    private Instant introductionCompletedAt;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -152,6 +155,8 @@ public class UserEntity {
     public void setOnlineStatus(OnlineStatus onlineStatus) { this.onlineStatus = onlineStatus; }
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
+    public Instant getIntroductionCompletedAt() { return introductionCompletedAt; }
+    public void setIntroductionCompletedAt(Instant introductionCompletedAt) { this.introductionCompletedAt = introductionCompletedAt; }
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
     public Instant getCreatedAt() { return createdAt; }

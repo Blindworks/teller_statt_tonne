@@ -59,6 +59,26 @@ export class UserService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+  markIntroductionCompleted(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/introduction-completed`, {});
+  }
+
+  pause(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/pause`, {});
+  }
+
+  reactivate(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/reactivate`, {});
+  }
+
+  leave(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/leave`, {});
+  }
+
+  remove(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/remove`, {});
+  }
+
   uploadPhoto(id: number, file: File): Observable<User> {
     const form = new FormData();
     form.append('file', file);

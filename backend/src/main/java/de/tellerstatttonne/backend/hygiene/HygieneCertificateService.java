@@ -9,6 +9,7 @@ import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
 import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
+import de.tellerstatttonne.backend.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ public class HygieneCertificateService {
 
     private final HygieneCertificateRepository repository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final RoleRepository roleRepository;
     private final DocumentStorageService storage;
     private final NotificationService notificationService;
@@ -39,6 +41,7 @@ public class HygieneCertificateService {
     public HygieneCertificateService(
         HygieneCertificateRepository repository,
         UserRepository userRepository,
+        UserService userService,
         RoleRepository roleRepository,
         DocumentStorageService storage,
         NotificationService notificationService,
@@ -46,6 +49,7 @@ public class HygieneCertificateService {
     ) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.userService = userService;
         this.roleRepository = roleRepository;
         this.storage = storage;
         this.notificationService = notificationService;
@@ -131,6 +135,8 @@ public class HygieneCertificateService {
         entity.setDecidedBy(decider);
         entity.setDecidedAt(Instant.now());
         HygieneCertificateEntity saved = repository.save(entity);
+
+        userService.promoteToActiveIfReady(user.getId());
 
         notificationService.create(
             List.of(user.getId()),

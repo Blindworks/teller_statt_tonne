@@ -24,6 +24,8 @@ class AuthServiceStub {
       photoUrl: null,
       onlineStatus: 'OFFLINE',
       status: 'ACTIVE',
+      introductionCompletedAt: null,
+      hygieneApproved: true,
       tags: [],
     });
   }
