@@ -10,5 +10,7 @@ public interface HygieneCertificateRepository extends JpaRepository<HygieneCerti
 
     List<HygieneCertificateEntity> findByStatusOrderByCreatedAtAsc(HygieneCertificateStatus status);
 
+    List<HygieneCertificateEntity> findAllByOrderByCreatedAtAsc();
+
     long countByStatus(HygieneCertificateStatus status);
 }

@@ -100,10 +100,10 @@ public class HygieneCertificateService {
 
     @Transactional(readOnly = true)
     public List<HygieneCertificateDto> listByStatus(HygieneCertificateStatus status) {
-        HygieneCertificateStatus filter = status == null ? HygieneCertificateStatus.PENDING : status;
-        return repository.findByStatusOrderByCreatedAtAsc(filter).stream()
-            .map(HygieneCertificateMapper::toDto)
-            .toList();
+        List<HygieneCertificateEntity> rows = status == null
+            ? repository.findAllByOrderByCreatedAtAsc()
+            : repository.findByStatusOrderByCreatedAtAsc(status);
+        return rows.stream().map(HygieneCertificateMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
