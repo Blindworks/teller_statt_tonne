@@ -23,6 +23,7 @@ import {
 } from '../../partners/partner.model';
 import { AuthService } from '../../auth/auth.service';
 import { StoreDetailDialogService } from './store-detail-dialog.service';
+import { PhotoUrlPipe } from '../../users/photo-url.pipe';
 
 const WEEKDAY_LABELS: Record<Weekday, string> = WEEKDAYS.reduce(
   (acc, w) => {
@@ -42,7 +43,7 @@ const WEEKDAY_ORDER: Record<Weekday, number> = WEEKDAYS.reduce(
 
 @Component({
   selector: 'app-store-detail-dialog',
-  imports: [RouterLink],
+  imports: [RouterLink, PhotoUrlPipe],
   templateUrl: './store-detail-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

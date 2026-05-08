@@ -2,6 +2,7 @@ package de.tellerstatttonne.backend.user;
 
 import de.tellerstatttonne.backend.role.Role;
 import de.tellerstatttonne.backend.role.RoleService;
+import de.tellerstatttonne.backend.storage.ImageStorageService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -27,13 +28,13 @@ public class UserController {
 
     private final UserService service;
     private final RoleService roleService;
-    private final PhotoStorageService photoStorageService;
+    private final ImageStorageService imageStorageService;
 
     public UserController(UserService service, RoleService roleService,
-                          PhotoStorageService photoStorageService) {
+                          ImageStorageService imageStorageService) {
         this.service = service;
         this.roleService = roleService;
-        this.photoStorageService = photoStorageService;
+        this.imageStorageService = imageStorageService;
     }
 
     public record RoleOption(String value, String label) {}
@@ -97,7 +98,7 @@ public class UserController {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        String newUrl = photoStorageService.store(id, file, previousUrl);
+        String newUrl = imageStorageService.store("photos", id.toString(), file, previousUrl);
         return service.updatePhotoUrl(id, newUrl)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());

@@ -7,6 +7,23 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-05-08
+
+### Added
+
+- Logo-Upload im Betrieb-Formular (`/stores/edit/:id`): zusätzlich zum bestehenden URL-Feld lassen sich Logos jetzt direkt hochladen (JPG/PNG/WebP/GIF, max. 5 MB). Erfolgreicher Upload setzt das `logoUrl`-Feld auf den vom Backend gelieferten Pfad. Der Upload-Button ist erst nach dem ersten Speichern eines neuen Betriebs verfügbar.
+- `PartnerService.uploadLogo(id, file)` (POST `/api/partners/{id}/logo` als multipart).
+
+### Fixed
+
+- Logo-Anzeige in Betriebs-Liste, Detail-Dialog, Dashboard und Mitglieder-Verwaltung nutzt jetzt die `photoUrl`-Pipe, sodass relative Pfade aus Uploads (`/uploads/logos/...`) korrekt mit Backend-Host aufgelöst werden.
+
+## [0.14.1] - 2026-05-08
+
+### Changed
+
+- Landing-Page: „Wer wir sind"-Panel auf eine Icon-Liste mit vier Punkten umgestellt (Verein-Selbstvorstellung, Erfahrung & Ziel, Zuverlässigkeit/Hygiene, Verteil-Anspruch) — analog zu den bestehenden Panels „Unsere Ziele" und „Was wir tun".
+
 ## [0.14.0] - 2026-05-07
 
 ### Added

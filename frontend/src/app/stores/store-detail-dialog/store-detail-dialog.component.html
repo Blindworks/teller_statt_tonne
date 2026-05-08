@@ -26,8 +26,8 @@
           <div
             class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center text-primary overflow-hidden shrink-0"
           >
-            @if (p.logoUrl) {
-              <img [src]="p.logoUrl" [alt]="p.name" class="w-full h-full object-cover" />
+            @if (p.logoUrl | photoUrl; as logoSrc) {
+              <img [src]="logoSrc" [alt]="p.name" class="w-full h-full object-cover" />
             } @else {
               <span class="material-symbols-outlined text-3xl">{{
                 categoryIcons[p.category]

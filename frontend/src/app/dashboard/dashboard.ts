@@ -12,6 +12,7 @@ import { AuthService } from '../auth/auth.service';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
 import { PickupAssignment } from '../pickups/pickup.model';
 import { resolvePhotoUrl } from '../users/photo-url';
+import { PhotoUrlPipe } from '../users/photo-url.pipe';
 import { Role } from '../users/user.model';
 import { UserProfileDialogService } from '../users/user-profile-dialog/user-profile-dialog.service';
 import { DaySlot } from './day-slot.model';
@@ -60,7 +61,7 @@ const UNASSIGN_CUTOFF_MS = 2 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgTemplateOutlet, RouterLink],
+  imports: [NgTemplateOutlet, RouterLink, PhotoUrlPipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

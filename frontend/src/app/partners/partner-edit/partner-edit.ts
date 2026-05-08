@@ -17,6 +17,7 @@ import {
 } from '../location-picker/location-picker-dialog';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog';
 import { PartnerNotesSectionComponent } from '../../stores/notes/partner-notes-section/partner-notes-section.component';
+import { PhotoUrlPipe } from '../../users/photo-url.pipe';
 import {
   CATEGORY_LABELS,
   Category,
@@ -58,7 +59,7 @@ type PartnerForm = FormGroup<{
 
 @Component({
   selector: 'app-partner-edit',
-  imports: [ReactiveFormsModule, RouterLink, DecimalPipe, LocationPickerDialogComponent, ConfirmDialogComponent, PartnerNotesSectionComponent],
+  imports: [ReactiveFormsModule, RouterLink, DecimalPipe, LocationPickerDialogComponent, ConfirmDialogComponent, PartnerNotesSectionComponent, PhotoUrlPipe],
   templateUrl: './partner-edit.html',
   styleUrl: './partner-edit.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,6 +92,9 @@ export class PartnerEditComponent {
   readonly geocoding = signal(false);
   readonly geocodeMessage = signal<string | null>(null);
   readonly pickerOpen = signal(false);
+
+  readonly uploadingLogo = signal(false);
+  readonly logoUploadError = signal<string | null>(null);
 
   readonly form: PartnerForm = this.buildForm();
 
@@ -218,6 +222,48 @@ export class PartnerEditComponent {
       error: () => {
         this.geocoding.set(false);
         this.geocodeMessage.set('Geocoding fehlgeschlagen.');
+      },
+    });
+  }
+
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.logoUploadError.set(null);
+
+    if (!file.type.startsWith('image/')) {
+      this.logoUploadError.set('Bitte eine Bilddatei auswählen.');
+      input.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.logoUploadError.set('Datei ist zu groß (max. 5 MB).');
+      input.value = '';
+      return;
+    }
+
+    const id = this.partnerId();
+    if (!id) {
+      this.logoUploadError.set('Bitte erst Betrieb speichern, dann Logo hochladen.');
+      input.value = '';
+      return;
+    }
+
+    this.uploadingLogo.set(true);
+    this.service.uploadLogo(id, file).subscribe({
+      next: (partner) => {
+        this.uploadingLogo.set(false);
+        this.form.controls.logoUrl.setValue(partner.logoUrl ?? '');
+        this.form.controls.logoUrl.markAsDirty();
+        input.value = '';
+      },
+      error: (err) => {
+        this.uploadingLogo.set(false);
+        input.value = '';
+        this.logoUploadError.set(
+          typeof err?.error === 'string' ? err.error : 'Upload fehlgeschlagen.',
+        );
       },
     });
   }

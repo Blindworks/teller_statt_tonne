@@ -7,6 +7,16 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-05-08
+
+### Added
+
+- Logo-Upload für Betriebe: neuer Endpoint `POST /api/partners/{id}/logo` (multipart, Feld `file`) speichert hochgeladene Bilddateien (JPG/PNG/WebP/GIF, max. 5 MB) unter `uploads/logos/<id>-<uuid>.<ext>`, schreibt den öffentlichen Pfad in `Partner.logoUrl` und löscht eine zuvor lokal gespeicherte Datei.
+
+### Changed
+
+- `PhotoStorageService` (Paket `user`) wurde generalisiert und nach `de.tellerstatttonne.backend.storage.ImageStorageService` verschoben. Signatur jetzt `store(String subdir, String idPrefix, MultipartFile file, String previousUrl)`. `UserController.uploadPhoto` ruft den Service mit `subdir = "photos"` auf — Verhalten und URL-Format (`/uploads/photos/<id>-<uuid>.<ext>`) unverändert.
+
 ## [0.10.1] - 2026-05-07
 
 ### Fixed

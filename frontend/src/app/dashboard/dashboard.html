@@ -301,9 +301,9 @@
       <div
         class="w-14 h-14 rounded-md overflow-hidden flex-shrink-0 bg-primary-container flex items-center justify-center text-on-primary-container"
       >
-        @if (slot.logoUrl) {
+        @if (slot.logoUrl | photoUrl; as logoSrc) {
           <img
-            [src]="slot.logoUrl"
+            [src]="logoSrc"
             [alt]="slot.partnerName"
             class="w-full h-full object-cover group-hover:scale-110 transition-transform"
           />

@@ -151,6 +151,18 @@ public class PartnerService {
         });
     }
 
+    public Optional<Partner> updateLogoUrl(Long id, String logoUrl) {
+        return repository.findById(id).map(entity -> {
+            entity.setLogoUrl(logoUrl);
+            return PartnerMapper.toDto(repository.save(entity));
+        });
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<String> findLogoUrl(Long id) {
+        return repository.findById(id).map(PartnerEntity::getLogoUrl);
+    }
+
     public Optional<Partner> regeocode(Long id) {
         return repository.findById(id).map(entity -> {
             applyForwardGeocoding(entity);

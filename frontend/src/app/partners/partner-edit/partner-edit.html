@@ -165,9 +165,9 @@
       <div
         class="w-32 h-32 rounded-full bg-surface-container-high flex items-center justify-center mb-4 overflow-hidden"
       >
-        @if (form.controls.logoUrl.value) {
+        @if (form.controls.logoUrl.value | photoUrl; as logoSrc) {
           <img
-            [src]="form.controls.logoUrl.value"
+            [src]="logoSrc"
             alt="Logo"
             class="w-full h-full object-cover"
           />
@@ -175,14 +175,40 @@
           <span class="material-symbols-outlined text-primary text-4xl">storefront</span>
         }
       </div>
-      <p class="text-sm font-bold text-on-surface mb-1">Logo-URL</p>
-      <p class="text-xs text-on-surface-variant mb-4">Direktlink zum Bild</p>
+      <p class="text-sm font-bold text-on-surface mb-1">Logo</p>
+      <p class="text-xs text-on-surface-variant mb-4">Direktlink oder Datei hochladen</p>
       <input
         type="url"
         formControlName="logoUrl"
         placeholder="https://…"
-        class="w-full bg-surface-container-high border-none rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+        class="w-full bg-surface-container-high border-none rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none mb-3"
       />
+      <label
+        class="bg-primary text-on-primary px-4 py-2 rounded-full text-sm font-bold shadow-sm shadow-primary/20 active:scale-95 transition-transform cursor-pointer inline-flex items-center justify-center gap-2 w-fit"
+        [class.opacity-50]="uploadingLogo() || !isEdit"
+      >
+        <span class="material-symbols-outlined text-base">upload</span>
+        {{ uploadingLogo() ? 'Lädt hoch…' : 'Logo hochladen' }}
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          class="hidden"
+          [disabled]="uploadingLogo() || !isEdit"
+          (change)="onLogoSelected($event)"
+        />
+      </label>
+      @if (!isEdit) {
+        <p class="text-xs text-on-surface-variant mt-2">
+          Erst speichern, dann Logo hochladen.
+        </p>
+      } @else {
+        <p class="text-xs text-on-surface-variant mt-2">
+          JPG, PNG, WebP oder GIF. Maximal 5 MB.
+        </p>
+      }
+      @if (logoUploadError()) {
+        <p class="text-sm text-error font-semibold mt-2">{{ logoUploadError() }}</p>
+      }
     </div>
 
     <!-- Kontakt -->

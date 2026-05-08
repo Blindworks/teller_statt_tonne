@@ -16,10 +16,11 @@ import { ApplyToStoreDialogService } from '../partner-applications/apply-to-stor
 import { ApplyToStoreDialogComponent } from '../partner-applications/apply-to-store-dialog/apply-to-store-dialog.component';
 import { PartnerApplicationsService } from '../partner-applications/partner-applications.service';
 import { PartnerApplication } from '../partner-applications/partner-application.model';
+import { PhotoUrlPipe } from '../users/photo-url.pipe';
 
 @Component({
   selector: 'app-stores',
-  imports: [RouterLink, ApplyToStoreDialogComponent],
+  imports: [RouterLink, ApplyToStoreDialogComponent, PhotoUrlPipe],
   templateUrl: './stores.html',
   styleUrl: './stores.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

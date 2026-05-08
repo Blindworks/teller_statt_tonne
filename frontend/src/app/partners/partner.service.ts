@@ -50,6 +50,12 @@ export class PartnerService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+  uploadLogo(id: number, file: File): Observable<Partner> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<Partner>(`${this.baseUrl}/${id}/logo`, form);
+  }
+
   regeocode(id: number): Observable<Partner> {
     return this.http.post<Partner>(`${this.baseUrl}/${id}/geocode`, null);
   }

@@ -34,8 +34,8 @@
             <div
               class="w-14 h-14 rounded-md bg-primary-container flex items-center justify-center text-on-primary-container overflow-hidden"
             >
-              @if (store.logoUrl) {
-                <img class="w-full h-full object-cover" [src]="store.logoUrl" alt="" />
+              @if (store.logoUrl | photoUrl; as logoSrc) {
+                <img class="w-full h-full object-cover" [src]="logoSrc" alt="" />
               } @else {
                 <span class="material-symbols-outlined">{{
                   categoryIcons[store.category]
