@@ -16,6 +16,7 @@ import { User } from '../users/user.model';
 import { resolvePhotoUrl } from '../users/photo-url';
 import { UserAvailabilityComponent } from '../users/user-availability/user-availability';
 import { PushNotificationService } from '../push/push-notification.service';
+import { HygieneCertificateSectionComponent } from '../hygiene-certificate/hygiene-certificate-section/hygiene-certificate-section.component';
 
 type ProfileForm = FormGroup<{
   firstName: FormControl<string>;
@@ -36,7 +37,12 @@ type PasswordForm = FormGroup<{
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, RouterLink, UserAvailabilityComponent],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    UserAvailabilityComponent,
+    HygieneCertificateSectionComponent,
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,6 +62,7 @@ export class ProfileComponent {
 
   readonly currentUser = this.auth.currentUser;
   readonly hasProfile = computed(() => !!this.currentUser());
+  readonly hasRetterRole = computed(() => !!this.currentUser()?.roles?.includes('RETTER'));
 
   readonly photoPreview = signal<string | null>(null);
   readonly displayPhoto = computed(() => {

@@ -21,5 +21,11 @@ export class AdminDashboardComponent {
       icon: 'how_to_reg',
       link: '/admin/applications',
     },
+    {
+      title: 'Hygienezertifikate',
+      description: 'Eingereichte Hygienezertifikate prüfen und Retter freischalten.',
+      icon: 'verified_user',
+      link: '/admin/zertifikate',
+    },
   ];
 }

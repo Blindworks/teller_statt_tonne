@@ -204,6 +204,14 @@
       </form>
       }
 
+      <!-- Hygienezertifikat -->
+      @if (currentUser()?.id; as uid) {
+        <app-hygiene-certificate-section
+          [userId]="uid"
+          [hasRetterRole]="hasRetterRole()"
+        />
+      }
+
       <!-- Verfügbarkeit -->
       @if (currentUser()?.id; as uid) {
         <fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-4">

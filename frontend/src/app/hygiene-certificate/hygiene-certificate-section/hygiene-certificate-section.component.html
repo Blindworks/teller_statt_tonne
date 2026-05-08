@@ -1,0 +1,130 @@
+<fieldset class="bg-surface-container-lowest rounded-xl p-8 space-y-5">
+  <legend class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+    Hygienezertifikat
+  </legend>
+
+  @if (loading()) {
+    <p class="text-sm text-on-surface-variant">Lade Zertifikat…</p>
+  } @else {
+    @if (!hasRetterRole() && certificate()?.status !== 'APPROVED') {
+      <p class="text-sm text-on-surface-variant">
+        Lade dein Hygienezertifikat (z. B. Belehrung nach §43 IfSG) hoch, um als Retter
+        freigeschaltet zu werden. Ein Teamleiter prüft dein Dokument.
+      </p>
+    }
+
+    @if (certificate(); as cert) {
+      <div class="flex flex-wrap items-start gap-4 justify-between">
+        <div class="space-y-1">
+          <div class="flex items-center gap-3">
+            <span
+              class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+              [class]="badgeClass(cert.status)"
+            >
+              {{ statusLabels[cert.status] }}
+            </span>
+            <span class="text-sm text-on-surface-variant">
+              hochgeladen {{ cert.createdAt | date: 'dd.MM.yyyy HH:mm' }}
+            </span>
+          </div>
+          <p class="text-sm text-on-surface">
+            <span class="font-semibold">Datei:</span>
+            {{ cert.originalFilename ?? '(ohne Namen)' }}
+            <span class="text-on-surface-variant">·
+              ausgestellt am {{ cert.issuedDate | date: 'dd.MM.yyyy' }}
+            </span>
+          </p>
+          @if (cert.decidedAt) {
+            <p class="text-xs text-on-surface-variant">
+              Entschieden {{ cert.decidedAt | date: 'dd.MM.yyyy HH:mm' }}
+              @if (cert.decidedByDisplayName) {
+                von {{ cert.decidedByDisplayName }}
+              }
+            </p>
+          }
+        </div>
+        <button
+          type="button"
+          (click)="openPreview()"
+          [disabled]="previewLoading()"
+          class="px-4 py-2 rounded-full text-sm font-bold border border-outline-variant text-on-surface-variant hover:bg-surface-container-high disabled:opacity-50"
+        >
+          {{ previewLoading() ? 'Lädt…' : 'Vorschau öffnen' }}
+        </button>
+      </div>
+
+      @if (cert.status === 'REJECTED' && cert.rejectionReason) {
+        <div
+          class="px-4 py-3 rounded-lg bg-error-container text-on-error-container text-sm"
+        >
+          <p class="font-bold">Abgelehnt</p>
+          <p class="mt-1 whitespace-pre-line">{{ cert.rejectionReason }}</p>
+        </div>
+      }
+    }
+
+    @if (certificate()?.status !== 'APPROVED') {
+      <form [formGroup]="uploadForm" (ngSubmit)="submit()" class="space-y-4">
+        <p class="text-xs text-on-surface-variant">
+          @if (certificate()?.status === 'REJECTED') {
+            Lade ein korrigiertes Zertifikat hoch.
+          } @else if (certificate()?.status === 'PENDING') {
+            Du kannst ein neues Zertifikat hochladen, falls erforderlich.
+          }
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-on-surface-variant">Datei (PDF, JPG, PNG, WebP) *</span>
+            <input
+              type="file"
+              accept="application/pdf,image/jpeg,image/png,image/webp"
+              [disabled]="uploading()"
+              (change)="onFileSelected($event)"
+              class="text-sm text-on-surface file:bg-primary file:text-on-primary file:border-0 file:px-4 file:py-2 file:rounded-full file:font-bold file:cursor-pointer"
+            />
+            @if (selectedFileName(); as name) {
+              <span class="text-xs text-on-surface-variant truncate">Ausgewählt: {{ name }}</span>
+            }
+          </label>
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-on-surface-variant">Ausstellungsdatum *</span>
+            <input
+              type="date"
+              formControlName="issuedDate"
+              [max]="today"
+              class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </label>
+        </div>
+
+        <p class="text-xs text-on-surface-variant">Maximal 10 MB.</p>
+
+        @if (error()) {
+          <div class="px-4 py-3 rounded-lg bg-error-container text-on-error-container text-sm font-semibold">
+            {{ error() }}
+          </div>
+        }
+        @if (message()) {
+          <div class="px-4 py-3 rounded-lg bg-tertiary-container text-on-tertiary-container text-sm font-semibold">
+            {{ message() }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="uploading() || !selectedFile() || uploadForm.invalid"
+          class="bg-primary text-on-primary px-6 py-3 rounded-full font-bold shadow-lg shadow-primary/20 disabled:opacity-60 active:scale-95 transition-transform"
+        >
+          {{ uploading() ? 'Lädt hoch…' : 'Zertifikat hochladen' }}
+        </button>
+      </form>
+    } @else {
+      @if (error()) {
+        <div class="px-4 py-3 rounded-lg bg-error-container text-on-error-container text-sm font-semibold">
+          {{ error() }}
+        </div>
+      }
+    }
+  }
+</fieldset>

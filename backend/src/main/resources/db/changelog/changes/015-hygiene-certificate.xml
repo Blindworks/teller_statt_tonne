@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="015-create-hygiene-certificate" author="teller-statt-tonne">
+        <createTable tableName="hygiene_certificate">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" unique="true"
+                             uniqueConstraintName="uq_hygiene_certificate_user"/>
+            </column>
+            <column name="file_url" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mime_type" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="original_filename" type="VARCHAR(512)"/>
+            <column name="file_size_bytes" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="issued_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rejection_reason" type="VARCHAR(1000)"/>
+            <column name="decided_by_user_id" type="BIGINT"/>
+            <column name="decided_at" type="DATETIME(6)"/>
+            <column name="created_at" type="DATETIME(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME(6)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="hygiene_certificate" baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_hygiene_certificate_user"
+                                 onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="hygiene_certificate" baseColumnNames="decided_by_user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_hygiene_certificate_decided_by"
+                                 onDelete="SET NULL"/>
+
+        <createIndex tableName="hygiene_certificate" indexName="idx_hygiene_certificate_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -137,6 +137,14 @@ export const routes: Routes = [
           import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),
       },
       {
+        path: 'admin/zertifikate',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import(
+            './hygiene-certificate/admin-hygiene-certificates/admin-hygiene-certificates.component'
+          ).then((m) => m.AdminHygieneCertificatesComponent),
+      },
+      {
         path: 'admin/applications',
         canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
         loadComponent: () =>

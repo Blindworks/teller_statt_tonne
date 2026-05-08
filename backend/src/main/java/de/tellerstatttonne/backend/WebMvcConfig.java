@@ -9,6 +9,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    private static final String[] PUBLIC_SUBDIRS = {"logos", "photos"};
+
     private final String uploadsDir;
 
     public WebMvcConfig(@Value("${app.uploads.dir:./uploads}") String uploadsDir) {
@@ -17,9 +19,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String location = Path.of(uploadsDir).toAbsolutePath().normalize().toUri().toString();
-        registry.addResourceHandler("/uploads/**")
-            .addResourceLocations(location)
-            .setCachePeriod(3600);
+        Path base = Path.of(uploadsDir).toAbsolutePath().normalize();
+        for (String subdir : PUBLIC_SUBDIRS) {
+            String location = base.resolve(subdir).toUri().toString();
+            registry.addResourceHandler("/uploads/" + subdir + "/**")
+                .addResourceLocations(location)
+                .setCachePeriod(3600);
+        }
     }
 }

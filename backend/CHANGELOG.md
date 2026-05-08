@@ -7,6 +7,19 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-05-08
+
+### Added
+
+- Hygienezertifikat-Upload als Voraussetzung für die Retter-Rolle: User können über `POST /api/users/{id}/hygiene-certificate` (multipart `file` + Query-Param `issuedDate`, ISO-Datum) ein Zertifikat (PDF / JPG / PNG / WebP, max. 10 MB) hochladen. Pro User existiert maximal ein Eintrag (`HygieneCertificateEntity`, `@OneToOne` mit Unique-Constraint auf `user_id`); Re-Upload löscht die alte Datei von der Disk und setzt den Status auf `PENDING`. Eigentümer und ADMINISTRATOR/TEAMLEITER können Metadaten via `GET /api/users/{id}/hygiene-certificate` und die Datei per Streaming via `GET /api/users/{id}/hygiene-certificate/file` (auth-geschützt, kein öffentliches Static-Mapping) abrufen. ADMINISTRATOR/TEAMLEITER prüfen Zertifikate über `GET /api/hygiene-certificates?status=…` und `…/pending-count`, genehmigen via `POST /api/hygiene-certificates/{id}/approve` (vergibt Rolle `RETTER`, entfernt `NEW_MEMBER`) oder lehnen via `POST /api/hygiene-certificates/{id}/reject` (Body `{reason}`, Pflicht) ab.
+- Neuer Service `DocumentStorageService` (Paket `storage`) parallel zu `ImageStorageService`: erlaubt PDF + Bilder, max. 10 MB, Ablage unter `uploads/certificates/<id>-<uuid>.<ext>`, mit `resolve(relativePath)` für authentifiziertes File-Streaming und `delete(relativePath)`.
+- Liquibase-Changeset 015 legt Tabelle `hygiene_certificate` an (FK auf `app_user` mit `ON DELETE CASCADE`, Unique-Constraint auf `user_id`, FK auf `decided_by_user_id` mit `ON DELETE SET NULL`, Status-Index).
+- SSE-Notifications: `HYGIENE_CERTIFICATE_SUBMITTED` an Admin/Teamleitung beim Upload, `HYGIENE_CERTIFICATE_APPROVED`/`HYGIENE_CERTIFICATE_REJECTED` an den User nach Entscheidung.
+
+### Changed
+
+- `WebMvcConfig`: Static-Resource-Mapping unter `/uploads/**` ist nicht mehr pauschal öffentlich, sondern explizit auf die öffentlichen Subdirs `logos/` und `photos/` beschränkt. `uploads/certificates/` ist nicht direkt erreichbar — Zertifikate werden ausschließlich über den authentifizierten Endpoint ausgeliefert.
+
 ## [0.11.0] - 2026-05-08
 
 ### Added

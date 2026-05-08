@@ -7,6 +7,14 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-05-08
+
+### Added
+
+- Hygienezertifikat-Bereich im Profil (`/profile`): User laden ihr Zertifikat (PDF, JPG, PNG oder WebP, max. 10 MB) zusammen mit dem Ausstellungsdatum hoch. Status-Badge (`Ausstehend` / `Genehmigt` / `Abgelehnt`), Vorschau-Button (öffnet das authentifiziert geladene Dokument als Blob in einem neuen Tab) und — bei Ablehnung — Begründung sind sichtbar. Hinweistext für User ohne `RETTER`-Rolle erklärt den Pflichtcharakter. Beim erneuten Hochladen wird das alte Dokument ersetzt und der Status zurück auf `PENDING` gesetzt.
+- Review-Oberfläche `/admin/zertifikate` für Admin und Teamleitung mit Status-Filter (Offen/Genehmigt/Abgelehnt/Alle), eingebetteter PDF-Vorschau (sicher gebunden via `DomSanitizer`) bzw. Bild-Vorschau, Genehmigen-Button (Bestätigung über bestehende `ConfirmDialogService`-Komponente) und Inline-Pflicht-Textarea für die Ablehnungsbegründung. Tile in der Admin-Übersicht ergänzt.
+- `HygieneCertificateService` (`getForUser`, `upload`, `fetchFile`, `list`, `pendingCount`, `approve`, `reject`) plus Modell mit Status-Labels.
+
 ## [0.14.1] - 2026-05-08
 
 ### Added
