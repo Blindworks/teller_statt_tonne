@@ -57,6 +57,8 @@ public class PasswordResetService {
         this.eventPublisher = eventPublisher;
     }
 
+    public enum MailKind { RESET, INVITATION }
+
     public void initiate(String email) {
         String normalized = email == null ? "" : email.trim().toLowerCase();
         Optional<UserEntity> userOpt = userRepository.findByEmail(normalized);
@@ -68,12 +70,31 @@ public class PasswordResetService {
                 .build());
             return;
         }
-        UserEntity user = userOpt.get();
-        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.PASSWORD_RESET_REQUESTED)
-            .actor(user.getId(), user.getEmail())
-            .target("USER", user.getId())
-            .message("Passwort-Reset angefordert")
-            .build());
+        sendTokenMail(userOpt.get(), MailKind.RESET);
+    }
+
+    /**
+     * Sends an invitation mail to a freshly created user that contains a link
+     * to set the initial password. Reuses the password-reset token machinery.
+     */
+    public void sendInvitation(UserEntity user) {
+        sendTokenMail(user, MailKind.INVITATION);
+    }
+
+    private void sendTokenMail(UserEntity user, MailKind kind) {
+        if (kind == MailKind.RESET) {
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.PASSWORD_RESET_REQUESTED)
+                .actor(user.getId(), user.getEmail())
+                .target("USER", user.getId())
+                .message("Passwort-Reset angefordert")
+                .build());
+        } else {
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.USER_INVITATION_SENT)
+                .actor(user.getId(), user.getEmail())
+                .target("USER", user.getId())
+                .message("Einladungs-Mail gesendet")
+                .build());
+        }
 
         tokenRepository.deleteByUserId(user.getId());
 
@@ -85,9 +106,11 @@ public class PasswordResetService {
         tokenRepository.save(entity);
 
         String resetUrl = buildResetUrl(rawToken);
-        String subject = "Passwort zuruecksetzen";
-        String html = renderHtml(user.getFirstName(), resetUrl);
-        String plain = renderPlain(user.getFirstName(), resetUrl);
+        String subject = kind == MailKind.INVITATION
+            ? "Willkommen bei Teller statt Tonne — Passwort vergeben"
+            : "Passwort zuruecksetzen";
+        String html = renderHtml(user.getFirstName(), resetUrl, kind);
+        String plain = renderPlain(user.getFirstName(), resetUrl, kind);
         mailService.sendHtml(user.getEmail(), subject, html, plain);
     }
 
@@ -129,23 +152,45 @@ public class PasswordResetService {
         return base + "/reset-password/" + URLEncoder.encode(rawToken, StandardCharsets.UTF_8);
     }
 
-    private String renderHtml(String firstName, String resetUrl) {
+    private String renderHtml(String firstName, String resetUrl, MailKind kind) {
         String safeName = firstName == null ? "" : firstName;
+        String intro;
+        String cta;
+        String footer;
+        if (kind == MailKind.INVITATION) {
+            intro = "<p>willkommen bei <strong>Teller statt Tonne</strong>! Ein Konto wurde fuer dich angelegt.</p>"
+                + "<p>Damit du dich anmelden kannst, vergib bitte ueber den folgenden Link innerhalb von 30 Minuten dein Passwort:</p>";
+            cta = "Passwort vergeben";
+            footer = "<p>Sollte der Link bereits abgelaufen sein, kannst du jederzeit ueber \"Passwort vergessen\" auf der Login-Seite ein neues Passwort anfordern.</p>";
+        } else {
+            intro = "<p>du hast eine Zuruecksetzung deines Passworts fuer <strong>Teller statt Tonne</strong> angefordert.</p>"
+                + "<p>Ueber den folgenden Link kannst du innerhalb von 30 Minuten ein neues Passwort vergeben:</p>";
+            cta = "Passwort zuruecksetzen";
+            footer = "<p>Falls du diese Anfrage nicht gestellt hast, kannst du diese Mail ignorieren — dein Passwort bleibt unveraendert.</p>";
+        }
         return "<!DOCTYPE html><html><body style=\"font-family:Arial,sans-serif;color:#222;\">"
             + "<p>Hallo " + escape(safeName) + ",</p>"
-            + "<p>du hast eine Zuruecksetzung deines Passworts fuer <strong>Teller statt Tonne</strong> angefordert.</p>"
-            + "<p>Ueber den folgenden Link kannst du innerhalb von 30 Minuten ein neues Passwort vergeben:</p>"
+            + intro
             + "<p><a href=\"" + resetUrl + "\" style=\"display:inline-block;padding:10px 16px;"
-            + "background:#4caf50;color:#fff;text-decoration:none;border-radius:6px;\">Passwort zuruecksetzen</a></p>"
+            + "background:#4caf50;color:#fff;text-decoration:none;border-radius:6px;\">" + cta + "</a></p>"
             + "<p>Wenn der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br/>"
             + "<a href=\"" + resetUrl + "\">" + resetUrl + "</a></p>"
-            + "<p>Falls du diese Anfrage nicht gestellt hast, kannst du diese Mail ignorieren — dein Passwort bleibt unveraendert.</p>"
+            + footer
             + "<p>Viele Gruesse<br/>Dein Teller-statt-Tonne-Team</p>"
             + "</body></html>";
     }
 
-    private String renderPlain(String firstName, String resetUrl) {
+    private String renderPlain(String firstName, String resetUrl, MailKind kind) {
         String safeName = firstName == null ? "" : firstName;
+        if (kind == MailKind.INVITATION) {
+            return "Hallo " + safeName + ",\n\n"
+                + "willkommen bei Teller statt Tonne! Ein Konto wurde fuer dich angelegt.\n\n"
+                + "Damit du dich anmelden kannst, vergib bitte ueber den folgenden Link innerhalb von 30 Minuten dein Passwort:\n"
+                + resetUrl + "\n\n"
+                + "Sollte der Link bereits abgelaufen sein, kannst du jederzeit ueber \"Passwort vergessen\" auf der Login-Seite ein neues Passwort anfordern.\n\n"
+                + "Viele Gruesse\n"
+                + "Dein Teller-statt-Tonne-Team\n";
+        }
         return "Hallo " + safeName + ",\n\n"
             + "du hast eine Zuruecksetzung deines Passworts fuer Teller statt Tonne angefordert.\n\n"
             + "Ueber den folgenden Link kannst du innerhalb von 30 Minuten ein neues Passwort vergeben:\n"

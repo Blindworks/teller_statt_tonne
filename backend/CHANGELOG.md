@@ -7,6 +7,21 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-05-08
+
+### Added
+
+- Einladungs-Mail beim Anlegen eines Users: `UserService.adminCreate` versendet via `PasswordResetService.sendInvitation` automatisch eine Mail mit einem Link zum initialen Passwort-Setzen (TTL 30 Min, gleicher Mechanismus wie Password-Reset; eigener `MailKind.INVITATION` mit angepasstem Betreff/Body).
+- Neuer Endpoint `POST /api/users/{id}/resend-invitation` (`ADMINISTRATOR`/`TEAMLEITER`): generiert neuen Token, invalidiert vorherige Einladungs-/Reset-Tokens des Nutzers und sendet die Einladungs-Mail erneut. Wirft `409 Conflict`, wenn der Nutzer bereits ein Passwort gesetzt hat.
+- Neuer Systemlog-Eventtyp `USER_INVITATION_SENT`.
+- `User`-DTO um `hasPassword: boolean` erweitert, damit das Frontend den Resend-Button korrekt anzeigen kann.
+
+### Changed
+
+- `AdminCreateUserRequest` enthält kein `password`-Feld mehr — der angelegte User vergibt sein Passwort selbst über den Einladungs-Link.
+- `UserEntity.passwordHash` ist nullable (Liquibase 019 entfernt das `NOT NULL`-Constraint), damit ein User vor dem Setzen seines Initialpassworts existieren kann.
+- `AuthService.login` lehnt Login mit `passwordHash == null` sauber als ungültige Anmeldedaten ab (kein NPE).
+
 ## [0.15.0] - 2026-05-08
 
 ### Added

@@ -31,7 +31,6 @@ type UserForm = FormGroup<{
   lastName: FormControl<string>;
   role: FormControl<RoleName>;
   email: FormControl<string>;
-  password: FormControl<string>;
   phone: FormControl<string>;
   street: FormControl<string>;
   postalCode: FormControl<string>;
@@ -73,7 +72,9 @@ export class UserEditComponent {
   readonly saving = signal(false);
   readonly deleting = signal(false);
   readonly transitioning = signal(false);
+  readonly resending = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly successMessage = signal<string | null>(null);
   readonly currentUser = signal<User | null>(null);
 
   readonly isAdmin = computed(() => !!this.auth.currentUser()?.roles?.includes('ADMINISTRATOR'));
@@ -98,7 +99,6 @@ export class UserEditComponent {
     if (idParam) {
       const id = Number(idParam);
       this.userId.set(id);
-      this.form.controls.password.disable();
       this.service.get(id).subscribe({
         next: (user) => {
           this.currentUser.set(user);
@@ -107,9 +107,6 @@ export class UserEditComponent {
         error: () => this.errorMessage.set('Nutzer konnte nicht geladen werden.'),
       });
     } else {
-      this.form.controls.password.setValidators([Validators.required, Validators.minLength(8)]);
-      this.form.controls.password.updateValueAndValidity();
-
       const qp = this.route.snapshot.queryParamMap;
       const firstName = qp.get('firstName');
       const lastName = qp.get('lastName');
@@ -143,18 +140,56 @@ export class UserEditComponent {
     }
     this.saving.set(true);
     this.errorMessage.set(null);
+    this.successMessage.set(null);
+    const isCreate = !this.isEdit;
     const req$ = this.isEdit
       ? this.service.update(this.userId()!, this.toUser())
       : this.service.create(this.toCreateRequest());
     req$.subscribe({
-      next: () => {
+      next: (user) => {
         this.saving.set(false);
-        this.router.navigate(['/users']);
+        if (isCreate) {
+          this.successMessage.set(
+            `Nutzer angelegt. Eine Einladungs-Mail wurde an ${user.email} gesendet.`,
+          );
+          setTimeout(() => this.router.navigate(['/users']), 1500);
+        } else {
+          this.router.navigate(['/users']);
+        }
       },
       error: (err) => {
         this.saving.set(false);
         this.errorMessage.set(
           typeof err?.error === 'string' ? err.error : 'Speichern fehlgeschlagen.',
+        );
+      },
+    });
+  }
+
+  async resendInvitation(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'Einladung erneut senden',
+      message:
+        'Eine neue Einladungs-Mail an den Nutzer senden? Der bisherige Einladungs-Link wird ungültig.',
+      confirmLabel: 'Senden',
+    });
+    if (!ok) return;
+    this.resending.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.service.resendInvitation(id).subscribe({
+      next: (user) => {
+        this.resending.set(false);
+        this.successMessage.set(`Einladungs-Mail wurde erneut an ${user.email} gesendet.`);
+      },
+      error: (err) => {
+        this.resending.set(false);
+        this.errorMessage.set(
+          typeof err?.error === 'string' && err.error
+            ? err.error
+            : 'Einladung konnte nicht gesendet werden.',
         );
       },
     });
@@ -276,7 +311,6 @@ export class UserEditComponent {
       lastName: this.fb.nonNullable.control(defaults.lastName, Validators.required),
       role: this.fb.nonNullable.control<RoleName>(defaults.roles[0] ?? '', Validators.required),
       email: this.fb.nonNullable.control(defaults.email, [Validators.required, Validators.email]),
-      password: this.fb.nonNullable.control(''),
       phone: this.fb.nonNullable.control(defaults.phone ?? ''),
       street: this.fb.nonNullable.control(defaults.street ?? ''),
       postalCode: this.fb.nonNullable.control(defaults.postalCode ?? ''),
@@ -327,6 +361,7 @@ export class UserEditComponent {
       status: existing?.status ?? 'PENDING',
       introductionCompletedAt: existing?.introductionCompletedAt ?? null,
       hygieneApproved: existing?.hygieneApproved ?? false,
+      hasPassword: existing?.hasPassword ?? false,
       tags: raw.tags.map((t) => t.trim()).filter((t) => t.length > 0),
     };
   }
@@ -335,7 +370,6 @@ export class UserEditComponent {
     const raw = this.form.getRawValue();
     return {
       email: raw.email,
-      password: raw.password,
       firstName: raw.firstName,
       lastName: raw.lastName,
       roleNames: [raw.role],

@@ -28,6 +28,7 @@ public final class UserMapper {
             e.getStatus(),
             e.getIntroductionCompletedAt(),
             hygieneApproved,
+            e.getPasswordHash() != null,
             e.getTags() == null ? List.of() : List.copyOf(e.getTags())
         );
     }

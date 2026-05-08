@@ -7,6 +7,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-05-08
+
+### Added
+
+- Erfolgs-Hinweis beim Anlegen eines Nutzers: nach dem Speichern erscheint ein Banner „Eine Einladungs-Mail wurde an {email} gesendet."
+- Button „Einladung erneut senden" im User-Edit (sichtbar für `ADMINISTRATOR`/`TEAMLEITER`, solange der Nutzer im Status `PENDING` ist und noch kein Passwort gesetzt hat). Bestätigung läuft über `ConfirmDialogService`.
+- `UserService.resendInvitation` und `User.hasPassword` ergänzt.
+
+### Changed
+
+- Anlage-Formular für Nutzer enthält kein Passwort-Feld mehr — der angelegte Nutzer vergibt sein Passwort selbst über den Einladungs-Link aus der zugesendeten E-Mail.
+
 ## [0.18.0] - 2026-05-08
 
 ### Added

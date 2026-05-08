@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.user;
 
+import de.tellerstatttonne.backend.auth.passwordreset.PasswordResetService;
 import de.tellerstatttonne.backend.hygiene.HygieneCertificateRepository;
 import de.tellerstatttonne.backend.hygiene.HygieneCertificateStatus;
 import de.tellerstatttonne.backend.role.RoleEntity;
@@ -20,7 +21,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,16 +31,17 @@ public class UserService {
     private final UserRepository repository;
     private final RoleRepository roleRepository;
     private final HygieneCertificateRepository hygieneRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordResetService passwordResetService;
     private final ApplicationEventPublisher eventPublisher;
 
     public UserService(UserRepository repository, RoleRepository roleRepository,
                        HygieneCertificateRepository hygieneRepository,
-                       PasswordEncoder passwordEncoder, ApplicationEventPublisher eventPublisher) {
+                       PasswordResetService passwordResetService,
+                       ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
         this.roleRepository = roleRepository;
         this.hygieneRepository = hygieneRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordResetService = passwordResetService;
         this.eventPublisher = eventPublisher;
     }
 
@@ -69,7 +70,6 @@ public class UserService {
         Set<RoleEntity> roles = resolveRoles(request.roleNames());
         UserEntity entity = new UserEntity();
         entity.setEmail(email);
-        entity.setPasswordHash(passwordEncoder.encode(request.password()));
         entity.setRoles(roles);
         entity.setFirstName(request.firstName().trim());
         entity.setLastName(request.lastName().trim());
@@ -86,7 +86,18 @@ public class UserService {
             .message("Nutzer angelegt: " + saved.getEmail() + " (Rollen: "
                 + String.join(",", saved.getRoleNames()) + ")")
             .build());
+        passwordResetService.sendInvitation(saved);
         return toDto(saved);
+    }
+
+    public User resendInvitation(Long id) {
+        UserEntity entity = requireUser(id);
+        if (entity.getPasswordHash() != null) {
+            throw new IllegalStateException(
+                "Einladung kann nicht erneut gesendet werden: Nutzer hat bereits ein Passwort");
+        }
+        passwordResetService.sendInvitation(entity);
+        return toDto(entity);
     }
 
     @Transactional(readOnly = true)

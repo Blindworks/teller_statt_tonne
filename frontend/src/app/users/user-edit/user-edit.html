@@ -24,6 +24,13 @@
       {{ errorMessage() }}
     </div>
   }
+  @if (successMessage()) {
+    <div
+      class="mb-6 px-6 py-4 rounded-xl bg-primary-container text-on-primary-container text-sm font-semibold"
+    >
+      {{ successMessage() }}
+    </div>
+  }
 
   <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-8 max-w-4xl">
     <!-- Basis -->
@@ -85,18 +92,6 @@
             class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </label>
-        @if (!isEdit) {
-          <label class="flex flex-col gap-2">
-            <span class="text-sm font-semibold text-on-surface-variant">Passwort *</span>
-            <input
-              type="password"
-              formControlName="password"
-              autocomplete="new-password"
-              placeholder="mind. 8 Zeichen"
-              class="bg-surface-container-low rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </label>
-        }
         <label class="flex flex-col gap-2">
           <span class="text-sm font-semibold text-on-surface-variant">Telefon</span>
           <input
@@ -236,6 +231,17 @@
           <div class="pt-2 border-t border-outline-variant/40">
             <p class="text-sm font-semibold text-on-surface-variant mb-3">Aktionen</p>
             <div class="flex flex-wrap gap-3">
+              @if (cu.status === 'PENDING' && !cu.hasPassword) {
+                <button
+                  type="button"
+                  [disabled]="resending()"
+                  (click)="resendInvitation()"
+                  class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full text-sm font-bold shadow-md hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">forward_to_inbox</span>
+                  {{ resending() ? 'Sende...' : 'Einladung erneut senden' }}
+                </button>
+              }
               @if (cu.status === 'PENDING' && !cu.introductionCompletedAt) {
                 <button
                   type="button"

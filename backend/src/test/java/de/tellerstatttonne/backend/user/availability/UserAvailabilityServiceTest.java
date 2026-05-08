@@ -88,7 +88,7 @@ class UserAvailabilityServiceTest {
     void countMatchesOnlyFullCoverageAndActiveMembers() {
         Long active1 = createUser("Active", "One", UserEntity.Status.ACTIVE);
         Long active2 = createUser("Active", "Two", UserEntity.Status.ACTIVE);
-        Long inactive = createUser("Inactive", "User", UserEntity.Status.INACTIVE);
+        Long inactive = createUser("Inactive", "User", UserEntity.Status.LEFT);
 
         service.replaceAll(active1, List.of(
             new UserAvailability(null, active1, Partner.Weekday.MONDAY, "14:00", "18:00")

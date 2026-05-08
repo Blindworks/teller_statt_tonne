@@ -16,6 +16,7 @@ public enum SystemLogEventType {
     USER_DELETED(SystemLogCategory.USER_MGMT, SystemLogSeverity.WARN),
     USER_ROLES_CHANGED(SystemLogCategory.USER_MGMT, SystemLogSeverity.INFO),
     USER_STATUS_CHANGED(SystemLogCategory.USER_MGMT, SystemLogSeverity.INFO),
+    USER_INVITATION_SENT(SystemLogCategory.USER_MGMT, SystemLogSeverity.INFO),
     ROLE_CREATED(SystemLogCategory.USER_MGMT, SystemLogSeverity.INFO),
     ROLE_UPDATED(SystemLogCategory.USER_MGMT, SystemLogSeverity.INFO),
     ROLE_DELETED(SystemLogCategory.USER_MGMT, SystemLogSeverity.WARN),

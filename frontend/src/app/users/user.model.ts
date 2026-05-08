@@ -26,6 +26,7 @@ export interface User {
   status: UserStatus;
   introductionCompletedAt: string | null;
   hygieneApproved: boolean;
+  hasPassword: boolean;
   tags: string[];
 }
 
@@ -64,6 +65,7 @@ export function emptyUser(defaultRole: RoleName = 'RETTER'): User {
     status: 'PENDING',
     introductionCompletedAt: null,
     hygieneApproved: false,
+    hasPassword: false,
     tags: [],
   };
 }

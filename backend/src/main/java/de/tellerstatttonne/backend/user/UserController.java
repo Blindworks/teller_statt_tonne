@@ -82,6 +82,12 @@ public class UserController {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
+    @PostMapping("/{id}/resend-invitation")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
+    public ResponseEntity<User> resendInvitation(@PathVariable Long id) {
+        return ResponseEntity.ok(service.resendInvitation(id));
+    }
+
     @PostMapping("/{id}/introduction-completed")
     @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<User> markIntroductionCompleted(@PathVariable Long id) {

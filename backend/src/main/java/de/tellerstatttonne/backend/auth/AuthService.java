@@ -59,7 +59,8 @@ public class AuthService {
                 .build());
             throw new BadCredentialsException("Invalid credentials");
         }
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+        if (user.getPasswordHash() == null
+            || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.LOGIN_FAILED)
                 .actor(user.getId(), user.getEmail())
                 .target("USER", user.getId())

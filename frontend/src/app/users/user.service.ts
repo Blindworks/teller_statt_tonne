@@ -12,7 +12,6 @@ export interface UserFilter {
 
 export interface AdminCreateUserRequest {
   email: string;
-  password: string;
   firstName: string;
   lastName: string;
   roleNames: RoleName[];
@@ -57,6 +56,10 @@ export class UserService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  resendInvitation(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/resend-invitation`, {});
   }
 
   markIntroductionCompleted(id: number): Observable<User> {

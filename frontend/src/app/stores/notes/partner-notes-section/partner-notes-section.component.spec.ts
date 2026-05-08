@@ -26,6 +26,7 @@ class AuthServiceStub {
       status: 'ACTIVE',
       introductionCompletedAt: null,
       hygieneApproved: true,
+      hasPassword: true,
       tags: [],
     });
   }
