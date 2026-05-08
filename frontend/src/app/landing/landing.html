@@ -4,7 +4,7 @@
       <img src="/assets/landing/logo-icon.png" alt="" />
       <div>
         <div class="brand-name">Teller statt Tonne</div>
-        <div class="brand-sub">Bad Vilbel e.V.</div>
+        <div class="brand-sub">Bad Vilbel i.G.</div>
       </div>
     </a>
     <nav class="nav">
@@ -29,15 +29,83 @@
     <aside class="col-side">
       <div class="panel" id="wer">
         <h2>Wer wir sind</h2>
-        <p>
-          Wir sind <strong>Teller statt Tonne Bad Vilbel e.V.</strong> – ein gemeinnütziger Verein
-          aus engagierten Lebensmittelretter:innen, viele von uns mit Erfahrung aus dem
-          Foodsharing.
-        </p>
-        <p>
-          Uns verbindet ein klares Ziel: Wir wollen nicht länger zusehen, wie wertvolle
-          Lebensmittel im Müll landen.
-        </p>
+        <ul class="goals">
+          <li class="goal">
+            <span class="goal-ico">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="9" cy="8" r="3" />
+                <circle cx="17" cy="9" r="2.4" />
+                <path d="M3 20a6 6 0 0 1 12 0" />
+                <path d="M14 20a5 5 0 0 1 7-4" />
+              </svg>
+            </span>
+            <span>
+              Wir sind <strong>Teller statt Tonne Bad Vilbel i.G.</strong> – ein gemeinnütziger
+              Verein, der sich ehrenamtlich für Lebensmittelrettung und gegen
+              Lebensmittelverschwendung engagiert.
+            </span>
+          </li>
+          <li class="goal">
+            <span class="goal-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"
+                />
+              </svg>
+            </span>
+            <span>
+              Viele von uns verfügen über langjährige Erfahrung in verschiedenen Bereichen der
+              Lebensmittelrettung. Uns verbindet ein klares Ziel:
+              <strong>Wertvolle Lebensmittel retten, statt wegwerfen.</strong>
+            </span>
+          </li>
+          <li class="goal">
+            <span class="goal-ico">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 3 4 6v6c0 4.5 3.4 8.4 8 9 4.6-.6 8-4.5 8-9V6l-8-3Z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+            </span>
+            <span>
+              Dabei stehen für uns Zuverlässigkeit, ein respektvoller Umgang mit Lebensmitteln
+              sowie die Einhaltung von Hygiene und Vorschriften im Mittelpunkt.
+            </span>
+          </li>
+          <li class="goal">
+            <span class="goal-ico">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z" />
+                <circle cx="7" cy="18" r="2" />
+                <circle cx="17" cy="18" r="2" />
+              </svg>
+            </span>
+            <span>
+              Unser Anspruch ist es, Lebensmittel schnell, sinnvoll und unkompliziert dorthin zu
+              bringen, wo sie wirklich gebraucht werden.
+            </span>
+          </li>
+        </ul>
       </div>
 
       <div class="panel">
@@ -129,7 +197,7 @@
         <img src="/assets/landing/logo-icon.png" alt="" />
         <div class="logo-text">
           <div class="name">Teller statt Tonne</div>
-          <div class="ev">Bad Vilbel e.V.</div>
+          <div class="ev">Bad Vilbel i.G.</div>
         </div>
       </div>
       <div class="tagline">
@@ -142,7 +210,7 @@
         <span>DICH!</span>
       </h1>
 
-      <div class="ribbon">RETTER GESUCHT!</div>
+      <div class="ribbon">RETTER:IN GESUCHT!</div>
 
       <a class="hero-cta" routerLink="/quiz" aria-label="Hier kommst du zu uns">
         <img src="/assets/landing/hero-cta.png" alt="Hier kommst du zu uns!" />
@@ -229,7 +297,7 @@
         </a>
       </div>
 
-      <a class="social-card fb" [href]="facebookUrl" target="_blank" rel="noopener noreferrer"
+      <a class="social-card fb" [href]="'https://www.facebook.com/tellerstatttonnebadvilbel'" target="_blank" rel="noopener noreferrer"
          aria-label="Besuche uns auf Facebook">
         <span class="ic">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
@@ -254,7 +322,7 @@
         <img src="/assets/landing/logo-icon.png" alt="" />
         <div>
           <div class="n">Teller statt Tonne</div>
-          <div class="s">Bad Vilbel e.V.</div>
+          <div class="s">Bad Vilbel i.G.</div>
         </div>
       </div>
       <p class="foot-about">
@@ -277,7 +345,7 @@
     </div>
   </div>
   <div class="copy">
-    © {{ currentYear }} Teller statt Tonne Bad Vilbel e.V. — Für einen besseren Umgang mit
+    © {{ currentYear }} Teller statt Tonne Bad Vilbel i.G. — Für einen besseren Umgang mit
     Lebensmitteln. ♥
   </div>
 </footer>
