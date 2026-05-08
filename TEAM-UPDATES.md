@@ -5,6 +5,16 @@ Für die technische Detailansicht siehe [`backend/CHANGELOG.md`](backend/CHANGEL
 
 ---
 
+## 08.05.2026
+
+### Neu
+
+- **Logo-Upload für Betriebe.** Im Betrieb-Editor (✏️ Bearbeiten-Button auf einem Betrieb) lässt sich jetzt direkt eine Bilddatei als Logo hochladen — JPG, PNG, WebP oder GIF, bis 5 MB. Das bisherige URL-Feld bleibt parallel bestehen, falls man lieber einen Link einträgt. Hochgeladene Logos erscheinen sofort in der Betriebe-Liste, im Detail-Dialog, im Dashboard und in der Mitglieder-Verwaltung. *Was heißt das fürs Team?* Niemand muss mehr ein Logo erst irgendwo extern hosten — Datei auswählen, fertig.
+
+> Hinweis: Bei einem **neuen** Betrieb erst einmal speichern, dann ist der Upload-Button aktiv.
+
+---
+
 ## 07.05.2026
 
 > 🚀 **Live ausgerollt am 07.05.2026** — die folgenden Änderungen sind in der Produktiv-App verfügbar.
