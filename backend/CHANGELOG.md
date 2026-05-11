@@ -7,6 +7,20 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-05-11
+
+### Added
+
+- Verteilerplätze (intern „Verteilerplatz", extern „Teller-Treff"): neues Modul `distributionpoint` mit Entity, DTO, Mapper, Repository, Service und Controller (`/api/distribution-points`). CRUD-Endpunkte sind auf `ADMINISTRATOR` und `TEAMLEITER` beschränkt. Felder: Name, Beschreibung, Adresse (Straße, PLZ, Stadt, optional Lat/Lng), Betreiber als `@ManyToMany` zu `UserEntity` (Join-Table `distribution_point_operator`) und Öffnungszeiten als `@ElementCollection` (`distribution_point_opening_slot`, Wochentag + Start-/Endzeit, mehrere Slots pro Wochentag möglich).
+- Liquibase-Changeset 020 legt die Tabellen `distribution_point`, `distribution_point_operator` und `distribution_point_opening_slot` an (Cascade-Delete auf den Verteilerplatz).
+- Neue Systemlog-Eventtypen `DISTRIBUTION_POINT_CREATED`, `DISTRIBUTION_POINT_UPDATED`, `DISTRIBUTION_POINT_DELETED` (Kategorie `ADMIN_ACTION`).
+
+## [0.17.0] - 2026-05-11
+
+### Added
+
+- `Partner.Category` um den Wert `BUTCHER` (Metzgerei) erweitert.
+
 ## [0.16.0] - 2026-05-08
 
 ### Added

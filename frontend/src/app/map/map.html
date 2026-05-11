@@ -51,6 +51,21 @@
       Nur aktive
     </button>
 
+    @if (canSeeDistributionPoints()) {
+      <button
+        type="button"
+        (click)="toggleDistributionPoints()"
+        [class.bg-tertiary]="showDistributionPoints()"
+        [class.text-on-tertiary]="showDistributionPoints()"
+        [class.bg-surface-container-high]="!showDistributionPoints()"
+        [class.text-on-surface-variant]="!showDistributionPoints()"
+        class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+      >
+        <span class="material-symbols-outlined text-base">distance</span>
+        Verteilerplätze
+      </button>
+    }
+
     <div class="ml-auto flex items-center gap-2">
       <label for="day-select" class="text-xs uppercase tracking-wider text-on-surface-variant font-bold">
         Tag

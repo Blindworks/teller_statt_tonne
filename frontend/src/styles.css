@@ -108,6 +108,11 @@ h3,
   --map-pin-fg: var(--color-on-tertiary, #fff8f2);
 }
 
+.map-marker--distribution-point {
+  --map-pin-bg: var(--color-tertiary, #835512);
+  --map-pin-fg: var(--color-on-tertiary, #ffffff);
+}
+
 .map-marker__pin {
   width: 36px;
   height: 36px;

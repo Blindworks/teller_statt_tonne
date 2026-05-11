@@ -25,4 +25,15 @@ public class GeocodingController {
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.noContent().build());
     }
+
+    @GetMapping("/forward")
+    public ResponseEntity<GeocodingService.Coordinates> forward(
+        @RequestParam(required = false) String street,
+        @RequestParam(required = false) String postalCode,
+        @RequestParam(required = false) String city
+    ) {
+        return service.geocode(street, postalCode, city)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.noContent().build());
+    }
 }

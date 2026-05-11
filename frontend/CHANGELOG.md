@@ -7,6 +7,19 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-05-11
+
+### Added
+
+- Admin-View „Verteilerplätze" (öffentlich „Teller-Treff") unter `/admin/distribution-points`: Liste plus Formular zum Anlegen und Bearbeiten. Pflichtfeld Name; optionale Beschreibung, Adresse (Straße, PLZ, Stadt, Lat/Lng), Mehrfach-Auswahl von Betreiber:innen und beliebig viele Öffnungszeiten-Slots (Wochentag + Von/Bis als `<input type="time">`). Löschen über eigenen Confirm-Dialog. Zugriff für `ADMINISTRATOR` und `TEAMLEITER`.
+- Karte „Verteilerplätze" im Admin-Dashboard.
+
+## [0.20.0] - 2026-05-11
+
+### Added
+
+- Neue Betriebs-Kategorie `BUTCHER` (UI-Label „Metzgerei", Icon `kebab_dining`). Auswählbar im Betriebs-Edit, in den Kartenfiltern und korrekt dargestellt in Pickup-Cards.
+
 ## [0.19.0] - 2026-05-08
 
 ### Added

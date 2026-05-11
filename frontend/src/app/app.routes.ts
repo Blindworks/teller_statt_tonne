@@ -141,6 +141,30 @@ export const routes: Routes = [
           import('./admin/roles/role-form/role-form').then((m) => m.RoleFormComponent),
       },
       {
+        path: 'admin/distribution-points',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import(
+            './admin/distribution-points/distribution-points-list/distribution-points-list'
+          ).then((m) => m.DistributionPointsListComponent),
+      },
+      {
+        path: 'admin/distribution-points/new',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import(
+            './admin/distribution-points/distribution-point-form/distribution-point-form'
+          ).then((m) => m.DistributionPointFormComponent),
+      },
+      {
+        path: 'admin/distribution-points/:id',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import(
+            './admin/distribution-points/distribution-point-form/distribution-point-form'
+          ).then((m) => m.DistributionPointFormComponent),
+      },
+      {
         path: 'admin/store-members',
         canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
         loadComponent: () =>

@@ -29,6 +29,9 @@ public enum SystemLogEventType {
     STORE_DELETED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.WARN),
     STORE_RESTORED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.INFO),
     STORE_MEMBER_ASSIGNED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.INFO),
+    DISTRIBUTION_POINT_CREATED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.INFO),
+    DISTRIBUTION_POINT_UPDATED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.INFO),
+    DISTRIBUTION_POINT_DELETED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.WARN),
 
     // --- SYSTEM ---
     UNHANDLED_EXCEPTION(SystemLogCategory.SYSTEM, SystemLogSeverity.ERROR),

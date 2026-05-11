@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="020-create-distribution-point" author="teller-statt-tonne">
+        <createTable tableName="distribution_point">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(2000)"/>
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(16)"/>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="020-create-distribution-point-operator" author="teller-statt-tonne">
+        <createTable tableName="distribution_point_operator">
+            <column name="distribution_point_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="distribution_point_operator"
+                       columnNames="distribution_point_id, user_id"
+                       constraintName="pk_distribution_point_operator"/>
+        <addForeignKeyConstraint baseTableName="distribution_point_operator"
+                                 baseColumnNames="distribution_point_id"
+                                 referencedTableName="distribution_point" referencedColumnNames="id"
+                                 constraintName="fk_dpop_distribution_point" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="distribution_point_operator"
+                                 baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_dpop_user" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="020-create-distribution-point-opening-slot" author="teller-statt-tonne">
+        <createTable tableName="distribution_point_opening_slot">
+            <column name="distribution_point_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weekday" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="VARCHAR(8)"/>
+            <column name="end_time" type="VARCHAR(8)"/>
+        </createTable>
+        <addPrimaryKey tableName="distribution_point_opening_slot"
+                       columnNames="distribution_point_id, slot_order"
+                       constraintName="pk_distribution_point_opening_slot"/>
+        <addForeignKeyConstraint baseTableName="distribution_point_opening_slot"
+                                 baseColumnNames="distribution_point_id"
+                                 referencedTableName="distribution_point" referencedColumnNames="id"
+                                 constraintName="fk_dpopslot_distribution_point" onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

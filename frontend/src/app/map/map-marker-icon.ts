@@ -26,3 +26,20 @@ export function buildPartnerMarkerIcon(
     popupAnchor: [0, -38],
   });
 }
+
+export function buildDistributionPointMarkerIcon(): L.DivIcon {
+  return L.divIcon({
+    className: 'map-marker map-marker--distribution-point',
+    html: `
+        <div class="map-marker__pin">
+          <span class="material-symbols-outlined">distance</span>
+        </div>
+        <svg class="map-marker__tail" viewBox="0 0 12 10" aria-hidden="true">
+          <path d="M0 0 H12 L6 10 Z"/>
+        </svg>
+      `,
+    iconSize: [36, 44],
+    iconAnchor: [18, 42],
+    popupAnchor: [0, -38],
+  });
+}

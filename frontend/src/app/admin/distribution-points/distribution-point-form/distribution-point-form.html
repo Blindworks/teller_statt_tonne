@@ -1,0 +1,212 @@
+<section class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <div class="max-w-4xl">
+  <a
+    routerLink="/admin/distribution-points"
+    class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-2"
+  >
+    <span class="material-symbols-outlined text-base">arrow_back</span>
+    Verteilerplätze
+  </a>
+  <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface mb-2">
+    @if (isEdit()) { Verteilerplatz bearbeiten } @else { Neuer Verteilerplatz }
+  </h1>
+  <p class="text-sm text-on-surface-variant mb-8">Öffentlich angezeigt als „Teller-Treff".</p>
+
+  @if (errorMessage()) {
+    <p class="mb-4 rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm">
+      {{ errorMessage() }}
+    </p>
+  }
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    class="bg-surface-container-lowest rounded-2xl shadow-[0_20px_50px_rgba(48,52,40,0.04)] p-6 space-y-6"
+  >
+    <div>
+      <label class="block text-sm font-bold text-on-surface mb-1">
+        Name <span class="text-error">*</span>
+      </label>
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="z. B. Teller-Treff Marktstraße"
+        class="w-full rounded-lg border border-outline-variant px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+      />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        <p class="text-xs text-error mt-1">Name ist erforderlich.</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-bold text-on-surface mb-1">Beschreibung</label>
+      <textarea
+        formControlName="description"
+        rows="3"
+        placeholder="z. B. Garage rechts vom Hofeingang, Selbstbedienung."
+        class="w-full rounded-lg border border-outline-variant px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+      ></textarea>
+    </div>
+
+    <fieldset class="border border-outline-variant/40 rounded-xl p-4">
+      <legend class="px-2 text-sm font-bold text-on-surface">Adresse</legend>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-on-surface-variant mb-1">Straße & Hausnummer</label>
+          <input
+            type="text"
+            formControlName="street"
+            class="w-full rounded-lg border border-outline-variant px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-on-surface-variant mb-1">PLZ</label>
+            <input
+              type="text"
+              formControlName="postalCode"
+              class="w-full rounded-lg border border-outline-variant px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Stadt</label>
+            <input
+              type="text"
+              formControlName="city"
+              class="w-full rounded-lg border border-outline-variant px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Breitengrad (optional)</label>
+            <input
+              type="number"
+              step="0.000001"
+              formControlName="latitude"
+              class="w-full rounded-lg border border-outline-variant px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Längengrad (optional)</label>
+            <input
+              type="number"
+              step="0.000001"
+              formControlName="longitude"
+              class="w-full rounded-lg border border-outline-variant px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <button
+            type="button"
+            (click)="geolocate()"
+            [disabled]="geocoding()"
+            class="inline-flex items-center gap-2 rounded-full bg-secondary-container/60 text-on-secondary-container px-4 py-2 text-sm font-bold hover:shadow disabled:opacity-50"
+          >
+            <span class="material-symbols-outlined text-base">my_location</span>
+            @if (geocoding()) { Suche … } @else { Koordinaten aus Adresse bestimmen }
+          </button>
+          @if (geocodeMessage()) {
+            <span class="text-xs text-on-surface-variant">{{ geocodeMessage() }}</span>
+          }
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="border border-outline-variant/40 rounded-xl p-4">
+      <legend class="px-2 text-sm font-bold text-on-surface">Betreiber</legend>
+      @if (users().length === 0) {
+        <p class="text-sm text-on-surface-variant">Keine Nutzer:innen verfügbar.</p>
+      } @else {
+        <div class="max-h-64 overflow-y-auto space-y-1 pr-2">
+          @for (user of users(); track user.id) {
+            <label class="flex items-center gap-2 py-1 text-sm hover:bg-surface-container/40 px-2 rounded">
+              <input
+                type="checkbox"
+                class="w-4 h-4"
+                [checked]="isOperatorSelected(user.id!)"
+                (change)="toggleOperator(user.id!, $any($event.target).checked)"
+              />
+              <span>{{ userLabel(user) }}</span>
+            </label>
+          }
+        </div>
+      }
+    </fieldset>
+
+    <fieldset class="border border-outline-variant/40 rounded-xl p-4">
+      <legend class="px-2 text-sm font-bold text-on-surface">Öffnungszeiten</legend>
+      <div formArrayName="openingSlots" class="space-y-3">
+        @for (slot of slots.controls; track $index; let i = $index) {
+          <div [formGroupName]="i" class="grid grid-cols-12 gap-3 items-end">
+            <div class="col-span-4">
+              <label class="block text-xs font-semibold text-on-surface-variant mb-1">Wochentag</label>
+              <select
+                formControlName="weekday"
+                class="w-full rounded-lg border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                @for (day of weekdays; track day) {
+                  <option [value]="day">{{ weekdayLabels[day] }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-span-3">
+              <label class="block text-xs font-semibold text-on-surface-variant mb-1">Von</label>
+              <input
+                type="time"
+                formControlName="startTime"
+                class="w-full rounded-lg border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div class="col-span-3">
+              <label class="block text-xs font-semibold text-on-surface-variant mb-1">Bis</label>
+              <input
+                type="time"
+                formControlName="endTime"
+                class="w-full rounded-lg border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div class="col-span-2 flex justify-end">
+              <button
+                type="button"
+                (click)="removeSlot(i)"
+                class="rounded-full p-2 text-on-surface-variant hover:bg-error-container hover:text-on-error-container"
+                title="Slot entfernen"
+              >
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-sm text-on-surface-variant">Noch keine Öffnungszeiten erfasst.</p>
+        }
+      </div>
+      <button
+        type="button"
+        (click)="addSlot()"
+        class="mt-4 inline-flex items-center gap-1 rounded-full bg-secondary-container/60 text-on-secondary-container px-4 py-2 text-sm font-bold hover:shadow"
+      >
+        <span class="material-symbols-outlined text-base">add</span>
+        Öffnungszeit hinzufügen
+      </button>
+    </fieldset>
+
+    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/20">
+      <a
+        routerLink="/admin/distribution-points"
+        class="rounded-full px-5 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
+      >
+        Abbrechen
+      </a>
+      <button
+        type="submit"
+        [disabled]="saving()"
+        class="rounded-full bg-primary text-on-primary px-6 py-2 text-sm font-bold shadow hover:shadow-lg disabled:opacity-50"
+      >
+        @if (saving()) { Speichere … } @else { Speichern }
+      </button>
+    </div>
+  </form>
+  </div>
+</section>

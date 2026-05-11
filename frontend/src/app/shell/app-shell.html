@@ -47,6 +47,20 @@
       <span class="material-symbols-outlined">map</span>
       Karte
     </a>
+    @if (canSeeDistributionPoints()) {
+      <a
+        routerLink="/admin/distribution-points"
+        routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+        #distPointsLink="routerLinkActive"
+        class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+        [class.text-on-surface]="!distPointsLink.isActive"
+        [class.hover:bg-surface-container]="!distPointsLink.isActive"
+        [class.hover:translate-x-1]="!distPointsLink.isActive"
+      >
+        <span class="material-symbols-outlined">distance</span>
+        Verteilerplätze
+      </a>
+    }
     @if (isPlanner()) {
       <a
         routerLink="/pickups"
@@ -309,6 +323,19 @@
         >
           <span class="material-symbols-outlined">calendar_today</span>
           Abholung-Planer
+        </a>
+      }
+      @if (canSeeDistributionPoints()) {
+        <a
+          routerLink="/admin/distribution-points"
+          (click)="closeMore()"
+          routerLinkActive="text-primary"
+          #distPointsSheet="routerLinkActive"
+          class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+          [class.text-on-surface]="!distPointsSheet.isActive"
+        >
+          <span class="material-symbols-outlined">distance</span>
+          Verteilerplätze
         </a>
       }
       @if (canSeeStoreMembers()) {

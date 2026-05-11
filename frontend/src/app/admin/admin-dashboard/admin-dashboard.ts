@@ -16,6 +16,13 @@ export class AdminDashboardComponent {
       link: '/admin/roles',
     },
     {
+      title: 'Verteilerplätze',
+      description:
+        'Orte verwalten, an denen gerettete Lebensmittel an Endkund:innen weitergegeben werden (Teller-Treff).',
+      icon: 'storefront',
+      link: '/admin/distribution-points',
+    },
+    {
       title: 'Bewerbungen',
       description: 'Bewerbungen von Retter:innen auf Betriebe annehmen oder ablehnen.',
       icon: 'how_to_reg',
