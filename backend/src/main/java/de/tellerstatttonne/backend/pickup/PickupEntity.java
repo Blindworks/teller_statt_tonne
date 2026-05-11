@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.pickup;
 
+import de.tellerstatttonne.backend.event.EventEntity;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -29,9 +30,13 @@ public class PickupEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "partner_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "partner_id")
     private PartnerEntity partner;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "event_id")
+    private EventEntity event;
 
     @Column(name = "pickup_date", nullable = false)
     private LocalDate date;
@@ -67,6 +72,8 @@ public class PickupEntity {
     public void setId(Long id) { this.id = id; }
     public PartnerEntity getPartner() { return partner; }
     public void setPartner(PartnerEntity partner) { this.partner = partner; }
+    public EventEntity getEvent() { return event; }
+    public void setEvent(EventEntity event) { this.event = event; }
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
     public String getStartTime() { return startTime; }

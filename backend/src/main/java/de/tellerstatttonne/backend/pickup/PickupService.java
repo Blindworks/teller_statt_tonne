@@ -1,6 +1,8 @@
 package de.tellerstatttonne.backend.pickup;
 
 import de.tellerstatttonne.backend.auth.CurrentUser;
+import de.tellerstatttonne.backend.event.EventEntity;
+import de.tellerstatttonne.backend.event.EventRepository;
 import de.tellerstatttonne.backend.notification.event.PickupStatusChangedEvent;
 import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
@@ -30,17 +32,20 @@ public class PickupService {
 
     private final PickupRepository repository;
     private final PartnerRepository partnerRepository;
+    private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
 
     public PickupService(PickupRepository repository,
                          PartnerRepository partnerRepository,
+                         EventRepository eventRepository,
                          UserRepository userRepository,
                          UserService userService,
                          ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
         this.partnerRepository = partnerRepository;
+        this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.userService = userService;
         this.eventPublisher = eventPublisher;
@@ -49,7 +54,6 @@ public class PickupService {
     @Transactional(readOnly = true)
     public List<Pickup> findBetween(LocalDate from, LocalDate to) {
         Optional<Set<Long>> filter = currentUserPartnerFilter();
-        if (filter.isPresent() && filter.get().isEmpty()) return List.of();
         List<PickupEntity> entities = repository.findByDateBetweenOrderByDateAscStartTimeAsc(from, to);
         return mapAll(applyFilter(entities, filter));
     }
@@ -57,14 +61,12 @@ public class PickupService {
     @Transactional(readOnly = true)
     public List<Pickup> findRecent() {
         Optional<Set<Long>> filter = currentUserPartnerFilter();
-        if (filter.isPresent() && filter.get().isEmpty()) return List.of();
         return mapAll(applyFilter(repository.findTop10ByOrderByDateDescStartTimeDesc(), filter));
     }
 
     @Transactional(readOnly = true)
     public List<Pickup> findUpcoming(int limit) {
         Optional<Set<Long>> filter = currentUserPartnerFilter();
-        if (filter.isPresent() && filter.get().isEmpty()) return List.of();
         int capped = Math.max(1, Math.min(limit, 50));
         return mapAll(applyFilter(repository.findByStatusAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
             Pickup.Status.SCHEDULED, LocalDate.now(), PageRequest.of(0, capped)), filter));
@@ -74,8 +76,14 @@ public class PickupService {
     public Optional<Pickup> findById(Long id) {
         Optional<Set<Long>> filter = currentUserPartnerFilter();
         return repository.findById(id)
-            .filter(e -> filter.isEmpty() || (e.getPartner() != null && filter.get().contains(e.getPartner().getId())))
+            .filter(e -> isAllowed(e, filter))
             .map(e -> PickupMapper.toDto(e, resolveUsers(List.of(e))));
+    }
+
+    private static boolean isAllowed(PickupEntity e, Optional<Set<Long>> filter) {
+        if (filter.isEmpty()) return true;
+        if (e.getEvent() != null) return true;
+        return e.getPartner() != null && filter.get().contains(e.getPartner().getId());
     }
 
     private Optional<Set<Long>> currentUserPartnerFilter() {
@@ -96,22 +104,27 @@ public class PickupService {
 
     private static List<PickupEntity> applyFilter(List<PickupEntity> entities, Optional<Set<Long>> filter) {
         if (filter.isEmpty()) return entities;
-        Set<Long> allowed = filter.get();
         return entities.stream()
-            .filter(e -> e.getPartner() != null && allowed.contains(e.getPartner().getId()))
+            .filter(e -> isAllowed(e, filter))
             .toList();
     }
 
     public Pickup create(Pickup pickup) {
         validate(pickup);
-        PartnerEntity partner = loadPartner(pickup.partnerId());
-        if (partner.getStatus() != Partner.Status.KOOPERIERT) {
-            throw new IllegalArgumentException(
-                "Pickups können nur für kooperierende Betriebe angelegt werden");
+        PartnerEntity partner = null;
+        EventEntity event = null;
+        if (pickup.eventId() != null) {
+            event = loadEvent(pickup.eventId());
+        } else {
+            partner = loadPartner(pickup.partnerId());
+            if (partner.getStatus() != Partner.Status.KOOPERIERT) {
+                throw new IllegalArgumentException(
+                    "Pickups können nur für kooperierende Betriebe angelegt werden");
+            }
         }
         PickupEntity entity = new PickupEntity();
-        PickupMapper.applyToEntity(entity, pickup, partner);
-        if (entity.getSavedKg() == null) {
+        PickupMapper.applyToEntity(entity, pickup, partner, event);
+        if (entity.getSavedKg() == null && partner != null) {
             entity.setSavedKg(resolveSlotExpectedKg(partner, pickup));
         }
         PickupEntity saved = repository.save(entity);
@@ -138,6 +151,9 @@ public class PickupService {
     };
 
     public List<Pickup> createSeries(Pickup template, LocalDate until) {
+        if (template.eventId() != null) {
+            throw new IllegalArgumentException("series creation is not supported for event pickups");
+        }
         if (template.date() == null) {
             throw new IllegalArgumentException("date is required");
         }
@@ -154,6 +170,7 @@ public class PickupService {
             Pickup occurrence = new Pickup(
                 null, template.partnerId(), template.partnerName(), template.partnerCategoryId(),
                 template.partnerStreet(), template.partnerCity(), template.partnerLogoUrl(),
+                null, null, null,
                 cursor, template.startTime(), template.endTime(), template.status(),
                 template.capacity(), template.assignments(), template.notes(), template.savedKg()
             );
@@ -166,9 +183,15 @@ public class PickupService {
     public Optional<Pickup> update(Long id, Pickup pickup) {
         return repository.findById(id).map(entity -> {
             validate(pickup);
-            PartnerEntity partner = loadPartner(pickup.partnerId());
+            PartnerEntity partner = null;
+            EventEntity event = null;
+            if (pickup.eventId() != null) {
+                event = loadEvent(pickup.eventId());
+            } else {
+                partner = loadPartner(pickup.partnerId());
+            }
             Pickup.Status oldStatus = entity.getStatus();
-            PickupMapper.applyToEntity(entity, pickup, partner);
+            PickupMapper.applyToEntity(entity, pickup, partner, event);
             PickupEntity saved = repository.save(entity);
             Pickup.Status newStatus = saved.getStatus();
             if (oldStatus != newStatus) {
@@ -224,7 +247,15 @@ public class PickupService {
             .orElseThrow(() -> new IllegalArgumentException("partner not found: " + partnerId));
     }
 
+    private EventEntity loadEvent(Long eventId) {
+        return eventRepository.findById(eventId)
+            .orElseThrow(() -> new IllegalArgumentException("event not found: " + eventId));
+    }
+
     private void validate(Pickup pickup) {
+        if ((pickup.partnerId() == null) == (pickup.eventId() == null)) {
+            throw new IllegalArgumentException("exactly one of partnerId or eventId must be set");
+        }
         if (pickup.date() == null) {
             throw new IllegalArgumentException("date is required");
         }

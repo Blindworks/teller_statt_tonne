@@ -45,12 +45,14 @@ public class PickupSignupService {
         if (pickup.getDate().isBefore(LocalDate.now())) return Result.PICKUP_PAST;
 
         PartnerEntity partner = pickup.getPartner();
-        if (partner.getStatus() != Partner.Status.KOOPERIERT) {
-            return Result.PARTNER_NOT_COOPERATING;
+        if (partner != null) {
+            if (partner.getStatus() != Partner.Status.KOOPERIERT) {
+                return Result.PARTNER_NOT_COOPERATING;
+            }
+            boolean isMember = partner.getMembers().stream()
+                .anyMatch(m -> userId.equals(m.getId()));
+            if (!isMember) return Result.NOT_MEMBER;
         }
-        boolean isMember = partner.getMembers().stream()
-            .anyMatch(m -> userId.equals(m.getId()));
-        if (!isMember) return Result.NOT_MEMBER;
 
         boolean alreadyAssigned = pickup.getAssignments().stream()
             .anyMatch(a -> userId.equals(a.getUserId()));

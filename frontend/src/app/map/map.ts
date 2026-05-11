@@ -22,12 +22,18 @@ import { PartnerService } from '../partners/partner.service';
 import { PartnerCategoryRegistry } from '../partners/partner-category-registry.service';
 import { AuthService } from '../auth/auth.service';
 import { StoreDetailDialogService } from '../stores/store-detail-dialog/store-detail-dialog.service';
-import { buildDistributionPointMarkerIcon, buildPartnerMarkerIcon } from './map-marker-icon';
+import {
+  buildDistributionPointMarkerIcon,
+  buildEventMarkerIcon,
+  buildPartnerMarkerIcon,
+} from './map-marker-icon';
 import { DistributionPointService } from '../admin/distribution-points/distribution-point.service';
 import {
   DistributionPoint,
   WEEKDAY_LABELS,
 } from '../admin/distribution-points/distribution-point.model';
+import { EventService } from '../events/event.service';
+import { CharityEvent } from '../events/event.model';
 
 type DayFilter = 'ALL' | Weekday;
 
@@ -44,6 +50,7 @@ const DEFAULT_ZOOM = 13;
 export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly service = inject(PartnerService);
   private readonly distributionPointService = inject(DistributionPointService);
+  private readonly eventService = inject(EventService);
   private readonly auth = inject(AuthService);
   private readonly detailDialog = inject(StoreDetailDialogService);
   private readonly categoryRegistry = inject(PartnerCategoryRegistry);
@@ -53,6 +60,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   readonly partners = signal<Partner[]>([]);
   readonly distributionPoints = signal<DistributionPoint[]>([]);
+  readonly events = signal<CharityEvent[]>([]);
   readonly loadError = signal<string | null>(null);
 
   readonly selectedCategories = signal<Set<number>>(new Set());
@@ -60,6 +68,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   readonly activeOnly = signal(false);
   readonly selectedDay = signal<DayFilter>('ALL');
   readonly showDistributionPoints = signal(true);
+  readonly showEvents = signal(true);
 
   readonly weekdays = WEEKDAYS;
   readonly allCategories = this.categoryRegistry.categories;
@@ -95,6 +104,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return this.distributionPoints().filter((dp) => dp.latitude != null && dp.longitude != null);
   });
 
+  readonly filteredEvents = computed(() => {
+    if (!this.showEvents()) return [];
+    return this.events().filter((ev) => ev.latitude != null && ev.longitude != null);
+  });
+
   private map?: L.Map;
   private cluster?: L.MarkerClusterGroup;
   private routeLayer?: L.Polyline;
@@ -115,6 +129,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       });
     }
 
+    this.eventService.list('active').subscribe({
+      next: (list) => this.events.set(list),
+      error: () => {
+        // Veranstaltungen sind optional auf der Karte — Fehler still ignorieren
+      },
+    });
+
     effect(() => {
       const cats = this.allCategories();
       if (!this.categoryInit && cats.length > 0) {
@@ -128,6 +149,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     effect(() => {
       this.filteredPartners();
       this.filteredDistributionPoints();
+      this.filteredEvents();
       this.selectedDay();
       if (this.map) {
         this.redraw();
@@ -181,6 +203,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   toggleDistributionPoints(): void {
     this.showDistributionPoints.update((v) => !v);
+  }
+
+  toggleEvents(): void {
+    this.showEvents.update((v) => !v);
   }
 
   canSeeDistributionPoints(): boolean {
@@ -238,6 +264,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
     dpMarkers.forEach((m) => this.cluster!.addLayer(m));
 
+    const eventMarkers: L.Marker[] = [];
+    for (const ev of this.filteredEvents()) {
+      const marker = L.marker([ev.latitude!, ev.longitude!], {
+        icon: buildEventMarkerIcon(),
+      });
+      marker.bindPopup(this.buildEventPopup(ev));
+      eventMarkers.push(marker);
+    }
+    eventMarkers.forEach((m) => this.cluster!.addLayer(m));
+
     if (day !== 'ALL' && ordered.length >= 2) {
       const latlngs: L.LatLngTuple[] = ordered.map((p) => [p.latitude!, p.longitude!]);
       this.routeLayer = L.polyline(latlngs, {
@@ -254,6 +290,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       ...this.filteredDistributionPoints().map(
         (dp) => [dp.latitude!, dp.longitude!] as L.LatLngTuple,
       ),
+      ...this.filteredEvents().map((ev) => [ev.latitude!, ev.longitude!] as L.LatLngTuple),
     ];
     if (allPoints.length > 0) {
       const bounds = L.latLngBounds(allPoints);
@@ -288,6 +325,31 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         <div class="map-popup__category">Teller-Treff</div>
         ${addressLine ? `<div class="map-popup__address">${addressLine}</div>` : ''}
         ${hours}
+        ${editLink}
+      </div>
+    `;
+  }
+
+  private buildEventPopup(ev: CharityEvent): string {
+    const escape = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const addressLine = [ev.street, [ev.postalCode, ev.city].filter((p) => !!p).join(' ').trim()]
+      .filter((p) => !!p && p.trim())
+      .map((p) => escape(p!.trim()))
+      .join(', ');
+    const period =
+      ev.startDate === ev.endDate
+        ? escape(ev.startDate)
+        : `${escape(ev.startDate)} – ${escape(ev.endDate)}`;
+    const isPlanner = this.canSeeDistributionPoints();
+    const editLink = isPlanner
+      ? `<a class="map-popup__link" href="/events/${ev.id}">Bearbeiten →</a>`
+      : '';
+    return `
+      <div class="map-popup">
+        <div class="map-popup__title">${escape(ev.name)} <span class="map-popup__badge map-popup__badge--active">Veranstaltung</span></div>
+        <div class="map-popup__category">${period}</div>
+        ${addressLine ? `<div class="map-popup__address">${addressLine}</div>` : ''}
         ${editLink}
       </div>
     `;

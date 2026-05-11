@@ -72,6 +72,23 @@ export const routes: Routes = [
         loadComponent: () => import('./map/map').then((m) => m.MapComponent),
       },
       {
+        path: 'events',
+        loadComponent: () =>
+          import('./events/events-list/events-list').then((m) => m.EventsListComponent),
+      },
+      {
+        path: 'events/new',
+        canActivate: [plannerRoles],
+        loadComponent: () =>
+          import('./events/event-form/event-form').then((m) => m.EventFormComponent),
+      },
+      {
+        path: 'events/:id',
+        canActivate: [plannerRoles],
+        loadComponent: () =>
+          import('./events/event-form/event-form').then((m) => m.EventFormComponent),
+      },
+      {
         path: 'pickups',
         canActivate: [plannerViewRoles],
         loadComponent: () =>

@@ -32,6 +32,9 @@ public enum SystemLogEventType {
     DISTRIBUTION_POINT_CREATED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.INFO),
     DISTRIBUTION_POINT_UPDATED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.INFO),
     DISTRIBUTION_POINT_DELETED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.WARN),
+    EVENT_CREATED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.INFO),
+    EVENT_UPDATED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.INFO),
+    EVENT_DELETED(SystemLogCategory.ADMIN_ACTION, SystemLogSeverity.WARN),
 
     // --- SYSTEM ---
     UNHANDLED_EXCEPTION(SystemLogCategory.SYSTEM, SystemLogSeverity.ERROR),

@@ -12,6 +12,9 @@ public record Pickup(
     String partnerStreet,
     String partnerCity,
     String partnerLogoUrl,
+    Long eventId,
+    String eventName,
+    String eventLogoUrl,
     LocalDate date,
     String startTime,
     String endTime,
@@ -27,7 +30,8 @@ public record Pickup(
 
     public Pickup withId(Long newId) {
         return new Pickup(newId, partnerId, partnerName, partnerCategoryId,
-            partnerStreet, partnerCity, partnerLogoUrl, date,
+            partnerStreet, partnerCity, partnerLogoUrl,
+            eventId, eventName, eventLogoUrl, date,
             startTime, endTime, status, capacity, assignments, notes, savedKg);
     }
 }

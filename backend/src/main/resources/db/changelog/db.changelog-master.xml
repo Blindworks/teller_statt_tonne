@@ -26,5 +26,6 @@
     <include file="db/changelog/changes/019-password-hash-nullable.xml"/>
     <include file="db/changelog/changes/020-distribution-point.xml"/>
     <include file="db/changelog/changes/021-partner-category.xml"/>
+    <include file="db/changelog/changes/022-event.xml"/>
 
 </databaseChangeLog>

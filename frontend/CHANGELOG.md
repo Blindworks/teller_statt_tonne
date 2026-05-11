@@ -7,6 +7,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-05-11
+
+### Added
+
+- Veranstaltungen als kurzlebige Abholungsorte: neues Modul `events` mit `event.model.ts`, `event.service.ts`, `events-list/` (Tabs „Aktiv" / „Vergangen") und `event-form/` (Anlegen und Bearbeiten von Name, Beschreibung, Start-/Enddatum, Adresse, Ansprechperson, optionalem Logo). Routen `/events`, `/events/new`, `/events/:id` (Bearbeiten/Anlegen nur für `ADMINISTRATOR`/`TEAMLEITER`).
+- Top-Navigation: neuer Eintrag „Veranstaltungen" für alle eingeloggten Rollen.
+- Karte: aktive Veranstaltungen erscheinen mit eigenem `event`-Marker neben Betrieben und Verteilerplätzen; Popups zeigen Name, Zeitraum und Adresse.
+
+### Changed
+
+- `Pickup`-Modell und `DaySlot`-Modell um `eventId`, `eventName`, `eventLogoUrl` erweitert. Dashboard zeigt Event-Pickups jeder/jedem Retter:in (offen, ohne Vorab-Zuordnung) — die Anzeige richtet sich nach dem neuen Diskriminator: ist `eventId` gesetzt, wird der Slot als Veranstaltung dargestellt.
+
 ## [0.22.0] - 2026-05-11
 
 ### Added

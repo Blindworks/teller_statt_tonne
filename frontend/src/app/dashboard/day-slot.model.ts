@@ -8,6 +8,9 @@ export interface DaySlot {
   partnerStreet: string | null;
   partnerCity: string | null;
   partnerLogoUrl: string | null;
+  eventId: number | null;
+  eventName: string | null;
+  eventLogoUrl: string | null;
   date: string;
   startTime: string;
   endTime: string;

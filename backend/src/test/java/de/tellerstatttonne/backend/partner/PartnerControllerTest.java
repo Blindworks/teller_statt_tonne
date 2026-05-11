@@ -220,6 +220,7 @@ class PartnerControllerTest {
         }
         pickupService.create(new Pickup(
             null, created.id(), null, null, null, null, null,
+            null, null, null,
             nextMonday, "09:00", "10:00", Pickup.Status.SCHEDULED, 1, List.of(), null, null
         ));
 

@@ -1,5 +1,6 @@
 package de.tellerstatttonne.backend.pickup;
 
+import de.tellerstatttonne.backend.event.EventEntity;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.user.User;
 import java.util.List;
@@ -11,6 +12,7 @@ final class PickupMapper {
 
     static Pickup toDto(PickupEntity e, Map<Long, User> usersById) {
         PartnerEntity partner = e.getPartner();
+        EventEntity event = e.getEvent();
         List<Pickup.Assignment> assignments = e.getAssignments() == null
             ? List.of()
             : e.getAssignments().stream().map(a -> {
@@ -33,6 +35,9 @@ final class PickupMapper {
             partner != null ? partner.getStreet() : null,
             partner != null ? partner.getCity() : null,
             partner != null ? partner.getLogoUrl() : null,
+            event != null ? event.getId() : null,
+            event != null ? event.getName() : null,
+            event != null ? event.getLogoUrl() : null,
             e.getDate(),
             e.getStartTime(),
             e.getEndTime(),
@@ -44,8 +49,9 @@ final class PickupMapper {
         );
     }
 
-    static void applyToEntity(PickupEntity target, Pickup src, PartnerEntity partner) {
+    static void applyToEntity(PickupEntity target, Pickup src, PartnerEntity partner, EventEntity event) {
         target.setPartner(partner);
+        target.setEvent(event);
         target.setDate(src.date());
         target.setStartTime(src.startTime());
         target.setEndTime(src.endTime());

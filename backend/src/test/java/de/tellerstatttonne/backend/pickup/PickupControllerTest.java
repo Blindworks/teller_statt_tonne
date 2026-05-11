@@ -93,6 +93,7 @@ class PickupControllerTest {
     void createListUpdateDeleteRoundTrip() {
         Pickup payload = new Pickup(
             null, partnerId, null, null, null, null, null,
+            null, null, null,
             LocalDate.of(2026, 4, 21), "19:30", "20:00",
             Pickup.Status.SCHEDULED, 2,
             List.of(new Pickup.Assignment(memberId, null, null)),
@@ -116,6 +117,7 @@ class PickupControllerTest {
 
         Pickup updatedPayload = new Pickup(
             created.id(), partnerId, null, null, null, null, null,
+            null, null, null,
             created.date(), "19:30", "20:00",
             Pickup.Status.COMPLETED, 2, created.assignments(), "done", null
         );
@@ -132,6 +134,7 @@ class PickupControllerTest {
     void rejectsEndBeforeStart() {
         Pickup bad = new Pickup(
             null, partnerId, null, null, null, null, null,
+            null, null, null,
             LocalDate.of(2026, 4, 21), "20:00", "19:00",
             Pickup.Status.SCHEDULED, 1, List.of(), null, null
         );
@@ -143,6 +146,7 @@ class PickupControllerTest {
     void rejectsCapacityBelowAssignments() {
         Pickup bad = new Pickup(
             null, partnerId, null, null, null, null, null,
+            null, null, null,
             LocalDate.of(2026, 4, 21), "10:00", "10:30",
             Pickup.Status.SCHEDULED, 1,
             List.of(
@@ -160,6 +164,7 @@ class PickupControllerTest {
     void updateMissingReturns404() {
         Pickup payload = new Pickup(
             -1L, partnerId, null, null, null, null, null,
+            null, null, null,
             LocalDate.of(2026, 4, 21), "10:00", "10:30",
             Pickup.Status.SCHEDULED, 1, List.of(), null, null
         );

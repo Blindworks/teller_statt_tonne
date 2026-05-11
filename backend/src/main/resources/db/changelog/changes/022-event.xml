@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="022-create-event" author="teller-statt-tonne">
+        <createTable tableName="event">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(2000)"/>
+            <column name="start_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(16)"/>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+            <column name="logo_url" type="VARCHAR(1024)"/>
+            <column name="contact_name" type="VARCHAR(255)"/>
+            <column name="contact_email" type="VARCHAR(255)"/>
+            <column name="contact_phone" type="VARCHAR(64)"/>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="event" indexName="idx_event_end_date">
+            <column name="end_date"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="022-pickup-add-event-id" author="teller-statt-tonne">
+        <addColumn tableName="pickup">
+            <column name="event_id" type="BIGINT"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="pickup" baseColumnNames="event_id"
+                                 referencedTableName="event" referencedColumnNames="id"
+                                 constraintName="fk_pickup_event" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="022-pickup-partner-nullable" author="teller-statt-tonne">
+        <dropForeignKeyConstraint baseTableName="pickup" constraintName="fk_pickup_partner"/>
+        <dropNotNullConstraint tableName="pickup" columnName="partner_id" columnDataType="BIGINT"/>
+        <addForeignKeyConstraint baseTableName="pickup" baseColumnNames="partner_id"
+                                 referencedTableName="partner" referencedColumnNames="id"
+                                 constraintName="fk_pickup_partner" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="022-pickup-parent-xor-check" author="teller-statt-tonne">
+        <sql>
+            ALTER TABLE pickup
+            ADD CONSTRAINT ck_pickup_parent_xor
+            CHECK ((partner_id IS NOT NULL AND event_id IS NULL)
+                OR (partner_id IS NULL AND event_id IS NOT NULL))
+        </sql>
+        <rollback>
+            ALTER TABLE pickup DROP CONSTRAINT ck_pickup_parent_xor
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -7,7 +7,19 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
-## [0.19.0] - 2026-05-11
+## [0.20.0] - 2026-05-11
+
+### Added
+
+- Veranstaltungen als kurzlebige Abholungsorte: neues Modul `event` mit Entity, DTO, Mapper, Repository, Service und Controller (`/api/events`). Felder: `name`, `description`, `startDate`/`endDate` (Pflicht), Adresse (Straße/PLZ/Stadt/Lat/Lng — Geocoding über `GeocodingService`), optionales `logoUrl` und ein eingebetteter `Contact` (Name/E-Mail/Telefon). `GET /api/events?scope=active|past|all` (Default `active`, filtert auf `endDate >= heute`/`< heute`). Anlegen, Bearbeiten, Löschen und Logo-Upload erfordern `ADMINISTRATOR` oder `TEAMLEITER`. Neue Systemlog-Eventtypen `EVENT_CREATED`, `EVENT_UPDATED`, `EVENT_DELETED` (Kategorie `ADMIN_ACTION`).
+- Liquibase-Changeset 022 legt Tabelle `event` an (inkl. Index auf `end_date`), ergänzt `pickup.event_id` mit FK auf `event.id` (`ON DELETE CASCADE`), macht `pickup.partner_id` nullable und sichert per CHECK-Constraint `ck_pickup_parent_xor`, dass jedes Pickup genau einen Eltern-Datensatz (Betrieb ODER Veranstaltung) besitzt.
+
+### Changed
+
+- `PickupEntity` hat jetzt eine zweite optionale ManyToOne-Referenz `event` (Spalte `event_id`); `partner` ist optional. `Pickup`-DTO und `DaySlot`-DTO um `eventId`, `eventName`, `eventLogoUrl` erweitert.
+- `PickupService` validiert beim Anlegen/Aktualisieren, dass genau eines von `partnerId`/`eventId` gesetzt ist. Sichtbarkeitsfilter: `RETTER` sieht alle Event-Pickups (offen, ohne Partner-Zuordnung) zusätzlich zu Pickups der Betriebe, denen er zugeordnet ist. `createSeries` ist nur für Betriebs-Pickups erlaubt; Veranstaltungs-Pickups werden manuell pro Slot angelegt.
+- `PickupSignupService.signup` überspringt für Event-Pickups die Membership- und Partner-Status-Checks — jede:r RETTER kann sich in einen freien Event-Slot eintragen.
+- `DashboardService` nimmt Event-Pickups in die DaySlot-Aggregation auf und blendet sie für RETTER nicht über die Partner-Mitgliedschaft aus.
 
 ### Added
 
