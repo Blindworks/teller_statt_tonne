@@ -27,6 +27,7 @@ class PartnerApplicationServiceTest {
     @Autowired private PartnerRepository partnerRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
+    @Autowired private de.tellerstatttonne.backend.partnercategory.PartnerCategoryRepository partnerCategoryRepository;
 
     @Test
     void applyCreatesPendingApplication() {
@@ -137,7 +138,7 @@ class PartnerApplicationServiceTest {
     private PartnerEntity createPartner() {
         PartnerEntity entity = new PartnerEntity();
         entity.setName("Testbetrieb " + System.nanoTime());
-        entity.setCategory(Partner.Category.BAKERY);
+        entity.setCategoryId(partnerCategoryRepository.findByCodeIgnoreCase("BAKERY").orElseThrow().getId());
         entity.setStatus(Partner.Status.KOOPERIERT);
         return partnerRepository.save(entity);
     }

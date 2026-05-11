@@ -23,6 +23,8 @@ public interface PartnerRepository extends JpaRepository<PartnerEntity, Long> {
     @Query("select p.id from PartnerEntity p join p.members m where m.id = :userId")
     List<Long> findIdsByMemberId(Long userId);
 
+    long countByCategoryId(Long categoryId);
+
     interface MemberCountRow {
         Long getPartnerId();
         Integer getMemberCount();

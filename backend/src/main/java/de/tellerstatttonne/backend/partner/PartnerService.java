@@ -128,7 +128,7 @@ public class PartnerService {
             })
             .toList();
         return new Partner(
-            p.id(), p.name(), p.category(), p.street(), p.postalCode(), p.city(),
+            p.id(), p.name(), p.categoryId(), p.street(), p.postalCode(), p.city(),
             p.logoUrl(), p.contact(), enriched, p.status(), p.latitude(), p.longitude()
         );
     }
@@ -301,8 +301,8 @@ public class PartnerService {
         if (partner.name() == null || partner.name().isBlank()) {
             throw new IllegalArgumentException("name is required");
         }
-        if (partner.category() == null) {
-            throw new IllegalArgumentException("category is required");
+        if (partner.categoryId() == null) {
+            throw new IllegalArgumentException("categoryId is required");
         }
     }
 }

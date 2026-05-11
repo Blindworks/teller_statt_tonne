@@ -1,6 +1,5 @@
 package de.tellerstatttonne.backend.pickup;
 
-import de.tellerstatttonne.backend.partner.Partner;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -9,7 +8,7 @@ public record Pickup(
     Long id,
     Long partnerId,
     String partnerName,
-    Partner.Category partnerCategory,
+    Long partnerCategoryId,
     String partnerStreet,
     String partnerCity,
     String partnerLogoUrl,
@@ -27,7 +26,7 @@ public record Pickup(
     public record Assignment(Long memberId, String memberName, String memberAvatarUrl) {}
 
     public Pickup withId(Long newId) {
-        return new Pickup(newId, partnerId, partnerName, partnerCategory,
+        return new Pickup(newId, partnerId, partnerName, partnerCategoryId,
             partnerStreet, partnerCity, partnerLogoUrl, date,
             startTime, endTime, status, capacity, assignments, notes, savedKg);
     }

@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CATEGORY_LABELS, Category } from '../../partners/partner.model';
+import { PartnerCategoryRegistry } from '../../partners/partner-category-registry.service';
 import { resolvePhotoUrl } from '../../users/photo-url';
 import { UserProfileDialogService } from '../../users/user-profile-dialog/user-profile-dialog.service';
 import { Pickup } from '../pickup.model';
@@ -27,6 +27,7 @@ export type PickupCardMode = 'PLANNER' | 'RETTER';
 })
 export class PickupCardComponent {
   private readonly profileDialog = inject(UserProfileDialogService);
+  private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   private readonly nowMs = signal(Date.now());
 
@@ -43,8 +44,6 @@ export class PickupCardComponent {
   readonly signupRequested = output<number>();
   readonly unassignRequested = output<number>();
 
-  readonly categoryLabels = CATEGORY_LABELS;
-
   readonly variant = computed<Variant>(() => {
     const p = this.pickup();
     if (p.status === 'CANCELLED') return 'CANCELLED';
@@ -60,13 +59,13 @@ export class PickupCardComponent {
   });
 
   readonly chipClasses = computed(() => {
-    const c = this.pickup().partnerCategory;
-    return chipClass(c);
+    const c = this.categoryRegistry.byId(this.pickup().partnerCategoryId);
+    return chipClass(c?.code ?? null);
   });
 
   readonly chipLabel = computed(() => {
-    const c = this.pickup().partnerCategory;
-    return c ? CATEGORY_LABELS[c] : 'Partner';
+    const c = this.categoryRegistry.byId(this.pickup().partnerCategoryId);
+    return c?.label ?? 'Partner';
   });
 
   readonly isRetter = computed(() => this.mode() === 'RETTER');
@@ -144,8 +143,8 @@ export class PickupCardComponent {
   }
 }
 
-function chipClass(category: Category | null): string {
-  switch (category) {
+function chipClass(code: string | null): string {
+  switch (code) {
     case 'BAKERY':
       return 'text-primary bg-primary-container';
     case 'SUPERMARKET':

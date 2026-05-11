@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import de.tellerstatttonne.backend.partner.note.PartnerNote;
 import de.tellerstatttonne.backend.partner.note.PartnerNoteController;
 import de.tellerstatttonne.backend.partner.note.Visibility;
+import de.tellerstatttonne.backend.partnercategory.PartnerCategoryRepository;
 import de.tellerstatttonne.backend.pickup.Pickup;
 import de.tellerstatttonne.backend.pickup.PickupRepository;
 import de.tellerstatttonne.backend.pickup.PickupService;
@@ -52,12 +53,22 @@ class PartnerControllerTest {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private PartnerCategoryRepository partnerCategoryRepository;
+
     private Long adminId;
+    private Long bakeryId;
+    private Long cafeId;
+    private Long butcherId;
 
     @BeforeEach
     void cleanSlate() {
         pickupRepository.deleteAll();
         repository.deleteAll();
+
+        bakeryId = partnerCategoryRepository.findByCodeIgnoreCase("BAKERY").orElseThrow().getId();
+        cafeId = partnerCategoryRepository.findByCodeIgnoreCase("CAFE").orElseThrow().getId();
+        butcherId = partnerCategoryRepository.findByCodeIgnoreCase("BUTCHER").orElseThrow().getId();
 
         UserEntity admin = new UserEntity();
         admin.setEmail("admin-" + System.nanoTime() + "@example.de");
@@ -90,7 +101,7 @@ class PartnerControllerTest {
         Partner payload = new Partner(
             null,
             "Bäckerei Sonnenschein",
-            Partner.Category.BAKERY,
+            bakeryId,
             "Hauptstraße 42",
             "10115",
             "Berlin",
@@ -110,43 +121,43 @@ class PartnerControllerTest {
 
         Partner fetched = controller.get(created.id()).getBody();
         assertThat(fetched).isNotNull();
-        assertThat(fetched.category()).isEqualTo(Partner.Category.BAKERY);
+        assertThat(fetched.categoryId()).isEqualTo(bakeryId);
         assertThat(fetched.pickupSlots().get(0).weekday()).isEqualTo(Partner.Weekday.MONDAY);
 
         assertThat(controller.list(false)).hasSize(1);
 
         Partner updatedPayload = new Partner(
-            created.id(), "Bäckerei Sonne", Partner.Category.CAFE,
+            created.id(), "Bäckerei Sonne", cafeId,
             "Hauptstraße 42", "10115", "Berlin", null,
             payload.contact(), payload.pickupSlots(), Partner.Status.VERHANDLUNGEN_LAUFEN, null, null
         );
         Partner updated = controller.update(created.id(), updatedPayload).getBody();
         assertThat(updated).isNotNull();
         assertThat(updated.name()).isEqualTo("Bäckerei Sonne");
-        assertThat(updated.category()).isEqualTo(Partner.Category.CAFE);
+        assertThat(updated.categoryId()).isEqualTo(cafeId);
         assertThat(updated.status()).isEqualTo(Partner.Status.VERHANDLUNGEN_LAUFEN);
     }
 
     @Test
     void butcherCategoryRoundTrip() {
         Partner created = controller.create(new Partner(
-            null, "Metzgerei Müller", Partner.Category.BUTCHER,
+            null, "Metzgerei Müller", butcherId,
             "Wurststraße 1", "10115", "Berlin", null,
             new Partner.Contact("Max Müller", "max@example.de", "+49 176 0000000"),
             List.of(), Partner.Status.KOOPERIERT, null, null
         )).getBody();
         assertThat(created).isNotNull();
-        assertThat(created.category()).isEqualTo(Partner.Category.BUTCHER);
+        assertThat(created.categoryId()).isEqualTo(butcherId);
 
         Partner fetched = controller.get(created.id()).getBody();
         assertThat(fetched).isNotNull();
-        assertThat(fetched.category()).isEqualTo(Partner.Category.BUTCHER);
+        assertThat(fetched.categoryId()).isEqualTo(butcherId);
     }
 
     @Test
     void updateAddsAndRemovesSlots() {
         Partner created = controller.create(new Partner(
-            null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
+            null, "Test", bakeryId, "s", "p", "c", null,
             new Partner.Contact("a", "b", "c"),
             List.of(new Partner.PickupSlot(Partner.Weekday.MONDAY, "09:00", "10:00", true)),
             Partner.Status.KOOPERIERT, null, null
@@ -154,7 +165,7 @@ class PartnerControllerTest {
         assertThat(created).isNotNull();
 
         Partner withTwo = new Partner(
-            created.id(), created.name(), created.category(), created.street(),
+            created.id(), created.name(), created.categoryId(), created.street(),
             created.postalCode(), created.city(), created.logoUrl(), created.contact(),
             List.of(
                 new Partner.PickupSlot(Partner.Weekday.MONDAY, "09:00", "10:00", true),
@@ -167,7 +178,7 @@ class PartnerControllerTest {
         assertThat(updated.pickupSlots()).hasSize(2);
 
         Partner removed = new Partner(
-            created.id(), created.name(), created.category(), created.street(),
+            created.id(), created.name(), created.categoryId(), created.street(),
             created.postalCode(), created.city(), created.logoUrl(), created.contact(),
             List.of(new Partner.PickupSlot(Partner.Weekday.FRIDAY, "17:00", "18:00", true)),
             created.status(), null, null
@@ -181,7 +192,7 @@ class PartnerControllerTest {
     @Test
     void updateAllowsMultipleSlotsOnSameWeekday() {
         Partner created = controller.create(new Partner(
-            null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
+            null, "Test", bakeryId, "s", "p", "c", null,
             new Partner.Contact("a", "b", "c"),
             List.of(
                 new Partner.PickupSlot(Partner.Weekday.FRIDAY, "09:00", "10:00", true),
@@ -196,7 +207,7 @@ class PartnerControllerTest {
     @Test
     void updateRejectsRemovingSlotWithFutureScheduledPickup() {
         Partner created = controller.create(new Partner(
-            null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
+            null, "Test", bakeryId, "s", "p", "c", null,
             new Partner.Contact("a", "b", "c"),
             List.of(new Partner.PickupSlot(Partner.Weekday.MONDAY, "09:00", "10:00", true)),
             Partner.Status.KOOPERIERT, null, null
@@ -213,7 +224,7 @@ class PartnerControllerTest {
         ));
 
         Partner withoutSlot = new Partner(
-            created.id(), created.name(), created.category(), created.street(),
+            created.id(), created.name(), created.categoryId(), created.street(),
             created.postalCode(), created.city(), created.logoUrl(), created.contact(),
             List.of(), created.status(), null, null
         );
@@ -224,7 +235,7 @@ class PartnerControllerTest {
     @Test
     void statusChangeAutoCreatesInternalNote() {
         Partner created = controller.create(new Partner(
-            null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
+            null, "Test", bakeryId, "s", "p", "c", null,
             new Partner.Contact("a", "b", "c"),
             List.of(), Partner.Status.KEIN_KONTAKT, null, null
         )).getBody();
@@ -233,7 +244,7 @@ class PartnerControllerTest {
         assertThat(noteController.list(created.id())).isEmpty();
 
         Partner statusChange = new Partner(
-            created.id(), created.name(), created.category(), created.street(),
+            created.id(), created.name(), created.categoryId(), created.street(),
             created.postalCode(), created.city(), created.logoUrl(), created.contact(),
             created.pickupSlots(), Partner.Status.KOOPERIERT, null, null
         );
@@ -247,7 +258,7 @@ class PartnerControllerTest {
         assertThat(note.authorUserId()).isEqualTo(adminId);
 
         Partner nameOnlyChange = new Partner(
-            created.id(), "Anderer Name", created.category(), created.street(),
+            created.id(), "Anderer Name", created.categoryId(), created.street(),
             created.postalCode(), created.city(), created.logoUrl(), created.contact(),
             created.pickupSlots(), Partner.Status.KOOPERIERT, null, null
         );
@@ -263,7 +274,7 @@ class PartnerControllerTest {
 
     @Test
     void updateMissingReturns404() {
-        Partner partner = new Partner(999L, "X", Partner.Category.CAFE, "s", "p", "c",
+        Partner partner = new Partner(999L, "X", cafeId, "s", "p", "c",
             null, new Partner.Contact("a", "b", "c"), List.of(), Partner.Status.KOOPERIERT, null, null);
         assertThat(controller.update(999L, partner).getStatusCode().value()).isEqualTo(404);
     }

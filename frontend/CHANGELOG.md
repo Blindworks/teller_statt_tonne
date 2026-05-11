@@ -7,6 +7,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-05-11
+
+### Added
+
+- Zentraler Signal-basierter `PartnerCategoryRegistry` in `frontend/src/app/partners/`: lädt aktive Betrieb-Kategorien einmalig per `APP_INITIALIZER` aus `/api/partner-categories` und stellt sie als Signal sowie über `labelForId(id)`, `iconForId(id)`, `byId(id)`, `byCode(code)` allen Konsumenten bereit. Damit gibt es keine hartcodierten Kategorien mehr im Frontend.
+- Admin-View „Betrieb-Kategorien" unter `/admin/partner-categories`: Tabelle mit Aktiv-Toggle und Löschen sowie Formular zum Anlegen/Bearbeiten (Code, Label, Reihenfolge, Aktiv-Flag) inkl. Icon-Picker-Grid aus kuratierter Liste lebensmittelbezogener Material-Symbols. Eintrag im Admin-Dashboard.
+
+### Changed
+
+- `Partner.category` (String-Literal-Union) wurde durch `Partner.categoryId: number | null` ersetzt; die statischen Maps `CATEGORY_LABELS` und `CATEGORY_ICONS` sowie der `Category`-Type aus `partner.model.ts` sind entfallen. Karte, Stores-Liste, Pickup-Card, Dashboard, Store-Detail-Dialog, Mitglieder-Verwaltung und Papierkorb laden Labels/Icons jetzt über den `PartnerCategoryRegistry`.
+- `Pickup.partnerCategory` und `DaySlot.partnerCategory` heißen jetzt `partnerCategoryId: number | null` (passend zum Backend).
+
 ## [0.21.0] - 2026-05-11
 
 ### Added

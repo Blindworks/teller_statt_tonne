@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PartnerService } from '../partners/partner.service';
+import { PartnerCategoryRegistry } from '../partners/partner-category-registry.service';
 import {
-  CATEGORY_ICONS,
-  CATEGORY_LABELS,
-  Category,
   Partner,
   STATUS_LABELS,
   STATUS_ORDER,
@@ -31,13 +29,19 @@ export class StoresComponent {
   private readonly auth = inject(AuthService);
   private readonly applyDialog = inject(ApplyToStoreDialogService);
   private readonly applications = inject(PartnerApplicationsService);
+  private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   readonly partners = signal<Partner[]>([]);
   readonly loadError = signal<string | null>(null);
   readonly city = 'Bad Vilbel';
-  readonly categoryIcons = CATEGORY_ICONS;
-  readonly categoryLabels = CATEGORY_LABELS;
   readonly statusLabels = STATUS_LABELS;
+
+  categoryIcon(id: number | null): string {
+    return this.categoryRegistry.iconForId(id);
+  }
+  categoryLabel(id: number | null): string {
+    return this.categoryRegistry.labelForId(id);
+  }
 
   readonly isRetter = computed(() => !!this.auth.currentUser()?.roles?.includes('RETTER'));
   readonly canApply = computed(() => {
@@ -52,12 +56,10 @@ export class StoresComponent {
   );
 
   readonly searchTerm = signal('');
-  readonly categoryFilter = signal<Category | 'ALL'>('ALL');
+  readonly categoryFilter = signal<number | 'ALL'>('ALL');
   readonly statusFilter = signal<Status | 'ALL'>('ALL');
 
-  readonly categoryOptions: ReadonlyArray<{ value: Category; label: string }> = (
-    Object.keys(CATEGORY_LABELS) as Category[]
-  ).map((value) => ({ value, label: CATEGORY_LABELS[value] }));
+  readonly categoryOptions = this.categoryRegistry.categories;
   readonly statusOptions: ReadonlyArray<{ value: Status; label: string }> = STATUS_ORDER.map(
     (value) => ({ value, label: STATUS_LABELS[value] }),
   );
@@ -74,7 +76,7 @@ export class StoresComponent {
     const category = this.categoryFilter();
     const status = this.statusFilter();
     return this.partners().filter((p) => {
-      if (category !== 'ALL' && p.category !== category) return false;
+      if (category !== 'ALL' && p.categoryId !== category) return false;
       if (status !== 'ALL' && p.status !== status) return false;
       if (term.length > 0) {
         const haystack = `${p.name} ${p.street} ${p.postalCode} ${p.city}`.toLowerCase();
@@ -137,7 +139,8 @@ export class StoresComponent {
   }
 
   onCategoryChange(event: Event): void {
-    this.categoryFilter.set((event.target as HTMLSelectElement).value as Category | 'ALL');
+    const raw = (event.target as HTMLSelectElement).value;
+    this.categoryFilter.set(raw === 'ALL' ? 'ALL' : Number(raw));
   }
 
   onStatusChange(event: Event): void {

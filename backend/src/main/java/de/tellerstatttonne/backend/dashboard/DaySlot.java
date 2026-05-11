@@ -1,6 +1,5 @@
 package de.tellerstatttonne.backend.dashboard;
 
-import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.pickup.Pickup;
 import java.time.LocalDate;
 import java.util.List;
@@ -9,7 +8,7 @@ public record DaySlot(
     Long pickupId,
     Long partnerId,
     String partnerName,
-    Partner.Category partnerCategory,
+    Long partnerCategoryId,
     String partnerStreet,
     String partnerCity,
     String partnerLogoUrl,

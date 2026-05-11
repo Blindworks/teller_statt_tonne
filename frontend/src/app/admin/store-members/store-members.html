@@ -38,7 +38,7 @@
                 <img class="w-full h-full object-cover" [src]="logoSrc" alt="" />
               } @else {
                 <span class="material-symbols-outlined">{{
-                  categoryIcons[store.category]
+                  categoryIcon(store.categoryId)
                 }}</span>
               }
             </div>
@@ -46,9 +46,9 @@
               <h3 class="font-bold text-on-surface truncate">{{ store.name }}</h3>
               <div class="flex items-center gap-1 text-xs text-on-surface-variant">
                 <span class="material-symbols-outlined text-[14px]">{{
-                  categoryIcons[store.category]
+                  categoryIcon(store.categoryId)
                 }}</span>
-                <span class="truncate">{{ categoryLabels[store.category] }}</span>
+                <span class="truncate">{{ categoryLabel(store.categoryId) }}</span>
               </div>
             </div>
           </div>

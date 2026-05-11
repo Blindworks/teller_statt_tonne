@@ -29,7 +29,7 @@ final class PickupMapper {
             e.getId(),
             partner != null ? partner.getId() : null,
             partner != null ? partner.getName() : null,
-            partner != null ? partner.getCategory() : null,
+            partner != null ? partner.getCategoryId() : null,
             partner != null ? partner.getStreet() : null,
             partner != null ? partner.getCity() : null,
             partner != null ? partner.getLogoUrl() : null,

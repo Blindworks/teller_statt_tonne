@@ -30,14 +30,14 @@
               <img [src]="logoSrc" [alt]="p.name" class="w-full h-full object-cover" />
             } @else {
               <span class="material-symbols-outlined text-3xl">{{
-                categoryIcons[p.category]
+                categoryIcon(p.categoryId)
               }}</span>
             }
           </div>
           <div class="flex-1 min-w-0">
             <h4 class="text-2xl font-extrabold text-on-surface break-words">{{ p.name }}</h4>
             <p class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mt-1">
-              {{ categoryLabels[p.category] }}
+              {{ categoryLabel(p.categoryId) }}
             </p>
             <div class="mt-2">
               @if (p.status === 'KOOPERIERT') {

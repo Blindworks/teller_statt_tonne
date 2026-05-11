@@ -55,7 +55,7 @@ public class DashboardService {
             boolean assigned = p.assignments() != null && p.assignments().stream()
                 .anyMatch(a -> currentUserId.equals(a.memberId()));
             result.add(new DaySlot(
-                p.id(), p.partnerId(), p.partnerName(), p.partnerCategory(),
+                p.id(), p.partnerId(), p.partnerName(), p.partnerCategoryId(),
                 p.partnerStreet(), p.partnerCity(), p.partnerLogoUrl(),
                 p.date(), p.startTime(), p.endTime(),
                 p.capacity(), p.assignments() == null ? List.of() : p.assignments(),

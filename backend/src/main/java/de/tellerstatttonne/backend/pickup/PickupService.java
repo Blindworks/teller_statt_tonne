@@ -152,7 +152,7 @@ public class PickupService {
         LocalDate cursor = template.date();
         while (!cursor.isAfter(until)) {
             Pickup occurrence = new Pickup(
-                null, template.partnerId(), template.partnerName(), template.partnerCategory(),
+                null, template.partnerId(), template.partnerName(), template.partnerCategoryId(),
                 template.partnerStreet(), template.partnerCity(), template.partnerLogoUrl(),
                 cursor, template.startTime(), template.endTime(), template.status(),
                 template.capacity(), template.assignments(), template.notes(), template.savedKg()

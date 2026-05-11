@@ -6,7 +6,7 @@ import java.util.List;
 public record Partner(
     Long id,
     String name,
-    Category category,
+    Long categoryId,
     String street,
     String postalCode,
     String city,
@@ -17,8 +17,6 @@ public record Partner(
     Double latitude,
     Double longitude
 ) {
-    public enum Category { BAKERY, SUPERMARKET, CAFE, RESTAURANT, BUTCHER }
-
     public enum Status {
         KEIN_KONTAKT,
         VERHANDLUNGEN_LAUFEN,
@@ -55,7 +53,7 @@ public record Partner(
     }
 
     public Partner withId(Long newId) {
-        return new Partner(newId, name, category, street, postalCode, city, logoUrl,
+        return new Partner(newId, name, categoryId, street, postalCode, city, logoUrl,
             contact, pickupSlots, status, latitude, longitude);
     }
 }

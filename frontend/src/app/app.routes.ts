@@ -165,6 +165,30 @@ export const routes: Routes = [
           ).then((m) => m.DistributionPointFormComponent),
       },
       {
+        path: 'admin/partner-categories',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import(
+            './admin/partner-categories/partner-categories-list/partner-categories-list'
+          ).then((m) => m.PartnerCategoriesListComponent),
+      },
+      {
+        path: 'admin/partner-categories/new',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import(
+            './admin/partner-categories/partner-category-form/partner-category-form'
+          ).then((m) => m.PartnerCategoryFormComponent),
+      },
+      {
+        path: 'admin/partner-categories/:id',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import(
+            './admin/partner-categories/partner-category-form/partner-category-form'
+          ).then((m) => m.PartnerCategoryFormComponent),
+      },
+      {
         path: 'admin/store-members',
         canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
         loadComponent: () =>

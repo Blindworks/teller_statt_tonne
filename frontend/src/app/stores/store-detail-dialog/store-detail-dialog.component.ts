@@ -14,13 +14,12 @@ import { RouterLink } from '@angular/router';
 import { L } from '../../map/leaflet-global';
 import { buildPartnerMarkerIcon } from '../../map/map-marker-icon';
 import {
-  CATEGORY_ICONS,
-  CATEGORY_LABELS,
   PickupSlot,
   STATUS_LABELS,
   WEEKDAYS,
   Weekday,
 } from '../../partners/partner.model';
+import { PartnerCategoryRegistry } from '../../partners/partner-category-registry.service';
 import { AuthService } from '../../auth/auth.service';
 import { StoreDetailDialogService } from './store-detail-dialog.service';
 import { PhotoUrlPipe } from '../../users/photo-url.pipe';
@@ -50,12 +49,18 @@ const WEEKDAY_ORDER: Record<Weekday, number> = WEEKDAYS.reduce(
 export class StoreDetailDialogComponent implements AfterViewInit, OnDestroy {
   private readonly dialogService = inject(StoreDetailDialogService);
   private readonly auth = inject(AuthService);
+  private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   readonly partner = this.dialogService.partner;
   readonly isRetter = computed(() => !!this.auth.currentUser()?.roles?.includes('RETTER'));
-  readonly categoryLabels = CATEGORY_LABELS;
-  readonly categoryIcons = CATEGORY_ICONS;
   readonly statusLabels = STATUS_LABELS;
+
+  categoryIcon(id: number | null): string {
+    return this.categoryRegistry.iconForId(id);
+  }
+  categoryLabel(id: number | null): string {
+    return this.categoryRegistry.labelForId(id);
+  }
 
   readonly activeSlots = computed<PickupSlot[]>(() => {
     const p = this.partner();
@@ -159,7 +164,7 @@ export class StoreDetailDialogComponent implements AfterViewInit, OnDestroy {
       this.map.setView(coords, 15);
     }
 
-    const icon = buildPartnerMarkerIcon(p);
+    const icon = buildPartnerMarkerIcon(p, this.categoryRegistry.byId(p.categoryId));
     if (this.marker) {
       this.marker.setLatLng(coords);
       this.marker.setIcon(icon);

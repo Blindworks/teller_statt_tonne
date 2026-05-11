@@ -11,6 +11,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PartnerService } from '../partner.service';
+import { PartnerCategoryRegistry } from '../partner-category-registry.service';
 import {
   LocationPickResult,
   LocationPickerDialogComponent,
@@ -19,8 +20,6 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
 import { PartnerNotesSectionComponent } from '../../stores/notes/partner-notes-section/partner-notes-section.component';
 import { PhotoUrlPipe } from '../../users/photo-url.pipe';
 import {
-  CATEGORY_LABELS,
-  Category,
   Partner,
   PickupSlot,
   STATUS_LABELS,
@@ -43,7 +42,7 @@ type SlotForm = FormGroup<{
 
 type PartnerForm = FormGroup<{
   name: FormControl<string>;
-  category: FormControl<Category>;
+  categoryId: FormControl<number | null>;
   street: FormControl<string>;
   postalCode: FormControl<string>;
   city: FormControl<string>;
@@ -70,6 +69,7 @@ export class PartnerEditComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
+  private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   readonly isAdmin = computed(() => !!this.auth.currentUser()?.roles?.includes('ADMINISTRATOR'));
   readonly partnerStatus = signal<Status | null>(null);
@@ -79,8 +79,7 @@ export class PartnerEditComponent {
   readonly deleting = signal(false);
 
   readonly weekdays = WEEKDAYS;
-  readonly categoryLabels = CATEGORY_LABELS;
-  readonly categories: Category[] = ['BAKERY', 'SUPERMARKET', 'CAFE', 'RESTAURANT', 'BUTCHER'];
+  readonly categories = this.categoryRegistry.categories;
   readonly statusLabels = STATUS_LABELS;
   readonly statuses = STATUS_ORDER;
 
@@ -153,7 +152,7 @@ export class PartnerEditComponent {
     const defaults = emptyPartner();
     return this.fb.group({
       name: this.fb.nonNullable.control(defaults.name, Validators.required),
-      category: this.fb.nonNullable.control<Category>(defaults.category, Validators.required),
+      categoryId: this.fb.control<number | null>(defaults.categoryId, Validators.required),
       street: this.fb.nonNullable.control(defaults.street),
       postalCode: this.fb.nonNullable.control(defaults.postalCode),
       city: this.fb.nonNullable.control(defaults.city),
@@ -313,7 +312,7 @@ export class PartnerEditComponent {
     this.partnerName.set(partner.name);
     this.form.patchValue({
       name: partner.name,
-      category: partner.category,
+      categoryId: partner.categoryId,
       street: partner.street,
       postalCode: partner.postalCode,
       city: partner.city,
@@ -344,12 +343,16 @@ export class PartnerEditComponent {
     this.slots.removeAt(index);
   }
 
+  compareNumbers(a: number | null, b: number | null): boolean {
+    return a === b;
+  }
+
   private toPartner(): Partner {
     const raw = this.form.getRawValue();
     return {
       id: this.partnerId(),
       name: raw.name,
-      category: raw.category,
+      categoryId: raw.categoryId,
       street: raw.street,
       postalCode: raw.postalCode,
       city: raw.city,

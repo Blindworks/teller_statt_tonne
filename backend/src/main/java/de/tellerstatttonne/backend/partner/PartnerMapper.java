@@ -10,7 +10,7 @@ final class PartnerMapper {
         return new Partner(
             e.getId(),
             e.getName(),
-            e.getCategory(),
+            e.getCategoryId(),
             e.getStreet(),
             e.getPostalCode(),
             e.getCity(),
@@ -33,7 +33,7 @@ final class PartnerMapper {
 
     static void applyToEntity(PartnerEntity target, Partner src) {
         target.setName(src.name());
-        target.setCategory(src.category());
+        target.setCategoryId(src.categoryId());
         target.setStreet(src.street());
         target.setPostalCode(src.postalCode());
         target.setCity(src.city());

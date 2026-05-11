@@ -1,13 +1,16 @@
 import { L } from './leaflet-global';
-import { CATEGORY_ICONS, Category, Status } from '../partners/partner.model';
+import { Status } from '../partners/partner.model';
+import { PartnerCategory } from '../admin/partner-categories/partner-category.model';
 
 export function buildPartnerMarkerIcon(
-  partner: { category: Category; status: Status },
+  partner: { categoryId: number | null; status: Status },
+  category: PartnerCategory | null,
   order: number | null = null,
 ): L.DivIcon {
-  const symbol = CATEGORY_ICONS[partner.category];
+  const symbol = category?.icon ?? 'storefront';
+  const codeSlug = (category?.code ?? 'unknown').toLowerCase();
   const inactive = partner.status !== 'KOOPERIERT' ? ' is-inactive' : '';
-  const categoryClass = ` map-marker--${partner.category.toLowerCase()}`;
+  const categoryClass = ` map-marker--${codeSlug}`;
   const badge =
     order != null ? `<span class="map-marker__badge">${order}</span>` : '';
   return L.divIcon({

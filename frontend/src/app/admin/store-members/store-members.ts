@@ -6,8 +6,9 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CATEGORY_ICONS, CATEGORY_LABELS, Partner } from '../../partners/partner.model';
+import { Partner } from '../../partners/partner.model';
 import { PartnerService } from '../../partners/partner.service';
+import { PartnerCategoryRegistry } from '../../partners/partner-category-registry.service';
 import { UserService } from '../../users/user.service';
 import { User } from '../../users/user.model';
 import { StoreMember } from './store-member.model';
@@ -28,6 +29,7 @@ export class StoreMembersComponent {
   private readonly userService = inject(UserService);
   private readonly storeMembersService = inject(StoreMembersService);
   private readonly profileDialog = inject(UserProfileDialogService);
+  private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   readonly stores = signal<Partner[]>([]);
   readonly memberCounts = signal<Record<number, number>>({});
@@ -38,8 +40,12 @@ export class StoreMembersComponent {
   readonly allMembers = signal<User[]>([]);
   readonly assignDialogOpen = signal(false);
 
-  readonly categoryIcons = CATEGORY_ICONS;
-  readonly categoryLabels = CATEGORY_LABELS;
+  categoryIcon(id: number | null): string {
+    return this.categoryRegistry.iconForId(id);
+  }
+  categoryLabel(id: number | null): string {
+    return this.categoryRegistry.labelForId(id);
+  }
 
   readonly selectedStore = computed(() => {
     const id = this.selectedStoreId();

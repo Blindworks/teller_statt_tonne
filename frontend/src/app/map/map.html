@@ -21,18 +21,18 @@
 
   <section class="bg-surface-container-low rounded-xl p-4 mb-4 flex flex-wrap items-center gap-3">
     <div class="flex flex-wrap gap-2">
-      @for (cat of allCategories; track cat) {
+      @for (cat of allCategories(); track cat.id) {
         <button
           type="button"
-          (click)="toggleCategory(cat)"
-          [class.bg-primary]="isCategorySelected(cat)"
-          [class.text-on-primary]="isCategorySelected(cat)"
-          [class.bg-surface-container-high]="!isCategorySelected(cat)"
-          [class.text-on-surface-variant]="!isCategorySelected(cat)"
+          (click)="toggleCategory(cat.id!)"
+          [class.bg-primary]="isCategorySelected(cat.id!)"
+          [class.text-on-primary]="isCategorySelected(cat.id!)"
+          [class.bg-surface-container-high]="!isCategorySelected(cat.id!)"
+          [class.text-on-surface-variant]="!isCategorySelected(cat.id!)"
           class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
         >
-          <span class="material-symbols-outlined text-base">{{ categoryIcons[cat] }}</span>
-          {{ categoryLabels[cat] }}
+          <span class="material-symbols-outlined text-base">{{ cat.icon }}</span>
+          {{ cat.label }}
         </button>
       }
     </div>

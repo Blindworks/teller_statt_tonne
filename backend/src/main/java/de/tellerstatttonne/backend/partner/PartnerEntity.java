@@ -34,9 +34,8 @@ public class PartnerEntity {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 32)
-    private Partner.Category category;
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
 
     private String street;
 
@@ -79,8 +78,8 @@ public class PartnerEntity {
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public Partner.Category getCategory() { return category; }
-    public void setCategory(Partner.Category category) { this.category = category; }
+    public Long getCategoryId() { return categoryId; }
+    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
     public String getStreet() { return street; }
     public void setStreet(String street) { this.street = street; }
     public String getPostalCode() { return postalCode; }

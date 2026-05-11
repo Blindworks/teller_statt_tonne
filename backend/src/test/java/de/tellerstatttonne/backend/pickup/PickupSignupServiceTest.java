@@ -31,6 +31,7 @@ class PickupSignupServiceTest {
     @Autowired private PartnerService partnerService;
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
+    @Autowired private de.tellerstatttonne.backend.partnercategory.PartnerCategoryRepository partnerCategoryRepository;
 
     private Long partnerId;
     private Long memberId;
@@ -41,8 +42,10 @@ class PickupSignupServiceTest {
     void setup() {
         pickupRepository.deleteAll();
 
+        Long supermarketCategoryId = partnerCategoryRepository
+            .findByCodeIgnoreCase("SUPERMARKET").orElseThrow().getId();
         Partner partner = partnerService.create(new Partner(
-            null, "Bio-Markt Sonne", Partner.Category.SUPERMARKET,
+            null, "Bio-Markt Sonne", supermarketCategoryId,
             "Hauptstraße 1", "10115", "Berlin", null,
             new Partner.Contact("Ina", "ina@example.de", "+49 30 111"),
             List.of(), Partner.Status.KOOPERIERT, null, null

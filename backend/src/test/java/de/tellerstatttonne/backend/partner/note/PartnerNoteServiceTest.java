@@ -28,6 +28,7 @@ class PartnerNoteServiceTest {
     @Autowired private PartnerRepository partnerRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
+    @Autowired private de.tellerstatttonne.backend.partnercategory.PartnerCategoryRepository partnerCategoryRepository;
 
     @Test
     void createPersistsNote() {
@@ -121,7 +122,7 @@ class PartnerNoteServiceTest {
     private PartnerEntity createPartner() {
         PartnerEntity entity = new PartnerEntity();
         entity.setName("Testbetrieb " + System.nanoTime());
-        entity.setCategory(Partner.Category.BAKERY);
+        entity.setCategoryId(partnerCategoryRepository.findByCodeIgnoreCase("BAKERY").orElseThrow().getId());
         entity.setStatus(Partner.Status.KEIN_KONTAKT);
         return partnerRepository.save(entity);
     }

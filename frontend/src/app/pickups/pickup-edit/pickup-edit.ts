@@ -374,7 +374,7 @@ export class PickupEditComponent {
       id: this.pickupId(),
       partnerId: raw.partnerId,
       partnerName: null,
-      partnerCategory: null,
+      partnerCategoryId: null,
       partnerStreet: null,
       partnerCity: null,
       partnerLogoUrl: null,

@@ -13,15 +13,13 @@ import {
 import { L } from './leaflet-global';
 import 'leaflet.markercluster';
 import {
-  CATEGORY_ICONS,
-  CATEGORY_LABELS,
-  Category,
   Partner,
   STATUS_LABELS,
   WEEKDAYS,
   Weekday,
 } from '../partners/partner.model';
 import { PartnerService } from '../partners/partner.service';
+import { PartnerCategoryRegistry } from '../partners/partner-category-registry.service';
 import { AuthService } from '../auth/auth.service';
 import { StoreDetailDialogService } from '../stores/store-detail-dialog/store-detail-dialog.service';
 import { buildDistributionPointMarkerIcon, buildPartnerMarkerIcon } from './map-marker-icon';
@@ -32,8 +30,6 @@ import {
 } from '../admin/distribution-points/distribution-point.model';
 
 type DayFilter = 'ALL' | Weekday;
-
-const ALL_CATEGORIES: Category[] = ['BAKERY', 'SUPERMARKET', 'CAFE', 'RESTAURANT', 'BUTCHER'];
 
 const DEFAULT_CENTER: L.LatLngTuple = [50.1817, 8.74];
 const DEFAULT_ZOOM = 13;
@@ -50,6 +46,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly distributionPointService = inject(DistributionPointService);
   private readonly auth = inject(AuthService);
   private readonly detailDialog = inject(StoreDetailDialogService);
+  private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   @ViewChild('mapContainer', { static: true })
   private mapContainerRef!: ElementRef<HTMLDivElement>;
@@ -58,22 +55,28 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   readonly distributionPoints = signal<DistributionPoint[]>([]);
   readonly loadError = signal<string | null>(null);
 
-  readonly selectedCategories = signal<Set<Category>>(new Set(ALL_CATEGORIES));
+  readonly selectedCategories = signal<Set<number>>(new Set());
+  private categoryInit = false;
   readonly activeOnly = signal(false);
   readonly selectedDay = signal<DayFilter>('ALL');
   readonly showDistributionPoints = signal(true);
 
-  readonly categoryLabels = CATEGORY_LABELS;
-  readonly categoryIcons = CATEGORY_ICONS;
   readonly weekdays = WEEKDAYS;
-  readonly allCategories = ALL_CATEGORIES;
+  readonly allCategories = this.categoryRegistry.categories;
+
+  categoryIcon(id: number | null): string {
+    return this.categoryRegistry.iconForId(id);
+  }
+  categoryLabel(id: number | null): string {
+    return this.categoryRegistry.labelForId(id);
+  }
 
   readonly filteredPartners = computed(() => {
     const cats = this.selectedCategories();
     const onlyActive = this.activeOnly();
     const day = this.selectedDay();
     return this.partners().filter((p) => {
-      if (!cats.has(p.category)) return false;
+      if (p.categoryId == null || !cats.has(p.categoryId)) return false;
       if (onlyActive && p.status !== 'KOOPERIERT') return false;
       if (day !== 'ALL') {
         const slot = p.pickupSlots.find((s) => s.weekday === day && s.active);
@@ -113,6 +116,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
     effect(() => {
+      const cats = this.allCategories();
+      if (!this.categoryInit && cats.length > 0) {
+        this.categoryInit = true;
+        this.selectedCategories.set(
+          new Set(cats.map((c) => c.id).filter((id): id is number => id != null)),
+        );
+      }
+    });
+
+    effect(() => {
       this.filteredPartners();
       this.filteredDistributionPoints();
       this.selectedDay();
@@ -142,20 +155,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.map = undefined;
   }
 
-  toggleCategory(cat: Category): void {
+  toggleCategory(id: number): void {
     this.selectedCategories.update((s) => {
       const next = new Set(s);
-      if (next.has(cat)) {
-        next.delete(cat);
+      if (next.has(id)) {
+        next.delete(id);
       } else {
-        next.add(cat);
+        next.add(id);
       }
       return next;
     });
   }
 
-  isCategorySelected(cat: Category): boolean {
-    return this.selectedCategories().has(cat);
+  isCategorySelected(id: number): boolean {
+    return this.selectedCategories().has(id);
   }
 
   toggleActiveOnly(): void {
@@ -281,7 +294,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
   private buildIcon(partner: Partner, order: number | null): L.DivIcon {
-    return buildPartnerMarkerIcon(partner, order);
+    return buildPartnerMarkerIcon(partner, this.categoryRegistry.byId(partner.categoryId), order);
   }
 
   private buildPopup(p: Partner): string {
@@ -299,7 +312,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return `
       <div class="map-popup">
         <div class="map-popup__title">${escape(p.name)} ${statusBadge}</div>
-        <div class="map-popup__category">${escape(CATEGORY_LABELS[p.category])}</div>
+        <div class="map-popup__category">${escape(this.categoryRegistry.labelForId(p.categoryId))}</div>
         <div class="map-popup__address">${escape(p.street ?? '')}, ${escape(p.postalCode ?? '')} ${escape(p.city ?? '')}</div>
         ${actionLink}
       </div>

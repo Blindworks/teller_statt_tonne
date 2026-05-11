@@ -64,11 +64,13 @@
             >Kategorie *</span
           >
           <select
-            formControlName="category"
+            formControlName="categoryId"
+            [compareWith]="compareNumbers"
             class="bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary appearance-none transition-all outline-none"
           >
-            @for (cat of categories; track cat) {
-              <option [value]="cat">{{ categoryLabels[cat] }}</option>
+            <option [ngValue]="null" disabled>Bitte wählen …</option>
+            @for (cat of categories(); track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.label }}</option>
             }
           </select>
         </label>

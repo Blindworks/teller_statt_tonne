@@ -1,5 +1,3 @@
-import { Category } from '../partners/partner.model';
-
 export type PickupStatus = 'SCHEDULED' | 'COMPLETED' | 'CANCELLED';
 
 export interface PickupAssignment {
@@ -12,7 +10,7 @@ export interface Pickup {
   id: number | null;
   partnerId: number | null;
   partnerName: string | null;
-  partnerCategory: Category | null;
+  partnerCategoryId: number | null;
   partnerStreet: string | null;
   partnerCity: string | null;
   partnerLogoUrl: string | null;
@@ -37,7 +35,7 @@ export function emptyPickup(): Pickup {
     id: null,
     partnerId: null,
     partnerName: null,
-    partnerCategory: null,
+    partnerCategoryId: null,
     partnerStreet: null,
     partnerCity: null,
     partnerLogoUrl: null,

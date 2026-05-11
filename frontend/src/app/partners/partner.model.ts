@@ -1,4 +1,3 @@
-export type Category = 'BAKERY' | 'SUPERMARKET' | 'CAFE' | 'RESTAURANT' | 'BUTCHER';
 export type Status =
   | 'KEIN_KONTAKT'
   | 'VERHANDLUNGEN_LAUFEN'
@@ -35,7 +34,7 @@ export interface PickupSlot {
 export interface Partner {
   id: number | null;
   name: string;
-  category: Category;
+  categoryId: number | null;
   street: string;
   postalCode: string;
   city: string;
@@ -56,22 +55,6 @@ export const WEEKDAYS: ReadonlyArray<{ value: Weekday; label: string }> = [
   { value: 'SATURDAY', label: 'Samstag' },
   { value: 'SUNDAY', label: 'Sonntag' },
 ];
-
-export const CATEGORY_LABELS: Record<Category, string> = {
-  BAKERY: 'Bäckerei',
-  SUPERMARKET: 'Supermarkt',
-  CAFE: 'Café',
-  RESTAURANT: 'Restaurant',
-  BUTCHER: 'Metzgerei',
-};
-
-export const CATEGORY_ICONS: Record<Category, string> = {
-  BAKERY: 'bakery_dining',
-  SUPERMARKET: 'shopping_basket',
-  CAFE: 'restaurant',
-  RESTAURANT: 'local_mall',
-  BUTCHER: 'kebab_dining',
-};
 
 export const STATUS_LABELS: Record<Status, string> = {
   KEIN_KONTAKT: 'Kein Kontakt',
@@ -97,7 +80,7 @@ export function emptyPartner(): Partner {
   return {
     id: null,
     name: '',
-    category: 'BAKERY',
+    categoryId: null,
     street: '',
     postalCode: '',
     city: '',

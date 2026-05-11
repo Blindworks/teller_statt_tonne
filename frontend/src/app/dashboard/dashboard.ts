@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-import { CATEGORY_ICONS, CATEGORY_LABELS, Category } from '../partners/partner.model';
+import { PartnerCategoryRegistry } from '../partners/partner-category-registry.service';
 import { PickupAssignment } from '../pickups/pickup.model';
 import { resolvePhotoUrl } from '../users/photo-url';
 import { PhotoUrlPipe } from '../users/photo-url.pipe';
@@ -71,6 +71,7 @@ export class DashboardComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly profileDialog = inject(UserProfileDialogService);
+  private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   private readonly daySlotsSignal = signal<DaySlot[]>([]);
   private readonly errorSignal = signal<string | null>(null);
@@ -244,9 +245,9 @@ export class DashboardComponent {
   }
 
   private toDisplay(s: DaySlot, idx: number, now: number): DisplaySlot {
-    const category: Category | null = s.partnerCategory;
-    const categoryIcon = category ? CATEGORY_ICONS[category] : 'storefront';
-    const categoryLabel = category ? CATEGORY_LABELS[category] : 'Pickup';
+    const category = this.categoryRegistry.byId(s.partnerCategoryId);
+    const categoryIcon = category?.icon ?? 'storefront';
+    const categoryLabel = category?.label ?? 'Pickup';
 
     const location = [s.partnerStreet, s.partnerCity].filter((x) => !!x).join(', ');
     const assignments = s.assignments ?? [];

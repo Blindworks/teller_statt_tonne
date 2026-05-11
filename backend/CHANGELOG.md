@@ -7,6 +7,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-05-11
+
+### Added
+
+- Neues Modul `partnercategory` mit Entity, DTO, Mapper, Repository, Service und Controller (`/api/partner-categories`). `GET` ist öffentlich lesbar (für Dropdowns/Filter im Frontend), `GET /all`, `POST`, `PUT`, `DELETE` erfordern `ADMINISTRATOR` oder `TEAMLEITER`. `DELETE` liefert `409 Conflict`, wenn die Kategorie noch von Betrieben verwendet wird; Kategorien können stattdessen über `active=false` weich deaktiviert werden.
+- Liquibase-Changeset 021 legt Tabelle `partner_category` mit Spalten `id`, `code` (UNIQUE), `label`, `icon`, `order_index`, `active` an, seedet die fünf bestehenden Kategorien (BAKERY, SUPERMARKET, CAFE, RESTAURANT, BUTCHER) und migriert die `partner.category`-VARCHAR-Spalte auf einen `category_id`-FK.
+
+### Changed
+
+- `Partner` (DTO und Entity) verwendet statt eines `Category`-Enums jetzt `categoryId: Long` mit FK auf `partner_category.id`. Das innere Enum `Partner.Category` wurde entfernt.
+- `Pickup.partnerCategory` und `DaySlot.partnerCategory` heißen jetzt `partnerCategoryId: Long` und führen den FK statt eines Enum-Werts.
+
 ## [0.18.0] - 2026-05-11
 
 ### Added

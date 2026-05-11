@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="021-create-partner-category" author="teller-statt-tonne">
+        <createTable tableName="partner_category">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="label" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_index" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="021-seed-partner-category" author="teller-statt-tonne">
+        <insert tableName="partner_category">
+            <column name="code" value="BAKERY"/>
+            <column name="label" value="Bäckerei"/>
+            <column name="icon" value="bakery_dining"/>
+            <column name="order_index" valueNumeric="0"/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="partner_category">
+            <column name="code" value="SUPERMARKET"/>
+            <column name="label" value="Supermarkt"/>
+            <column name="icon" value="shopping_basket"/>
+            <column name="order_index" valueNumeric="1"/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="partner_category">
+            <column name="code" value="CAFE"/>
+            <column name="label" value="Café"/>
+            <column name="icon" value="restaurant"/>
+            <column name="order_index" valueNumeric="2"/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="partner_category">
+            <column name="code" value="RESTAURANT"/>
+            <column name="label" value="Restaurant"/>
+            <column name="icon" value="local_mall"/>
+            <column name="order_index" valueNumeric="3"/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="partner_category">
+            <column name="code" value="BUTCHER"/>
+            <column name="label" value="Metzgerei"/>
+            <column name="icon" value="kebab_dining"/>
+            <column name="order_index" valueNumeric="4"/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="021-partner-category-id-column" author="teller-statt-tonne">
+        <addColumn tableName="partner">
+            <column name="category_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="021-partner-category-id-backfill" author="teller-statt-tonne">
+        <sql>
+            UPDATE partner SET category_id = (SELECT pc.id FROM partner_category pc WHERE pc.code = partner.category)
+        </sql>
+    </changeSet>
+
+    <changeSet id="021-partner-category-id-not-null" author="teller-statt-tonne">
+        <addNotNullConstraint tableName="partner" columnName="category_id" columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="021-partner-category-fk" author="teller-statt-tonne">
+        <addForeignKeyConstraint
+            baseTableName="partner" baseColumnNames="category_id"
+            referencedTableName="partner_category" referencedColumnNames="id"
+            constraintName="fk_partner_category_id"/>
+    </changeSet>
+
+    <changeSet id="021-partner-drop-old-category" author="teller-statt-tonne">
+        <dropColumn tableName="partner" columnName="category"/>
+    </changeSet>
+
+</databaseChangeLog>

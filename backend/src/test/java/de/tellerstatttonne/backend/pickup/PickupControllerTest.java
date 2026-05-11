@@ -31,15 +31,18 @@ class PickupControllerTest {
     @Autowired private PartnerService partnerService;
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
+    @Autowired private de.tellerstatttonne.backend.partnercategory.PartnerCategoryRepository partnerCategoryRepository;
 
     private Long partnerId;
     private Long memberId;
+    private Long supermarketCategoryId;
 
     @BeforeEach
     void setup() {
         pickupRepository.deleteAll();
+        supermarketCategoryId = partnerCategoryRepository.findByCodeIgnoreCase("SUPERMARKET").orElseThrow().getId();
         Partner partner = partnerService.create(new Partner(
-            null, "Bio-Markt Sonne", Partner.Category.SUPERMARKET,
+            null, "Bio-Markt Sonne", supermarketCategoryId,
             "Hauptstraße 1", "10115", "Berlin", null,
             new Partner.Contact("Ina", "ina@example.de", "+49 30 111"),
             List.of(), Partner.Status.KOOPERIERT, null, null
@@ -101,7 +104,7 @@ class PickupControllerTest {
         assertThat(created).isNotNull();
         assertThat(created.id()).isNotNull();
         assertThat(created.partnerName()).isEqualTo("Bio-Markt Sonne");
-        assertThat(created.partnerCategory()).isEqualTo(Partner.Category.SUPERMARKET);
+        assertThat(created.partnerCategoryId()).isEqualTo(supermarketCategoryId);
         assertThat(created.assignments()).hasSize(1);
         assertThat(created.assignments().get(0).memberName()).isEqualTo("Lisa Muster");
 

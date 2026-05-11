@@ -16,6 +16,12 @@ export class AdminDashboardComponent {
       link: '/admin/roles',
     },
     {
+      title: 'Betrieb-Kategorien',
+      description: 'Kategorien für Betriebe pflegen (Bäckerei, Supermarkt, …) — Icons, Reihenfolge, aktiv/inaktiv.',
+      icon: 'category',
+      link: '/admin/partner-categories',
+    },
+    {
       title: 'Verteilerplätze',
       description:
         'Orte verwalten, an denen gerettete Lebensmittel an Endkund:innen weitergegeben werden (Teller-Treff).',

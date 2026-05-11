@@ -67,8 +67,8 @@
       class="bg-surface-container-low text-on-surface rounded-full border border-outline-variant px-4 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
       <option value="ALL">Alle Kategorien</option>
-      @for (opt of categoryOptions; track opt.value) {
-        <option [value]="opt.value">{{ opt.label }}</option>
+      @for (opt of categoryOptions(); track opt.id) {
+        <option [value]="opt.id">{{ opt.label }}</option>
       }
     </select>
     <select
@@ -169,7 +169,7 @@
               <img [src]="logoSrc" [alt]="partner.name" class="w-full h-full object-cover" />
             } @else {
               <span class="material-symbols-outlined text-3xl">{{
-                categoryIcons[partner.category]
+                categoryIcon(partner.categoryId)
               }}</span>
             }
           </div>
@@ -222,7 +222,7 @@
         <div>
           <h5 class="text-xl font-bold text-on-surface mb-1">{{ partner.name }}</h5>
           <p class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mb-2">
-            {{ categoryLabels[partner.category] }}
+            {{ categoryLabel(partner.categoryId) }}
           </p>
           <p class="text-sm text-on-surface-variant flex items-center gap-2">
             <span class="material-symbols-outlined text-xs">location_on</span>

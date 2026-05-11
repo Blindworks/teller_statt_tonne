@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CATEGORY_ICONS, CATEGORY_LABELS, Partner } from '../../partners/partner.model';
+import { Partner } from '../../partners/partner.model';
 import { PartnerService } from '../../partners/partner.service';
+import { PartnerCategoryRegistry } from '../../partners/partner-category-registry.service';
 
 @Component({
   selector: 'app-deleted-stores',
@@ -12,12 +13,18 @@ import { PartnerService } from '../../partners/partner.service';
 })
 export class DeletedStoresComponent {
   private readonly service = inject(PartnerService);
+  private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   readonly partners = signal<Partner[]>([]);
   readonly loadError = signal<string | null>(null);
   readonly actionError = signal<string | null>(null);
-  readonly categoryIcons = CATEGORY_ICONS;
-  readonly categoryLabels = CATEGORY_LABELS;
+
+  categoryIcon(id: number | null): string {
+    return this.categoryRegistry.iconForId(id);
+  }
+  categoryLabel(id: number | null): string {
+    return this.categoryRegistry.labelForId(id);
+  }
 
   constructor() {
     this.reload();
