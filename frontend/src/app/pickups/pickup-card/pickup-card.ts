@@ -152,6 +152,7 @@ function chipClass(category: Category | null): string {
       return 'text-secondary bg-secondary-container';
     case 'CAFE':
     case 'RESTAURANT':
+    case 'BUTCHER':
       return 'text-tertiary bg-tertiary-container';
     default:
       return 'text-on-surface-variant bg-surface-container-high';

@@ -17,7 +17,7 @@ public record Partner(
     Double latitude,
     Double longitude
 ) {
-    public enum Category { BAKERY, SUPERMARKET, CAFE, RESTAURANT }
+    public enum Category { BAKERY, SUPERMARKET, CAFE, RESTAURANT, BUTCHER }
 
     public enum Status {
         KEIN_KONTAKT,

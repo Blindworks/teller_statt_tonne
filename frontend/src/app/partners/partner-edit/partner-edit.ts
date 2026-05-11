@@ -80,7 +80,7 @@ export class PartnerEditComponent {
 
   readonly weekdays = WEEKDAYS;
   readonly categoryLabels = CATEGORY_LABELS;
-  readonly categories: Category[] = ['BAKERY', 'SUPERMARKET', 'CAFE', 'RESTAURANT'];
+  readonly categories: Category[] = ['BAKERY', 'SUPERMARKET', 'CAFE', 'RESTAURANT', 'BUTCHER'];
   readonly statusLabels = STATUS_LABELS;
   readonly statuses = STATUS_ORDER;
 

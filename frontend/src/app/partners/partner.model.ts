@@ -1,4 +1,4 @@
-export type Category = 'BAKERY' | 'SUPERMARKET' | 'CAFE' | 'RESTAURANT';
+export type Category = 'BAKERY' | 'SUPERMARKET' | 'CAFE' | 'RESTAURANT' | 'BUTCHER';
 export type Status =
   | 'KEIN_KONTAKT'
   | 'VERHANDLUNGEN_LAUFEN'
@@ -62,6 +62,7 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   SUPERMARKET: 'Supermarkt',
   CAFE: 'Café',
   RESTAURANT: 'Restaurant',
+  BUTCHER: 'Metzgerei',
 };
 
 export const CATEGORY_ICONS: Record<Category, string> = {
@@ -69,6 +70,7 @@ export const CATEGORY_ICONS: Record<Category, string> = {
   SUPERMARKET: 'shopping_basket',
   CAFE: 'restaurant',
   RESTAURANT: 'local_mall',
+  BUTCHER: 'kebab_dining',
 };
 
 export const STATUS_LABELS: Record<Status, string> = {

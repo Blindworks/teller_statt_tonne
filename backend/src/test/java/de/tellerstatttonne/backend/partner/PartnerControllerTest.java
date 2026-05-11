@@ -128,6 +128,22 @@ class PartnerControllerTest {
     }
 
     @Test
+    void butcherCategoryRoundTrip() {
+        Partner created = controller.create(new Partner(
+            null, "Metzgerei Müller", Partner.Category.BUTCHER,
+            "Wurststraße 1", "10115", "Berlin", null,
+            new Partner.Contact("Max Müller", "max@example.de", "+49 176 0000000"),
+            List.of(), Partner.Status.KOOPERIERT, null, null
+        )).getBody();
+        assertThat(created).isNotNull();
+        assertThat(created.category()).isEqualTo(Partner.Category.BUTCHER);
+
+        Partner fetched = controller.get(created.id()).getBody();
+        assertThat(fetched).isNotNull();
+        assertThat(fetched.category()).isEqualTo(Partner.Category.BUTCHER);
+    }
+
+    @Test
     void updateAddsAndRemovesSlots() {
         Partner created = controller.create(new Partner(
             null, "Test", Partner.Category.BAKERY, "s", "p", "c", null,
