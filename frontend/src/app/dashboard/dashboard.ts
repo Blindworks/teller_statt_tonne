@@ -123,6 +123,21 @@ export class DashboardComponent {
     return this.displaySlots().filter((s) => s.date === today && s.freeCount > 0).length;
   });
 
+  readonly todaySlots = computed<DisplaySlot[]>(() => {
+    const today = this.todayIso();
+    return this.displaySlots().filter((s) => s.date === today);
+  });
+
+  readonly tomorrowSlots = computed<DisplaySlot[]>(() => {
+    const tomorrow = this.tomorrowIso();
+    return this.displaySlots().filter((s) => s.date === tomorrow);
+  });
+
+  readonly dayAfterTomorrowSlots = computed<DisplaySlot[]>(() => {
+    const dayAfter = this.dayAfterTomorrowIso();
+    return this.displaySlots().filter((s) => s.date === dayAfter);
+  });
+
   readonly nextPickupCountdown = computed<{
     days: number;
     hours: number;
@@ -300,8 +315,21 @@ export class DashboardComponent {
   }
 
   private todayIso(): string {
+    return this.offsetIso(0);
+  }
+
+  private tomorrowIso(): string {
+    return this.offsetIso(1);
+  }
+
+  private dayAfterTomorrowIso(): string {
+    return this.offsetIso(2);
+  }
+
+  private offsetIso(offsetDays: number): string {
     void this.nowSignal();
     const d = new Date();
+    d.setDate(d.getDate() + offsetDays);
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
