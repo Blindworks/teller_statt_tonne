@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
-import { resolvePhotoUrl } from '../../users/photo-url';
 import { PickupService } from '../pickup.service';
 import { Pickup } from '../pickup.model';
 import { PickupCardComponent } from '../pickup-card/pickup-card';
@@ -35,7 +34,6 @@ export class PickupsComponent {
   readonly actionError = signal<string | null>(null);
   readonly pickups = signal<Pickup[]>([]);
   readonly holidays = signal<Holiday[]>([]);
-  readonly recent = signal<Pickup[]>([]);
   readonly view = signal<ViewMode>('WEEK');
   readonly availableOnly = signal(false);
 
@@ -148,11 +146,6 @@ export class PickupsComponent {
         error: () => this.holidays.set([]),
       });
     });
-
-    this.service.recent().subscribe({
-      next: (list) => this.recent.set(list),
-      error: () => {},
-    });
   }
 
   toggleAvailable(): void {
@@ -214,35 +207,6 @@ export class PickupsComponent {
     this.currentWeekStart.set(d);
   }
 
-  logStatusLabel(p: Pickup): string {
-    switch (p.status) {
-      case 'COMPLETED':
-        return 'VERIFIED';
-      case 'CANCELLED':
-        return 'OPEN';
-      default:
-        return 'SCHEDULED';
-    }
-  }
-
-  logActionLabel(p: Pickup): string {
-    switch (p.status) {
-      case 'COMPLETED':
-        return 'completed a pickup at';
-      case 'CANCELLED':
-        return 'cancelled their slot at';
-      default:
-        return 'scheduled a pickup at';
-    }
-  }
-
-  logMemberName(p: Pickup): string {
-    return p.assignments[0]?.memberName ?? 'Unbekannt';
-  }
-
-  logAvatar(p: Pickup): string | null {
-    return resolvePhotoUrl(p.assignments[0]?.memberAvatarUrl ?? null);
-  }
 }
 
 const SHORT_WEEKDAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
