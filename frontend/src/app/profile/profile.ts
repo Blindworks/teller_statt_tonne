@@ -12,7 +12,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { UserService } from '../users/user.service';
-import { User } from '../users/user.model';
+import { RoleName, RoleOption, User } from '../users/user.model';
 import { resolvePhotoUrl } from '../users/photo-url';
 import { UserAvailabilityComponent } from '../users/user-availability/user-availability';
 import { PushNotificationService } from '../push/push-notification.service';
@@ -64,6 +64,17 @@ export class ProfileComponent {
   readonly hasProfile = computed(() => !!this.currentUser());
   readonly hasRetterRole = computed(() => !!this.currentUser()?.roles?.includes('RETTER'));
 
+  readonly roleOptions = signal<RoleOption[]>([]);
+  readonly userRoles = computed(() => {
+    const roles = this.currentUser()?.roles ?? [];
+    const options = this.roleOptions();
+    return roles.map((role) => ({
+      value: role,
+      label: options.find((o) => o.value === role)?.label ?? role,
+      badgeClass: this.roleBadgeClass(role),
+    }));
+  });
+
   readonly photoPreview = signal<string | null>(null);
   readonly displayPhoto = computed(() => {
     const preview = this.photoPreview();
@@ -114,6 +125,24 @@ export class ProfileComponent {
       const u = this.currentUser();
       if (u) this.patchForm(u);
     });
+    this.userService.roles().subscribe({
+      next: (roles) => this.roleOptions.set(roles),
+    });
+  }
+
+  private roleBadgeClass(role: RoleName): string {
+    switch (role) {
+      case 'ADMINISTRATOR':
+        return 'bg-error-container text-on-error-container';
+      case 'TEAMLEITER':
+        return 'bg-tertiary-container text-on-tertiary-fixed';
+      case 'RETTER':
+        return 'bg-primary-container text-on-primary-container';
+      case 'NEW_MEMBER':
+        return 'bg-secondary-container text-on-secondary-container';
+      default:
+        return 'bg-surface-container text-on-surface';
+    }
   }
 
   get tagsArray(): FormArray<FormControl<string>> {
