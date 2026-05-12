@@ -55,7 +55,7 @@
             </h3>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @for (slot of mySlots(); track slot.key) {
+            @for (slot of myUpcomingSlots(); track slot.key) {
               <ng-container
                 *ngTemplateOutlet="slotCardTpl; context: { $implicit: slot }"
               ></ng-container>
@@ -101,6 +101,24 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               @for (slot of fullSlots(); track slot.key) {
+                <ng-container
+                  *ngTemplateOutlet="slotCardTpl; context: { $implicit: slot }"
+                ></ng-container>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Vergangene Pickups -->
+        @if (myPastSlots().length > 0) {
+          <section>
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-extrabold text-on-surface-variant tracking-tight">
+                Vergangene Pickups
+              </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (slot of myPastSlots(); track slot.key) {
                 <ng-container
                   *ngTemplateOutlet="slotCardTpl; context: { $implicit: slot }"
                 ></ng-container>

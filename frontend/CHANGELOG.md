@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.26.1] - 2026-05-12
+
+### Changed
+
+- Retter-Dashboard: Eingetragene Pickups, deren Endzeit bereits in der Vergangenheit liegt, erscheinen nicht mehr unter „Meine kommenden Pickups", sondern in einer neuen Sektion **„Vergangene Pickups"** ganz unten auf der Seite (absteigend sortiert, nur sichtbar wenn vorhanden). Die `range`-Abfrage des Dashboards umfasst dafür die letzten 7 Tage zusätzlich. „Freie Slots" und „Belegte Slots" werden zusätzlich auf zukünftige Slots gefiltert. Der Button **„Abholung starten"** erscheint bei vergangenen Pickups nicht mehr.
+
 ## [0.26.0] - 2026-05-12
 
 ### Added

@@ -89,17 +89,39 @@ export class DashboardComponent {
     this.displaySlots().filter((s) => s.currentUserAssigned),
   );
 
-  readonly availableSlots = computed<DisplaySlot[]>(() =>
-    this.displaySlots().filter(
-      (s) => !s.isTemplate && !s.currentUserAssigned && s.freeCount > 0,
-    ),
-  );
+  readonly myUpcomingSlots = computed<DisplaySlot[]>(() => {
+    const now = this.nowSignal();
+    return this.mySlots().filter((s) => this.parseSlotEnd(s) >= now);
+  });
 
-  readonly fullSlots = computed<DisplaySlot[]>(() =>
-    this.displaySlots().filter(
-      (s) => !s.isTemplate && !s.currentUserAssigned && s.freeCount === 0,
-    ),
-  );
+  readonly myPastSlots = computed<DisplaySlot[]>(() => {
+    const now = this.nowSignal();
+    return this.mySlots()
+      .filter((s) => this.parseSlotEnd(s) < now)
+      .sort((a, b) => this.parseSlotStart(b) - this.parseSlotStart(a));
+  });
+
+  readonly availableSlots = computed<DisplaySlot[]>(() => {
+    const now = this.nowSignal();
+    return this.displaySlots().filter(
+      (s) =>
+        !s.isTemplate &&
+        !s.currentUserAssigned &&
+        s.freeCount > 0 &&
+        this.parseSlotEnd(s) >= now,
+    );
+  });
+
+  readonly fullSlots = computed<DisplaySlot[]>(() => {
+    const now = this.nowSignal();
+    return this.displaySlots().filter(
+      (s) =>
+        !s.isTemplate &&
+        !s.currentUserAssigned &&
+        s.freeCount === 0 &&
+        this.parseSlotEnd(s) >= now,
+    );
+  });
 
   readonly nextOwnPickup = computed<DisplaySlot | null>(() => {
     const now = this.nowSignal();
@@ -240,7 +262,12 @@ export class DashboardComponent {
   }
 
   canStartRun(slot: DisplaySlot): boolean {
-    return slot.currentUserAssigned && slot.pickupId != null && slot.date === this.todayIso();
+    return (
+      slot.currentUserAssigned &&
+      slot.pickupId != null &&
+      slot.date === this.todayIso() &&
+      this.parseSlotEnd(slot) >= this.nowSignal()
+    );
   }
 
   unassign(slot: DisplaySlot): void {
@@ -253,7 +280,9 @@ export class DashboardComponent {
   }
 
   private loadSlots(): void {
-    this.dashboardService.range().subscribe({
+    const from = this.offsetIso(-7);
+    const to = this.offsetIso(6);
+    this.dashboardService.range(from, to).subscribe({
       next: (slots) => this.daySlotsSignal.set(slots),
       error: () => this.daySlotsSignal.set([]),
     });
@@ -347,6 +376,11 @@ export class DashboardComponent {
 
   private parseSlotStart(slot: DisplaySlot): number {
     const parsed = new Date(`${slot.date}T${slot.startTime}`);
+    return parsed.getTime();
+  }
+
+  private parseSlotEnd(slot: DisplaySlot): number {
+    const parsed = new Date(`${slot.date}T${slot.endTime}`);
     return parsed.getTime();
   }
 
