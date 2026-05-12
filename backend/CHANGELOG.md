@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.20.2] - 2026-05-12
+
+### Changed
+
+- `QuizAdminController` (`/api/quiz/**`) ist jetzt zusätzlich für `TEAMLEITER` freigegeben (`@PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")`). Frontend-Guard war bereits entsprechend konfiguriert.
+
 ## [0.20.1] - 2026-05-12
 
 ### Changed

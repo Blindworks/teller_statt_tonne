@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/quiz")
-@PreAuthorize("hasRole('ADMINISTRATOR')")
+@PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
 public class QuizAdminController {
 
     private final QuestionService questionService;
