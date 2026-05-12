@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.26.2] - 2026-05-12
+
+### Added
+
+- Betriebsdetails-Dialog zeigt die vier Hinweis-Felder (Parken, Zugang, Vorgehen, Ansprechpartner) in einem neuen Abschnitt **„Hinweise"**, sofern gepflegt.
+
 ## [0.26.1] - 2026-05-12
 
 ### Changed

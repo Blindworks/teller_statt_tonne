@@ -175,6 +175,62 @@
             </ul>
           }
         </section>
+
+        @if (p.parkingInfo || p.accessInstructions || p.pickupProcedure || p.onSiteContactNote) {
+          <section class="mt-6">
+            <h5
+              class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mb-2"
+            >
+              Hinweise
+            </h5>
+            <ul class="space-y-2">
+              @if (p.parkingInfo) {
+                <li class="flex items-start gap-3 px-4 py-3 rounded-lg bg-surface-container-low">
+                  <span class="material-symbols-outlined text-primary">local_parking</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-on-surface">Parken</p>
+                    <p class="text-sm text-on-surface-variant whitespace-pre-line break-words">
+                      {{ p.parkingInfo }}
+                    </p>
+                  </div>
+                </li>
+              }
+              @if (p.accessInstructions) {
+                <li class="flex items-start gap-3 px-4 py-3 rounded-lg bg-surface-container-low">
+                  <span class="material-symbols-outlined text-primary">door_front</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-on-surface">Zugang</p>
+                    <p class="text-sm text-on-surface-variant whitespace-pre-line break-words">
+                      {{ p.accessInstructions }}
+                    </p>
+                  </div>
+                </li>
+              }
+              @if (p.pickupProcedure) {
+                <li class="flex items-start gap-3 px-4 py-3 rounded-lg bg-surface-container-low">
+                  <span class="material-symbols-outlined text-primary">list_alt</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-on-surface">Vorgehen</p>
+                    <p class="text-sm text-on-surface-variant whitespace-pre-line break-words">
+                      {{ p.pickupProcedure }}
+                    </p>
+                  </div>
+                </li>
+              }
+              @if (p.onSiteContactNote) {
+                <li class="flex items-start gap-3 px-4 py-3 rounded-lg bg-surface-container-low">
+                  <span class="material-symbols-outlined text-primary">person</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-on-surface">Ansprechpartner</p>
+                    <p class="text-sm text-on-surface-variant break-words">
+                      {{ p.onSiteContactNote }}
+                    </p>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+        }
       </div>
 
       <footer
