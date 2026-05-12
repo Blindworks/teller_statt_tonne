@@ -10,5 +10,6 @@ public record QuizApplicantStatus(
     boolean locked,
     boolean passed,
     Instant lastAttemptAt,
-    QuizColor lastResultColor
+    QuizColor lastResultColor,
+    boolean userExists
 ) {}

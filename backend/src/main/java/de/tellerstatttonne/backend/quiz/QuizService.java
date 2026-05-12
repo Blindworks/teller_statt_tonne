@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import de.tellerstatttonne.backend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class QuizService {
     private final ResultCategoryRepository categoryRepository;
     private final QuizAttemptRepository attemptRepository;
     private final QuizApplicantLockRepository lockRepository;
+    private final UserRepository userRepository;
     private final int maxAttempts;
 
     public QuizService(
@@ -29,12 +31,14 @@ public class QuizService {
         ResultCategoryRepository categoryRepository,
         QuizAttemptRepository attemptRepository,
         QuizApplicantLockRepository lockRepository,
+        UserRepository userRepository,
         @Value("${quiz.max-attempts:3}") int maxAttempts
     ) {
         this.questionRepository = questionRepository;
         this.categoryRepository = categoryRepository;
         this.attemptRepository = attemptRepository;
         this.lockRepository = lockRepository;
+        this.userRepository = userRepository;
         this.maxAttempts = maxAttempts;
     }
 
@@ -215,6 +219,7 @@ public class QuizService {
             boolean passed = list.stream().anyMatch(a -> a.getResultColor() == QuizColor.GREEN);
             int allowed = maxAttempts + bonusByEmail.getOrDefault(entry.getKey(), 0);
             boolean locked = !passed && count >= allowed;
+            boolean userExists = entry.getKey().isEmpty() ? false : userRepository.existsByEmail(entry.getKey());
             result.add(new QuizApplicantStatus(
                 latest.getApplicantEmail(),
                 latest.getApplicantName(),
@@ -223,7 +228,8 @@ public class QuizService {
                 locked,
                 passed,
                 latest.getCompletedAt(),
-                latest.getResultColor()
+                latest.getResultColor(),
+                userExists
             ));
         }
         result.sort(Comparator.comparing(QuizApplicantStatus::lastAttemptAt, Comparator.nullsLast(Comparator.reverseOrder())));

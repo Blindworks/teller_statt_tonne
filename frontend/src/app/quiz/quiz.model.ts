@@ -85,6 +85,7 @@ export interface QuizApplicantStatus {
   passed: boolean;
   lastAttemptAt: string | null;
   lastResultColor: QuizColor | null;
+  userExists: boolean;
 }
 
 export const ALLOWED_WEIGHTS: ReadonlyArray<number> = [0.5, 1.0, 1.5];
