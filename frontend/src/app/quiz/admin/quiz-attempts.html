@@ -138,9 +138,10 @@
           <button
             type="button"
             (click)="createUser(group.attempts[0])"
-            class="shrink-0 rounded-full bg-primary text-on-primary px-3 py-1.5 text-xs font-semibold shadow-sm hover:opacity-90 transition"
+            [disabled]="group.status?.userExists"
+            class="shrink-0 rounded-full bg-primary text-on-primary px-3 py-1.5 text-xs font-semibold shadow-sm hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            + Nutzer anlegen
+            {{ group.status?.userExists ? 'Nutzer existiert' : '+ Nutzer anlegen' }}
           </button>
         </header>
         <div class="space-y-2">

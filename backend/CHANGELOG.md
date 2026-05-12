@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.20.1] - 2026-05-12
+
+### Changed
+
+- `QuizApplicantStatus`-DTO um Feld `userExists` erweitert. `QuizService.findAllApplicants()` prüft pro Bewerber-E-Mail via `UserRepository.existsByEmail`, ob bereits ein User-Account angelegt ist, und füllt das Flag entsprechend.
+
 ## [0.20.0] - 2026-05-11
 
 ### Added

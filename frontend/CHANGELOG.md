@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.23.3] - 2026-05-12
+
+### Changed
+
+- Admin-Quiz-Versuche (`/admin/quiz/attempts`): Der Button „+ Nutzer anlegen" wird ausgegraut und deaktiviert, wenn zur Bewerber-E-Mail bereits ein User-Account existiert. Label wechselt in diesem Fall zu „Nutzer existiert". Verhindert den fehlschlagenden Folge-Versuch mit „Email already registered".
+
 ## [0.23.2] - 2026-05-12
 
 ### Fixed
