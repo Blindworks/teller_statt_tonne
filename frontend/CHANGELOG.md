@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.23.4] - 2026-05-12
+
+### Fixed
+
+- Nutzerliste: Edit-Button in der Nutzer-Karte ist jetzt wieder kreisrund. Vorher führte das reine `p-2 rounded-full` ohne fixe Maße zu einer leicht ovalen Form, weil das `material-symbols-outlined`-Icon nicht quadratisch ist. Fix: feste Größe `w-10 h-10` mit zentriertem Inhalt.
+
 ## [0.23.3] - 2026-05-12
 
 ### Changed
