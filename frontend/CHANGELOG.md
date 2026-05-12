@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.25.2] - 2026-05-12
+
+### Added
+
+- Karte (`/map`): Toggle-Button „Veranstaltungen" im Filterbereich, mit dem die Veranstaltungs-Marker (und Bounds-Fit) ein- bzw. ausgeblendet werden können — analog zum „Verteilerplätze"-Toggle, jedoch für alle Rollen sichtbar. Button und Marker-Pin verwenden die sekundäre Akzentfarbe, damit Veranstaltungen visuell von Verteilerplätzen (tertiär) unterscheidbar bleiben.
+
 ## [0.25.1] - 2026-05-12
 
 ### Added

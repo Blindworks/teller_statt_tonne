@@ -113,6 +113,11 @@ h3,
   --map-pin-fg: var(--color-on-tertiary, #ffffff);
 }
 
+.map-marker--event {
+  --map-pin-bg: var(--color-secondary, #974a00);
+  --map-pin-fg: var(--color-on-secondary, #fff7f4);
+}
+
 .map-marker__pin {
   width: 36px;
   height: 36px;
