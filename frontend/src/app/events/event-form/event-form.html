@@ -59,7 +59,10 @@
     </div>
 
     <fieldset class="space-y-3">
-      <legend class="text-sm font-bold text-on-surface">Adresse</legend>
+      <legend class="text-sm font-bold text-on-surface">Adresse oder Karten-Markierung *</legend>
+      <p class="text-xs text-on-surface-variant">
+        Mindestens Ort eintragen oder einen Pin auf der Karte setzen, damit Retter:innen wissen wohin.
+      </p>
       <input
         type="text"
         formControlName="street"
@@ -79,6 +82,61 @@
           placeholder="Ort"
           class="col-span-2 rounded-lg border border-outline-variant bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         />
+      </div>
+      <div class="rounded-lg bg-surface-container-low px-4 py-3 text-sm space-y-3">
+        <div class="flex items-start gap-3">
+          <span
+            class="material-symbols-outlined"
+            [class.text-primary]="hasCoords()"
+            [class.text-on-surface-variant]="!hasCoords()"
+          >
+            {{ hasCoords() ? 'place' : 'wrong_location' }}
+          </span>
+          <div class="flex-1 text-on-surface-variant leading-snug">
+            @if (hasCoords()) {
+              <span class="font-semibold text-on-surface">Auf Karte verortet</span>
+              <span class="block text-xs mt-0.5">
+                {{ latitude() | number: '1.4-4' }}, {{ longitude() | number: '1.4-4' }}
+              </span>
+            } @else {
+              <span>Noch nicht auf der Karte verortet — Adresse eingeben oder Pin setzen.</span>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            (click)="geocodeFromAddress()"
+            [disabled]="geocoding()"
+            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-primary text-on-primary disabled:opacity-60"
+          >
+            <span class="material-symbols-outlined text-base">my_location</span>
+            {{ geocoding() ? 'Suche…' : 'Adresse verorten' }}
+          </button>
+          <button
+            type="button"
+            (click)="openPicker()"
+            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-surface-container-high text-on-surface"
+          >
+            <span class="material-symbols-outlined text-base">map</span>
+            Auf Karte wählen
+          </button>
+          @if (hasCoords()) {
+            <button
+              type="button"
+              (click)="clearPin()"
+              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-on-surface-variant hover:bg-surface-container-high"
+            >
+              <span class="material-symbols-outlined text-base">close</span>
+              Pin entfernen
+            </button>
+          }
+        </div>
+
+        @if (geocodeMessage()) {
+          <p class="text-xs text-error">{{ geocodeMessage() }}</p>
+        }
       </div>
     </fieldset>
 
@@ -143,6 +201,15 @@
       </button>
     </div>
   </form>
+
+  @if (pickerOpen()) {
+    <app-location-picker-dialog
+      [initialLatitude]="latitude()"
+      [initialLongitude]="longitude()"
+      (accepted)="applyPick($event)"
+      (cancelled)="closePicker()"
+    />
+  }
 
   @if (isEdit()) {
     <section

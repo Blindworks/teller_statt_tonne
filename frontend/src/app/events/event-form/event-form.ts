@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import {
   FormBuilder,
@@ -11,6 +12,11 @@ import { EventService } from '../event.service';
 import { CharityEvent } from '../event.model';
 import { PickupService } from '../../pickups/pickup.service';
 import { Pickup, emptyPickup } from '../../pickups/pickup.model';
+import {
+  LocationPickResult,
+  LocationPickerDialogComponent,
+} from '../../partners/location-picker/location-picker-dialog';
+import { PartnerService } from '../../partners/partner.service';
 
 type EventForm = FormGroup<{
   name: FormControl<string>;
@@ -27,7 +33,7 @@ type EventForm = FormGroup<{
 
 @Component({
   selector: 'app-event-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, LocationPickerDialogComponent, DecimalPipe],
   templateUrl: './event-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -35,6 +41,7 @@ export class EventFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly service = inject(EventService);
   private readonly pickupService = inject(PickupService);
+  private readonly partnerService = inject(PartnerService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -44,6 +51,15 @@ export class EventFormComponent {
   readonly logoUrl = signal<string | null>(null);
   readonly uploadingLogo = signal(false);
   readonly isEdit = computed(() => this.itemId() !== null);
+
+  readonly latitude = signal<number | null>(null);
+  readonly longitude = signal<number | null>(null);
+  readonly pickerOpen = signal(false);
+  readonly geocoding = signal(false);
+  readonly geocodeMessage = signal<string | null>(null);
+  readonly hasCoords = computed(
+    () => this.latitude() !== null && this.longitude() !== null,
+  );
 
   readonly pickups = signal<Pickup[]>([]);
   readonly slotError = signal<string | null>(null);
@@ -179,6 +195,68 @@ export class EventFormComponent {
       contactPhone: item.contact?.phone ?? '',
     });
     this.logoUrl.set(item.logoUrl);
+    this.latitude.set(item.latitude);
+    this.longitude.set(item.longitude);
+  }
+
+  openPicker(): void {
+    this.pickerOpen.set(true);
+  }
+
+  closePicker(): void {
+    this.pickerOpen.set(false);
+  }
+
+  applyPick(pick: LocationPickResult): void {
+    this.latitude.set(pick.latitude);
+    this.longitude.set(pick.longitude);
+    const patch: Partial<{ street: string; postalCode: string; city: string }> = {};
+    if (pick.street != null) patch.street = pick.street;
+    if (pick.postalCode != null) patch.postalCode = pick.postalCode;
+    if (pick.city != null) patch.city = pick.city;
+    if (Object.keys(patch).length > 0) {
+      this.form.patchValue(patch);
+    }
+    this.pickerOpen.set(false);
+  }
+
+  clearPin(): void {
+    this.latitude.set(null);
+    this.longitude.set(null);
+    this.geocodeMessage.set(null);
+  }
+
+  geocodeFromAddress(): void {
+    const raw = this.form.getRawValue();
+    const street = raw.street.trim() || null;
+    const postalCode = raw.postalCode.trim() || null;
+    const city = raw.city.trim() || null;
+    if (!street && !postalCode && !city) {
+      this.geocodeMessage.set('Bitte zuerst eine Adresse eingeben.');
+      return;
+    }
+    this.geocoding.set(true);
+    this.geocodeMessage.set(null);
+    this.partnerService.forwardGeocode(street, postalCode, city).subscribe({
+      next: (result) => {
+        this.geocoding.set(false);
+        if (!result) {
+          this.geocodeMessage.set('Adresse konnte nicht gefunden werden.');
+          return;
+        }
+        this.latitude.set(result.lat);
+        this.longitude.set(result.lon);
+      },
+      error: () => {
+        this.geocoding.set(false);
+        this.geocodeMessage.set('Geocoding fehlgeschlagen.');
+      },
+    });
+  }
+
+  hasAddressInput(): boolean {
+    const raw = this.form.getRawValue();
+    return !!(raw.street.trim() || raw.postalCode.trim() || raw.city.trim());
   }
 
   save(): void {
@@ -191,6 +269,13 @@ export class EventFormComponent {
       this.errorMessage.set('Das Enddatum darf nicht vor dem Startdatum liegen.');
       return;
     }
+    const cityTrimmed = raw.city.trim();
+    if (!cityTrimmed && !this.hasCoords()) {
+      this.errorMessage.set(
+        'Bitte Ort eingeben oder Veranstaltungsort auf der Karte markieren.',
+      );
+      return;
+    }
     const payload: CharityEvent = {
       id: this.itemId(),
       name: raw.name.trim(),
@@ -199,9 +284,9 @@ export class EventFormComponent {
       endDate: raw.endDate,
       street: raw.street.trim() || null,
       postalCode: raw.postalCode.trim() || null,
-      city: raw.city.trim() || null,
-      latitude: null,
-      longitude: null,
+      city: cityTrimmed || null,
+      latitude: this.latitude(),
+      longitude: this.longitude(),
       logoUrl: this.logoUrl(),
       contact: {
         name: raw.contactName.trim() || null,

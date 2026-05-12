@@ -7,6 +7,16 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-05-12
+
+### Added
+
+- `EventService.validate(...)` erzwingt jetzt eine Lokalität: entweder `city` (nicht blank) oder Koordinaten (`latitude` & `longitude`) müssen gesetzt sein, sonst `IllegalArgumentException` („Lokalität erforderlich: Adresse oder Markierung auf der Karte").
+
+### Changed
+
+- `EventService.create`/`update` respektiert nun vom Client gelieferte Koordinaten: Sind `latitude` und `longitude` im DTO gesetzt, wird kein Forward-Geocoding mehr ausgeführt (analog zu `PartnerService`). Nur wenn keine Koordinaten geliefert werden und Adresse geändert wurde oder Koordinaten fehlen, wird per `GeocodingService` geocodet.
+
 ## [0.20.2] - 2026-05-12
 
 ### Changed

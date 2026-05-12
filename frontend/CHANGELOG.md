@@ -7,6 +7,19 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.25.1] - 2026-05-12
+
+### Added
+
+- Veranstaltungs-Edit: Button „Adresse verorten" startet Forward-Geocoding für die eingegebenen Adressfelder (Straße/PLZ/Ort) über `GET /api/geocoding/forward` und setzt die ermittelten Koordinaten als Pin. Bei leeren Adressfeldern oder erfolglosem Lookup wird eine Fehlermeldung angezeigt.
+- `PartnerService.forwardGeocode(street, postalCode, city)` als wiederverwendbarer Client für den Forward-Endpoint.
+
+## [0.25.0] - 2026-05-12
+
+### Added
+
+- Veranstaltungs-Edit (`event-form`): Lokalität ist jetzt Pflicht. Nutzer:innen können entweder Adresse (mindestens Ort) eingeben **oder** einen Pin auf der Karte setzen. Der wiederverwendete `LocationPickerDialogComponent` öffnet eine Leaflet-Karte; Reverse-Geocoding füllt Straße/PLZ/Ort automatisch beim Setzen des Pins. Gesetzter Pin wird mit Koordinaten-Anzeige und „Pin entfernen"-Button dargestellt.
+
 ## [0.24.1] - 2026-05-12
 
 ### Changed

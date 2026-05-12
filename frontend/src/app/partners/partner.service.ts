@@ -12,6 +12,11 @@ export interface ReverseGeocodeResult {
   lon: number;
 }
 
+export interface ForwardGeocodeResult {
+  lat: number;
+  lon: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PartnerService {
   private readonly http = inject(HttpClient);
@@ -64,6 +69,21 @@ export class PartnerService {
     return this.http.get<ReverseGeocodeResult | null>(
       `${environment.apiBaseUrl}/api/geocoding/reverse`,
       { params: { lat, lon } },
+    );
+  }
+
+  forwardGeocode(
+    street: string | null,
+    postalCode: string | null,
+    city: string | null,
+  ): Observable<ForwardGeocodeResult | null> {
+    const params: Record<string, string> = {};
+    if (street) params['street'] = street;
+    if (postalCode) params['postalCode'] = postalCode;
+    if (city) params['city'] = city;
+    return this.http.get<ForwardGeocodeResult | null>(
+      `${environment.apiBaseUrl}/api/geocoding/forward`,
+      { params },
     );
   }
 }

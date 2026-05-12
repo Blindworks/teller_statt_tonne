@@ -50,7 +50,9 @@ public class EventService {
         validate(dto);
         EventEntity entity = new EventEntity();
         EventMapper.applyScalarFields(entity, dto);
-        applyGeocoding(entity);
+        if (!hasCoordinates(dto)) {
+            applyGeocoding(entity);
+        }
         EventEntity saved = repository.save(entity);
 
         eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.EVENT_CREATED)
@@ -71,7 +73,8 @@ public class EventService {
                 || !equal(entity.getCity(), dto.city());
 
             EventMapper.applyScalarFields(entity, dto);
-            if (addressChanged || entity.getLatitude() == null || entity.getLongitude() == null) {
+            if (!hasCoordinates(dto)
+                && (addressChanged || entity.getLatitude() == null || entity.getLongitude() == null)) {
                 applyGeocoding(entity);
             }
             EventEntity saved = repository.save(entity);
@@ -133,6 +136,15 @@ public class EventService {
         if (dto.endDate().isBefore(dto.startDate())) {
             throw new IllegalArgumentException("endDate darf nicht vor startDate liegen");
         }
+        boolean hasCity = dto.city() != null && !dto.city().isBlank();
+        if (!hasCity && !hasCoordinates(dto)) {
+            throw new IllegalArgumentException(
+                "Lokalität erforderlich: Adresse oder Markierung auf der Karte");
+        }
+    }
+
+    private static boolean hasCoordinates(Event dto) {
+        return dto.latitude() != null && dto.longitude() != null;
     }
 
     private static boolean equal(Object a, Object b) {
