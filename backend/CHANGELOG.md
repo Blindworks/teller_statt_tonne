@@ -7,6 +7,21 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-05-12
+
+### Added
+
+- **Pickup-Run-Feature** für Retter: neuer Wizard-Endpoint `/api/pickups/{id}/run` mit `start`, `items` (add/remove), `complete`, `abort` (Rolle `RETTER`).
+- **`FoodCategoryEntity`** + Endpoints (`GET /api/food-categories`, Admin-CRUD unter `/api/admin/food-categories`) als Master-Liste für Schnellerfassung.
+- **Bevorzugte Lebensmittel pro Betrieb** über `PartnerEntity.preferredFoodCategoryIds` (neue Tabelle `partner_food_category`), persistiert via `Partner`-DTO.
+- **Neue Hinweis-Felder am Betrieb** (`PartnerEntity`): `parkingInfo`, `accessInstructions`, `pickupProcedure`, `onSiteContactNote` — sichtbar im Retter-Wizard.
+- **`DistributionPostEntity`** + `DistributionPostPhotoEntity` mit Endpoints `GET /api/distribution-posts/{id}`, `POST /api/distribution-posts/{id}/photos` (Multipart, via `ImageStorageService`) und `GET /api/distribution-points/{id}/posts?status=…`. Beim Abschließen eines Pickup-Runs wird automatisch ein Verteiler-Post mit Status `FRESH` erzeugt.
+- Liquibase-Migration `023-pickup-run.xml`.
+
+### Notes
+
+- Vorbereitete Zukunfts-Felder (für späteres Operator-Update-Feature am Verteiler): `PickupRunItemEntity.takenAt`, `DistributionPostEntity.status`-Übergänge (`PARTIALLY_AVAILABLE`/`EMPTY`).
+
 ## [0.21.0] - 2026-05-12
 
 ### Added

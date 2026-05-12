@@ -1,0 +1,140 @@
+<section class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <header class="mb-8">
+    <a
+      routerLink="/admin"
+      class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-2"
+    >
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Administration
+    </a>
+    <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface">Lebensmittel-Kategorien</h1>
+    <p class="text-sm text-on-surface-variant mt-2 max-w-2xl">
+      Master-Liste der Lebensmittel, die Retter im Abhol-Wizard schnell antippen können.
+    </p>
+  </header>
+
+  @if (loadError()) {
+    <div class="rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm mb-4">
+      {{ loadError() }}
+    </div>
+  }
+
+  <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 md:p-8 mb-8">
+    <h2 class="text-lg font-bold text-on-surface mb-5">
+      {{ editing() ? 'Kategorie bearbeiten' : 'Neue Kategorie' }}
+    </h2>
+    <div class="grid gap-4 md:grid-cols-12 md:items-end">
+      <label class="md:col-span-7 text-sm font-medium text-on-surface-variant flex flex-col gap-1.5">
+        <span>Name</span>
+        <input
+          type="text"
+          class="rounded-lg border border-outline px-3 h-11 bg-surface"
+          [ngModel]="draft().name"
+          (ngModelChange)="updateDraft('name', $event)"
+          placeholder="z. B. Brot"
+        />
+      </label>
+      <label class="md:col-span-3 text-sm font-medium text-on-surface-variant flex flex-col gap-1.5">
+        <span>Reihenfolge <span class="text-xs font-normal text-on-surface-variant/70">(leer = automatisch)</span></span>
+        <input
+          type="number"
+          class="rounded-lg border border-outline px-3 h-11 bg-surface"
+          [ngModel]="draft().sortOrder || ''"
+          (ngModelChange)="updateDraft('sortOrder', $event === '' || $event == null ? 0 : +$event)"
+          placeholder="auto"
+        />
+      </label>
+      <label class="md:col-span-2 flex items-center gap-2 text-sm font-medium text-on-surface h-11">
+        <input
+          type="checkbox"
+          [ngModel]="draft().active"
+          (ngModelChange)="updateDraft('active', $event)"
+        />
+        Aktiv
+      </label>
+    </div>
+    @if (saveError()) {
+      <div class="rounded-lg bg-error-container text-on-error-container p-3 text-sm mt-4">
+        {{ saveError() }}
+      </div>
+    }
+    <div class="flex flex-wrap justify-end gap-2 mt-6">
+      @if (editing()) {
+        <button
+          type="button"
+          (click)="resetDraft()"
+          class="px-5 py-2.5 rounded-full text-sm font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors"
+        >
+          Abbrechen
+        </button>
+      }
+      <button
+        type="button"
+        (click)="save()"
+        [disabled]="busy()"
+        class="px-6 py-2.5 rounded-full text-sm font-bold bg-primary text-on-primary shadow hover:shadow-lg transition-all disabled:opacity-50"
+      >
+        {{ editing() ? 'Speichern' : 'Anlegen' }}
+      </button>
+    </div>
+  </section>
+
+  <section class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-surface-container-high text-on-surface-variant text-left">
+        <tr>
+          <th class="px-6 py-3 font-semibold">Name</th>
+          <th class="px-6 py-3 w-32 font-semibold">Reihenfolge</th>
+          <th class="px-6 py-3 w-28 font-semibold">Status</th>
+          <th class="px-6 py-3 w-56 font-semibold text-right">Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items(); track item.id) {
+          <tr class="border-t border-outline-variant">
+            <td class="px-6 py-4 font-medium text-on-surface">{{ item.name }}</td>
+            <td class="px-6 py-4 text-on-surface-variant">{{ item.sortOrder }}</td>
+            <td class="px-6 py-4">
+              <button
+                type="button"
+                (click)="toggleActive(item)"
+                class="px-3 py-1 rounded-full text-xs font-bold transition-colors"
+                [class.bg-primary]="item.active"
+                [class.text-on-primary]="item.active"
+                [class.bg-surface-container-high]="!item.active"
+                [class.text-on-surface-variant]="!item.active"
+              >
+                {{ item.active ? 'Aktiv' : 'Inaktiv' }}
+              </button>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex justify-end items-center gap-2 whitespace-nowrap">
+                <button
+                  type="button"
+                  (click)="startEdit(item)"
+                  class="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-container-high text-on-surface hover:bg-surface-container-highest"
+                >
+                  Bearbeiten
+                </button>
+                <button
+                  type="button"
+                  (click)="remove(item)"
+                  class="px-3 py-1.5 rounded-full text-xs font-bold text-error hover:bg-error/10"
+                >
+                  Löschen
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+        @if (!items().length) {
+          <tr>
+            <td colspan="4" class="px-6 py-10 text-center text-on-surface-variant">
+              Noch keine Kategorien angelegt.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</section>

@@ -27,5 +27,7 @@
     <include file="db/changelog/changes/020-distribution-point.xml"/>
     <include file="db/changelog/changes/021-partner-category.xml"/>
     <include file="db/changelog/changes/022-event.xml"/>
+    <include file="db/changelog/changes/023-pickup-run.xml"/>
+    <include file="db/changelog/changes/024-food-category-unique-name.xml"/>
 
 </databaseChangeLog>

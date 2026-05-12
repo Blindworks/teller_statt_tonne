@@ -15,7 +15,12 @@ public record Partner(
     List<PickupSlot> pickupSlots,
     Status status,
     Double latitude,
-    Double longitude
+    Double longitude,
+    String parkingInfo,
+    String accessInstructions,
+    String pickupProcedure,
+    String onSiteContactNote,
+    List<Long> preferredFoodCategoryIds
 ) {
     public enum Status {
         KEIN_KONTAKT,
@@ -52,8 +57,18 @@ public record Partner(
         }
     }
 
+    public Partner(
+        Long id, String name, Long categoryId, String street, String postalCode, String city,
+        String logoUrl, Contact contact, List<PickupSlot> pickupSlots, Status status,
+        Double latitude, Double longitude
+    ) {
+        this(id, name, categoryId, street, postalCode, city, logoUrl, contact, pickupSlots,
+            status, latitude, longitude, null, null, null, null, List.of());
+    }
+
     public Partner withId(Long newId) {
         return new Partner(newId, name, categoryId, street, postalCode, city, logoUrl,
-            contact, pickupSlots, status, latitude, longitude);
+            contact, pickupSlots, status, latitude, longitude,
+            parkingInfo, accessInstructions, pickupProcedure, onSiteContactNote, preferredFoodCategoryIds);
     }
 }

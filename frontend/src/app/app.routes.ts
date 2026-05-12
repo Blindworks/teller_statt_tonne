@@ -107,6 +107,20 @@ export const routes: Routes = [
           import('./pickups/pickup-edit/pickup-edit').then((m) => m.PickupEditComponent),
       },
       {
+        path: 'pickups/:pickupId/run',
+        canActivate: [roleGuard(['RETTER'])],
+        loadComponent: () =>
+          import('./pickup-run/pickup-run').then((m) => m.PickupRunComponent),
+      },
+      {
+        path: 'admin/food-categories',
+        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        loadComponent: () =>
+          import('./admin/food-categories/food-categories-admin').then(
+            (m) => m.FoodCategoriesAdminComponent,
+          ),
+      },
+      {
         path: 'users',
         loadComponent: () =>
           import('./users/users-list/users-list').then((m) => m.UsersListComponent),

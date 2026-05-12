@@ -7,6 +7,20 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-05-12
+
+### Added
+
+- **Pickup-Run-Wizard für Retter** (`/pickups/:pickupId/run`, neu): geführter 3-Schritt-Ablauf — (1) Betriebs-Hinweise, (2) Schnellerfassung der geretteten Lebensmittel über Emoji-Tap-Buttons + Freitext-Tag, (3) Verteiler-Wahl + optionale Fotos und Notiz. Beim Abschließen wird automatisch ein Verteiler-Post veröffentlicht. Abbrechen via `ConfirmDialogService`.
+- Im Dashboard erscheint bei eigenen heutigen Abholungen der Button **„Abholung starten"**, der direkt in den Wizard navigiert.
+- Admin-Maske **Lebensmittel-Kategorien** unter `/admin/food-categories` mit Inline-Editor (Name, Emoji, Farbe, Reihenfolge, Aktiv-Toggle).
+- Betriebs-Edit (`/stores/edit/:id`): neuer Abschnitt **Hinweise für Retter** (Parken, Zugang, Vorgehen, Ansprechpartner) sowie **Bevorzugte Lebensmittel** (Toggle-Chips aus Master-Liste).
+- Neue Services/Modelle: `FoodCategoryService`, `PickupRunService` mit Models in `pickup-run/pickup-run.model.ts`.
+
+### Changed
+
+- `Partner`-Model erweitert um `parkingInfo`, `accessInstructions`, `pickupProcedure`, `onSiteContactNote`, `preferredFoodCategoryIds`.
+
 ## [0.25.2] - 2026-05-12
 
 ### Added

@@ -1,7 +1,6 @@
-package de.tellerstatttonne.backend.distributionpoint;
+package de.tellerstatttonne.backend.foodcategory;
 
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,44 +14,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/distribution-points")
-public class DistributionPointController {
+@RequestMapping("/api/admin/food-categories")
+@PreAuthorize("hasRole('ADMINISTRATOR')")
+public class AdminFoodCategoryController {
 
-    private final DistributionPointService service;
+    private final FoodCategoryService service;
 
-    public DistributionPointController(DistributionPointService service) {
+    public AdminFoodCategoryController(FoodCategoryService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<DistributionPoint> list() {
+    public List<FoodCategory> list() {
         return service.findAll();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DistributionPoint> get(@PathVariable Long id) {
-        return service.findById(id)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
-    public ResponseEntity<DistributionPoint> create(@RequestBody DistributionPoint dto) {
-        DistributionPoint created = service.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<FoodCategory> create(@RequestBody FoodCategory dto) {
+        return ResponseEntity.ok(service.create(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
-    public ResponseEntity<DistributionPoint> update(@PathVariable Long id, @RequestBody DistributionPoint dto) {
+    public ResponseEntity<FoodCategory> update(@PathVariable Long id, @RequestBody FoodCategory dto) {
         return service.update(id, dto)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return service.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }

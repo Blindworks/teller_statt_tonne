@@ -19,6 +19,8 @@ import {
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog';
 import { PartnerNotesSectionComponent } from '../../stores/notes/partner-notes-section/partner-notes-section.component';
 import { PhotoUrlPipe } from '../../users/photo-url.pipe';
+import { FoodCategoryService } from '../../food-categories/food-category.service';
+import { FoodCategory } from '../../food-categories/food-category.model';
 import {
   Partner,
   PickupSlot,
@@ -54,6 +56,10 @@ type PartnerForm = FormGroup<{
   }>;
   pickupSlots: FormArray<SlotForm>;
   status: FormControl<Status>;
+  parkingInfo: FormControl<string>;
+  accessInstructions: FormControl<string>;
+  pickupProcedure: FormControl<string>;
+  onSiteContactNote: FormControl<string>;
 }>;
 
 @Component({
@@ -70,6 +76,10 @@ export class PartnerEditComponent {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
   private readonly categoryRegistry = inject(PartnerCategoryRegistry);
+  private readonly foodCategoryService = inject(FoodCategoryService);
+
+  readonly foodCategories = signal<FoodCategory[]>([]);
+  readonly preferredFoodCategoryIds = signal<number[]>([]);
 
   readonly isAdmin = computed(() => !!this.auth.currentUser()?.roles?.includes('ADMINISTRATOR'));
   readonly partnerStatus = signal<Status | null>(null);
@@ -98,6 +108,16 @@ export class PartnerEditComponent {
   readonly form: PartnerForm = this.buildForm();
 
   constructor() {
+    this.foodCategoryService.listAll().subscribe({
+      next: (items) => this.foodCategories.set(items),
+      error: () => {
+        // Fallback to active-only list for non-admin users.
+        this.foodCategoryService.listActive().subscribe({
+          next: (items) => this.foodCategories.set(items),
+          error: () => this.foodCategories.set([]),
+        });
+      },
+    });
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       const id = Number(idParam);
@@ -164,6 +184,10 @@ export class PartnerEditComponent {
       }),
       pickupSlots: this.fb.array(defaults.pickupSlots.map((s) => this.slotGroup(s))),
       status: this.fb.nonNullable.control<Status>(defaults.status),
+      parkingInfo: this.fb.nonNullable.control(''),
+      accessInstructions: this.fb.nonNullable.control(''),
+      pickupProcedure: this.fb.nonNullable.control(''),
+      onSiteContactNote: this.fb.nonNullable.control(''),
     });
   }
 
@@ -319,7 +343,12 @@ export class PartnerEditComponent {
       logoUrl: partner.logoUrl ?? '',
       contact: partner.contact,
       status: partner.status,
+      parkingInfo: partner.parkingInfo ?? '',
+      accessInstructions: partner.accessInstructions ?? '',
+      pickupProcedure: partner.pickupProcedure ?? '',
+      onSiteContactNote: partner.onSiteContactNote ?? '',
     });
+    this.preferredFoodCategoryIds.set(partner.preferredFoodCategoryIds ?? []);
     this.slots.clear();
     for (const slot of partner.pickupSlots) {
       this.slots.push(this.slotGroup(slot));
@@ -369,6 +398,21 @@ export class PartnerEditComponent {
       status: raw.status,
       latitude: this.latitude(),
       longitude: this.longitude(),
+      parkingInfo: raw.parkingInfo?.trim() ? raw.parkingInfo.trim() : null,
+      accessInstructions: raw.accessInstructions?.trim() ? raw.accessInstructions.trim() : null,
+      pickupProcedure: raw.pickupProcedure?.trim() ? raw.pickupProcedure.trim() : null,
+      onSiteContactNote: raw.onSiteContactNote?.trim() ? raw.onSiteContactNote.trim() : null,
+      preferredFoodCategoryIds: this.preferredFoodCategoryIds(),
     };
+  }
+
+  togglePreferredCategory(categoryId: number): void {
+    this.preferredFoodCategoryIds.update((ids) =>
+      ids.includes(categoryId) ? ids.filter((i) => i !== categoryId) : [...ids, categoryId],
+    );
+  }
+
+  isPreferred(categoryId: number): boolean {
+    return this.preferredFoodCategoryIds().includes(categoryId);
   }
 }

@@ -1,0 +1,312 @@
+<main class="min-h-screen bg-surface pb-32">
+  @if (loading()) {
+    <div class="flex items-center justify-center min-h-[60vh] text-on-surface-variant">
+      Lädt …
+    </div>
+  } @else if (errorMessage() && !run()) {
+    <div class="mx-auto max-w-2xl mt-12 p-6 bg-error-container text-on-error-container rounded-2xl">
+      <h2 class="text-lg font-bold mb-2">Hoppla</h2>
+      <p>{{ errorMessage() }}</p>
+      <button
+        type="button"
+        (click)="router.navigate(['/dashboard'])"
+        class="mt-4 px-5 py-2 rounded-full bg-primary text-on-primary font-bold"
+      >
+        Zurück zum Dashboard
+      </button>
+    </div>
+  } @else {
+    <!-- Header / Stepper -->
+    <header class="sticky top-0 z-10 bg-surface/95 backdrop-blur border-b border-outline-variant px-4 py-4 shadow-sm">
+      <div class="max-w-3xl mx-auto flex items-center gap-3">
+        <button
+          type="button"
+          (click)="abort()"
+          class="material-symbols-outlined text-on-surface-variant hover:text-error"
+          title="Abbrechen"
+        >close</button>
+        <div class="flex-1">
+          <div class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+            Abholung
+          </div>
+          <div class="text-base font-extrabold text-on-surface truncate">
+            {{ partner()?.name ?? pickup()?.partnerName ?? 'Betrieb' }}
+          </div>
+        </div>
+      </div>
+      <div class="max-w-3xl mx-auto mt-3 flex items-center gap-2">
+        <div class="h-1 flex-1 rounded-full" [class.bg-primary]="step() === 'info' || step() === 'items' || step() === 'distribution'" [class.bg-surface-container-high]="false"></div>
+        <span class="text-xs font-bold text-on-surface-variant px-1">1</span>
+        <div class="h-1 flex-1 rounded-full" [class.bg-primary]="step() === 'items' || step() === 'distribution'" [class.bg-surface-container-high]="step() === 'info'"></div>
+        <span class="text-xs font-bold text-on-surface-variant px-1">2</span>
+        <div class="h-1 flex-1 rounded-full" [class.bg-primary]="step() === 'distribution'" [class.bg-surface-container-high]="step() !== 'distribution'"></div>
+        <span class="text-xs font-bold text-on-surface-variant px-1">3</span>
+      </div>
+    </header>
+
+    <div class="max-w-3xl mx-auto px-4 mt-6">
+      @if (errorMessage()) {
+        <div class="rounded-lg bg-error/10 text-error p-3 text-sm mb-4">{{ errorMessage() }}</div>
+      }
+
+      <!-- Step 1: Info -->
+      @if (step() === 'info') {
+        <section>
+          <h1 class="text-2xl font-extrabold text-on-surface mb-1">Hinweise zum Betrieb</h1>
+          <p class="text-sm text-on-surface-variant mb-6">
+            Bitte vor Beginn der Abholung kurz durchlesen.
+          </p>
+
+          @if (partner(); as p) {
+            <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3 flex items-center gap-4">
+              @if (p.logoUrl) {
+                <img [src]="p.logoUrl" alt="" class="w-14 h-14 rounded-xl object-cover" />
+              }
+              <div>
+                <div class="text-lg font-extrabold text-on-surface">{{ p.name }}</div>
+                <div class="text-sm text-on-surface-variant">
+                  {{ p.street }}, {{ p.postalCode }} {{ p.city }}
+                </div>
+              </div>
+            </div>
+
+            @if (p.parkingInfo) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">local_parking</span>
+                  Parken
+                </div>
+                <p class="text-sm text-on-surface whitespace-pre-line">{{ p.parkingInfo }}</p>
+              </div>
+            }
+            @if (p.accessInstructions) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">door_front</span>
+                  Zugang
+                </div>
+                <p class="text-sm text-on-surface whitespace-pre-line">{{ p.accessInstructions }}</p>
+              </div>
+            }
+            @if (p.pickupProcedure) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">list_alt</span>
+                  Vorgehen
+                </div>
+                <p class="text-sm text-on-surface whitespace-pre-line">{{ p.pickupProcedure }}</p>
+              </div>
+            }
+            @if (p.onSiteContactNote) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">person</span>
+                  Ansprechpartner
+                </div>
+                <p class="text-sm text-on-surface">{{ p.onSiteContactNote }}</p>
+              </div>
+            }
+            @if (!p.parkingInfo && !p.accessInstructions && !p.pickupProcedure && !p.onSiteContactNote) {
+              <div class="text-sm text-on-surface-variant italic">
+                Keine besonderen Hinweise hinterlegt.
+              </div>
+            }
+          }
+        </section>
+      }
+
+      <!-- Step 2: Items -->
+      @if (step() === 'items') {
+        <section>
+          <h1 class="text-2xl font-extrabold text-on-surface mb-1">Was hast du gerettet?</h1>
+          <p class="text-sm text-on-surface-variant mb-5">
+            Tippe alle Kategorien an, die du dabei hast. Erneut tippen entfernt sie.
+          </p>
+
+          @if (preferredCategories().length) {
+            <h2 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2">
+              Bei diesem Betrieb typisch
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+              @for (cat of preferredCategories(); track cat.id) {
+                <button
+                  type="button"
+                  (click)="toggleCategory(cat)"
+                  class="relative rounded-2xl py-6 px-3 shadow-sm border-2 transition-all active:scale-95"
+                  [class.bg-primary]="isSelected(cat.id!)"
+                  [class.text-on-primary]="isSelected(cat.id!)"
+                  [class.border-primary]="isSelected(cat.id!)"
+                  [class.shadow-primary/20]="isSelected(cat.id!)"
+                  [class.bg-surface-container-low]="!isSelected(cat.id!)"
+                  [class.text-on-surface]="!isSelected(cat.id!)"
+                  [class.border-transparent]="!isSelected(cat.id!)"
+                >
+                  @if (isSelected(cat.id!)) {
+                    <span class="material-symbols-outlined absolute top-2 right-2 text-base">check_circle</span>
+                  }
+                  <span class="text-base font-bold leading-tight text-center block">{{ cat.name }}</span>
+                </button>
+              }
+            </div>
+          }
+
+          @if (otherCategories().length) {
+            <h2 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2">
+              Weitere Kategorien
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+              @for (cat of otherCategories(); track cat.id) {
+                <button
+                  type="button"
+                  (click)="toggleCategory(cat)"
+                  class="relative rounded-2xl py-6 px-3 shadow-sm border-2 transition-all active:scale-95"
+                  [class.bg-primary]="isSelected(cat.id!)"
+                  [class.text-on-primary]="isSelected(cat.id!)"
+                  [class.border-primary]="isSelected(cat.id!)"
+                  [class.bg-surface-container-low]="!isSelected(cat.id!)"
+                  [class.text-on-surface]="!isSelected(cat.id!)"
+                  [class.border-transparent]="!isSelected(cat.id!)"
+                >
+                  @if (isSelected(cat.id!)) {
+                    <span class="material-symbols-outlined absolute top-2 right-2 text-base">check_circle</span>
+                  }
+                  <span class="text-base font-bold leading-tight text-center block">{{ cat.name }}</span>
+                </button>
+              }
+            </div>
+          }
+
+          <h2 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2">
+            Etwas Eigenes
+          </h2>
+          <div class="bg-surface-container-low rounded-2xl shadow-sm p-4 flex items-center gap-2 mb-3">
+            <input
+              type="text"
+              class="flex-1 rounded-lg border border-outline px-3 h-11 bg-surface"
+              [ngModel]="customLabel()"
+              (ngModelChange)="customLabel.set($event)"
+              (keydown.enter)="addCustom()"
+              placeholder="z. B. Lasagne, Tofu …"
+            />
+            <button
+              type="button"
+              (click)="addCustom()"
+              [disabled]="!customLabel().trim()"
+              class="h-11 px-4 rounded-full bg-primary text-on-primary font-bold disabled:opacity-50"
+            >
+              Hinzufügen
+            </button>
+          </div>
+          @if (customItems().length) {
+            <div class="flex flex-wrap gap-2 mb-3">
+              @for (item of customItems(); track item.id) {
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container text-sm font-bold">
+                  {{ item.customLabel }}
+                  <button
+                    type="button"
+                    (click)="removeItem(item.id)"
+                    class="material-symbols-outlined text-base hover:text-error"
+                  >close</button>
+                </span>
+              }
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Step 3: Distribution -->
+      @if (step() === 'distribution') {
+        <section>
+          <h1 class="text-2xl font-extrabold text-on-surface mb-1">Am Verteiler posten</h1>
+          <p class="text-sm text-on-surface-variant mb-4">
+            Wähle den Verteiler aus, an dem du die Lebensmittel ablegst.
+          </p>
+
+          <label class="block text-sm font-bold text-on-surface mb-1">Verteiler</label>
+          <select
+            class="w-full rounded-lg border border-outline px-3 py-3 bg-surface mb-5"
+            [ngModel]="selectedDpId()"
+            (ngModelChange)="selectedDpId.set($event === null || $event === '' ? null : +$event)"
+          >
+            <option [ngValue]="null">— Verteiler wählen —</option>
+            @for (dp of distributionPoints(); track dp.id) {
+              <option [ngValue]="dp.id">{{ dp.name }}</option>
+            }
+          </select>
+
+          <label class="block text-sm font-bold text-on-surface mb-1">
+            Fotos (optional)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            capture="environment"
+            (change)="onPhotosSelected($event)"
+            class="block w-full text-sm mb-3"
+          />
+          @if (photoQueue().length) {
+            <div class="grid grid-cols-3 gap-2 mb-4">
+              @for (file of photoQueue(); track $index) {
+                <div class="relative">
+                  <img [src]="photoPreview(file)" alt="" class="w-full h-24 object-cover rounded-lg" />
+                  <button
+                    type="button"
+                    (click)="removePhoto($index)"
+                    class="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                  >×</button>
+                </div>
+              }
+            </div>
+          }
+
+          <label class="block text-sm font-bold text-on-surface mb-1 mt-3">
+            Notiz (optional)
+          </label>
+          <textarea
+            rows="3"
+            class="w-full rounded-lg border border-outline px-3 py-2 bg-surface mb-5"
+            [ngModel]="notes()"
+            (ngModelChange)="notes.set($event)"
+            placeholder="z. B. Brot ist von gestern, aber top …"
+          ></textarea>
+        </section>
+      }
+    </div>
+
+    <!-- Footer-Buttons -->
+    <footer class="fixed bottom-0 left-0 right-0 z-10 bg-surface/95 backdrop-blur border-t border-outline-variant px-4 py-3">
+      <div class="max-w-3xl mx-auto flex items-center justify-between gap-3">
+        @if (step() !== 'info') {
+          <button
+            type="button"
+            (click)="back()"
+            class="px-5 py-3 rounded-full font-bold text-on-surface-variant hover:bg-surface-container-high"
+          >
+            Zurück
+          </button>
+        } @else {
+          <span></span>
+        }
+        @if (step() !== 'distribution') {
+          <button
+            type="button"
+            (click)="next()"
+            class="flex-1 max-w-xs px-6 py-3 rounded-full bg-primary text-on-primary font-bold shadow-lg shadow-primary/20"
+          >
+            Weiter
+          </button>
+        } @else {
+          <button
+            type="button"
+            (click)="complete()"
+            [disabled]="completing() || selectedDpId() === null"
+            class="flex-1 max-w-xs px-6 py-3 rounded-full bg-primary text-on-primary font-bold shadow-lg shadow-primary/20 disabled:opacity-50"
+          >
+            {{ completing() ? 'Speichere …' : 'Abholung abschließen' }}
+          </button>
+        }
+      </div>
+    </footer>
+  }
+</main>

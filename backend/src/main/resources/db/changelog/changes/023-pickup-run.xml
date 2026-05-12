@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="023-create-food-category" author="teller-statt-tonne">
+        <createTable tableName="food_category">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emoji" type="VARCHAR(16)"/>
+            <column name="color_hex" type="VARCHAR(9)"/>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="023-partner-pickup-info-fields" author="teller-statt-tonne">
+        <addColumn tableName="partner">
+            <column name="parking_info" type="VARCHAR(4000)"/>
+            <column name="access_instructions" type="VARCHAR(4000)"/>
+            <column name="pickup_procedure" type="VARCHAR(4000)"/>
+            <column name="on_site_contact_note" type="VARCHAR(500)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="023-partner-food-category" author="teller-statt-tonne">
+        <createTable tableName="partner_food_category">
+            <column name="partner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="food_category_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="partner_food_category"
+                       columnNames="partner_id, sort_order"
+                       constraintName="pk_partner_food_category"/>
+        <addForeignKeyConstraint baseTableName="partner_food_category"
+                                 baseColumnNames="partner_id"
+                                 referencedTableName="partner" referencedColumnNames="id"
+                                 constraintName="fk_pfc_partner" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="partner_food_category"
+                                 baseColumnNames="food_category_id"
+                                 referencedTableName="food_category" referencedColumnNames="id"
+                                 constraintName="fk_pfc_food_category" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="023-create-pickup-run" author="teller-statt-tonne">
+        <createTable tableName="pickup_run">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pickup_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retter_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="started_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed_at" type="DATETIME"/>
+            <column name="status" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="distribution_point_id" type="BIGINT"/>
+            <column name="notes" type="VARCHAR(4000)"/>
+        </createTable>
+        <addUniqueConstraint tableName="pickup_run"
+                             columnNames="pickup_id, retter_id"
+                             constraintName="uq_pickup_run_pickup_retter"/>
+        <addForeignKeyConstraint baseTableName="pickup_run"
+                                 baseColumnNames="pickup_id"
+                                 referencedTableName="pickup" referencedColumnNames="id"
+                                 constraintName="fk_pickup_run_pickup" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_run"
+                                 baseColumnNames="retter_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_pickup_run_retter" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_run"
+                                 baseColumnNames="distribution_point_id"
+                                 referencedTableName="distribution_point" referencedColumnNames="id"
+                                 constraintName="fk_pickup_run_dp"/>
+    </changeSet>
+
+    <changeSet id="023-create-pickup-run-item" author="teller-statt-tonne">
+        <createTable tableName="pickup_run_item">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pickup_run_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="food_category_id" type="BIGINT"/>
+            <column name="custom_label" type="VARCHAR(100)"/>
+            <column name="taken_at" type="DATETIME"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="pickup_run_item"
+                                 baseColumnNames="pickup_run_id"
+                                 referencedTableName="pickup_run" referencedColumnNames="id"
+                                 constraintName="fk_pri_pickup_run" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_run_item"
+                                 baseColumnNames="food_category_id"
+                                 referencedTableName="food_category" referencedColumnNames="id"
+                                 constraintName="fk_pri_food_category"/>
+    </changeSet>
+
+    <changeSet id="023-create-distribution-post" author="teller-statt-tonne">
+        <createTable tableName="distribution_post">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="distribution_point_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_run_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="partner_id" type="BIGINT"/>
+            <column name="posted_by_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notes" type="VARCHAR(4000)"/>
+        </createTable>
+        <addUniqueConstraint tableName="distribution_post"
+                             columnNames="pickup_run_id"
+                             constraintName="uq_distribution_post_pickup_run"/>
+        <addForeignKeyConstraint baseTableName="distribution_post"
+                                 baseColumnNames="distribution_point_id"
+                                 referencedTableName="distribution_point" referencedColumnNames="id"
+                                 constraintName="fk_distpost_dp"/>
+        <addForeignKeyConstraint baseTableName="distribution_post"
+                                 baseColumnNames="pickup_run_id"
+                                 referencedTableName="pickup_run" referencedColumnNames="id"
+                                 constraintName="fk_distpost_pickup_run" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="distribution_post"
+                                 baseColumnNames="partner_id"
+                                 referencedTableName="partner" referencedColumnNames="id"
+                                 constraintName="fk_distpost_partner"/>
+        <addForeignKeyConstraint baseTableName="distribution_post"
+                                 baseColumnNames="posted_by_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_distpost_posted_by"/>
+    </changeSet>
+
+    <changeSet id="023-create-distribution-post-photo" author="teller-statt-tonne">
+        <createTable tableName="distribution_post_photo">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="post_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_url" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uploaded_by_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uploaded_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="distribution_post_photo"
+                                 baseColumnNames="post_id"
+                                 referencedTableName="distribution_post" referencedColumnNames="id"
+                                 constraintName="fk_distpostphoto_post" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="distribution_post_photo"
+                                 baseColumnNames="uploaded_by_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_distpostphoto_user"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -377,6 +377,89 @@
       </button>
     </div>
 
+    <!-- Hinweise für Retter (im Abhol-Wizard sichtbar) -->
+    <div class="lg:col-span-12 bg-surface-container-lowest rounded-xl p-8 shadow-sm">
+      <h4 class="text-xl font-bold mb-2 text-primary flex items-center gap-2">
+        <span class="material-symbols-outlined">tips_and_updates</span>
+        Hinweise für Retter
+      </h4>
+      <p class="text-sm text-on-surface-variant mb-6">
+        Diese Hinweise sieht der Retter, wenn er den Abhol-Wizard startet.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <label class="text-sm font-medium text-on-surface-variant flex flex-col gap-1">
+          Parkmöglichkeiten
+          <textarea
+            rows="3"
+            formControlName="parkingInfo"
+            class="rounded-lg border border-outline px-3 py-2 bg-surface"
+            placeholder="z. B. Hinterhof, Lieferanteneingang…"
+          ></textarea>
+        </label>
+        <label class="text-sm font-medium text-on-surface-variant flex flex-col gap-1">
+          Zugang / Eingang
+          <textarea
+            rows="3"
+            formControlName="accessInstructions"
+            class="rounded-lg border border-outline px-3 py-2 bg-surface"
+            placeholder="z. B. Klingel beim Bäcker, Seiteneingang…"
+          ></textarea>
+        </label>
+        <label class="text-sm font-medium text-on-surface-variant flex flex-col gap-1 md:col-span-2">
+          Vorgehensweise vor Ort
+          <textarea
+            rows="3"
+            formControlName="pickupProcedure"
+            class="rounded-lg border border-outline px-3 py-2 bg-surface"
+            placeholder="z. B. Personal ansprechen, Kisten am vereinbarten Ort prüfen…"
+          ></textarea>
+        </label>
+        <label class="text-sm font-medium text-on-surface-variant flex flex-col gap-1 md:col-span-2">
+          Ansprechpartner vor Ort
+          <input
+            type="text"
+            formControlName="onSiteContactNote"
+            class="rounded-lg border border-outline px-3 py-2 bg-surface"
+            placeholder="z. B. Frau Müller / Schichtleitung"
+          />
+        </label>
+      </div>
+    </div>
+
+    <!-- Bevorzugte Lebensmittel -->
+    <div class="lg:col-span-12 bg-surface-container-lowest rounded-xl p-8 shadow-sm">
+      <h4 class="text-xl font-bold mb-2 text-primary flex items-center gap-2">
+        <span class="material-symbols-outlined">restaurant</span>
+        Bevorzugte Lebensmittel
+      </h4>
+      <p class="text-sm text-on-surface-variant mb-6">
+        Häufige Lebensmittel-Kategorien dieses Betriebs. Erscheinen oben in der
+        Schnellerfassung des Retters.
+      </p>
+      <div class="flex flex-wrap gap-2">
+        @for (cat of foodCategories(); track cat.id) {
+          <button
+            type="button"
+            (click)="togglePreferredCategory(cat.id!)"
+            class="px-3 py-2 rounded-full text-sm font-bold border transition-colors"
+            [class.bg-primary]="isPreferred(cat.id!)"
+            [class.text-on-primary]="isPreferred(cat.id!)"
+            [class.border-primary]="isPreferred(cat.id!)"
+            [class.bg-surface-container-high]="!isPreferred(cat.id!)"
+            [class.text-on-surface]="!isPreferred(cat.id!)"
+            [class.border-outline]="!isPreferred(cat.id!)"
+          >
+            {{ cat.name }}
+          </button>
+        }
+        @if (!foodCategories().length) {
+          <p class="text-sm text-on-surface-variant">
+            Noch keine Kategorien hinterlegt. Lege sie unter Admin → Lebensmittel-Kategorien an.
+          </p>
+        }
+      </div>
+    </div>
+
     <!-- Save-Leiste -->
     <div class="lg:col-span-12 flex flex-col md:flex-row gap-4 justify-between items-center mt-2">
       <div>

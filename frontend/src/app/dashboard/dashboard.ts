@@ -234,6 +234,15 @@ export class DashboardComponent {
     });
   }
 
+  startRun(slot: DisplaySlot): void {
+    if (slot.pickupId == null) return;
+    this.router.navigate(['/pickups', slot.pickupId, 'run']);
+  }
+
+  canStartRun(slot: DisplaySlot): boolean {
+    return slot.currentUserAssigned && slot.pickupId != null && slot.date === this.todayIso();
+  }
+
   unassign(slot: DisplaySlot): void {
     if (slot.pickupId == null) return;
     this.errorSignal.set(null);

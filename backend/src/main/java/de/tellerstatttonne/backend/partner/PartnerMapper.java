@@ -27,7 +27,16 @@ final class PartnerMapper {
                     .toList(),
             e.getStatus(),
             e.getLatitude(),
-            e.getLongitude()
+            e.getLongitude(),
+            e.getParkingInfo(),
+            e.getAccessInstructions(),
+            e.getPickupProcedure(),
+            e.getOnSiteContactNote(),
+            e.getPreferredFoodCategories() == null
+                ? List.of()
+                : e.getPreferredFoodCategories().stream()
+                    .map(PartnerEntity.PreferredFoodCategoryEmbeddable::getFoodCategoryId)
+                    .toList()
         );
     }
 
@@ -39,6 +48,10 @@ final class PartnerMapper {
         target.setCity(src.city());
         target.setLogoUrl(src.logoUrl());
         target.setStatus(src.status() != null ? src.status() : Partner.Status.KEIN_KONTAKT);
+        target.setParkingInfo(src.parkingInfo());
+        target.setAccessInstructions(src.accessInstructions());
+        target.setPickupProcedure(src.pickupProcedure());
+        target.setOnSiteContactNote(src.onSiteContactNote());
 
         PartnerEntity.ContactEmbeddable contact = target.getContact() != null
             ? target.getContact()
@@ -63,6 +76,16 @@ final class PartnerMapper {
                     ? slot.expectedKg()
                     : null);
                 target.getPickupSlots().add(e);
+            }
+        }
+
+        target.getPreferredFoodCategories().clear();
+        if (src.preferredFoodCategoryIds() != null) {
+            for (Long fcId : src.preferredFoodCategoryIds()) {
+                if (fcId == null) continue;
+                PartnerEntity.PreferredFoodCategoryEmbeddable e = new PartnerEntity.PreferredFoodCategoryEmbeddable();
+                e.setFoodCategoryId(fcId);
+                target.getPreferredFoodCategories().add(e);
             }
         }
     }

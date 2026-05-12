@@ -22,6 +22,13 @@ export class AdminDashboardComponent {
       link: '/admin/partner-categories',
     },
     {
+      title: 'Lebensmittel-Kategorien',
+      description:
+        'Master-Liste der Lebensmittel für die Schnellerfassung im Abhol-Wizard (Brot, Obst, …) — Emoji, Farbe, Reihenfolge.',
+      icon: 'restaurant',
+      link: '/admin/food-categories',
+    },
+    {
       title: 'Verteilerplätze',
       description:
         'Orte verwalten, an denen gerettete Lebensmittel an Endkund:innen weitergegeben werden (Teller-Treff).',

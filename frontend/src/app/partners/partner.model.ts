@@ -44,6 +44,11 @@ export interface Partner {
   status: Status;
   latitude: number | null;
   longitude: number | null;
+  parkingInfo: string | null;
+  accessInstructions: string | null;
+  pickupProcedure: string | null;
+  onSiteContactNote: string | null;
+  preferredFoodCategoryIds: number[];
 }
 
 export const WEEKDAYS: ReadonlyArray<{ value: Weekday; label: string }> = [
@@ -90,5 +95,10 @@ export function emptyPartner(): Partner {
     status: 'KEIN_KONTAKT',
     latitude: null,
     longitude: null,
+    parkingInfo: null,
+    accessInstructions: null,
+    pickupProcedure: null,
+    onSiteContactNote: null,
+    preferredFoodCategoryIds: [],
   };
 }

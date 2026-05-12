@@ -47,6 +47,26 @@ public class PartnerEntity {
     @Column(name = "logo_url", length = 1024)
     private String logoUrl;
 
+    @Column(name = "parking_info", length = 4000)
+    private String parkingInfo;
+
+    @Column(name = "access_instructions", length = 4000)
+    private String accessInstructions;
+
+    @Column(name = "pickup_procedure", length = 4000)
+    private String pickupProcedure;
+
+    @Column(name = "on_site_contact_note", length = 500)
+    private String onSiteContactNote;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "partner_food_category",
+        joinColumns = @JoinColumn(name = "partner_id")
+    )
+    @OrderColumn(name = "sort_order")
+    private List<PreferredFoodCategoryEmbeddable> preferredFoodCategories = new ArrayList<>();
+
     @Embedded
     private ContactEmbeddable contact = new ContactEmbeddable();
 
@@ -100,6 +120,25 @@ public class PartnerEntity {
     public void setLongitude(Double longitude) { this.longitude = longitude; }
     public Set<UserEntity> getMembers() { return members; }
     public void setMembers(Set<UserEntity> members) { this.members = members; }
+    public String getParkingInfo() { return parkingInfo; }
+    public void setParkingInfo(String parkingInfo) { this.parkingInfo = parkingInfo; }
+    public String getAccessInstructions() { return accessInstructions; }
+    public void setAccessInstructions(String accessInstructions) { this.accessInstructions = accessInstructions; }
+    public String getPickupProcedure() { return pickupProcedure; }
+    public void setPickupProcedure(String pickupProcedure) { this.pickupProcedure = pickupProcedure; }
+    public String getOnSiteContactNote() { return onSiteContactNote; }
+    public void setOnSiteContactNote(String onSiteContactNote) { this.onSiteContactNote = onSiteContactNote; }
+    public List<PreferredFoodCategoryEmbeddable> getPreferredFoodCategories() { return preferredFoodCategories; }
+    public void setPreferredFoodCategories(List<PreferredFoodCategoryEmbeddable> preferredFoodCategories) { this.preferredFoodCategories = preferredFoodCategories; }
+
+    @Embeddable
+    public static class PreferredFoodCategoryEmbeddable {
+        @Column(name = "food_category_id", nullable = false)
+        private Long foodCategoryId;
+
+        public Long getFoodCategoryId() { return foodCategoryId; }
+        public void setFoodCategoryId(Long foodCategoryId) { this.foodCategoryId = foodCategoryId; }
+    }
 
     @Embeddable
     public static class ContactEmbeddable {
