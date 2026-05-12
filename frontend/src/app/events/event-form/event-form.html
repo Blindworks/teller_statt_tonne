@@ -1,4 +1,4 @@
-<section class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-3xl mx-auto min-h-screen">
+<section class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-5xl mx-auto min-h-screen">
   <a
     routerLink="/events"
     class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-2"
@@ -190,8 +190,8 @@
 
       <form [formGroup]="slotForm" (ngSubmit)="addSlot()" class="space-y-3 border-t border-outline-variant/30 pt-4">
         <h3 class="text-sm font-bold text-on-surface">Neuen Termin anlegen</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_0.8fr] gap-3">
+          <div class="min-w-0">
             <label class="block text-xs font-bold text-on-surface-variant mb-1">Datum</label>
             <input
               type="date"
@@ -199,7 +199,7 @@
               class="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          <div>
+          <div class="min-w-0">
             <label class="block text-xs font-bold text-on-surface-variant mb-1">Start</label>
             <input
               type="time"
@@ -207,7 +207,7 @@
               class="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          <div>
+          <div class="min-w-0">
             <label class="block text-xs font-bold text-on-surface-variant mb-1">Ende</label>
             <input
               type="time"
@@ -215,7 +215,7 @@
               class="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          <div>
+          <div class="min-w-0">
             <label class="block text-xs font-bold text-on-surface-variant mb-1">Kapazität</label>
             <input
               type="number"

@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.23.2] - 2026-05-12
+
+### Fixed
+
+- Event-Editor: Container von `max-w-3xl` auf `max-w-5xl` verbreitert, damit die vier nebeneinanderliegenden Eingabefelder im Termin-Anlegen-Formular (Datum/Start/Ende/Kapazität) genug Platz haben. Grid-Layout reagiert jetzt responsiv: 1 Spalte ≤ sm, 2 Spalten ≥ sm, 4 Spalten mit gewichteter Aufteilung ≥ lg.
+
 ## [0.23.1] - 2026-05-12
 
 ### Added
