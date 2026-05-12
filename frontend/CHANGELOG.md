@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-05-12
+
+### Added
+
+- Im Event-Editor (Bearbeiten-Modus) gibt es jetzt eine Sektion „Abhol-Termine": Liste aller Pickups der Veranstaltung (Datum, Zeitraum, Kapazität, Anzahl Eingetragener) mit Lösch-Button, plus Inline-Formular zum Anlegen weiterer Termine (Datum, Start/Ende, Kapazität). Validiert Reihenfolge der Zeiten und prüft, dass der Termin innerhalb der Veranstaltungs-Laufzeit liegt. Termine mit bereits eingetragenen Retter:innen können nicht gelöscht werden.
+
 ## [0.23.0] - 2026-05-11
 
 ### Added
