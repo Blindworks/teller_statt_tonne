@@ -38,6 +38,7 @@ interface DisplaySlot {
   pickupId: number | null;
   partnerId: number;
   partnerName: string;
+  isEvent: boolean;
   location: string;
   time: string;
   date: string;
@@ -245,9 +246,12 @@ export class DashboardComponent {
   }
 
   private toDisplay(s: DaySlot, idx: number, now: number): DisplaySlot {
+    const isEvent = s.eventId != null;
     const category = this.categoryRegistry.byId(s.partnerCategoryId);
-    const categoryIcon = category?.icon ?? 'storefront';
+    const categoryIcon = isEvent ? 'celebration' : (category?.icon ?? 'storefront');
     const categoryLabel = category?.label ?? 'Pickup';
+    const displayName = isEvent ? (s.eventName ?? 'Veranstaltung') : s.partnerName;
+    const displayLogoUrl = isEvent ? s.eventLogoUrl : s.partnerLogoUrl;
 
     const location = [s.partnerStreet, s.partnerCity].filter((x) => !!x).join(', ');
     const assignments = s.assignments ?? [];
@@ -270,17 +274,18 @@ export class DashboardComponent {
       key: `${s.pickupId ?? 't'}-${s.partnerId}-${s.date}-${s.startTime}-${idx}`,
       pickupId: s.pickupId,
       partnerId: s.partnerId,
-      partnerName: s.partnerName,
+      partnerName: displayName,
+      isEvent,
       location: location || '—',
       time: `${s.startTime} – ${s.endTime}`,
       date: s.date,
       startTime: s.startTime,
       endTime: s.endTime,
       dateLabel: this.formatDateLabel(s.date),
-      badgeLabel: s.isTemplate ? 'Slot frei' : categoryLabel,
+      badgeLabel: s.isTemplate ? 'Slot frei' : isEvent ? 'Veranstaltung' : categoryLabel,
       isTemplate: s.isTemplate,
       categoryIcon,
-      logoUrl: s.partnerLogoUrl,
+      logoUrl: displayLogoUrl,
       capacity,
       assignedCount: assignments.length,
       freeCount,

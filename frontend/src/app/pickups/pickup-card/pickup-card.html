@@ -42,7 +42,7 @@
     class="text-sm font-bold mb-1"
     [class.line-through]="v === 'COMPLETED' || v === 'CANCELLED'"
   >
-    {{ p.partnerName ?? 'Unbekannt' }}
+    {{ displayTitle() }}
   </h5>
 
   @if (v === 'COMPLETED') {

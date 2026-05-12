@@ -7,6 +7,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.24.1] - 2026-05-12
+
+### Changed
+
+- Pickup-Karten im Pickups-View und Slot-Listenzeilen im Dashboard zeigen für Termine, die zu einer Veranstaltung gehören (`eventId` gesetzt), das Badge „Veranstaltung", den Namen der Veranstaltung als Titel, gegebenenfalls das Veranstaltungs-Logo und ein Event-Icon — statt der Partner-Kategorie und „Unbekannt".
+
+## [0.24.0] - 2026-05-12
+
+### Added
+
+- Eigenes Profil (`/profil`): Neue Sektion „Rolle" (bzw. „Rollen" bei mehreren) zeigt die eigene Rolle als farbiges Badge an. Labels stammen aus `/users/roles`, Badge-Farben passen zur Nutzerliste (Administrator/Teamleiter/Retter/Neu).
+
 ## [0.23.4] - 2026-05-12
 
 ### Fixed
