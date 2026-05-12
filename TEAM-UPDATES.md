@@ -5,6 +5,22 @@ Für die technische Detailansicht siehe [`backend/CHANGELOG.md`](backend/CHANGEL
 
 ---
 
+## 11.05.2026
+
+### Neu
+
+- **Veranstaltungen als kurzlebige Abholungsorte.** Neuer Menüpunkt „Veranstaltungen" für alle eingeloggten Rollen. Teamleitung und Admin legen Events mit Name, Beschreibung, Start-/Enddatum, Adresse, Ansprechperson und optionalem Logo an; vergangene und aktive Events sind über Tabs trennbar. Aktive Events erscheinen mit eigenem Marker auf der Karte. Pickups, die zu einem Event gehören, tauchen für **alle** Retter:innen auf dem Dashboard auf — unabhängig davon, welchem Betrieb sie zugeordnet sind. *Was heißt das fürs Team?* Sonderaktionen (Stadtfest, Tafel-Event, Spendenlauf) können jetzt als eigenständiger Abholungsort geführt werden, ohne dass wir dafür einen Fake-Betrieb anlegen müssen.
+
+- **Teller-Treffs (Verteilerplätze) im Admin-Bereich.** Neue Verwaltung unter „Verteilerplätze" für Teamleitung und Admin: Name (Pflicht), Beschreibung, Adresse, Mehrfach-Auswahl von Betreiber:innen und beliebig viele Öffnungszeiten-Slots (Wochentag + Von/Bis). *Was heißt das fürs Team?* Endlich ein zentraler Ort, an dem wir festhalten, wo wir gerettetes Essen verteilen — wer den Ort betreut und wann er geöffnet ist.
+
+- **Betriebs-Kategorien selbst verwalten.** Neue Admin-Seite „Betrieb-Kategorien": Kategorien anlegen, umbenennen, Icon aus einer kuratierten Lebensmittel-Auswahl wählen, Reihenfolge bestimmen und einzeln aktiv/inaktiv schalten. Inaktive Kategorien verschwinden aus Dropdowns und Filtern, bleiben aber an bestehenden Betrieben erhalten. *Was heißt das fürs Team?* Wenn wir z. B. „Hofladen" oder „Kantine" als neue Kategorie brauchen, richten wir die selbst ein — kein Entwickler nötig.
+
+  > Hinweis: Eine Kategorie kann erst gelöscht werden, wenn kein Betrieb sie mehr verwendet. Falls das nicht der Fall ist, einfach auf „inaktiv" stellen.
+
+- **Metzgerei als neue Betriebs-Kategorie.** Neben Bäckerei, Supermarkt, Café und Restaurant gibt es jetzt auch **Metzgerei** (Icon: Spieß). Auswählbar im Betrieb-Edit, in den Kartenfiltern und korrekt dargestellt in den Pickup-Karten. *Was heißt das fürs Team?* Metzgereien werden nicht mehr ersatzweise als „Supermarkt" geführt — Filter und Statistik werden dadurch sauberer.
+
+---
+
 ## 08.05.2026
 
 ### Neu
@@ -16,6 +32,20 @@ Für die technische Detailansicht siehe [`backend/CHANGELOG.md`](backend/CHANGEL
 - **Logo-Upload für Betriebe.** Im Betrieb-Editor (✏️ Bearbeiten-Button auf einem Betrieb) lässt sich jetzt direkt eine Bilddatei als Logo hochladen — JPG, PNG, WebP oder GIF, bis 5 MB. Das bisherige URL-Feld bleibt parallel bestehen, falls man lieber einen Link einträgt. Hochgeladene Logos erscheinen sofort in der Betriebe-Liste, im Detail-Dialog, im Dashboard und in der Mitglieder-Verwaltung. *Was heißt das fürs Team?* Niemand muss mehr ein Logo erst irgendwo extern hosten — Datei auswählen, fertig.
 
 > Hinweis: Bei einem **neuen** Betrieb erst einmal speichern, dann ist der Upload-Button aktiv.
+
+- **Hygienezertifikat im Profil hochladen.** Im Profil gibt es einen neuen Bereich „Hygienezertifikat": User laden ihr Zertifikat (PDF, JPG, PNG oder WebP, bis 10 MB) zusammen mit dem Ausstellungsdatum hoch. Ein Status-Badge (Ausstehend / Genehmigt / Abgelehnt), ein Vorschau-Button und — bei Ablehnung — die Begründung sind direkt sichtbar. Wer noch kein Retter ist, sieht zusätzlich einen Hinweistext, dass das Zertifikat Voraussetzung für die Retter-Rolle ist. Re-Upload ersetzt das alte Dokument und setzt den Status zurück auf „Ausstehend". *Was heißt das fürs Team?* Niemand muss Zertifikate mehr per Mail rumschicken — und keine Sorge: andere Retter:innen können fremde Zertifikate nicht sehen.
+
+- **Hygienezertifikate prüfen (Teamleitung & Admin).** Neue Seite „Hygienezertifikate" mit Status-Filter (Offen / Genehmigt / Abgelehnt / Alle), eingebetteter PDF- oder Bild-Vorschau, Genehmigen-Button und Inline-Begründungsfeld beim Ablehnen. Genehmigen vergibt automatisch die Retter-Rolle (und entfernt die „Neues Mitglied"-Rolle). *Was heißt das fürs Team?* Onboarding läuft in einem zentralen Workflow statt über verstreute Mails — und der Übergang vom „Neuen Mitglied" zum Retter ist nur einen Klick entfernt.
+
+- **Klarer Lebenszyklus für Nutzer:innen.** Im User-Edit zeigt ein Status-Bereich, wo eine Person gerade steht: **Ausstehend** (Onboarding läuft), **Aktiv**, **Pausiert**, **Ausgetreten** oder **Entfernt**. Bei „Ausstehend" sieht Teamleitung & Admin den Fortschritt mit Häkchen für Einführungsgespräch und Hygienezertifikat. Status-Wechsel laufen über dedizierte Buttons („Einführung bestätigen", „Pausieren", „Reaktivieren", „Austreten", „Entfernen") — kein freies Status-Dropdown mehr. *Was heißt das fürs Team?* Wir sehen auf einen Blick, ob jemand wirklich „loslegen" kann, oder ob noch etwas im Onboarding fehlt.
+
+- **Einladungs-Mail beim Anlegen eines Nutzers.** Beim Anlegen eines Users gibt es kein Passwort-Feld mehr — stattdessen bekommt die Person automatisch eine Mail mit Link zum eigenen Passwort-Setzen. Im User-Edit gibt es einen Button **„Einladung erneut senden"**, solange der User noch kein Passwort gesetzt hat. *Was heißt das fürs Team?* Niemand muss sich mehr ein Initialpasswort ausdenken und weitergeben — und wenn die erste Mail versehentlich gelöscht wird, ein Klick genügt.
+
+  > Hinweis: Wie bei „Passwort vergessen?" hängt der tatsächliche Mail-Versand davon ab, dass die SMTP-Zugangsdaten auf dem Server hinterlegt sind.
+
+- **Systemlog für Admins.** Neue Admin-Seite „Systemlog" zeigt schreibgeschützt alle wichtigen System-Ereignisse: Logins, Passwort-Resets, User-Anlage/-Löschung, Rollen-Änderungen, Hygienezertifikat-Entscheidungen, Betriebs-Aktionen, Bewerbungs-Entscheidungen, Mail-Versand-Fehler und nicht behandelte Server-Fehler. Filter für Kategorie, Event-Typ, Severity, Datums-Bereich und Volltextsuche über Meldung und Akteur-E-Mail. *Was heißt das fürs Team?* Wenn wir wissen wollen „wer hat wann wem die Rolle entzogen?" oder „warum kam diese Mail nicht an?", schauen wir hier nach.
+
+  > Hinweis: Einträge älter als 90 Tage werden nachts automatisch gelöscht (Standardwert, anpassbar über `SYSTEMLOG_RETENTION_DAYS`).
 
 ---
 
