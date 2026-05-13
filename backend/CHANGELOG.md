@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.22.3] - 2026-05-13
+
+### Fixed
+
+- Passwort-Reset-Mail enthielt auf PROD einen Link auf `http://localhost:4200`. Ursache: `FRONTEND_BASE_URL` wurde in `docker-compose.yml` nicht an den Backend-Container weitergereicht, sodass der Default aus `application.properties` griff. Variable nun in `docker-compose.yml` und `.env.example` ergänzt — auf der VM muss `FRONTEND_BASE_URL` im `.env` gesetzt und der Backend-Container neu gestartet werden.
+
 ## [0.22.2] - 2026-05-13
 
 ### Added
