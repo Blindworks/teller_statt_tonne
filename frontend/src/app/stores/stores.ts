@@ -32,6 +32,7 @@ export class StoresComponent {
   private readonly categoryRegistry = inject(PartnerCategoryRegistry);
 
   readonly partners = signal<Partner[]>([]);
+  readonly memberCounts = signal<Record<number, number>>({});
   readonly loadError = signal<string | null>(null);
   readonly city = 'Bad Vilbel';
   readonly statusLabels = STATUS_LABELS;
@@ -90,6 +91,16 @@ export class StoresComponent {
     this.loadPartners();
     this.refreshMyApplications();
     this.refreshMyMemberships();
+    this.refreshMemberCounts();
+  }
+
+  private refreshMemberCounts(): void {
+    this.service.memberCounts().subscribe({
+      next: (counts) => this.memberCounts.set(counts),
+      error: () => {
+        /* silent — kachel zeigt dann 0 */
+      },
+    });
   }
 
   hasPendingApplication(partnerId: number): boolean {
@@ -170,10 +181,9 @@ export class StoresComponent {
     return partner.pickupSlots.filter((s) => s.active).length;
   }
 
-  availableRettersCount(partner: Partner): number {
-    return partner.pickupSlots
-      .filter((s) => s.active)
-      .reduce((sum, s) => sum + (s.availableMemberCount ?? 0), 0);
+  assignedRettersCount(partner: Partner): number {
+    if (partner.id == null) return 0;
+    return this.memberCounts()[partner.id] ?? 0;
   }
 
   openDetail(partner: Partner): void {

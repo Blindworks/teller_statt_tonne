@@ -253,10 +253,10 @@
             </span>
             <span
               class="flex items-center gap-1"
-              [title]="availableRettersCount(partner) + ' Retter können abholen (Summe über alle aktiven Slots)'"
+              [title]="assignedRettersCount(partner) + ' Retter sind diesem Betrieb zugeordnet'"
             >
               <span class="material-symbols-outlined text-xs">volunteer_activism</span>
-              {{ availableRettersCount(partner) }} Retter
+              {{ assignedRettersCount(partner) }} Retter
             </span>
           </span>
           <span class="font-medium">{{ partner.contact.name }}</span>

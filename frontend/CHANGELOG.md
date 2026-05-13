@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.26.5] - 2026-05-13
+
+### Fixed
+
+- Betriebs-Übersicht (`/stores`): Kacheln zeigten konstant `0 Retter`. Ursache: Anzeige basierte auf der Summe von `pickupSlot.availableMemberCount` (Retter mit passender `UserAvailability`), die in der Praxis stets 0 ist. Kachel zählt jetzt die dem Betrieb zugeordneten Mitglieder via `GET /api/partners/member-counts`. Slot-Granularität im Detail-Dialog und im Edit-Formular bleibt unverändert.
+
 ## [0.26.4] - 2026-05-13
 
 ### Fixed
