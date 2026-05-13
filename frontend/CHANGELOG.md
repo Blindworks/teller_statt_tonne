@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.26.4] - 2026-05-13
+
+### Fixed
+
+- Öffentliche Routen (`/reset-password/:token`, `/forgot-password`, `/about`, `/impressum`, `/datenschutz`, `/quiz`) leiteten unangemeldete Besucher fälschlich auf `/login?returnUrl=%2F` um. Ursache: Der `provideAppInitializer` lädt beim App-Start `/api/partner-categories`, das im Backend `authenticated()` ist; der 401 löste im `authInterceptor` einen Hard-Redirect auf `/login` aus. Interceptor unterdrückt den Redirect jetzt, solange der Browser auf einer der öffentlichen Routen steht — `clearSession` und Error-Propagation bleiben unverändert.
+
 ## [0.26.3] - 2026-05-13
 
 ### Added

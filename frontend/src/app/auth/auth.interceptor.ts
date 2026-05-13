@@ -7,6 +7,27 @@ import { AuthService } from './auth.service';
 
 const AUTH_PATHS = ['/api/auth/login', '/api/auth/refresh', '/api/auth/logout'];
 
+// Oeffentliche Frontend-Routen, auf denen ein 401 aus Hintergrund-Requests
+// (z.B. der App-Initializer fuer Partner-Kategorien) NICHT zu einem Login-
+// Redirect fuehren darf. Sonst wuerde z.B. /reset-password/:token sofort auf
+// /login?returnUrl=%2F umgeleitet, weil das Backend /api/partner-categories
+// fuer anonyme User mit 401 ablehnt.
+const PUBLIC_ROUTE_PREFIXES = [
+  '/login',
+  '/forgot-password',
+  '/reset-password',
+  '/about',
+  '/impressum',
+  '/datenschutz',
+  '/quiz',
+];
+
+function isOnPublicRoute(): boolean {
+  const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  if (path === '/' || path === '') return true;
+  return PUBLIC_ROUTE_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
+}
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -25,13 +46,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       }
       if (!auth.getRefreshToken()) {
         auth.clearSession();
-        router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
+        if (!isOnPublicRoute()) {
+          router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
+        }
         return throwError(() => err);
       }
       return auth.refresh().pipe(
         switchMap((res) => {
           if (!res) {
-            router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
+            if (!isOnPublicRoute()) {
+              router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
+            }
             return throwError(() => err);
           }
           return next(addToken(req, res.accessToken));
