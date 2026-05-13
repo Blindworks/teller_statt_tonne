@@ -64,18 +64,30 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+        CorsConfiguration strict = new CorsConfiguration();
+        strict.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
             .map(String::trim)
             .filter(s -> !s.isEmpty())
             .toList());
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setExposedHeaders(List.of("Location"));
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
+        strict.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        strict.setAllowedHeaders(List.of("*"));
+        strict.setExposedHeaders(List.of("Location"));
+        strict.setAllowCredentials(true);
+        strict.setMaxAge(3600L);
+
+        // Oeffentliche Endpunkte (/api/public/**) sind anonym und ohne Credentials nutzbar.
+        // Erlaube beliebige Origins inkl. "null" (In-App-Webviews, Privacy-Browser,
+        // Redirect-Ketten), damit z.B. das Quiz auch dort funktioniert.
+        CorsConfiguration publicConfig = new CorsConfiguration();
+        publicConfig.setAllowedOriginPatterns(List.of("*"));
+        publicConfig.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
+        publicConfig.setAllowedHeaders(List.of("*"));
+        publicConfig.setAllowCredentials(false);
+        publicConfig.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/api/public/**", publicConfig);
+        source.registerCorsConfiguration("/api/**", strict);
         return source;
     }
 }

@@ -7,6 +7,17 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.22.1] - 2026-05-13
+
+### Fixed
+
+- Sporadische „Invalid CORS request"-Fehler beim Quiz auf mobilen Geräten. `/api/public/**` akzeptiert nun beliebige Origins (inkl. `Origin: null` aus In-App-Webviews, Privacy-Browsern und Redirect-Ketten) ohne Credentials, während `/api/**` weiterhin strikt auf `CORS_ALLOWED_ORIGINS` beschränkt bleibt (`SecurityConfig.corsConfigurationSource`).
+
+### Changed
+
+- `logging.level.org.springframework.web.cors=DEBUG` temporär aktiviert, um verbleibende CORS-Edge-Cases im Prod-Log sichtbar zu machen. Nach Abklingen wieder entfernen.
+- `.env.example`: Hinweis und Beispiel für mehrere Origin-Varianten (apex + www) ergänzt.
+
 ## [0.22.0] - 2026-05-12
 
 ### Added
