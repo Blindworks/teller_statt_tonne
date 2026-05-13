@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 
 /**
  * Fängt unerwartete Exceptions, die nicht von den Controller-lokalen Handlern abgedeckt werden,
@@ -32,6 +33,17 @@ public class GlobalExceptionHandler {
 
     public GlobalExceptionHandler(ApplicationEventPublisher publisher) {
         this.publisher = publisher;
+    }
+
+    /**
+     * Erwarteter Lifecycle-Event: SSE/Async-Client hat die Verbindung getrennt. Kein ERROR-Log
+     * und kein SystemLog-Eintrag — der Emitter wird vom {@code NotificationStreamService} selbst
+     * aufgeräumt, der Response-Body ist irrelevant, weil der Client weg ist.
+     */
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public ResponseEntity<Void> handleClientDisconnect(AsyncRequestNotUsableException ex, HttpServletRequest request) {
+        log.debug("Async-Client für {} getrennt: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
     }
 
     @ExceptionHandler(Exception.class)

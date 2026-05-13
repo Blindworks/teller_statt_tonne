@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Fixed
+
+- SSE-Disconnects am `/api/notifications/stream` erzeugen keine ERROR-Logs und keine `UNHANDLED_EXCEPTION`-SystemLog-Einträge mehr. `NotificationStreamService` fängt zusätzlich `AsyncRequestNotUsableException` und `ClientAbortException` ab und entfernt den toten Emitter; `GlobalExceptionHandler` behandelt `AsyncRequestNotUsableException` als erwarteten Lifecycle-Event (DEBUG-Log, `503`).
+
 ## [0.22.3] - 2026-05-13
 
 ### Fixed

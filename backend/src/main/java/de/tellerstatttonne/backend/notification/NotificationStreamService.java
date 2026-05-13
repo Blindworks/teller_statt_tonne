@@ -1,15 +1,17 @@
 package de.tellerstatttonne.backend.notification;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 @Service
 public class NotificationStreamService {
@@ -25,11 +27,7 @@ public class NotificationStreamService {
         emitter.onCompletion(() -> remove(userId, emitter));
         emitter.onTimeout(() -> remove(userId, emitter));
         emitter.onError(ex -> remove(userId, emitter));
-        try {
-            emitter.send(SseEmitter.event().name("connected").data("ok"));
-        } catch (IOException e) {
-            remove(userId, emitter);
-        }
+        trySend(userId, emitter, SseEmitter.event().name("connected").data("ok"));
         return emitter;
     }
 
@@ -45,11 +43,7 @@ public class NotificationStreamService {
         List<SseEmitter> emitters = emittersByUserId.get(userId);
         if (emitters == null || emitters.isEmpty()) return;
         for (SseEmitter emitter : emitters) {
-            try {
-                emitter.send(SseEmitter.event().name(eventName).data(payload));
-            } catch (IOException | IllegalStateException ex) {
-                remove(userId, emitter);
-            }
+            trySend(userId, emitter, SseEmitter.event().name(eventName).data(payload));
         }
     }
 
@@ -57,13 +51,34 @@ public class NotificationStreamService {
     void heartbeat() {
         for (Map.Entry<Long, CopyOnWriteArrayList<SseEmitter>> entry : emittersByUserId.entrySet()) {
             for (SseEmitter emitter : entry.getValue()) {
-                try {
-                    emitter.send(SseEmitter.event().name("ping").data(""));
-                } catch (IOException | IllegalStateException ex) {
-                    remove(entry.getKey(), emitter);
-                }
+                trySend(entry.getKey(), emitter, SseEmitter.event().name("ping").data(""));
             }
         }
+    }
+
+    private void trySend(Long userId, SseEmitter emitter, SseEventBuilder event) {
+        try {
+            emitter.send(event);
+        } catch (Exception ex) {
+            if (isClientDisconnect(ex)) {
+                log.debug("SSE-Client für User {} getrennt, entferne Emitter: {}", userId, ex.toString());
+            } else {
+                log.warn("SSE-Send für User {} fehlgeschlagen, entferne Emitter", userId, ex);
+            }
+            remove(userId, emitter);
+        }
+    }
+
+    private static boolean isClientDisconnect(Throwable ex) {
+        for (Throwable t = ex; t != null; t = t.getCause()) {
+            if (t instanceof java.io.IOException
+                || t instanceof IllegalStateException
+                || t instanceof AsyncRequestNotUsableException
+                || t instanceof ClientAbortException) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void remove(Long userId, SseEmitter emitter) {
