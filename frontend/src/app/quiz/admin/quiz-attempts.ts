@@ -31,6 +31,7 @@ export class QuizAttemptsComponent {
   readonly errorMessage = signal<string | null>(null);
   readonly view = signal<View>('attempts');
   readonly unlockingEmail = signal<string | null>(null);
+  readonly deletingId = signal<number | null>(null);
 
   readonly colorEmoji = COLOR_EMOJI;
 
@@ -109,6 +110,31 @@ export class QuizAttemptsComponent {
     if (a.passed) return 'Bestanden';
     if (a.locked) return 'Gesperrt';
     return 'Offen';
+  }
+
+  async deleteAttempt(attempt: QuizAttempt): Promise<void> {
+    const ok = await this.confirmDialog.ask({
+      title: 'Versuch löschen',
+      message: `Quiz-Versuch von ${attempt.applicantName} vom ${new Date(attempt.completedAt).toLocaleString('de-DE')} wirklich löschen?`,
+      confirmLabel: 'Löschen',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.deletingId.set(attempt.id);
+    this.service.deleteAttempt(attempt.id).subscribe({
+      next: () => {
+        this.deletingId.set(null);
+        this.attempts.update((xs) => xs.filter((x) => x.id !== attempt.id));
+        if (this.selected()?.id === attempt.id) {
+          this.selected.set(null);
+        }
+        this.loadApplicants();
+      },
+      error: () => {
+        this.deletingId.set(null);
+        this.errorMessage.set('Versuch konnte nicht gelöscht werden.');
+      },
+    });
   }
 
   open(attempt: QuizAttempt): void {

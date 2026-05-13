@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.22.2] - 2026-05-13
+
+### Added
+
+- `DELETE /api/quiz/attempts/{id}` (Rollen `ADMINISTRATOR`/`TEAMLEITER`): löscht einen Quiz-Versuch inklusive der zugehörigen Antworten (Cascade via `QuizAttemptEntity.answers`). Liefert `204` bei Erfolg, `404` bei unbekannter ID.
+
 ## [0.22.1] - 2026-05-13
 
 ### Fixed

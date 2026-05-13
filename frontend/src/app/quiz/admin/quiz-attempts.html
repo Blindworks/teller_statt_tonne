@@ -161,6 +161,15 @@
               @if (a.knockoutTriggered) {
                 <span class="text-xs text-error font-medium">K.O.</span>
               }
+              <button
+                type="button"
+                (click)="deleteAttempt(a); $event.stopPropagation()"
+                [disabled]="deletingId() === a.id"
+                aria-label="Versuch löschen"
+                class="shrink-0 w-9 h-9 rounded-full text-error hover:bg-red-100 disabled:opacity-50 flex items-center justify-center transition"
+              >
+                🗑
+              </button>
             </article>
           }
         </div>
@@ -243,6 +252,17 @@
             <span class="text-xs text-on-surface-variant">
               {{ sel.answers.length }} Fragen
             </span>
+          </div>
+
+          <div class="mb-4 flex justify-end">
+            <button
+              type="button"
+              (click)="deleteAttempt(sel)"
+              [disabled]="deletingId() === sel.id"
+              class="rounded-full bg-error text-white px-4 py-2 text-sm font-semibold shadow-sm hover:opacity-90 disabled:opacity-50 transition"
+            >
+              {{ deletingId() === sel.id ? 'Lösche ...' : '🗑 Versuch löschen' }}
+            </button>
           </div>
 
           <ol class="space-y-3">

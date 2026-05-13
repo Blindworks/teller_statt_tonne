@@ -95,6 +95,11 @@ public class QuizAdminController {
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/attempts/{id}")
+    public ResponseEntity<Void> deleteAttempt(@PathVariable Long id) {
+        return quizService.deleteAttempt(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/applicants")
     public List<QuizApplicantStatus> listApplicants() {
         return quizService.findAllApplicants();

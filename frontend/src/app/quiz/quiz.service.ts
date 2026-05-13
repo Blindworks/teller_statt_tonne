@@ -80,6 +80,10 @@ export class QuizService {
     return this.http.get<QuizAttempt>(`${this.adminUrl}/attempts/${id}`);
   }
 
+  deleteAttempt(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.adminUrl}/attempts/${id}`);
+  }
+
   // Admin: Applicants (Wiederholungs-Status)
   listApplicants(): Observable<QuizApplicantStatus[]> {
     return this.http.get<QuizApplicantStatus[]>(`${this.adminUrl}/applicants`);

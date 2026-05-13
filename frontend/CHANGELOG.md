@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.26.3] - 2026-05-13
+
+### Added
+
+- Admin-View `/admin/quiz/attempts`: Quiz-Versuche können jetzt gelöscht werden. Lösch-Button im Detail-Modal sowie ein Mülleimer-Icon je Eintrag in der Versuchsliste. Bestätigungs-Dialog (Tone `danger`) vor dem Löschen; nach erfolgreichem Löschen verschwindet der Versuch aus der Liste und der Bewerber-Status wird neu geladen.
+
 ## [0.26.2] - 2026-05-12
 
 ### Added

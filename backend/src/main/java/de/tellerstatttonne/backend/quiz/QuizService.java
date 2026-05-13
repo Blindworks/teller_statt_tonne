@@ -159,6 +159,14 @@ public class QuizService {
         return attemptRepository.findById(id).map(QuizMapper::toDto);
     }
 
+    public boolean deleteAttempt(Long id) {
+        if (!attemptRepository.existsById(id)) {
+            return false;
+        }
+        attemptRepository.deleteById(id);
+        return true;
+    }
+
     @Transactional(readOnly = true)
     public Eligibility checkEligibility(String rawEmail) {
         if (rawEmail == null || rawEmail.isBlank()) {
