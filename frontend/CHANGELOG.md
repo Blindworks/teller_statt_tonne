@@ -22,6 +22,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Dashboard-Slot „Frei“-Chip trägt Admin/Teamleitung jetzt direkt in den Slot ein (vorher: Weiterleitung zum Abholung-Bearbeiten-Screen). Aria-Label ebenfalls angepasst.
 - Dashboard-Sektion für Retter „Freie Slots an deinen Betrieben“ heißt nun „Freie Slots & Sonderabholungen“, damit Retter Sonderabholungen dort tatsächlich erwarten — Inhalt unverändert (`availableSlots()` enthält Events bereits).
 - App-Shell (`isAdmin`, `isPlanner`, `canSeeQuizAdmin`, `canSeeStoreMembers`, `canSeeDistributionPoints`, `canSeeTeamleitung`) prüft Feature-Keys statt Rollen-Listen — Verhalten bleibt durch Seed-Daten zunächst identisch.
+- Dashboard: Aktions-Reihe (Abholung starten / Austragen / Eintragen) wird nicht mehr nur Rettern, sondern allen Rollen angezeigt, sobald der Slot kein Template ist. Admin/Teamleitung können sich damit auch wieder austragen — gleiches Verhalten für normale Pickups und Sonderabholungen.
 
 - Quiz-Frageseite: Unter dem „Quiz abschicken"-Button steht jetzt ein „Abbrechen"-Link, der das Quiz beendet und zur Startseite navigiert.
 

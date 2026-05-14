@@ -478,7 +478,7 @@
       </div>
     </div>
 
-    @if (isRetter() && !slot.isTemplate) {
+    @if (!slot.isTemplate) {
       <div class="flex justify-end pt-2 gap-2">
         @if (canStartRun(slot)) {
           <button
