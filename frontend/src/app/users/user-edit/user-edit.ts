@@ -363,6 +363,8 @@ export class UserEditComponent {
       hygieneApproved: existing?.hygieneApproved ?? false,
       hasPassword: existing?.hasPassword ?? false,
       tags: raw.tags.map((t) => t.trim()).filter((t) => t.length > 0),
+      agreementUploadedAt: existing?.agreementUploadedAt ?? null,
+      testPickupCompletedAt: existing?.testPickupCompletedAt ?? null,
     };
   }
 

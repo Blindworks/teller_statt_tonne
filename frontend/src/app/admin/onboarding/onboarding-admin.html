@@ -1,0 +1,210 @@
+<section class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <header class="mb-8">
+    <a
+      routerLink="/admin"
+      class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-2"
+    >
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Administration
+    </a>
+    <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface">Onboarding</h1>
+    <p class="text-sm text-on-surface-variant mt-2 max-w-2xl">
+      Kennenlern-Termine verwalten, Teilnahme bestätigen und Testabholungen abhaken.
+    </p>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm mb-4">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (successMessage()) {
+    <div class="rounded-lg bg-primary-container text-on-primary-container px-4 py-3 text-sm mb-4">
+      {{ successMessage() }}
+    </div>
+  }
+
+  <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 md:p-8 mb-8">
+    <h2 class="text-lg font-bold text-on-surface mb-5">Kennenlern-Termine</h2>
+
+    <form [formGroup]="slotForm" (ngSubmit)="createSlot()" class="grid gap-4 md:grid-cols-12">
+      <label class="md:col-span-3 text-sm font-medium text-on-surface-variant flex flex-col gap-1.5">
+        <span>Datum</span>
+        <input type="date" formControlName="date"
+               class="rounded-lg border border-outline px-3 h-11 bg-surface" />
+      </label>
+      <label class="md:col-span-2 text-sm font-medium text-on-surface-variant flex flex-col gap-1.5">
+        <span>Von</span>
+        <input type="time" formControlName="startTime"
+               class="rounded-lg border border-outline px-3 h-11 bg-surface" />
+      </label>
+      <label class="md:col-span-2 text-sm font-medium text-on-surface-variant flex flex-col gap-1.5">
+        <span>Bis</span>
+        <input type="time" formControlName="endTime"
+               class="rounded-lg border border-outline px-3 h-11 bg-surface" />
+      </label>
+      <label class="md:col-span-2 text-sm font-medium text-on-surface-variant flex flex-col gap-1.5">
+        <span>Plätze</span>
+        <input type="number" min="1" formControlName="capacity"
+               class="rounded-lg border border-outline px-3 h-11 bg-surface" />
+      </label>
+      <label class="md:col-span-3 text-sm font-medium text-on-surface-variant flex flex-col gap-1.5">
+        <span>Ort</span>
+        <input type="text" formControlName="location" placeholder="z. B. Vereinsraum"
+               class="rounded-lg border border-outline px-3 h-11 bg-surface" />
+      </label>
+      <label class="md:col-span-12 text-sm font-medium text-on-surface-variant flex flex-col gap-1.5">
+        <span>Notizen</span>
+        <textarea formControlName="notes" rows="2"
+                  class="rounded-lg border border-outline px-3 py-2 bg-surface resize-y"></textarea>
+      </label>
+      <div class="md:col-span-12 flex justify-end">
+        <button
+          type="submit"
+          [disabled]="creating()"
+          class="px-6 py-2.5 rounded-full text-sm font-bold bg-primary text-on-primary shadow hover:shadow-lg transition-all disabled:opacity-50"
+        >
+          {{ creating() ? 'Speichere …' : 'Termin anlegen' }}
+        </button>
+      </div>
+    </form>
+
+    <div class="mt-8">
+      @if (loading()) {
+        <p class="text-sm text-on-surface-variant">Lade Termine …</p>
+      } @else if (slots().length === 0) {
+        <p class="text-sm text-on-surface-variant">Noch keine Termine angelegt.</p>
+      } @else {
+        <ul class="divide-y divide-outline-variant">
+          @for (slot of slots(); track slot.id) {
+            <li class="py-3 flex items-center justify-between gap-4">
+              <div class="text-sm text-on-surface">
+                <strong class="font-semibold">{{ slot.date | date: 'EEE, dd.MM.yyyy' }}</strong>
+                <span class="text-on-surface-variant">
+                  · {{ slot.startTime }}–{{ slot.endTime }}
+                </span>
+                @if (slot.location) {
+                  <span class="text-on-surface-variant"> · {{ slot.location }}</span>
+                }
+                <span class="ml-2 inline-block text-xs text-on-surface-variant">
+                  {{ slot.bookedCount }} / {{ slot.capacity }} belegt
+                </span>
+              </div>
+              <button
+                type="button"
+                (click)="deleteSlot(slot)"
+                class="px-3 py-1.5 rounded-full text-xs font-bold text-error hover:bg-error/10"
+              >
+                Löschen
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </section>
+
+  <section class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+    <header class="px-6 py-5 border-b border-outline-variant">
+      <h2 class="text-lg font-bold text-on-surface">Retter im Onboarding</h2>
+      <p class="text-sm text-on-surface-variant mt-1">
+        Schritte werden automatisch geprüft. Sobald alle fünf grün sind, wird der Retter
+        freigeschaltet.
+      </p>
+    </header>
+
+    @if (pendingUsers().length === 0) {
+      <p class="px-6 py-10 text-center text-sm text-on-surface-variant">
+        Aktuell sind keine Retter im Onboarding.
+      </p>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-surface-container-high text-on-surface-variant text-left">
+            <tr>
+              <th class="px-6 py-3 font-semibold">Name</th>
+              <th class="px-4 py-3 font-semibold text-center">Hygiene</th>
+              <th class="px-4 py-3 font-semibold">Kennenlerngespräch</th>
+              <th class="px-4 py-3 font-semibold text-center">Profil</th>
+              <th class="px-4 py-3 font-semibold text-center">Vereinbarung</th>
+              <th class="px-4 py-3 font-semibold">Testabholung</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of pendingUsers(); track entry.user.id) {
+              <tr class="border-t border-outline-variant">
+                <td class="px-6 py-4 font-medium text-on-surface">
+                  {{ entry.user.firstName }} {{ entry.user.lastName }}
+                  <div class="text-xs text-on-surface-variant font-normal">{{ entry.user.email }}</div>
+                </td>
+                <td class="px-4 py-4 text-center">
+                  <span
+                    class="inline-block px-2.5 py-1 rounded-full text-xs font-bold"
+                    [class.bg-primary]="entry.status?.hygieneCompleted"
+                    [class.text-on-primary]="entry.status?.hygieneCompleted"
+                    [class.bg-surface-container-high]="!entry.status?.hygieneCompleted"
+                    [class.text-on-surface-variant]="!entry.status?.hygieneCompleted"
+                  >
+                    {{ entry.status?.hygieneCompleted ? 'OK' : 'Offen' }}
+                  </span>
+                </td>
+                <td class="px-4 py-4">
+                  @if (entry.status?.introductionCompleted) {
+                    <span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold bg-primary text-on-primary">OK</span>
+                  } @else if (entry.status?.introductionSlotId && entry.user.id !== null) {
+                    <button
+                      type="button"
+                      (click)="confirmAttendance(entry.user.id!, entry.status!.introductionSlotId!)"
+                      class="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-container-high text-on-surface hover:bg-surface-container-highest"
+                    >
+                      Teilnahme bestätigen
+                    </button>
+                  } @else {
+                    <span class="text-xs text-on-surface-variant">Noch nicht gebucht</span>
+                  }
+                </td>
+                <td class="px-4 py-4 text-center">
+                  <span
+                    class="inline-block px-2.5 py-1 rounded-full text-xs font-bold"
+                    [class.bg-primary]="entry.status?.profileCompleted"
+                    [class.text-on-primary]="entry.status?.profileCompleted"
+                    [class.bg-surface-container-high]="!entry.status?.profileCompleted"
+                    [class.text-on-surface-variant]="!entry.status?.profileCompleted"
+                  >
+                    {{ entry.status?.profileCompleted ? 'OK' : 'Offen' }}
+                  </span>
+                </td>
+                <td class="px-4 py-4 text-center">
+                  <span
+                    class="inline-block px-2.5 py-1 rounded-full text-xs font-bold"
+                    [class.bg-primary]="entry.status?.agreementCompleted"
+                    [class.text-on-primary]="entry.status?.agreementCompleted"
+                    [class.bg-surface-container-high]="!entry.status?.agreementCompleted"
+                    [class.text-on-surface-variant]="!entry.status?.agreementCompleted"
+                  >
+                    {{ entry.status?.agreementCompleted ? 'OK' : 'Offen' }}
+                  </span>
+                </td>
+                <td class="px-4 py-4">
+                  @if (entry.user.id !== null) {
+                    <label class="inline-flex items-center gap-2 text-sm text-on-surface cursor-pointer">
+                      <input
+                        type="checkbox"
+                        class="h-4 w-4 accent-primary"
+                        [checked]="entry.status?.testPickupCompleted"
+                        (change)="toggleTestPickup(entry.user.id!, $any($event.target).checked)"
+                      />
+                      <span class="text-xs">
+                        {{ entry.status?.testPickupCompleted ? 'Erledigt' : 'Als erledigt markieren' }}
+                      </span>
+                    </label>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</section>

@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Onboarding-Workflow für neue Retter: neue Felder `agreement_file_url`, `agreement_uploaded_at`, `test_pickup_completed_at` an `app_user`; neue Tabellen `introduction_slot` und `introduction_booking`. Neue Endpoints unter `/api/onboarding/*`, `/api/introduction-slots/*` und `/api/users/{id}/agreement` sowie `/api/users/{id}/test-pickup` und `/api/users/{id}/self-profile`. Automatische Freischaltung (`PENDING → ACTIVE`) erst nach allen fünf Onboarding-Schritten (Hygienezertifikat, Kennenlerngespräch, Profildaten, Rettervereinbarung, Testabholung).
+
 ### Fixed
 
 - SSE-Disconnects am `/api/notifications/stream` erzeugen keine ERROR-Logs und keine `UNHANDLED_EXCEPTION`-SystemLog-Einträge mehr. `NotificationStreamService` fängt zusätzlich `AsyncRequestNotUsableException` und `ClientAbortException` ab und entfernt den toten Emitter; `GlobalExceptionHandler` behandelt `AsyncRequestNotUsableException` als erwarteten Lifecycle-Event (DEBUG-Log, `503`).

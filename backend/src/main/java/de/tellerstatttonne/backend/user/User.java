@@ -20,11 +20,14 @@ public record User(
     Instant introductionCompletedAt,
     boolean hygieneApproved,
     boolean hasPassword,
-    List<String> tags
+    List<String> tags,
+    Instant agreementUploadedAt,
+    Instant testPickupCompletedAt
 ) {
     public User withId(Long newId) {
         return new User(newId, email, roles, firstName, lastName, phone,
             street, postalCode, city, country,
-            photoUrl, onlineStatus, status, introductionCompletedAt, hygieneApproved, hasPassword, tags);
+            photoUrl, onlineStatus, status, introductionCompletedAt, hygieneApproved, hasPassword, tags,
+            agreementUploadedAt, testPickupCompletedAt);
     }
 }

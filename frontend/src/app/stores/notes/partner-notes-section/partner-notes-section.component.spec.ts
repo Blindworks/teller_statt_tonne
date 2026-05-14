@@ -28,6 +28,8 @@ class AuthServiceStub {
       hygieneApproved: true,
       hasPassword: true,
       tags: [],
+      agreementUploadedAt: null,
+      testPickupCompletedAt: null,
     });
   }
 }

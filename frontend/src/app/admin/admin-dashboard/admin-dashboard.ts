@@ -42,6 +42,13 @@ export class AdminDashboardComponent {
       link: '/admin/applications',
     },
     {
+      title: 'Onboarding',
+      description:
+        'Kennenlern-Termine verwalten, Teilnahme bestätigen und Testabholungen abhaken.',
+      icon: 'task_alt',
+      link: '/admin/onboarding',
+    },
+    {
       title: 'Hygienezertifikate',
       description: 'Eingereichte Hygienezertifikate prüfen und Retter freischalten.',
       icon: 'verified_user',

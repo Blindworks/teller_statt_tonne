@@ -123,6 +123,23 @@ public class UserController {
         return ResponseEntity.ok(service.remove(id));
     }
 
+    public record SelfProfileRequest(String phone, String street, String postalCode, String city, String country) {}
+
+    @PutMapping("/{id}/self-profile")
+    public ResponseEntity<User> updateSelfProfile(@PathVariable Long id,
+                                                  @RequestBody SelfProfileRequest req,
+                                                  Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!isAuthorizedForUser(authentication, id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return service.updateSelfProfile(id, req)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/{id}/photo")
     public ResponseEntity<User> uploadPhoto(
         @PathVariable Long id,

@@ -32,6 +32,9 @@ export class HygieneCertificateSectionComponent implements OnInit {
 
   readonly userId = input.required<number>();
   readonly hasRetterRole = input<boolean>(false);
+  readonly compact = input<boolean>(false);
+
+  readonly showUploadForm = signal(false);
 
   readonly certificate = signal<HygieneCertificate | null>(null);
   readonly loading = signal(true);

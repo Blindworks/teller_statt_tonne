@@ -86,6 +86,15 @@ public class UserEntity {
     @Column(name = "introduction_completed_at")
     private Instant introductionCompletedAt;
 
+    @Column(name = "agreement_file_url", length = 1024)
+    private String agreementFileUrl;
+
+    @Column(name = "agreement_uploaded_at")
+    private Instant agreementUploadedAt;
+
+    @Column(name = "test_pickup_completed_at")
+    private Instant testPickupCompletedAt;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "user_tag",
@@ -157,6 +166,12 @@ public class UserEntity {
     public void setStatus(Status status) { this.status = status; }
     public Instant getIntroductionCompletedAt() { return introductionCompletedAt; }
     public void setIntroductionCompletedAt(Instant introductionCompletedAt) { this.introductionCompletedAt = introductionCompletedAt; }
+    public String getAgreementFileUrl() { return agreementFileUrl; }
+    public void setAgreementFileUrl(String agreementFileUrl) { this.agreementFileUrl = agreementFileUrl; }
+    public Instant getAgreementUploadedAt() { return agreementUploadedAt; }
+    public void setAgreementUploadedAt(Instant agreementUploadedAt) { this.agreementUploadedAt = agreementUploadedAt; }
+    public Instant getTestPickupCompletedAt() { return testPickupCompletedAt; }
+    public void setTestPickupCompletedAt(Instant testPickupCompletedAt) { this.testPickupCompletedAt = testPickupCompletedAt; }
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
     public Instant getCreatedAt() { return createdAt; }

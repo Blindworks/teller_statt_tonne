@@ -28,6 +28,8 @@ export interface User {
   hygieneApproved: boolean;
   hasPassword: boolean;
   tags: string[];
+  agreementUploadedAt: string | null;
+  testPickupCompletedAt: string | null;
 }
 
 export const ONLINE_STATUS_LABELS: Record<OnlineStatus, string> = {
@@ -67,6 +69,8 @@ export function emptyUser(defaultRole: RoleName = 'RETTER'): User {
     hygieneApproved: false,
     hasPassword: false,
     tags: [],
+    agreementUploadedAt: null,
+    testPickupCompletedAt: null,
   };
 }
 

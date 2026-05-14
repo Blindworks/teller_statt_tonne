@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Onboarding-Seite für noch nicht freigeschaltete Retter unter `/onboarding`: zeigt die fünf Schritte Hygienezertifikat, Kennenlerngespräch (Terminbuchung), Profildaten, Rettervereinbarung (Download/Upload statisches PDF) und Testabholung. Neue Guards (`onboardingRequiredGuard`, `onboardingCompletedGuard`) verhindern Zugriff auf die übrige App, solange der Status `PENDING` ist; die Onboarding-Route liegt ausserhalb der App-Shell (keine Sidebar). Neue Admin-Seite `/admin/onboarding` zur Verwaltung der Kennenlern-Termine, Bestätigung der Teilnahme und manuellem Abhaken der Testabholung.
+
 ## [0.26.6] - 2026-05-14
 
 ### Changed

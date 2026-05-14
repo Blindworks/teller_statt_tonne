@@ -1,0 +1,205 @@
+<div class="onboarding-shell">
+  <header class="onboarding-header">
+    <div class="brand">
+      <h1>Teller statt Tonne</h1>
+      <p class="subline">Willkommen, {{ currentUser()?.firstName }} – noch ein paar Schritte bis du loslegen kannst.</p>
+    </div>
+    <button type="button" class="btn ghost" (click)="logout()">Abmelden</button>
+  </header>
+
+  @if (loading()) {
+    <p class="muted">Lade Onboarding-Status …</p>
+  } @else if (status()) {
+    <p class="progress">{{ completedSteps() }} von 5 Schritten erledigt</p>
+
+    @if (errorMessage()) {
+      <div class="alert error">{{ errorMessage() }}</div>
+    }
+    @if (successMessage()) {
+      <div class="alert success">{{ successMessage() }}</div>
+    }
+
+    <section class="step" [class.done]="status()!.hygieneCompleted">
+      <header>
+        <span class="step-number">1</span>
+        <h2>Hygienezertifikat</h2>
+        <span class="badge" [class.ok]="status()!.hygieneCompleted">
+          {{ status()!.hygieneCompleted ? 'Erledigt' : 'Offen' }}
+        </span>
+      </header>
+      <p class="muted">
+        Lade dein Hygienezertifikat hoch. Wie du es erlangen kannst, erfährst du z.&nbsp;B. bei der
+        <a href="https://www.bgn.de/" target="_blank" rel="noopener">BGN</a>
+        oder über deine kommunale Lebensmittelüberwachung.
+      </p>
+      @if (userId() !== null) {
+        <app-hygiene-certificate-section
+          [userId]="userId()!"
+          [hasRetterRole]="true"
+          [compact]="true"
+        ></app-hygiene-certificate-section>
+      }
+    </section>
+
+    <section class="step" [class.done]="status()!.introductionCompleted">
+      <header>
+        <span class="step-number">2</span>
+        <h2>Kennenlerngespräch</h2>
+        <span class="badge" [class.ok]="status()!.introductionCompleted">
+          {{ status()!.introductionCompleted ? 'Erledigt' : 'Offen' }}
+        </span>
+      </header>
+      <p class="muted">Wähle einen Termin aus, an dem wir dich kennenlernen.</p>
+
+      @if (status()!.introductionBookingId) {
+        @if (bookedSlot(); as slot) {
+          <div class="booked">
+            <strong>Dein gebuchter Termin:</strong>
+            {{ slot.date | date: 'EEEE, dd.MM.yyyy' }} ·
+            {{ slot.startTime }}–{{ slot.endTime }}
+            @if (slot.location) {
+              <span> · {{ slot.location }}</span>
+            }
+            <div class="hint">
+              Sobald wir dich beim Termin getroffen haben, hakt der Teamleiter den Schritt ab.
+            </div>
+            @if (!status()!.introductionCompleted) {
+              <button type="button" class="btn ghost" (click)="cancelBooking()">
+                Termin stornieren
+              </button>
+            }
+          </div>
+        } @else {
+          <p class="muted">Termin gebucht (Details werden geladen).</p>
+        }
+      } @else if (slotsLoading()) {
+        <p class="muted">Lade verfügbare Termine …</p>
+      } @else if (slots().length === 0) {
+        <p class="muted">Momentan sind keine Termine verfügbar. Bitte schau später nochmal vorbei.</p>
+      } @else {
+        <ul class="slot-list">
+          @for (slot of slots(); track slot.id) {
+            <li>
+              <div class="slot-info">
+                <strong>{{ slot.date | date: 'EEEE, dd.MM.yyyy' }}</strong>
+                {{ slot.startTime }}–{{ slot.endTime }}
+                @if (slot.location) {
+                  · {{ slot.location }}
+                }
+                <span class="capacity">{{ slot.bookedCount }} / {{ slot.capacity }} belegt</span>
+              </div>
+              <button
+                type="button"
+                class="btn primary"
+                [disabled]="bookingSlot() !== null || slot.bookedCount >= slot.capacity"
+                (click)="bookSlot(slot)"
+              >
+                @if (bookingSlot() === slot.id) {
+                  Buche …
+                } @else {
+                  Buchen
+                }
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="step" [class.done]="status()!.profileCompleted">
+      <header>
+        <span class="step-number">3</span>
+        <h2>Profildaten</h2>
+        <span class="badge" [class.ok]="status()!.profileCompleted">
+          {{ status()!.profileCompleted ? 'Erledigt' : 'Offen' }}
+        </span>
+      </header>
+      <p class="muted">Bitte vervollständige deine Kontaktdaten.</p>
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+        <label>
+          Telefon
+          <input type="tel" formControlName="phone" autocomplete="tel" />
+        </label>
+        <label>
+          Straße &amp; Hausnummer
+          <input type="text" formControlName="street" autocomplete="street-address" />
+        </label>
+        <div class="row">
+          <label>
+            PLZ
+            <input type="text" formControlName="postalCode" autocomplete="postal-code" />
+          </label>
+          <label>
+            Ort
+            <input type="text" formControlName="city" autocomplete="address-level2" />
+          </label>
+        </div>
+        <label>
+          Land
+          <input type="text" formControlName="country" autocomplete="country-name" />
+        </label>
+        <button type="submit" class="btn primary" [disabled]="savingProfile()">
+          @if (savingProfile()) {
+            Speichere …
+          } @else {
+            Profil speichern
+          }
+        </button>
+      </form>
+    </section>
+
+    <section class="step" [class.done]="status()!.agreementCompleted">
+      <header>
+        <span class="step-number">4</span>
+        <h2>Rettervereinbarung</h2>
+        <span class="badge" [class.ok]="status()!.agreementCompleted">
+          {{ status()!.agreementCompleted ? 'Erledigt' : 'Offen' }}
+        </span>
+      </header>
+      <p class="muted">
+        Lade die Rettervereinbarung herunter, unterschreibe sie und lade sie hier wieder hoch
+        (PDF oder Foto).
+      </p>
+      <div class="agreement-actions">
+        <a class="btn ghost" href="/assets/rettervereinbarung.pdf" download>
+          Rettervereinbarung herunterladen
+        </a>
+        <label class="btn primary file-btn" [class.disabled]="uploadingAgreement()">
+          @if (uploadingAgreement()) {
+            Lade hoch …
+          } @else if (status()!.agreementCompleted) {
+            Erneut hochladen
+          } @else {
+            Unterschriebene Vereinbarung hochladen
+          }
+          <input
+            type="file"
+            accept="application/pdf,image/jpeg,image/png,image/webp"
+            (change)="onAgreementSelected($event)"
+            hidden
+          />
+        </label>
+      </div>
+    </section>
+
+    <section class="step" [class.done]="status()!.testPickupCompleted">
+      <header>
+        <span class="step-number">5</span>
+        <h2>Testabholung</h2>
+        <span class="badge" [class.ok]="status()!.testPickupCompleted">
+          {{ status()!.testPickupCompleted ? 'Erledigt' : 'Offen' }}
+        </span>
+      </header>
+      <p class="muted">
+        Begleite einen erfahrenen Retter bei einer Testabholung. Dein Teamleiter bestätigt
+        anschließend deine Teilnahme – danach wirst du als vollwertiger Retter freigeschaltet.
+      </p>
+    </section>
+
+    @if (status()!.allCompleted) {
+      <div class="alert success final">
+        Alle Schritte sind erledigt! Sobald ein Teamleiter dich freischaltet, kannst du loslegen.
+      </div>
+    }
+  }
+</div>

@@ -159,6 +159,19 @@ public class UserService {
         });
     }
 
+    public Optional<User> updateSelfProfile(Long id, UserController.SelfProfileRequest req) {
+        return repository.findById(id).map(entity -> {
+            entity.setPhone(req.phone());
+            entity.setStreet(req.street());
+            entity.setPostalCode(req.postalCode());
+            entity.setCity(req.city());
+            entity.setCountry(req.country());
+            UserEntity saved = repository.save(entity);
+            promoteToActiveIfReady(saved.getId());
+            return toDto(repository.findById(saved.getId()).orElse(saved));
+        });
+    }
+
     public Optional<User> updatePhotoUrl(Long id, String photoUrl) {
         return repository.findById(id).map(entity -> {
             entity.setPhotoUrl(photoUrl);
@@ -227,8 +240,22 @@ public class UserService {
         if (entity.getStatus() != UserEntity.Status.PENDING) return false;
         if (entity.getIntroductionCompletedAt() == null) return false;
         if (!hasApprovedHygieneCertificate(entity.getId())) return false;
+        if (entity.getAgreementUploadedAt() == null) return false;
+        if (entity.getTestPickupCompletedAt() == null) return false;
+        if (!isProfileComplete(entity)) return false;
         entity.setStatus(UserEntity.Status.ACTIVE);
         return true;
+    }
+
+    private static boolean isProfileComplete(UserEntity user) {
+        return notBlank(user.getPhone())
+            && notBlank(user.getStreet())
+            && notBlank(user.getPostalCode())
+            && notBlank(user.getCity());
+    }
+
+    private static boolean notBlank(String s) {
+        return s != null && !s.isBlank();
     }
 
     public User pause(Long id) {

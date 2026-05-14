@@ -4,6 +4,7 @@ import { StoresComponent } from './stores/stores';
 import { AppShellComponent } from './shell/app-shell';
 import { authGuard } from './auth/auth.guard';
 import { roleGuard } from './auth/role.guard';
+import { onboardingCompletedGuard, onboardingRequiredGuard } from './auth/onboarding.guard';
 import { landingGuard } from './landing/landing.guard';
 
 const plannerRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER']);
@@ -51,9 +52,15 @@ export const routes: Routes = [
       import('./legal/privacy/privacy').then((m) => m.PrivacyComponent),
   },
   {
+    path: 'onboarding',
+    canActivate: [authGuard, onboardingRequiredGuard],
+    loadComponent: () =>
+      import('./onboarding/onboarding-page').then((m) => m.OnboardingPageComponent),
+  },
+  {
     path: '',
     component: AppShellComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'stores', component: StoresComponent },
@@ -224,6 +231,12 @@ export const routes: Routes = [
         canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
         loadComponent: () =>
           import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),
+      },
+      {
+        path: 'admin/onboarding',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import('./admin/onboarding/onboarding-admin').then((m) => m.OnboardingAdminComponent),
       },
       {
         path: 'admin/zertifikate',
