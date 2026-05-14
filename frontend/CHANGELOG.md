@@ -23,6 +23,8 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Dashboard-Sektion für Retter „Freie Slots an deinen Betrieben“ heißt nun „Freie Slots & Sonderabholungen“, damit Retter Sonderabholungen dort tatsächlich erwarten — Inhalt unverändert (`availableSlots()` enthält Events bereits).
 - App-Shell (`isAdmin`, `isPlanner`, `canSeeQuizAdmin`, `canSeeStoreMembers`, `canSeeDistributionPoints`, `canSeeTeamleitung`) prüft Feature-Keys statt Rollen-Listen — Verhalten bleibt durch Seed-Daten zunächst identisch.
 
+- Quiz-Frageseite: Unter dem „Quiz abschicken"-Button steht jetzt ein „Abbrechen"-Link, der das Quiz beendet und zur Startseite navigiert.
+
 ### Fixed
 
 - Sidebar-Navigation scrollt jetzt bei kleinen Viewport-Höhen, sodass alle Menüeinträge erreichbar sind.
