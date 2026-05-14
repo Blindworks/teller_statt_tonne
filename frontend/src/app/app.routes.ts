@@ -155,6 +155,14 @@ export const routes: Routes = [
           import('./stats/stats-overview').then((m) => m.StatsOverviewComponent),
       },
       {
+        path: 'teamleitung',
+        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        loadComponent: () =>
+          import('./teamleiter/teamleiter-dashboard/teamleiter-dashboard').then(
+            (m) => m.TeamleiterDashboardComponent,
+          ),
+      },
+      {
         path: 'admin',
         canActivate: [roleGuard(['ADMINISTRATOR'])],
         loadComponent: () =>

@@ -71,6 +71,11 @@ export class AppShellComponent {
     return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
   });
 
+  readonly canSeeTeamleitung = computed(() => {
+    const roles = this.currentUser()?.roles ?? [];
+    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
+  });
+
   constructor() {
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationStart) {

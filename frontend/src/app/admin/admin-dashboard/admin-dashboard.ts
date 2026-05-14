@@ -36,25 +36,6 @@ export class AdminDashboardComponent {
       link: '/admin/distribution-points',
     },
     {
-      title: 'Bewerbungen',
-      description: 'Bewerbungen von Retter:innen auf Betriebe annehmen oder ablehnen.',
-      icon: 'how_to_reg',
-      link: '/admin/applications',
-    },
-    {
-      title: 'Onboarding',
-      description:
-        'Kennenlern-Termine verwalten, Teilnahme bestätigen und Testabholungen abhaken.',
-      icon: 'task_alt',
-      link: '/admin/onboarding',
-    },
-    {
-      title: 'Hygienezertifikate',
-      description: 'Eingereichte Hygienezertifikate prüfen und Retter freischalten.',
-      icon: 'verified_user',
-      link: '/admin/zertifikate',
-    },
-    {
       title: 'Systemlog',
       description:
         'Audit-Log aller systemrelevanten Aktionen: Logins, Passwort-Resets, Admin-Aktionen, Fehler.',

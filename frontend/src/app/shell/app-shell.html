@@ -125,6 +125,21 @@
         Mitglieder ↔ Betriebe
       </a>
     }
+    @if (canSeeTeamleitung()) {
+      <a
+        routerLink="/teamleitung"
+        routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+        [routerLinkActiveOptions]="{ exact: true }"
+        #teamleitungLink="routerLinkActive"
+        class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+        [class.text-on-surface]="!teamleitungLink.isActive"
+        [class.hover:bg-surface-container]="!teamleitungLink.isActive"
+        [class.hover:translate-x-1]="!teamleitungLink.isActive"
+      >
+        <span class="material-symbols-outlined">supervisor_account</span>
+        Teamleitung
+      </a>
+    }
     @if (isAdmin()) {
       <a
         routerLink="/admin"
@@ -361,6 +376,20 @@
         >
           <span class="material-symbols-outlined">groups</span>
           Mitglieder ↔ Betriebe
+        </a>
+      }
+      @if (canSeeTeamleitung()) {
+        <a
+          routerLink="/teamleitung"
+          (click)="closeMore()"
+          routerLinkActive="text-primary"
+          [routerLinkActiveOptions]="{ exact: true }"
+          #teamleitungSheet="routerLinkActive"
+          class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+          [class.text-on-surface]="!teamleitungSheet.isActive"
+        >
+          <span class="material-symbols-outlined">supervisor_account</span>
+          Teamleitung
         </a>
       }
       @if (isAdmin()) {

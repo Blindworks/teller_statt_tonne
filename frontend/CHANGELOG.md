@@ -7,6 +7,16 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-05-14
+
+### Added
+
+- Neuer Screen „Teamleitung“ unter `/teamleitung` mit den Übersichtskarten Bewerbungen, Onboarding und Hygienezertifikate. Sichtbar für Teamleiter:innen und Administrator:innen. Sidebar- und Mobile-Menü-Eintrag „Teamleitung“ ergänzt.
+
+### Changed
+
+- Die Karten Bewerbungen, Onboarding und Hygienezertifikate wurden aus dem Administration-Dashboard (`/admin`) in den neuen Teamleitung-Bereich verschoben. Die Ziel-URLs (`/admin/applications`, `/admin/onboarding`, `/admin/zertifikate`) bleiben unverändert.
+
 ## [0.27.2] - 2026-05-14
 
 ### Changed
