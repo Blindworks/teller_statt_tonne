@@ -7,6 +7,20 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.27.2] - 2026-05-14
+
+### Changed
+
+- Datenschutzerklärung um einen neuen Abschnitt „Social-Media-Präsenzen (Facebook, Instagram)“ erweitert: verlinkt unsere beiden Profile, informiert über die Datenverarbeitung durch Meta Platforms Ireland Ltd. (Art. 6 Abs. 1 lit. f DSGVO, gemeinsame Verantwortlichkeit gem. Art. 26 DSGVO für Insights-Daten) und verweist auf die Datenschutzhinweise von Meta. Folgeabschnitte 12–19 entsprechend umnummeriert.
+
+## [0.27.1] - 2026-05-14
+
+### Added
+
+- Quiz-Ergebnisseite: Neben „Quiz neu starten“ steht jetzt ein „Zur Startseite“-Button, der zur Landing-Page navigiert.
+
+## [0.27.0]
+
 ### Added
 
 - Onboarding-Seite für noch nicht freigeschaltete Retter unter `/onboarding`: zeigt die fünf Schritte Hygienezertifikat, Kennenlerngespräch (Terminbuchung), Profildaten, Rettervereinbarung (Download/Upload statisches PDF) und Testabholung. Neue Guards (`onboardingRequiredGuard`, `onboardingCompletedGuard`) verhindern Zugriff auf die übrige App, solange der Status `PENDING` ist; die Onboarding-Route liegt ausserhalb der App-Shell (keine Sidebar). Neue Admin-Seite `/admin/onboarding` zur Verwaltung der Kennenlern-Termine, Bestätigung der Teilnahme und manuellem Abhaken der Testabholung.

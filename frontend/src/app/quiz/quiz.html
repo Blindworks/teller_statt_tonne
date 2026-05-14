@@ -265,13 +265,21 @@
         <p class="text-sm text-on-surface-variant">
           Wir melden uns in den nächsten Tagen mit den weiteren Schritten bei dir.
         </p>
-        <button
-          type="button"
-          (click)="restart()"
-          class="rounded-full border border-primary text-primary font-medium px-6 py-2"
-        >
-          Quiz neu starten
-        </button>
+        <div class="flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            (click)="restart()"
+            class="rounded-full border border-primary text-primary font-medium px-6 py-2"
+          >
+            Quiz neu starten
+          </button>
+          <a
+            routerLink="/"
+            class="rounded-full bg-primary text-white font-medium px-6 py-2"
+          >
+            Zur Startseite
+          </a>
+        </div>
       </section>
     }
 

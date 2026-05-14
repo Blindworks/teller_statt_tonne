@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { COLOR_EMOJI, QuizQuestion, QuizResult, SubmittedAnswer } from './quiz.model';
 import { QuizService } from './quiz.service';
 
@@ -7,7 +8,7 @@ type Step = 'intro' | 'questions' | 'result' | 'error';
 
 @Component({
   selector: 'app-quiz',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './quiz.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
