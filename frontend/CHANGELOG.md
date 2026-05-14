@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.26.6] - 2026-05-14
+
+### Changed
+
+- UI-weite Umbenennung: „Veranstaltungen“ heisst überall in der Oberfläche jetzt „Sonderabholungen“ — Menü-Eintrag links, Seitentitel und Leerzustand der Events-Liste, Lösch-Dialog, „Neue Sonderabholung“-Button, Event-Formular-Header und Slot-Hinweistexte, Karten-Toggle und Marker-Popup-Badge, Dashboard-Badge sowie Pickup-Card-Chip. Code-Bezeichner (`events`, `event`, `EventService`, Routen `/events`, Marker-Typ `event`) bleiben unverändert.
+
 ## [0.26.5] - 2026-05-13
 
 ### Fixed

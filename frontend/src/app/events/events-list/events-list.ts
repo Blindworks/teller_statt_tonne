@@ -40,7 +40,7 @@ export class EventsListComponent {
           this.items.set(items);
           this.loadError.set(null);
         },
-        error: () => this.loadError.set('Veranstaltungen konnten nicht geladen werden.'),
+        error: () => this.loadError.set('Sonderabholungen konnten nicht geladen werden.'),
       });
   }
 
@@ -85,7 +85,7 @@ export class EventsListComponent {
         this.actionError.set(
           typeof err?.error === 'string' && err.error.length > 0
             ? err.error
-            : 'Veranstaltung konnte nicht gelöscht werden.',
+            : 'Sonderabholung konnte nicht gelöscht werden.',
         );
         this.confirmDeleteId.set(null);
       },

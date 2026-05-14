@@ -347,7 +347,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       : '';
     return `
       <div class="map-popup">
-        <div class="map-popup__title">${escape(ev.name)} <span class="map-popup__badge map-popup__badge--active">Veranstaltung</span></div>
+        <div class="map-popup__title">${escape(ev.name)} <span class="map-popup__badge map-popup__badge--active">Sonderabholung</span></div>
         <div class="map-popup__category">${period}</div>
         ${addressLine ? `<div class="map-popup__address">${addressLine}</div>` : ''}
         ${editLink}

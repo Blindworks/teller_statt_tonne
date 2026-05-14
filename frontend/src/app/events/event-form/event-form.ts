@@ -95,7 +95,7 @@ export class EventFormComponent {
           this.patchForm(item);
           this.reloadPickups(item);
         },
-        error: () => this.errorMessage.set('Veranstaltung konnte nicht geladen werden.'),
+        error: () => this.errorMessage.set('Sonderabholung konnte nicht geladen werden.'),
       });
     }
   }
@@ -131,11 +131,11 @@ export class EventFormComponent {
     const eventStart = this.form.controls.startDate.value;
     const eventEnd = this.form.controls.endDate.value;
     if (eventStart && raw.date < eventStart) {
-      this.slotError.set('Termin liegt vor dem Veranstaltungsstart.');
+      this.slotError.set('Termin liegt vor dem Start der Sonderabholung.');
       return;
     }
     if (eventEnd && raw.date > eventEnd) {
-      this.slotError.set('Termin liegt nach dem Veranstaltungsende.');
+      this.slotError.set('Termin liegt nach dem Ende der Sonderabholung.');
       return;
     }
     this.addingSlot.set(true);
@@ -272,7 +272,7 @@ export class EventFormComponent {
     const cityTrimmed = raw.city.trim();
     if (!cityTrimmed && !this.hasCoords()) {
       this.errorMessage.set(
-        'Bitte Ort eingeben oder Veranstaltungsort auf der Karte markieren.',
+        'Bitte Ort eingeben oder Standort auf der Karte markieren.',
       );
       return;
     }
@@ -321,7 +321,7 @@ export class EventFormComponent {
     if (!file) return;
     const id = this.itemId();
     if (id == null) {
-      this.errorMessage.set('Bitte zuerst die Veranstaltung speichern, dann ein Logo hochladen.');
+      this.errorMessage.set('Bitte zuerst die Sonderabholung speichern, dann ein Logo hochladen.');
       input.value = '';
       return;
     }

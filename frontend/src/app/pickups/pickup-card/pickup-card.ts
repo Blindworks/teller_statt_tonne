@@ -67,14 +67,14 @@ export class PickupCardComponent {
   });
 
   readonly chipLabel = computed(() => {
-    if (this.isEvent()) return 'Veranstaltung';
+    if (this.isEvent()) return 'Sonderabholung';
     const c = this.categoryRegistry.byId(this.pickup().partnerCategoryId);
     return c?.label ?? 'Partner';
   });
 
   readonly displayTitle = computed(() => {
     const p = this.pickup();
-    if (p.eventId != null) return p.eventName ?? 'Veranstaltung';
+    if (p.eventId != null) return p.eventName ?? 'Sonderabholung';
     return p.partnerName ?? 'Unbekannt';
   });
 

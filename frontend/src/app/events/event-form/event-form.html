@@ -4,10 +4,10 @@
     class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-2"
   >
     <span class="material-symbols-outlined text-base">arrow_back</span>
-    Veranstaltungen
+    Sonderabholungen
   </a>
   <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface mb-6">
-    @if (isEdit()) { Veranstaltung bearbeiten } @else { Neue Veranstaltung }
+    @if (isEdit()) { Sonderabholung bearbeiten } @else { Neue Sonderabholung }
   </h1>
 
   @if (errorMessage()) {
@@ -218,7 +218,7 @@
       <header class="mb-4">
         <h2 class="text-xl font-extrabold text-on-surface">Abhol-Termine</h2>
         <p class="text-sm text-on-surface-variant mt-1">
-          Konkrete Slots innerhalb der Veranstaltung, in die sich Retter:innen eintragen können.
+          Konkrete Slots innerhalb der Sonderabholung, in die sich Retter:innen eintragen können.
         </p>
       </header>
 

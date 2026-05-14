@@ -303,7 +303,7 @@ export class DashboardComponent {
     const category = this.categoryRegistry.byId(s.partnerCategoryId);
     const categoryIcon = isEvent ? 'celebration' : (category?.icon ?? 'storefront');
     const categoryLabel = category?.label ?? 'Pickup';
-    const displayName = isEvent ? (s.eventName ?? 'Veranstaltung') : s.partnerName;
+    const displayName = isEvent ? (s.eventName ?? 'Sonderabholung') : s.partnerName;
     const displayLogoUrl = isEvent ? s.eventLogoUrl : s.partnerLogoUrl;
 
     const location = [s.partnerStreet, s.partnerCity].filter((x) => !!x).join(', ');
@@ -335,7 +335,7 @@ export class DashboardComponent {
       startTime: s.startTime,
       endTime: s.endTime,
       dateLabel: this.formatDateLabel(s.date),
-      badgeLabel: s.isTemplate ? 'Slot frei' : isEvent ? 'Veranstaltung' : categoryLabel,
+      badgeLabel: s.isTemplate ? 'Slot frei' : isEvent ? 'Sonderabholung' : categoryLabel,
       isTemplate: s.isTemplate,
       categoryIcon,
       logoUrl: displayLogoUrl,
