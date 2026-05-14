@@ -42,5 +42,12 @@ export class AdminDashboardComponent {
       icon: 'receipt_long',
       link: '/admin/system-log',
     },
+    {
+      title: 'Papierkorb · Betriebe',
+      description:
+        'Geschlossene Betriebe einsehen und bei Bedarf wiederherstellen (Start im Status »Kein Kontakt«).',
+      icon: 'delete',
+      link: '/admin/stores/deleted',
+    },
   ];
 }

@@ -7,6 +7,12 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.28.1] - 2026-05-14
+
+### Changed
+
+- „Papierkorb · Betriebe“ aus der Hauptnavigation entfernt (Desktop-Sidebar und Mobile-„Mehr“-Sheet). Der Bereich ist nun ausschließlich über eine neue Karte im Administration-Dashboard (`/admin`) erreichbar; Route und Komponente bleiben unverändert.
+
 ## [0.28.0] - 2026-05-14
 
 ### Added
@@ -15,7 +21,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
-- Die Karten Bewerbungen, Onboarding und Hygienezertifikate wurden aus dem Administration-Dashboard (`/admin`) in den neuen Teamleitung-Bereich verschoben. Die Ziel-URLs (`/admin/applications`, `/admin/onboarding`, `/admin/zertifikate`) bleiben unverändert.
+- Die Bereiche Bewerbungen, Onboarding und Hygienezertifikate wurden aus dem Administration-Dashboard (`/admin`) in den neuen Teamleitung-Bereich verschoben. Die URLs lauten jetzt `/teamleitung/applications`, `/teamleitung/onboarding` und `/teamleitung/zertifikate` (vorher `/admin/...`).
 
 ## [0.27.2] - 2026-05-14
 
