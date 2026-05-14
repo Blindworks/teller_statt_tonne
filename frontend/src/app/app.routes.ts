@@ -3,14 +3,15 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { StoresComponent } from './stores/stores';
 import { AppShellComponent } from './shell/app-shell';
 import { authGuard } from './auth/auth.guard';
-import { roleGuard } from './auth/role.guard';
+import { featureGuard } from './auth/feature.guard';
 import { onboardingCompletedGuard, onboardingRequiredGuard } from './auth/onboarding.guard';
 import { landingGuard } from './landing/landing.guard';
 
-const plannerRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER']);
-const plannerViewRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER', 'RETTER']);
-const userEditRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER']);
-const quizAdminRoles = roleGuard(['ADMINISTRATOR', 'TEAMLEITER']);
+const plannerEdit = featureGuard('route.planner');
+const plannerView = featureGuard('route.planner.view');
+const userEdit = featureGuard('route.user.edit');
+const quizAdmin = featureGuard('route.quiz.admin');
+const adminArea = featureGuard('route.admin');
 
 export const routes: Routes = [
   {
@@ -85,43 +86,43 @@ export const routes: Routes = [
       },
       {
         path: 'events/new',
-        canActivate: [plannerRoles],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./events/event-form/event-form').then((m) => m.EventFormComponent),
       },
       {
         path: 'events/:id',
-        canActivate: [plannerRoles],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./events/event-form/event-form').then((m) => m.EventFormComponent),
       },
       {
         path: 'pickups',
-        canActivate: [plannerViewRoles],
+        canActivate: [plannerView],
         loadComponent: () =>
           import('./pickups/pickups/pickups').then((m) => m.PickupsComponent),
       },
       {
         path: 'pickups/new',
-        canActivate: [plannerRoles],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./pickups/pickup-edit/pickup-edit').then((m) => m.PickupEditComponent),
       },
       {
         path: 'pickups/edit/:id',
-        canActivate: [plannerRoles],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./pickups/pickup-edit/pickup-edit').then((m) => m.PickupEditComponent),
       },
       {
         path: 'pickups/:pickupId/run',
-        canActivate: [roleGuard(['RETTER'])],
+        canActivate: [plannerView],
         loadComponent: () =>
           import('./pickup-run/pickup-run').then((m) => m.PickupRunComponent),
       },
       {
         path: 'admin/food-categories',
-        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        canActivate: [adminArea],
         loadComponent: () =>
           import('./admin/food-categories/food-categories-admin').then(
             (m) => m.FoodCategoriesAdminComponent,
@@ -134,13 +135,13 @@ export const routes: Routes = [
       },
       {
         path: 'users/new',
-        canActivate: [userEditRoles],
+        canActivate: [userEdit],
         loadComponent: () =>
           import('./users/user-edit/user-edit').then((m) => m.UserEditComponent),
       },
       {
         path: 'users/edit/:id',
-        canActivate: [userEditRoles],
+        canActivate: [userEdit],
         loadComponent: () =>
           import('./users/user-edit/user-edit').then((m) => m.UserEditComponent),
       },
@@ -150,13 +151,13 @@ export const routes: Routes = [
       },
       {
         path: 'statistik',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./stats/stats-overview').then((m) => m.StatsOverviewComponent),
       },
       {
         path: 'teamleitung',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./teamleiter/teamleiter-dashboard/teamleiter-dashboard').then(
             (m) => m.TeamleiterDashboardComponent,
@@ -164,31 +165,39 @@ export const routes: Routes = [
       },
       {
         path: 'admin',
-        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        canActivate: [adminArea],
         loadComponent: () =>
           import('./admin/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboardComponent),
       },
       {
         path: 'admin/roles',
-        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        canActivate: [adminArea],
         loadComponent: () =>
           import('./admin/roles/roles-list/roles-list').then((m) => m.RolesListComponent),
       },
       {
         path: 'admin/roles/new',
-        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        canActivate: [adminArea],
         loadComponent: () =>
           import('./admin/roles/role-form/role-form').then((m) => m.RoleFormComponent),
       },
       {
         path: 'admin/roles/:id',
-        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        canActivate: [adminArea],
         loadComponent: () =>
           import('./admin/roles/role-form/role-form').then((m) => m.RoleFormComponent),
       },
       {
+        path: 'admin/permissions',
+        canActivate: [featureGuard('route.admin.permissions')],
+        loadComponent: () =>
+          import('./admin/permissions/permissions-matrix/permissions-matrix').then(
+            (m) => m.PermissionsMatrixComponent,
+          ),
+      },
+      {
         path: 'admin/distribution-points',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import(
             './admin/distribution-points/distribution-points-list/distribution-points-list'
@@ -196,7 +205,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin/distribution-points/new',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import(
             './admin/distribution-points/distribution-point-form/distribution-point-form'
@@ -204,7 +213,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin/distribution-points/:id',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import(
             './admin/distribution-points/distribution-point-form/distribution-point-form'
@@ -212,7 +221,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin/partner-categories',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import(
             './admin/partner-categories/partner-categories-list/partner-categories-list'
@@ -220,7 +229,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin/partner-categories/new',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import(
             './admin/partner-categories/partner-category-form/partner-category-form'
@@ -228,7 +237,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin/partner-categories/:id',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import(
             './admin/partner-categories/partner-category-form/partner-category-form'
@@ -236,27 +245,27 @@ export const routes: Routes = [
       },
       {
         path: 'admin/store-members',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./admin/store-members/store-members').then((m) => m.StoreMembersComponent),
       },
       {
-        path: 'admin/onboarding',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        path: 'teamleitung/onboarding',
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./admin/onboarding/onboarding-admin').then((m) => m.OnboardingAdminComponent),
       },
       {
-        path: 'admin/zertifikate',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        path: 'teamleitung/zertifikate',
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import(
             './hygiene-certificate/admin-hygiene-certificates/admin-hygiene-certificates.component'
           ).then((m) => m.AdminHygieneCertificatesComponent),
       },
       {
-        path: 'admin/applications',
-        canActivate: [roleGuard(['ADMINISTRATOR', 'TEAMLEITER'])],
+        path: 'teamleitung/applications',
+        canActivate: [plannerEdit],
         loadComponent: () =>
           import('./partner-applications/admin-applications/admin-applications.component').then(
             (m) => m.AdminApplicationsComponent,
@@ -271,43 +280,43 @@ export const routes: Routes = [
       },
       {
         path: 'admin/system-log',
-        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        canActivate: [adminArea],
         loadComponent: () =>
           import('./admin/system-log/admin-system-log').then((m) => m.AdminSystemLogComponent),
       },
       {
         path: 'admin/stores/deleted',
-        canActivate: [roleGuard(['ADMINISTRATOR'])],
+        canActivate: [adminArea],
         loadComponent: () =>
           import('./admin/deleted-stores/deleted-stores').then((m) => m.DeletedStoresComponent),
       },
       {
         path: 'admin/quiz/questions',
-        canActivate: [quizAdminRoles],
+        canActivate: [quizAdmin],
         loadComponent: () =>
           import('./quiz/admin/quiz-questions').then((m) => m.QuizQuestionsComponent),
       },
       {
         path: 'admin/quiz/questions/new',
-        canActivate: [quizAdminRoles],
+        canActivate: [quizAdmin],
         loadComponent: () =>
           import('./quiz/admin/question-edit').then((m) => m.QuestionEditComponent),
       },
       {
         path: 'admin/quiz/questions/edit/:id',
-        canActivate: [quizAdminRoles],
+        canActivate: [quizAdmin],
         loadComponent: () =>
           import('./quiz/admin/question-edit').then((m) => m.QuestionEditComponent),
       },
       {
         path: 'admin/quiz/categories',
-        canActivate: [quizAdminRoles],
+        canActivate: [quizAdmin],
         loadComponent: () =>
           import('./quiz/admin/quiz-categories').then((m) => m.QuizCategoriesComponent),
       },
       {
         path: 'admin/quiz/attempts',
-        canActivate: [quizAdminRoles],
+        canActivate: [quizAdmin],
         loadComponent: () =>
           import('./quiz/admin/quiz-attempts').then((m) => m.QuizAttemptsComponent),
       },

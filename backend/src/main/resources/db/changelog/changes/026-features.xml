@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="026-create-feature" author="teller-statt-tonne">
+        <createTable tableName="feature">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="feature_key" type="VARCHAR(128)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_feature_key"/>
+            </column>
+            <column name="label" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="category" type="VARCHAR(64)"/>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="026-create-role-feature" author="teller-statt-tonne">
+        <createTable tableName="role_feature">
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="feature_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="role_feature" columnNames="role_id, feature_id"
+                       constraintName="pk_role_feature"/>
+        <addForeignKeyConstraint baseTableName="role_feature" baseColumnNames="role_id"
+                                 referencedTableName="role" referencedColumnNames="id"
+                                 constraintName="fk_role_feature_role" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="role_feature" baseColumnNames="feature_id"
+                                 referencedTableName="feature" referencedColumnNames="id"
+                                 constraintName="fk_role_feature_feature" onDelete="CASCADE"/>
+        <createIndex tableName="role_feature" indexName="idx_role_feature_feature">
+            <column name="feature_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="026-seed-features" author="teller-statt-tonne">
+        <!-- Navigation -->
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.dashboard', 'Men&#252;: &#220;bersicht', 'Top-Level-Men&#252;punkt &#8222;&#220;bersicht&#8220;.', 'Navigation', 10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.events', 'Men&#252;: Termine', 'Top-Level-Men&#252;punkt &#8222;Termine&#8220;.', 'Navigation', 20, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.partners', 'Men&#252;: Betriebe', 'Top-Level-Men&#252;punkt &#8222;Betriebe&#8220;.', 'Navigation', 30, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.map', 'Men&#252;: Karte', 'Top-Level-Men&#252;punkt &#8222;Karte&#8220;.', 'Navigation', 40, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.planner', 'Men&#252;: Planung', 'Top-Level-Men&#252;punkt &#8222;Planung&#8220;.', 'Navigation', 50, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.distribution-points', 'Men&#252;: Verteilerpl&#228;tze', 'Top-Level-Men&#252;punkt &#8222;Verteilerpl&#228;tze&#8220;.', 'Navigation', 60, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.store-members', 'Men&#252;: Retter im Betrieb', 'Men&#252;punkt &#8222;Retter im Betrieb&#8220;.', 'Navigation', 70, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.quiz', 'Men&#252;: Quiz', 'Top-Level-Men&#252;punkt &#8222;Quiz&#8220;.', 'Navigation', 80, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.quiz-admin', 'Men&#252;: Quiz-Admin', 'Men&#252;punkt zur Quiz-Verwaltung.', 'Navigation', 90, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.admin', 'Men&#252;: Admin', 'Top-Level-Men&#252;punkt zum Admin-Bereich.', 'Navigation', 100, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.admin.permissions', 'Men&#252;: Berechtigungen (Admin)', 'Card im Admin-Dashboard f&#252;r Berechtigungs-Verwaltung.', 'Navigation', 110, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+
+        <!-- Routes (Zugriff via URL) -->
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('route.planner', 'Route: Planung bearbeiten', 'Zugriff auf Planungs-Routen mit Schreibrechten.', 'Routen', 200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('route.planner.view', 'Route: Planung ansehen', 'Lesender Zugriff auf Planungs-Routen.', 'Routen', 210, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('route.user.edit', 'Route: Benutzer bearbeiten', 'Zugriff auf Benutzer-Bearbeitungs-Routen.', 'Routen', 220, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('route.quiz.admin', 'Route: Quiz-Verwaltung', 'Zugriff auf Quiz-Admin-Routen.', 'Routen', 230, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('route.admin', 'Route: Admin-Bereich', 'Zugriff auf alle Admin-Routen (/admin/**).', 'Routen', 240, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('route.admin.permissions', 'Route: Berechtigungen verwalten', 'Zugriff auf die Berechtigungs-Verwaltungs-Seite.', 'Routen', 250, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+
+        <!-- Einzelne Aktionen -->
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('quiz.attempt.delete', 'Aktion: Quiz-Versuch l&#246;schen', 'Quiz-Versuch eines Benutzers l&#246;schen.', 'Aktionen', 300, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+    </changeSet>
+
+    <changeSet id="026-seed-role-feature" author="teller-statt-tonne">
+        <!-- Verhalten 1:1 wie hartkodiert: ADMINISTRATOR sieht alles (wird im Service erzwungen, hier dennoch zugewiesen). -->
+        <sql>
+            INSERT INTO role_feature (role_id, feature_id)
+            SELECT r.id, f.id FROM role r CROSS JOIN feature f WHERE r.name = 'ADMINISTRATOR'
+        </sql>
+
+        <!-- TEAMLEITER -->
+        <sql>
+            INSERT INTO role_feature (role_id, feature_id)
+            SELECT r.id, f.id FROM role r JOIN feature f ON f.feature_key IN (
+                'nav.dashboard','nav.events','nav.partners','nav.map','nav.quiz',
+                'nav.planner','nav.distribution-points','nav.store-members','nav.quiz-admin',
+                'route.planner','route.planner.view','route.user.edit','route.quiz.admin'
+            ) WHERE r.name = 'TEAMLEITER'
+        </sql>
+
+        <!-- RETTER -->
+        <sql>
+            INSERT INTO role_feature (role_id, feature_id)
+            SELECT r.id, f.id FROM role r JOIN feature f ON f.feature_key IN (
+                'nav.dashboard','nav.events','nav.partners','nav.map','nav.quiz',
+                'nav.planner','route.planner','route.planner.view'
+            ) WHERE r.name = 'RETTER'
+        </sql>
+
+        <!-- NEW_MEMBER -->
+        <sql>
+            INSERT INTO role_feature (role_id, feature_id)
+            SELECT r.id, f.id FROM role r JOIN feature f ON f.feature_key IN (
+                'nav.dashboard','nav.events','nav.partners','nav.map','nav.quiz'
+            ) WHERE r.name = 'NEW_MEMBER'
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

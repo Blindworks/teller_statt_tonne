@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { PermissionsService } from '../auth/permissions.service';
 import { NotificationBellComponent } from '../notifications/notification-bell/notification-bell';
 import { NotificationService } from '../notifications/notification.service';
 import { resolvePhotoUrl } from '../users/photo-url';
@@ -23,6 +24,7 @@ import { resolvePhotoUrl } from '../users/photo-url';
 })
 export class AppShellComponent {
   private readonly auth = inject(AuthService);
+  private readonly perms = inject(PermissionsService);
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly notifications = inject(NotificationService);
@@ -49,32 +51,15 @@ export class AppShellComponent {
   readonly menuOpen = signal(false);
   readonly moreOpen = signal(false);
 
-  readonly isPlanner = computed(() => {
-    const roles = this.currentUser()?.roles ?? [];
-    return roles.some((r) => r === 'ADMINISTRATOR' || r === 'TEAMLEITER' || r === 'RETTER');
-  });
-
-  readonly isAdmin = computed(() => !!this.currentUser()?.roles?.includes('ADMINISTRATOR'));
-
-  readonly canSeeQuizAdmin = computed(() => {
-    const roles = this.currentUser()?.roles ?? [];
-    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
-  });
-
-  readonly canSeeStoreMembers = computed(() => {
-    const roles = this.currentUser()?.roles ?? [];
-    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
-  });
-
-  readonly canSeeDistributionPoints = computed(() => {
-    const roles = this.currentUser()?.roles ?? [];
-    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
-  });
-
-  readonly canSeeTeamleitung = computed(() => {
-    const roles = this.currentUser()?.roles ?? [];
-    return roles.includes('ADMINISTRATOR') || roles.includes('TEAMLEITER');
-  });
+  // Reaktive Feature-Checks — abhängig vom PermissionsService-Signal.
+  readonly isPlanner = computed(() => this.perms.features().has('nav.planner'));
+  readonly isAdmin = computed(() => this.perms.features().has('nav.admin'));
+  readonly canSeeQuizAdmin = computed(() => this.perms.features().has('nav.quiz-admin'));
+  readonly canSeeStoreMembers = computed(() => this.perms.features().has('nav.store-members'));
+  readonly canSeeDistributionPoints = computed(() =>
+    this.perms.features().has('nav.distribution-points'),
+  );
+  readonly canSeeTeamleitung = computed(() => this.perms.features().has('nav.planner'));
 
   constructor() {
     this.router.events.subscribe((e) => {

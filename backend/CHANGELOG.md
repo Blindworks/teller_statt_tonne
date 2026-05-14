@@ -9,6 +9,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- Rollenbasierte GUI-Sichtbarkeit konfigurierbar: neue Tabellen `feature` (Spalten `feature_key`, `label`, `description`, `category`, `sort_order`) und `role_feature` (Composite-PK `role_id`+`feature_id`, FK-CASCADE). Neue Endpoints: `GET/POST /api/features`, `PUT/DELETE /api/features/{id}`, `GET/PUT /api/roles/{roleId}/features`, `GET /api/me/features`. `ADMINISTRATOR`-Rolle ist gesperrt (Bulk-`PUT` liefert `409`) und erhält im `/api/me/features`-Endpoint stets alle Feature-Keys. Initial-Seeding bildet die zuvor hartkodierten Rollen→Sichtbarkeits-Regeln 1:1 ab (Migration `026-features.xml`).
 - Onboarding-Workflow für neue Retter: neue Felder `agreement_file_url`, `agreement_uploaded_at`, `test_pickup_completed_at` an `app_user`; neue Tabellen `introduction_slot` und `introduction_booking`. Neue Endpoints unter `/api/onboarding/*`, `/api/introduction-slots/*` und `/api/users/{id}/agreement` sowie `/api/users/{id}/test-pickup` und `/api/users/{id}/self-profile`. Automatische Freischaltung (`PENDING → ACTIVE`) erst nach allen fünf Onboarding-Schritten (Hygienezertifikat, Kennenlerngespräch, Profildaten, Rettervereinbarung, Testabholung).
 
 ### Fixed

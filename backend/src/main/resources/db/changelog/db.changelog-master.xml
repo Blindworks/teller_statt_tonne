@@ -30,5 +30,6 @@
     <include file="db/changelog/changes/023-pickup-run.xml"/>
     <include file="db/changelog/changes/024-food-category-unique-name.xml"/>
     <include file="db/changelog/changes/025-onboarding.xml"/>
+    <include file="db/changelog/changes/026-features.xml"/>
 
 </databaseChangeLog>

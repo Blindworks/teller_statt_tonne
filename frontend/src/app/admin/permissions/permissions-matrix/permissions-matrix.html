@@ -1,0 +1,182 @@
+<section class="px-6 md:px-12 py-10 md:pl-80">
+  <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <nav class="text-xs text-on-surface-variant mb-2">
+        <a routerLink="/admin" class="hover:underline">Administration</a>
+        <span class="mx-1">/</span>
+        <span>Berechtigungen</span>
+      </nav>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface">Berechtigungen</h1>
+      <p class="text-sm text-on-surface-variant mt-2 max-w-2xl">
+        Pro Rolle festlegen, welche Menüpunkte, Routen und Aktionen in der GUI sichtbar sind.
+        Die Rolle <strong>Administrator</strong> sieht immer alles und ist gesperrt.
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        (click)="openCreate()"
+        [disabled]="busy()"
+        class="inline-flex items-center gap-2 rounded-full bg-primary text-on-primary px-5 py-2 text-sm font-bold shadow hover:shadow-lg transition disabled:opacity-50"
+      >
+        <span class="material-symbols-outlined text-base">add</span>
+        Neues Feature
+      </button>
+      <button
+        type="button"
+        (click)="saveAllDirty()"
+        [disabled]="busy() || !hasDirty()"
+        class="inline-flex items-center gap-2 rounded-full bg-secondary text-on-secondary px-5 py-2 text-sm font-bold shadow hover:shadow-lg transition disabled:opacity-50"
+      >
+        <span class="material-symbols-outlined text-base">save</span>
+        Alle Änderungen speichern
+      </button>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <div class="mb-4 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-error">
+      {{ loadError() }}
+    </div>
+  }
+  @if (saveError()) {
+    <div class="mb-4 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-error">
+      {{ saveError() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="text-sm text-on-surface-variant">Lädt…</div>
+  } @else {
+    <div class="overflow-x-auto rounded-2xl bg-surface-container-lowest shadow-[0_20px_50px_rgba(48,52,40,0.04)]">
+      <table class="w-full text-sm">
+        <thead class="bg-surface-container-low">
+          <tr>
+            <th class="sticky left-0 bg-surface-container-low px-4 py-3 text-left font-bold text-on-surface min-w-[18rem]">
+              Feature
+            </th>
+            @for (role of roles(); track role.id) {
+              <th class="px-3 py-3 text-center font-bold text-on-surface whitespace-nowrap">
+                {{ role.label }}
+                @if (isAdminRole(role)) {
+                  <span class="material-symbols-outlined text-base align-middle text-on-surface-variant" title="gesperrt">lock</span>
+                }
+                @if (dirtyRoles().has(role.id)) {
+                  <span class="ml-1 inline-block w-2 h-2 rounded-full bg-tertiary align-middle" title="ungespeichert"></span>
+                }
+              </th>
+            }
+            <th class="px-3 py-3 text-right font-bold text-on-surface">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (group of groupedFeatures(); track group.category) {
+            <tr class="bg-surface-container/50">
+              <td [attr.colspan]="roles().length + 2" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                {{ group.category }}
+              </td>
+            </tr>
+            @for (feature of group.features; track feature.id) {
+              <tr class="border-t border-outline-variant/20 hover:bg-surface-container-low/40">
+                <td class="sticky left-0 bg-surface-container-lowest px-4 py-3 align-top">
+                  <div class="font-semibold text-on-surface">{{ feature.label }}</div>
+                  <div class="text-xs text-on-surface-variant font-mono">{{ feature.key }}</div>
+                  @if (feature.description) {
+                    <div class="text-xs text-on-surface-variant mt-1">{{ feature.description }}</div>
+                  }
+                </td>
+                @for (role of roles(); track role.id) {
+                  <td class="px-3 py-3 text-center align-middle">
+                    @if (isAdminRole(role)) {
+                      <input type="checkbox" checked disabled
+                             class="w-5 h-5 rounded text-primary border-outline cursor-not-allowed opacity-60" />
+                    } @else {
+                      <input
+                        type="checkbox"
+                        [checked]="isChecked(role.id, feature.id)"
+                        (change)="toggle(role, feature.id)"
+                        class="w-5 h-5 rounded text-primary border-outline focus:ring-primary cursor-pointer"
+                      />
+                    }
+                  </td>
+                }
+                <td class="px-3 py-3 text-right align-middle whitespace-nowrap">
+                  <button
+                    type="button"
+                    (click)="openEdit(feature)"
+                    class="inline-flex items-center justify-center w-9 h-9 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition"
+                    title="Bearbeiten"
+                  >
+                    <span class="material-symbols-outlined text-base">edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="askDeleteFeature(feature)"
+                    class="inline-flex items-center justify-center w-9 h-9 rounded-full text-on-surface-variant hover:bg-error/10 hover:text-error transition"
+                    title="Löschen"
+                  >
+                    <span class="material-symbols-outlined text-base">delete</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          }
+          <tr>
+            <td class="sticky left-0 bg-surface-container-lowest px-4 py-3"></td>
+            @for (role of roles(); track role.id) {
+              <td class="px-3 py-3 text-center">
+                @if (!isAdminRole(role)) {
+                  <button
+                    type="button"
+                    (click)="saveRole(role)"
+                    [disabled]="busy() || !dirtyRoles().has(role.id)"
+                    class="text-xs rounded-full bg-primary/90 text-on-primary px-3 py-1 font-bold disabled:opacity-30"
+                  >
+                    Speichern
+                  </button>
+                }
+              </td>
+            }
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+
+@if (featureFormOpen()) {
+  <app-feature-form
+    [feature]="editingFeature()"
+    [busy]="busy()"
+    (submitForm)="onFeatureSubmit($event)"
+    (cancel)="closeFeatureForm()"
+  />
+}
+
+@if (confirmDeleteFeature(); as f) {
+  <div class="fixed inset-0 bg-black/40 z-[2000] flex items-center justify-center px-4"
+       (click)="cancelDeleteFeature()">
+    <div class="bg-surface rounded-2xl shadow-2xl max-w-md w-full p-6"
+         (click)="$event.stopPropagation()">
+      <h2 class="text-lg font-bold text-on-surface mb-2">Feature löschen?</h2>
+      <p class="text-sm text-on-surface-variant mb-4">
+        Soll das Feature <strong>{{ f.label }}</strong> (<span class="font-mono">{{ f.key }}</span>)
+        wirklich gelöscht werden? Alle Zuordnungen zu Rollen werden entfernt.
+      </p>
+      <div class="flex justify-end gap-3">
+        <button type="button"
+                (click)="cancelDeleteFeature()"
+                class="rounded-full px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-container">
+          Abbrechen
+        </button>
+        <button type="button"
+                (click)="confirmDeleteFeatureExec()"
+                [disabled]="busy()"
+                class="rounded-full bg-error text-on-error px-4 py-2 text-sm font-bold disabled:opacity-50">
+          Löschen
+        </button>
+      </div>
+    </div>
+  </div>
+}

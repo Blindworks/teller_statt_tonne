@@ -3,6 +3,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, finalize, of, shareReplay, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthResponse, User } from './auth.models';
+import { PermissionsService } from './permissions.service';
 
 const ACCESS_KEY = 'tst.access';
 const REFRESH_KEY = 'tst.refresh';
@@ -10,6 +11,7 @@ const REFRESH_KEY = 'tst.refresh';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly permissions = inject(PermissionsService);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/auth`;
 
   private readonly accessTokenSignal = signal<string | null>(this.readStorage(ACCESS_KEY));
@@ -22,7 +24,11 @@ export class AuthService {
 
   constructor() {
     if (this.accessTokenSignal()) {
-      this.me().subscribe();
+      this.me().subscribe((user) => {
+        if (user) {
+          this.permissions.load().subscribe();
+        }
+      });
     }
   }
 
@@ -139,6 +145,8 @@ export class AuthService {
     this.currentUserSignal.set(res.user);
     this.writeStorage(ACCESS_KEY, res.accessToken);
     this.writeStorage(REFRESH_KEY, res.refreshToken);
+    this.permissions.clear();
+    this.permissions.load().subscribe();
   }
 
   private clearTokens(): void {
@@ -147,6 +155,7 @@ export class AuthService {
     this.currentUserSignal.set(null);
     this.writeStorage(ACCESS_KEY, null);
     this.writeStorage(REFRESH_KEY, null);
+    this.permissions.clear();
   }
 
   private readStorage(key: string): string | null {

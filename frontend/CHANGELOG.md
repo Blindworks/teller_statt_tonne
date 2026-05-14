@@ -7,6 +7,15 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Neue Admin-Seite `/admin/permissions` (Card im Admin-Dashboard) zur rollenbasierten Steuerung der GUI-Sichtbarkeit: Matrix Rolle × Feature mit Checkboxen, „Neues Feature“-Dialog (Key/Label/Kategorie/Beschreibung), Löschen via eigener Bestätigungsdialog. Pro Rolle bzw. global speicherbar. ADMINISTRATOR-Spalte ist gesperrt und immer aktiv.
+- Neuer `PermissionsService` (`/api/me/features`) und `featureGuard(key)` lösen den bisherigen `roleGuard([...])`-Mechanismus ab. Navigations-Sichtbarkeit (Sidebar, Bottom-Nav, Admin-Dashboard-Cards) und Route-Guards in `app.routes.ts` arbeiten jetzt gegen Feature-Keys (`nav.*`, `route.*`). `role.guard.ts` entfällt.
+
+### Changed
+
+- App-Shell (`isAdmin`, `isPlanner`, `canSeeQuizAdmin`, `canSeeStoreMembers`, `canSeeDistributionPoints`, `canSeeTeamleitung`) prüft Feature-Keys statt Rollen-Listen — Verhalten bleibt durch Seed-Daten zunächst identisch.
+
 ## [0.28.1] - 2026-05-14
 
 ### Changed
