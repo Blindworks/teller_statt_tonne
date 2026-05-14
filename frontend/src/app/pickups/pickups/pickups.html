@@ -1,4 +1,9 @@
 <main class="pt-24 pb-32 md:pb-12 px-4 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen overflow-x-hidden">
+  @if (isRetter()) {
+    <div class="mb-4">
+      <app-hygiene-expiry-banner />
+    </div>
+  }
   <!-- Page Title -->
   <section class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
     <div>

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/pickups/{pickupId}/signup")
-@PreAuthorize("hasRole('RETTER')")
+@PreAuthorize("hasAnyRole('RETTER','ADMINISTRATOR','TEAMLEITER')")
 public class PickupSignupController {
 
     private final PickupSignupService service;
@@ -40,6 +40,8 @@ public class PickupSignupController {
             case PICKUP_PAST -> ResponseEntity.status(HttpStatus.GONE).build();
             case UNASSIGN_TOO_LATE -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
             case PARTNER_NOT_COOPERATING -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+            case HYGIENE_EXPIRED -> ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .header("X-Reason", "hygiene_certificate_expired").build();
         };
     }
 }

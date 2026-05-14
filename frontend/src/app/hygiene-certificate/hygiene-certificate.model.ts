@@ -1,9 +1,12 @@
-export type HygieneCertificateStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type HygieneCertificateStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'REPLACED';
+
+export type HygieneValidityStatus = 'valid' | 'expiring-soon' | 'expired' | null;
 
 export const HYGIENE_CERTIFICATE_STATUS_LABELS: Record<HygieneCertificateStatus, string> = {
   PENDING: 'Ausstehend',
   APPROVED: 'Genehmigt',
   REJECTED: 'Abgelehnt',
+  REPLACED: 'Ersetzt',
 };
 
 export interface HygieneCertificate {
@@ -17,6 +20,9 @@ export interface HygieneCertificate {
   originalFilename: string | null;
   fileSizeBytes: number;
   issuedDate: string; // ISO date
+  expiryDate: string; // ISO date
+  validityStatus: HygieneValidityStatus;
+  daysUntilExpiry: number | null;
   status: HygieneCertificateStatus;
   rejectionReason: string | null;
   decidedByUserId: number | null;

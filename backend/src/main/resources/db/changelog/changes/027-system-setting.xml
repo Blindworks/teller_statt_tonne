@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="027-create-system-setting" author="teller-statt-tonne">
+        <createTable tableName="system_setting">
+            <column name="setting_key" type="VARCHAR(128)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="setting_value" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by_user_id" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="system_setting" baseColumnNames="updated_by_user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_system_setting_updated_by"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="027-seed-hygiene-settings" author="teller-statt-tonne">
+        <sql>INSERT INTO system_setting (setting_key, setting_value, updated_at) VALUES ('hygiene.validity_months', '12', CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO system_setting (setting_key, setting_value, updated_at) VALUES ('hygiene.warning_days_before', '30', CURRENT_TIMESTAMP)</sql>
+    </changeSet>
+
+</databaseChangeLog>

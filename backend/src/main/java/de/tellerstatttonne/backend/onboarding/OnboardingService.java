@@ -69,8 +69,9 @@ public class OnboardingService {
     }
 
     private OnboardingStatusDto computeStatus(UserEntity user) {
-        boolean hygiene = hygieneRepository.findByUserId(user.getId())
-            .map(c -> c.getStatus() == HygieneCertificateStatus.APPROVED)
+        boolean hygiene = hygieneRepository.findFirstByUser_IdAndStatusOrderByExpiryDateDesc(
+                user.getId(), HygieneCertificateStatus.APPROVED)
+            .map(c -> !c.getExpiryDate().isBefore(java.time.LocalDate.now()))
             .orElse(false);
         boolean introduction = user.getIntroductionCompletedAt() != null;
         boolean profile = isProfileComplete(user);

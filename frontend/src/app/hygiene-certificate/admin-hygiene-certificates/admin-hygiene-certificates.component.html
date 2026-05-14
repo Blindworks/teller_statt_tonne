@@ -43,7 +43,13 @@
               <p class="text-xs text-on-surface-variant mt-1">
                 Datei: {{ cert.originalFilename ?? '(ohne Namen)' }} ·
                 ausgestellt {{ cert.issuedDate | date: 'dd.MM.yyyy' }} ·
-                hochgeladen {{ cert.createdAt | date: 'dd.MM.yyyy HH:mm' }}
+                gültig bis {{ cert.expiryDate | date: 'dd.MM.yyyy' }}
+                @if (cert.status === 'APPROVED' && cert.validityStatus === 'expired') {
+                  <span class="ml-1 font-bold text-error">(abgelaufen)</span>
+                } @else if (cert.status === 'APPROVED' && cert.validityStatus === 'expiring-soon') {
+                  <span class="ml-1 font-bold text-tertiary">(läuft bald ab)</span>
+                }
+                · hochgeladen {{ cert.createdAt | date: 'dd.MM.yyyy HH:mm' }}
                 @if (cert.decidedAt) {
                   · entschieden {{ cert.decidedAt | date: 'dd.MM.yyyy HH:mm' }}
                   @if (cert.decidedByDisplayName) {

@@ -40,6 +40,14 @@
             <span class="break-all ml-1">{{ cert.originalFilename ?? '(ohne Namen)' }}</span>
             <div class="text-xs text-on-surface-variant mt-1.5">
               ausgestellt am {{ cert.issuedDate | date: 'dd.MM.yyyy' }}
+              · gültig bis {{ cert.expiryDate | date: 'dd.MM.yyyy' }}
+              @if (cert.status === 'APPROVED' && cert.daysUntilExpiry !== null) {
+                @if (cert.validityStatus === 'expired') {
+                  <span class="ml-1 font-bold text-error">(abgelaufen)</span>
+                } @else if (cert.validityStatus === 'expiring-soon') {
+                  <span class="ml-1 font-bold text-tertiary">(läuft in {{ cert.daysUntilExpiry }} Tagen ab)</span>
+                }
+              }
               @if (cert.decidedAt) {
                 · entschieden {{ cert.decidedAt | date: 'dd.MM.yyyy HH:mm' }}
                 @if (cert.decidedByDisplayName) {
@@ -73,7 +81,7 @@
       </div>
     }
 
-    @if (certificate()?.status !== 'APPROVED') {
+    @if (certificate()?.status !== 'APPROVED' || certificate()?.validityStatus === 'expired' || certificate()?.validityStatus === 'expiring-soon') {
       @if (certificate() && !showUploadForm() && certificate()!.status !== 'REJECTED') {
         <div class="pt-2">
           <button

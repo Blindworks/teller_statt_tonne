@@ -4,6 +4,8 @@ import de.tellerstatttonne.backend.notification.NotificationService;
 import de.tellerstatttonne.backend.notification.NotificationType;
 import de.tellerstatttonne.backend.role.RoleEntity;
 import de.tellerstatttonne.backend.role.RoleRepository;
+import de.tellerstatttonne.backend.settings.SettingsKeys;
+import de.tellerstatttonne.backend.settings.SystemSettingService;
 import de.tellerstatttonne.backend.storage.DocumentStorageService;
 import de.tellerstatttonne.backend.systemlog.SystemLogEventType;
 import de.tellerstatttonne.backend.systemlog.event.SystemLogEvent;
@@ -37,6 +39,7 @@ public class HygieneCertificateService {
     private final DocumentStorageService storage;
     private final NotificationService notificationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final SystemSettingService settings;
 
     public HygieneCertificateService(
         HygieneCertificateRepository repository,
@@ -45,7 +48,8 @@ public class HygieneCertificateService {
         RoleRepository roleRepository,
         DocumentStorageService storage,
         NotificationService notificationService,
-        ApplicationEventPublisher eventPublisher
+        ApplicationEventPublisher eventPublisher,
+        SystemSettingService settings
     ) {
         this.repository = repository;
         this.userRepository = userRepository;
@@ -54,6 +58,7 @@ public class HygieneCertificateService {
         this.storage = storage;
         this.notificationService = notificationService;
         this.eventPublisher = eventPublisher;
+        this.settings = settings;
     }
 
     public HygieneCertificateDto submit(Long userId, MultipartFile file, LocalDate issuedDate) {
@@ -66,41 +71,44 @@ public class HygieneCertificateService {
         UserEntity user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("user not found: " + userId));
 
-        Optional<HygieneCertificateEntity> existingOpt = repository.findByUserId(userId);
-        String previousFileUrl = existingOpt.map(HygieneCertificateEntity::getFileUrl).orElse(null);
+        int validityMonths = currentValidityMonths();
+        LocalDate expiryDate = issuedDate.plusMonths(validityMonths);
 
         DocumentStorageService.StoredDocument stored = storage.store(
             DocumentStorageService.CERTIFICATES_SUBDIR,
-            userId.toString(),
+            userId.toString() + "-" + Instant.now().toEpochMilli(),
             file,
-            previousFileUrl
+            null
         );
 
-        HygieneCertificateEntity entity = existingOpt.orElseGet(HygieneCertificateEntity::new);
+        for (HygieneCertificateEntity pending : repository.findByUser_IdAndStatus(userId, HygieneCertificateStatus.PENDING)) {
+            pending.setStatus(HygieneCertificateStatus.REPLACED);
+            repository.save(pending);
+        }
+
+        HygieneCertificateEntity entity = new HygieneCertificateEntity();
         entity.setUser(user);
         entity.setFileUrl(stored.relativePath());
         entity.setMimeType(stored.mimeType());
         entity.setOriginalFilename(stored.originalFilename());
         entity.setFileSizeBytes(stored.sizeBytes());
         entity.setIssuedDate(issuedDate);
+        entity.setExpiryDate(expiryDate);
         entity.setStatus(HygieneCertificateStatus.PENDING);
-        entity.setRejectionReason(null);
-        entity.setDecidedBy(null);
-        entity.setDecidedAt(null);
 
         HygieneCertificateEntity saved = repository.save(entity);
         notifyDeciders(saved);
-        return HygieneCertificateMapper.toDto(saved);
+        return toDto(saved);
     }
 
     @Transactional(readOnly = true)
     public Optional<HygieneCertificateDto> findByUserId(Long userId) {
-        return repository.findByUserId(userId).map(HygieneCertificateMapper::toDto);
+        return repository.findFirstByUser_IdOrderByCreatedAtDesc(userId).map(this::toDto);
     }
 
     @Transactional(readOnly = true)
     public Optional<HygieneCertificateEntity> loadEntityForFile(Long userId) {
-        return repository.findByUserId(userId);
+        return repository.findFirstByUser_IdOrderByCreatedAtDesc(userId);
     }
 
     @Transactional(readOnly = true)
@@ -109,11 +117,24 @@ public class HygieneCertificateService {
     }
 
     @Transactional(readOnly = true)
+    public boolean isCurrentlyValid(Long userId) {
+        return repository.findFirstByUser_IdAndStatusOrderByExpiryDateDesc(userId, HygieneCertificateStatus.APPROVED)
+            .map(c -> !c.getExpiryDate().isBefore(LocalDate.now()))
+            .orElse(false);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasApprovedCertificate(Long userId) {
+        return repository.findFirstByUser_IdAndStatusOrderByExpiryDateDesc(userId, HygieneCertificateStatus.APPROVED)
+            .isPresent();
+    }
+
+    @Transactional(readOnly = true)
     public List<HygieneCertificateDto> listByStatus(HygieneCertificateStatus status) {
         List<HygieneCertificateEntity> rows = status == null
             ? repository.findAllByOrderByCreatedAtAsc()
             : repository.findByStatusOrderByCreatedAtAsc(status);
-        return rows.stream().map(HygieneCertificateMapper::toDto).toList();
+        return rows.stream().map(this::toDto).toList();
     }
 
     @Transactional(readOnly = true)
@@ -134,6 +155,8 @@ public class HygieneCertificateService {
         entity.setRejectionReason(null);
         entity.setDecidedBy(decider);
         entity.setDecidedAt(Instant.now());
+        entity.setWarningSentAt(null);
+        entity.setExpiredNoticeSentAt(null);
         HygieneCertificateEntity saved = repository.save(entity);
 
         userService.promoteToActiveIfReady(user.getId());
@@ -142,7 +165,8 @@ public class HygieneCertificateService {
             List.of(user.getId()),
             NotificationType.HYGIENE_CERTIFICATE_APPROVED,
             "Hygienezertifikat genehmigt",
-            "Dein Hygienezertifikat wurde genehmigt. Du bist jetzt als Retter freigeschaltet.",
+            "Dein Hygienezertifikat wurde genehmigt. Du bist als Retter freigeschaltet bis "
+                + entity.getExpiryDate() + ".",
             null,
             null,
             decider.getId()
@@ -150,9 +174,9 @@ public class HygieneCertificateService {
         eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.HYGIENE_CERTIFICATE_APPROVED)
             .actor(decider.getId(), decider.getEmail())
             .target("HYGIENE_CERTIFICATE", saved.getId())
-            .message("Hygienezertifikat von " + user.getEmail() + " genehmigt")
+            .message("Hygienezertifikat von " + user.getEmail() + " genehmigt (gültig bis " + entity.getExpiryDate() + ")")
             .build());
-        return HygieneCertificateMapper.toDto(saved);
+        return toDto(saved);
     }
 
     public HygieneCertificateDto reject(Long certificateId, Long deciderUserId, String reason) {
@@ -183,7 +207,7 @@ public class HygieneCertificateService {
             .target("HYGIENE_CERTIFICATE", saved.getId())
             .message("Hygienezertifikat von " + entity.getUser().getEmail() + " abgelehnt: " + trimmed)
             .build());
-        return HygieneCertificateMapper.toDto(saved);
+        return toDto(saved);
     }
 
     public boolean canAccess(Long certificateOwnerUserId, Long requesterUserId) {
@@ -192,6 +216,18 @@ public class HygieneCertificateService {
         return userRepository.findById(requesterUserId)
             .map(u -> u.hasRole(ROLE_ADMIN) || u.hasRole(ROLE_TEAMLEITER))
             .orElse(false);
+    }
+
+    private int currentValidityMonths() {
+        return settings.getInt(SettingsKeys.HYGIENE_VALIDITY_MONTHS, SettingsKeys.DEFAULT_HYGIENE_VALIDITY_MONTHS);
+    }
+
+    private int currentWarningDaysBefore() {
+        return settings.getInt(SettingsKeys.HYGIENE_WARNING_DAYS_BEFORE, SettingsKeys.DEFAULT_HYGIENE_WARNING_DAYS_BEFORE);
+    }
+
+    HygieneCertificateDto toDto(HygieneCertificateEntity entity) {
+        return HygieneCertificateMapper.toDto(entity, currentWarningDaysBefore());
     }
 
     private HygieneCertificateEntity loadPending(Long id) {

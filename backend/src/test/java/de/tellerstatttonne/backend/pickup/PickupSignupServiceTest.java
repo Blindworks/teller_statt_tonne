@@ -2,6 +2,9 @@ package de.tellerstatttonne.backend.pickup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.tellerstatttonne.backend.hygiene.HygieneCertificateEntity;
+import de.tellerstatttonne.backend.hygiene.HygieneCertificateRepository;
+import de.tellerstatttonne.backend.hygiene.HygieneCertificateStatus;
 import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
@@ -31,6 +34,7 @@ class PickupSignupServiceTest {
     @Autowired private PartnerService partnerService;
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
+    @Autowired private HygieneCertificateRepository hygieneRepository;
     @Autowired private de.tellerstatttonne.backend.partnercategory.PartnerCategoryRepository partnerCategoryRepository;
 
     private Long partnerId;
@@ -179,6 +183,32 @@ class PickupSignupServiceTest {
     }
 
     @Test
+    void signupRejectedWhenHygieneCertificateExpired() {
+        // alle Zertifikate des Members auf abgelaufen setzen
+        hygieneRepository.findByUser_IdAndStatus(memberId, HygieneCertificateStatus.APPROVED)
+            .forEach(c -> {
+                c.setExpiryDate(LocalDate.now().minusDays(1));
+                hygieneRepository.save(c);
+            });
+
+        PickupSignupService.Result result = signupService.signup(pickupId, memberId);
+
+        assertThat(result).isEqualTo(PickupSignupService.Result.HYGIENE_EXPIRED);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).isEmpty();
+    }
+
+    @Test
+    void removeFutureSignupsForUserRemovesAssignments() {
+        signupService.signup(pickupId, memberId);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).hasSize(1);
+
+        List<Long> affected = signupService.removeFutureSignupsForUser(memberId);
+
+        assertThat(affected).contains(pickupId);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).isEmpty();
+    }
+
+    @Test
     void signupRejectedWhenPartnerNotCooperating() {
         PartnerEntity partnerEntity = partnerRepository.findById(partnerId).orElseThrow();
         partnerEntity.setStatus(Partner.Status.VERHANDLUNGEN_LAUFEN);
@@ -188,6 +218,28 @@ class PickupSignupServiceTest {
 
         assertThat(result).isEqualTo(PickupSignupService.Result.PARTNER_NOT_COOPERATING);
         assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).isEmpty();
+    }
+
+    @Test
+    void signupSucceedsForAdminWithoutMembershipOrHygiene() {
+        UserEntity admin = createUserWithoutHygiene("admin", "ADMINISTRATOR");
+
+        PickupSignupService.Result result = signupService.signup(pickupId, admin.getId());
+
+        assertThat(result).isEqualTo(PickupSignupService.Result.OK);
+        PickupEntity pickup = pickupRepository.findById(pickupId).orElseThrow();
+        assertThat(pickup.getAssignments()).hasSize(1);
+        assertThat(pickup.getAssignments().get(0).getUserId()).isEqualTo(admin.getId());
+    }
+
+    @Test
+    void signupSucceedsForTeamleiterWithoutMembershipOrHygiene() {
+        UserEntity teamleiter = createUserWithoutHygiene("teamleiter", "TEAMLEITER");
+
+        PickupSignupService.Result result = signupService.signup(pickupId, teamleiter.getId());
+
+        assertThat(result).isEqualTo(PickupSignupService.Result.OK);
+        assertThat(pickupRepository.findById(pickupId).orElseThrow().getAssignments()).hasSize(1);
     }
 
     @Test
@@ -218,6 +270,37 @@ class PickupSignupServiceTest {
         Instant now = Instant.now();
         user.setCreatedAt(now);
         user.setUpdatedAt(now);
+        UserEntity saved = userRepository.save(user);
+        giveValidHygieneCertificate(saved);
+        return saved;
+    }
+
+    private UserEntity createUserWithoutHygiene(String prefix, String roleName) {
+        UserEntity user = new UserEntity();
+        user.setEmail(prefix + "-" + System.nanoTime() + "@example.de");
+        user.setPasswordHash("dummy");
+        user.setRoles(Set.of(roleRepository.findByName(roleName).orElseThrow()));
+        user.setFirstName("First");
+        user.setLastName("Last");
+        user.setOnlineStatus(UserEntity.OnlineStatus.OFFLINE);
+        user.setStatus(UserEntity.Status.ACTIVE);
+        Instant now = Instant.now();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
         return userRepository.save(user);
+    }
+
+    private void giveValidHygieneCertificate(UserEntity user) {
+        HygieneCertificateEntity cert = new HygieneCertificateEntity();
+        cert.setUser(user);
+        cert.setFileUrl("certificates/" + user.getId() + "/dummy.pdf");
+        cert.setMimeType("application/pdf");
+        cert.setOriginalFilename("dummy.pdf");
+        cert.setFileSizeBytes(1L);
+        cert.setIssuedDate(LocalDate.now().minusMonths(1));
+        cert.setExpiryDate(LocalDate.now().plusMonths(11));
+        cert.setStatus(HygieneCertificateStatus.APPROVED);
+        cert.setDecidedAt(Instant.now());
+        hygieneRepository.save(cert);
     }
 }

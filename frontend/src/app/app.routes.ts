@@ -291,6 +291,14 @@ export const routes: Routes = [
           import('./admin/deleted-stores/deleted-stores').then((m) => m.DeletedStoresComponent),
       },
       {
+        path: 'admin/system-settings',
+        canActivate: [adminArea],
+        loadComponent: () =>
+          import('./admin/system-settings/system-settings.component').then(
+            (m) => m.SystemSettingsComponent,
+          ),
+      },
+      {
         path: 'admin/quiz/questions',
         canActivate: [quizAdmin],
         loadComponent: () =>

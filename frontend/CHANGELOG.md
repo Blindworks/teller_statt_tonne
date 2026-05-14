@@ -9,11 +9,18 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- Neue Admin-Seite `/admin/system-settings` (Card „Systemeinstellungen“ im Admin-Dashboard) zur Pflege der globalen Hygienezertifikat-Werte: Gültigkeitsdauer (Monate, 1–60) und Vorwarnzeit (Tage, 1–365). Werte synchronisieren mit `GET/PUT /api/admin/settings`.
+- Neue Komponente `<app-hygiene-expiry-banner>` (Pickup-Liste, nur für Retter): gelber Hinweis bei nahem Ablauf, roter Banner mit Auffrischungs-CTA bei abgelaufenem Zertifikat.
+- Hygienezertifikat-Section zeigt nun „gültig bis“ inkl. Resttage, kennzeichnet abgelaufene/bald-ablaufende Zertifikate und erlaubt Re-Upload auch im Status APPROVED, sobald die Vorwarnzeit erreicht oder das Datum abgelaufen ist.
+- Admin-Liste der Hygienezertifikate zeigt zusätzlich „gültig bis“ mit visueller Markierung „abgelaufen“ / „läuft bald ab“.
+- Backend-Fehler `hygiene_certificate_expired` (HTTP 403 + Header `X-Reason`) wird in der Pickup-Anmeldung als „Dein Hygienezertifikat ist abgelaufen…“ übersetzt.
 - Neue Admin-Seite `/admin/permissions` (Card im Admin-Dashboard) zur rollenbasierten Steuerung der GUI-Sichtbarkeit: Matrix Rolle × Feature mit Checkboxen, „Neues Feature“-Dialog (Key/Label/Kategorie/Beschreibung), Löschen via eigener Bestätigungsdialog. Pro Rolle bzw. global speicherbar. ADMINISTRATOR-Spalte ist gesperrt und immer aktiv.
 - Neuer `PermissionsService` (`/api/me/features`) und `featureGuard(key)` lösen den bisherigen `roleGuard([...])`-Mechanismus ab. Navigations-Sichtbarkeit (Sidebar, Bottom-Nav, Admin-Dashboard-Cards) und Route-Guards in `app.routes.ts` arbeiten jetzt gegen Feature-Keys (`nav.*`, `route.*`). `role.guard.ts` entfällt.
 
 ### Changed
 
+- Dashboard-Slot „Frei“-Chip trägt Admin/Teamleitung jetzt direkt in den Slot ein (vorher: Weiterleitung zum Abholung-Bearbeiten-Screen). Aria-Label ebenfalls angepasst.
+- Dashboard-Sektion für Retter „Freie Slots an deinen Betrieben“ heißt nun „Freie Slots & Sonderabholungen“, damit Retter Sonderabholungen dort tatsächlich erwarten — Inhalt unverändert (`availableSlots()` enthält Events bereits).
 - App-Shell (`isAdmin`, `isPlanner`, `canSeeQuizAdmin`, `canSeeStoreMembers`, `canSeeDistributionPoints`, `canSeeTeamleitung`) prüft Feature-Keys statt Rollen-Listen — Verhalten bleibt durch Seed-Daten zunächst identisch.
 
 ### Fixed

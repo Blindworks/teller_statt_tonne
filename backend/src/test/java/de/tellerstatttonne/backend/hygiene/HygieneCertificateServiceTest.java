@@ -91,7 +91,7 @@ class HygieneCertificateServiceTest {
     }
 
     @Test
-    void reUploadDeletesOldFileAndResetsToPending() throws Exception {
+    void reUploadCreatesNewRowAndKeepsHistory() throws Exception {
         Long userId = createUser("NEW_MEMBER").getId();
         Long deciderId = createUser("TEAMLEITER").getId();
         HygieneCertificateDto first = service.submit(userId, samplePdf(), LocalDate.now());
@@ -104,10 +104,46 @@ class HygieneCertificateServiceTest {
         HygieneCertificateDto resubmitted = service.submit(userId, samplePdf(), LocalDate.now());
 
         assertThat(resubmitted.status()).isEqualTo(HygieneCertificateStatus.PENDING);
-        assertThat(resubmitted.rejectionReason()).isNull();
-        assertThat(Files.exists(firstPath)).isFalse();
-        // single row per user enforced by unique constraint
-        assertThat(repository.findByUserId(userId)).isPresent();
+        assertThat(resubmitted.id()).isNotEqualTo(first.id());
+        // Historie bleibt erhalten: alte Datei existiert weiterhin
+        assertThat(Files.exists(firstPath)).isTrue();
+        // Latest-Lookup liefert den neuen Datensatz
+        assertThat(repository.findFirstByUser_IdOrderByCreatedAtDesc(userId).orElseThrow().getId())
+            .isEqualTo(resubmitted.id());
+    }
+
+    @Test
+    void submitComputesExpiryFromValidityMonths() {
+        Long userId = createUser("NEW_MEMBER").getId();
+        LocalDate issued = LocalDate.now().minusDays(10);
+        HygieneCertificateDto dto = service.submit(userId, samplePdf(), issued);
+        assertThat(dto.expiryDate()).isEqualTo(issued.plusMonths(12));
+    }
+
+    @Test
+    void isCurrentlyValidTrueWhenLatestApprovedAndNotExpired() {
+        Long userId = createUser("NEW_MEMBER").getId();
+        Long deciderId = createUser("TEAMLEITER").getId();
+        HygieneCertificateDto submitted = service.submit(userId, samplePdf(), LocalDate.now());
+        service.approve(submitted.id(), deciderId);
+        assertThat(service.isCurrentlyValid(userId)).isTrue();
+    }
+
+    @Test
+    void isCurrentlyValidFalseWhenNeverApproved() {
+        Long userId = createUser("NEW_MEMBER").getId();
+        assertThat(service.isCurrentlyValid(userId)).isFalse();
+    }
+
+    @Test
+    void newPendingMarksOlderPendingAsReplaced() {
+        Long userId = createUser("NEW_MEMBER").getId();
+        HygieneCertificateDto first = service.submit(userId, samplePdf(), LocalDate.now().minusDays(2));
+        HygieneCertificateDto second = service.submit(userId, samplePdf(), LocalDate.now());
+
+        HygieneCertificateEntity firstReloaded = repository.findById(first.id()).orElseThrow();
+        assertThat(firstReloaded.getStatus()).isEqualTo(HygieneCertificateStatus.REPLACED);
+        assertThat(second.status()).isEqualTo(HygieneCertificateStatus.PENDING);
     }
 
     @Test

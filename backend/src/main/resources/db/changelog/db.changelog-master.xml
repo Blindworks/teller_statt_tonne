@@ -31,5 +31,7 @@
     <include file="db/changelog/changes/024-food-category-unique-name.xml"/>
     <include file="db/changelog/changes/025-onboarding.xml"/>
     <include file="db/changelog/changes/026-features.xml"/>
+    <include file="db/changelog/changes/027-system-setting.xml"/>
+    <include file="db/changelog/changes/028-hygiene-certificate-expiry.xml"/>
 
 </databaseChangeLog>

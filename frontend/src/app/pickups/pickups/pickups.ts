@@ -5,6 +5,7 @@ import { PickupService } from '../pickup.service';
 import { Pickup } from '../pickup.model';
 import { PickupCardComponent } from '../pickup-card/pickup-card';
 import { Holiday, HolidayService } from '../../holidays/holiday.service';
+import { HygieneExpiryBannerComponent } from '../../hygiene-certificate/hygiene-expiry-banner/hygiene-expiry-banner.component';
 
 interface DayColumn {
   date: Date;
@@ -20,7 +21,7 @@ type ViewMode = 'WEEK' | 'LIST' | 'MAP';
 
 @Component({
   selector: 'app-pickups',
-  imports: [RouterLink, PickupCardComponent],
+  imports: [RouterLink, PickupCardComponent, HygieneExpiryBannerComponent],
   templateUrl: './pickups.html',
   styleUrl: './pickups.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -176,7 +177,12 @@ export class PickupsComponent {
   }
 
   private errorText(err: unknown, fallback: string): string {
-    const status = (err as { status?: number })?.status;
+    const e = err as { status?: number; headers?: { get?: (k: string) => string | null } };
+    const status = e?.status;
+    const reasonHeader = e?.headers?.get?.('X-Reason');
+    if (status === 403 && reasonHeader === 'hygiene_certificate_expired') {
+      return 'Dein Hygienezertifikat ist abgelaufen. Bitte lade ein neues hoch.';
+    }
     if (status === 403) return 'Du bist diesem Store nicht zugeordnet.';
     if (status === 409) return 'Slot ist bereits voll.';
     if (status === 410) return 'Vergangene Pickups können nicht geändert werden.';

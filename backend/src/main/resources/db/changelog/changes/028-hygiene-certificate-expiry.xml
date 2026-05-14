@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <!-- Verfallsdatum & Versionierung fuer Hygienezertifikate.
+         Bestehende uq_hygiene_certificate_user (1 Zeile pro User) entfaellt,
+         damit jede Auffrischung eine neue Zeile bekommt (Historie). -->
+
+    <changeSet id="028-add-expiry-date" author="teller-statt-tonne">
+        <addColumn tableName="hygiene_certificate">
+            <column name="expiry_date" type="DATE"/>
+            <column name="warning_sent_at" type="DATETIME(6)"/>
+            <column name="expired_notice_sent_at" type="DATETIME(6)"/>
+        </addColumn>
+
+        <!-- Backfill: gueltigkeit = ausstellungsdatum + 12 Monate (Default). -->
+        <sql dbms="mysql,mariadb">
+            UPDATE hygiene_certificate
+            SET expiry_date = DATE_ADD(issued_date, INTERVAL 12 MONTH)
+            WHERE expiry_date IS NULL
+        </sql>
+        <sql dbms="h2">
+            UPDATE hygiene_certificate
+            SET expiry_date = DATEADD('MONTH', 12, issued_date)
+            WHERE expiry_date IS NULL
+        </sql>
+        <sql dbms="postgresql">
+            UPDATE hygiene_certificate
+            SET expiry_date = issued_date + INTERVAL '12 months'
+            WHERE expiry_date IS NULL
+        </sql>
+
+        <addNotNullConstraint tableName="hygiene_certificate" columnName="expiry_date" columnDataType="DATE"/>
+    </changeSet>
+
+    <changeSet id="028-drop-user-unique-h2" author="teller-statt-tonne" dbms="h2">
+        <customChange class="de.tellerstatttonne.backend.dbmigration.DropHygieneUserUniqueChange"/>
+    </changeSet>
+
+    <changeSet id="028-drop-user-unique-other" author="teller-statt-tonne">
+        <!-- MariaDB/MySQL: der FK fk_hygiene_certificate_user nutzt den Unique-Index als
+             Backing-Index. Deshalb erst FK loesen, Unique-Index droppen, FK wieder anlegen. -->
+        <sql dbms="mysql,mariadb" splitStatements="true" endDelimiter=";">
+            ALTER TABLE hygiene_certificate DROP FOREIGN KEY fk_hygiene_certificate_user;
+            ALTER TABLE hygiene_certificate DROP INDEX uq_hygiene_certificate_user;
+            ALTER TABLE hygiene_certificate
+                ADD CONSTRAINT fk_hygiene_certificate_user
+                FOREIGN KEY (user_id) REFERENCES app_user(id) ON DELETE CASCADE;
+        </sql>
+        <sql dbms="postgresql">ALTER TABLE hygiene_certificate DROP CONSTRAINT IF EXISTS uq_hygiene_certificate_user</sql>
+    </changeSet>
+
+    <changeSet id="028-add-user-created-index" author="teller-statt-tonne">
+        <createIndex tableName="hygiene_certificate" indexName="idx_hygiene_certificate_user_created">
+            <column name="user_id"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

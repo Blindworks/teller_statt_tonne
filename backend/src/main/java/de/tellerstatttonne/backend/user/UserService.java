@@ -310,8 +310,9 @@ public class UserService {
     }
 
     private boolean hasApprovedHygieneCertificate(Long userId) {
-        return hygieneRepository.findByUserId(userId)
-            .map(c -> c.getStatus() == HygieneCertificateStatus.APPROVED)
+        return hygieneRepository.findFirstByUser_IdAndStatusOrderByExpiryDateDesc(
+                userId, HygieneCertificateStatus.APPROVED)
+            .map(c -> !c.getExpiryDate().isBefore(java.time.LocalDate.now()))
             .orElse(false);
     }
 

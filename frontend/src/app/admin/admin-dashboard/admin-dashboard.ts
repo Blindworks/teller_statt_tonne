@@ -75,6 +75,14 @@ export class AdminDashboardComponent {
       link: '/admin/stores/deleted',
       featureKey: 'route.admin',
     },
+    {
+      title: 'Systemeinstellungen',
+      description:
+        'Globale Werte wie Gültigkeitsdauer und Vorwarnzeit für Hygienezertifikate pflegen.',
+      icon: 'tune',
+      link: '/admin/system-settings',
+      featureKey: 'route.admin',
+    },
   ];
 
   readonly cards = computed(() => this.allCards.filter((c) => this.perms.has(c.featureKey)));

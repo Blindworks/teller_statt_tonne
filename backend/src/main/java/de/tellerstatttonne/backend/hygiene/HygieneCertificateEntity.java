@@ -11,26 +11,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "hygiene_certificate",
-    uniqueConstraints = @UniqueConstraint(
-        name = "uq_hygiene_certificate_user", columnNames = "user_id"))
+@Table(name = "hygiene_certificate")
 public class HygieneCertificateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @Column(name = "file_url", nullable = false, length = 1024)
@@ -47,6 +43,15 @@ public class HygieneCertificateEntity {
 
     @Column(name = "issued_date", nullable = false)
     private LocalDate issuedDate;
+
+    @Column(name = "expiry_date", nullable = false)
+    private LocalDate expiryDate;
+
+    @Column(name = "warning_sent_at")
+    private Instant warningSentAt;
+
+    @Column(name = "expired_notice_sent_at")
+    private Instant expiredNoticeSentAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
@@ -94,6 +99,12 @@ public class HygieneCertificateEntity {
     public void setFileSizeBytes(Long fileSizeBytes) { this.fileSizeBytes = fileSizeBytes; }
     public LocalDate getIssuedDate() { return issuedDate; }
     public void setIssuedDate(LocalDate issuedDate) { this.issuedDate = issuedDate; }
+    public LocalDate getExpiryDate() { return expiryDate; }
+    public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
+    public Instant getWarningSentAt() { return warningSentAt; }
+    public void setWarningSentAt(Instant warningSentAt) { this.warningSentAt = warningSentAt; }
+    public Instant getExpiredNoticeSentAt() { return expiredNoticeSentAt; }
+    public void setExpiredNoticeSentAt(Instant expiredNoticeSentAt) { this.expiredNoticeSentAt = expiredNoticeSentAt; }
     public HygieneCertificateStatus getStatus() { return status; }
     public void setStatus(HygieneCertificateStatus status) { this.status = status; }
     public String getRejectionReason() { return rejectionReason; }
