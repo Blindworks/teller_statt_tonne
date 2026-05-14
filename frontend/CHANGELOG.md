@@ -16,6 +16,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 - App-Shell (`isAdmin`, `isPlanner`, `canSeeQuizAdmin`, `canSeeStoreMembers`, `canSeeDistributionPoints`, `canSeeTeamleitung`) prüft Feature-Keys statt Rollen-Listen — Verhalten bleibt durch Seed-Daten zunächst identisch.
 
+### Fixed
+
+- Sidebar-Navigation scrollt jetzt bei kleinen Viewport-Höhen, sodass alle Menüeinträge erreichbar sind.
+
 ## [0.28.1] - 2026-05-14
 
 ### Changed
