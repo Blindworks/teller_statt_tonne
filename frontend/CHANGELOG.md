@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Download „Rettervereinbarung herunterladen“ im Onboarding lieferte aufgrund des Service-Worker-Navigations-Fallbacks die Angular-`index.html` (~39 KB `.htm`) statt der PDF. `ngsw-config.json` deckt jetzt `/assets/**` und die Endung `pdf` in der `assets`-Gruppe ab.
+
 ### Added
 
 - Ticketsystem `/tickets` (Sidebar-Eintrag „Tickets", sichtbar bei Feature `nav.tickets` für ADMINISTRATOR, TEAMLEITER, RETTER, NEW_MEMBER): Liste mit Filter nach Status/Typ, neues `TicketFormComponent` für Create/Detail/Edit. Pflichtfelder Titel + Typ (BUG/FEATURE), optionale Beschreibung, mehrere Bild-Anhänge per Multi-File-Upload (`ImageStorageService`, Unterordner `tickets`), einfacher Kommentar-Thread. Statuswechsel (`OPEN → IN_PROGRESS → DONE/REJECTED`) sichtbar nur bei Feature `tickets.admin` (ADMINISTRATOR). Ersteller bearbeitet Titel/Beschreibung/Typ/Anhänge solange Status `OPEN`; danach read-only. Löschen von Ticket/Anhang/Kommentar via `ConfirmDialogService` (kein `window.confirm`). Bottom-Sheet auf Mobile zeigt den Eintrag analog.

@@ -169,6 +169,41 @@ export class OnboardingPageComponent implements OnInit {
     });
   }
 
+  async downloadAgreement(): Promise<void> {
+    this.errorMessage.set(null);
+    const url = '/assets/rettervereinbarung.pdf?ngsw-bypass=true&t=' + Date.now();
+    try {
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: { Accept: 'application/pdf' },
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const ct = res.headers.get('content-type') ?? '';
+      const buf = await res.arrayBuffer();
+      const head = new Uint8Array(buf.slice(0, 4));
+      const isPdf =
+        head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46;
+      if (!isPdf) {
+        throw new Error(
+          'Server lieferte kein PDF (Content-Type: ' + ct + '). Datei fehlt im Deployment.',
+        );
+      }
+      const blob = new Blob([buf], { type: 'application/pdf' });
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = 'rettervereinbarung.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch (err) {
+      this.errorMessage.set(
+        'Download fehlgeschlagen: ' + (err instanceof Error ? err.message : String(err)),
+      );
+    }
+  }
+
   onAgreementSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
