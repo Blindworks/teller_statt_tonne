@@ -54,7 +54,6 @@ export class AppShellComponent {
   // Reaktive Feature-Checks — abhängig vom PermissionsService-Signal.
   readonly isPlanner = computed(() => this.perms.features().has('nav.planner'));
   readonly isAdmin = computed(() => this.perms.features().has('nav.admin'));
-  readonly canSeeQuizAdmin = computed(() => this.perms.features().has('nav.quiz-admin'));
   readonly canSeeStoreMembers = computed(() => this.perms.features().has('nav.store-members'));
   readonly canSeeDistributionPoints = computed(() =>
     this.perms.features().has('nav.distribution-points'),

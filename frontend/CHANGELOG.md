@@ -9,6 +9,15 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Menüpunkt „Quiz“ aus Hauptnavigation (Sidebar + mobiles „Mehr“-Sheet) entfernt und als Karte in das Teamleitung-Dashboard (`/teamleitung`) verschoben. Sichtbarkeit weiterhin über Feature `nav.quiz-admin` gesteuert.
+
+### Added
+
+- Rolle „Betriebskoordinator“ (Code `KOORDINATOR`) im Store-Members-Screen (`/admin/store-members`). Betriebsdetail-Ansicht zeigt jetzt zwei getrennte Sektionen — „Koordinatoren“ (oben, Secondary-Farbe, Icon `supervisor_account`) und „Retter“ (unten, Primary-Farbe) — mit jeweils eigenem „Hinzufügen“-Button. `AssignMemberDialog` akzeptiert neuen `title`-Input und wird je nach Sektion mit „Koordinator zuweisen“ bzw. „Retter zuweisen“ aufgerufen; die Auswahlliste ist clientseitig nach Rolle gefiltert (`assignableMembers` berücksichtigt `assignDialogRole`).
+- Rollen-Badge-Farbe für `KOORDINATOR` im `user-profile-dialog` (Secondary-Container).
+
+### Changed
+
 - Letzte englische UI-Texte (Dashboard-Hero, Active-Community-Card, Sidebar-Tagline „The Living Pantry" → „Gemeinsam Lebensmittel retten") auf Deutsch umgestellt – App ist jetzt durchgängig deutsch.
 - Hygienezertifikat-Upload (Onboarding-Schritt 1 und Profilseite): klarer Abstand zwischen Beschreibungstext und Upload-Formular (`mt-6`), zusätzliche vertikale Luft zwischen den Feldern (`space-y-5`) sowie eine dünne Trennlinie über dem „Zertifikat hochladen“-Button.
 - Onboarding-Schritt 4 „Rettervereinbarung“: Button „PDF öffnen“ entfernt (redundant zum Download); mehr Abstand zwischen Beschreibungstext und Aktions-Buttons (`margin-top: 20px` auf `.agreement-actions`).
