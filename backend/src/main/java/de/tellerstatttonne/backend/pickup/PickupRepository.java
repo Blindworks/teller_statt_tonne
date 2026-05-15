@@ -21,6 +21,20 @@ public interface PickupRepository extends JpaRepository<PickupEntity, Long> {
         Long partnerId, Pickup.Status status, LocalDate from);
 
     @Query("""
+        select case when count(p) > 0 then true else false end
+        from PickupEntity p
+        where p.event.id = :eventId
+          and p.date = :date
+          and p.startTime < :endTime
+          and p.endTime > :startTime
+        """)
+    boolean existsEventPickupOverlap(
+        @Param("eventId") Long eventId,
+        @Param("date") LocalDate date,
+        @Param("startTime") String startTime,
+        @Param("endTime") String endTime);
+
+    @Query("""
         select a.userId as memberId,
                max(p.date) as lastPickupDate,
                coalesce(sum(p.savedKg), 0) as totalSavedKg,

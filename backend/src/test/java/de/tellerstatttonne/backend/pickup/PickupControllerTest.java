@@ -32,6 +32,7 @@ class PickupControllerTest {
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
     @Autowired private de.tellerstatttonne.backend.partnercategory.PartnerCategoryRepository partnerCategoryRepository;
+    @Autowired private de.tellerstatttonne.backend.event.EventRepository eventRepository;
 
     private Long partnerId;
     private Long memberId;
@@ -158,6 +159,47 @@ class PickupControllerTest {
         );
         assertThatThrownBy(() -> controller.create(bad))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void rejectsOverlappingEventPickup() {
+        de.tellerstatttonne.backend.event.EventEntity event =
+            new de.tellerstatttonne.backend.event.EventEntity();
+        event.setName("Stadtfest");
+        event.setStartDate(LocalDate.of(2026, 5, 1));
+        event.setEndDate(LocalDate.of(2026, 5, 1));
+        event.setStreet("Festplatz 1");
+        event.setPostalCode("10115");
+        event.setCity("Berlin");
+        Long eventId = eventRepository.save(event).getId();
+
+        Pickup first = new Pickup(
+            null, null, null, null, null, null, null,
+            eventId, "Stadtfest", null,
+            LocalDate.of(2026, 5, 1), "10:00", "12:00",
+            Pickup.Status.SCHEDULED, 2, List.of(), null, null
+        );
+        controller.create(first);
+
+        Pickup overlapping = new Pickup(
+            null, null, null, null, null, null, null,
+            eventId, "Stadtfest", null,
+            LocalDate.of(2026, 5, 1), "11:00", "13:00",
+            Pickup.Status.SCHEDULED, 1, List.of(), null, null
+        );
+        assertThatThrownBy(() -> controller.create(overlapping))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("bereits ein Termin");
+
+        Pickup adjacent = new Pickup(
+            null, null, null, null, null, null, null,
+            eventId, "Stadtfest", null,
+            LocalDate.of(2026, 5, 1), "12:00", "13:00",
+            Pickup.Status.SCHEDULED, 1, List.of(), null, null
+        );
+        Pickup created = controller.create(adjacent).getBody();
+        assertThat(created).isNotNull();
+        assertThat(created.id()).isNotNull();
     }
 
     @Test

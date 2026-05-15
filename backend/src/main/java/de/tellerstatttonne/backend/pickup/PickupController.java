@@ -84,4 +84,9 @@ public class PickupController {
     public ResponseEntity<String> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleConflict(IllegalStateException ex) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CONFLICT).body(ex.getMessage());
+    }
 }

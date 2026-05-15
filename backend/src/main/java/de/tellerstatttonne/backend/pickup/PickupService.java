@@ -115,6 +115,13 @@ public class PickupService {
         EventEntity event = null;
         if (pickup.eventId() != null) {
             event = loadEvent(pickup.eventId());
+            if (repository.existsEventPickupOverlap(
+                    pickup.eventId(), pickup.date(), pickup.startTime(), pickup.endTime())) {
+                throw new IllegalStateException(
+                    "Für diese Sonderabholung existiert am " + pickup.date()
+                        + " bereits ein Termin im Zeitraum "
+                        + pickup.startTime() + "–" + pickup.endTime() + " Uhr.");
+            }
         } else {
             partner = loadPartner(pickup.partnerId());
             if (partner.getStatus() != Partner.Status.KOOPERIERT) {
