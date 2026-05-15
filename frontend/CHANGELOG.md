@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Removed
+
+- Button „Einführung bestätigen“ im User-Edit-Menü entfernt; die Bestätigung läuft jetzt ausschließlich über das Admin-Onboarding (`/admin/onboarding`). Die Statuszeile mit Häkchen + Datum bleibt erhalten. Methode `confirmIntroduction()` in `user-edit.ts` entfällt; Service-Methode `markIntroductionCompleted` bleibt verfügbar.
+
 ### Added
 
 - Neue Admin-Seite `/admin/system-settings` (Card „Systemeinstellungen“ im Admin-Dashboard) zur Pflege der globalen Hygienezertifikat-Werte: Gültigkeitsdauer (Monate, 1–60) und Vorwarnzeit (Tage, 1–365). Werte synchronisieren mit `GET/PUT /api/admin/settings`.

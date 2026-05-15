@@ -242,18 +242,7 @@
                   {{ resending() ? 'Sende...' : 'Einladung erneut senden' }}
                 </button>
               }
-              @if (cu.status === 'PENDING' && !cu.introductionCompletedAt) {
-                <button
-                  type="button"
-                  [disabled]="transitioning()"
-                  (click)="confirmIntroduction()"
-                  class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold shadow-md shadow-primary/20 hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  <span class="material-symbols-outlined text-base">how_to_reg</span>
-                  Einführung bestätigen
-                </button>
-              }
-              @if (cu.status === 'ACTIVE') {
+@if (cu.status === 'ACTIVE') {
                 <button
                   type="button"
                   [disabled]="transitioning()"

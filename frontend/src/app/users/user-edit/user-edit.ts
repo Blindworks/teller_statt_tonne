@@ -209,18 +209,6 @@ export class UserEditComponent {
     }
   }
 
-  async confirmIntroduction(): Promise<void> {
-    const id = this.userId();
-    if (!id) return;
-    const ok = await this.confirmDialog.ask({
-      title: 'Einführungsgespräch bestätigen',
-      message: 'Hat der Nutzer am Einführungsgespräch teilgenommen?',
-      confirmLabel: 'Bestätigen',
-    });
-    if (!ok) return;
-    this.runTransition(this.service.markIntroductionCompleted(id), 'Einführung konnte nicht bestätigt werden.');
-  }
-
   async pauseUser(): Promise<void> {
     const id = this.userId();
     if (!id) return;
