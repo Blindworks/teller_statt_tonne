@@ -31,7 +31,8 @@ public final class UserMapper {
             e.getPasswordHash() != null,
             e.getTags() == null ? List.of() : List.copyOf(e.getTags()),
             e.getAgreementUploadedAt(),
-            e.getTestPickupCompletedAt()
+            e.getTestPickupCompletedAt(),
+            e.isTestUser()
         );
     }
 

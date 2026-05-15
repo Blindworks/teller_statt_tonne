@@ -353,6 +353,7 @@ export class UserEditComponent {
       tags: raw.tags.map((t) => t.trim()).filter((t) => t.length > 0),
       agreementUploadedAt: existing?.agreementUploadedAt ?? null,
       testPickupCompletedAt: existing?.testPickupCompletedAt ?? null,
+      testUser: existing?.testUser ?? false,
     };
   }
 

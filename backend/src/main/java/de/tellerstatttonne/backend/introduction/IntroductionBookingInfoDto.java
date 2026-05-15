@@ -5,5 +5,6 @@ public record IntroductionBookingInfoDto(
     Long userId,
     String firstName,
     String lastName,
-    String email
+    String email,
+    boolean testUser
 ) {}

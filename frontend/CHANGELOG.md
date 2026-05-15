@@ -9,6 +9,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- Test-Retter im Admin-Onboarding: neue Sektion zum Anlegen, Impersonieren und Löschen von Test-Retter-Accounts. Admin (Rolle `ADMINISTRATOR`) kann mit einem Klick einen Test-Retter erzeugen und sich per Token-Switch als dieser anmelden, ohne den Admin-Login zu verlieren — Admin-Tokens werden in separaten LocalStorage-Slots (`tst.admin_access`/`tst.admin_refresh`) gesichert. Sticky-Banner `app-impersonation-banner` oben in der App zeigt während der Impersonation die Test-User-E-Mail und einen Button "Zurück zum Admin". Neue wiederverwendbare Komponente `app-test-user-badge` markiert Test-Retter in der Pending-Liste, in den Slot-Buchungen und in der Test-Retter-Tabelle. `User`- und `IntroductionBookingInfo`-Modelle erweitert um `testUser: boolean`.
 - Admin-Onboarding (`/teamleitung/onboarding`): Kennenlern-Termine als aufklappbare Karten mit Bucher-Chips (Initialen-Avatar + Name). Im aufgeklappten Bereich erscheinen E-Mail und ein Storno-Button pro Bucher; Stornieren läuft über den bestehenden `ConfirmDialogService`.
 
 ### Removed

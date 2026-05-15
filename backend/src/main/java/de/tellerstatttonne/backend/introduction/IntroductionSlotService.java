@@ -175,7 +175,8 @@ public class IntroductionSlotService {
                 String first = u != null ? u.getFirstName() : null;
                 String last = u != null ? u.getLastName() : null;
                 String mail = u != null ? u.getEmail() : null;
-                return new IntroductionBookingInfoDto(b.getId(), b.getUserId(), first, last, mail);
+                boolean testUser = u != null && u.isTestUser();
+                return new IntroductionBookingInfoDto(b.getId(), b.getUserId(), first, last, mail, testUser);
             })
             .toList();
     }

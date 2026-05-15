@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ConfirmDialogService } from '../../shared/confirm-dialog/confirm-dialog.service';
+import { TestUserBadgeComponent } from '../../shared/test-user-badge/test-user-badge';
+import { AuthService } from '../../auth/auth.service';
 import { UserService } from '../../users/user.service';
 import { User } from '../../users/user.model';
 import { OnboardingService } from '../../onboarding/onboarding.service';
@@ -11,6 +13,7 @@ import {
   IntroductionSlot,
   OnboardingStatus,
 } from '../../onboarding/onboarding.models';
+import { TestUser, TestUserService } from './test-user.service';
 
 type SlotForm = FormGroup<{
   date: FormControl<string>;
@@ -24,7 +27,7 @@ type SlotForm = FormGroup<{
 @Component({
   selector: 'app-onboarding-admin',
   standalone: true,
-  imports: [DatePipe, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink, TestUserBadgeComponent],
   templateUrl: './onboarding-admin.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,11 +36,17 @@ export class OnboardingAdminComponent implements OnInit {
   private readonly onboarding = inject(OnboardingService);
   private readonly users = inject(UserService);
   private readonly confirm = inject(ConfirmDialogService);
+  private readonly testUsers = inject(TestUserService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   readonly slots = signal<IntroductionSlot[]>([]);
   readonly pendingUsers = signal<Array<{ user: User; status: OnboardingStatus | null }>>([]);
+  readonly testRetter = signal<TestUser[]>([]);
   readonly loading = signal(true);
   readonly creating = signal(false);
+  readonly creatingTestUser = signal(false);
+  readonly impersonatingId = signal<number | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
   readonly expandedSlotIds = signal<ReadonlySet<number>>(new Set());
@@ -115,6 +124,65 @@ export class OnboardingAdminComponent implements OnInit {
       },
     });
     this.loadPendingUsers();
+    this.loadTestUsers();
+  }
+
+  private loadTestUsers(): void {
+    this.testUsers.list().subscribe({
+      next: (list) => this.testRetter.set(list),
+      error: (err) => this.errorMessage.set(err?.error || 'Test-Retter konnten nicht geladen werden.'),
+    });
+  }
+
+  createTestUser(): void {
+    this.creatingTestUser.set(true);
+    this.errorMessage.set(null);
+    this.testUsers.create().subscribe({
+      next: () => {
+        this.creatingTestUser.set(false);
+        this.successMessage.set('Test-Retter angelegt.');
+        this.loadTestUsers();
+        this.loadPendingUsers();
+      },
+      error: (err) => {
+        this.creatingTestUser.set(false);
+        this.errorMessage.set(err?.error || 'Anlegen fehlgeschlagen.');
+      },
+    });
+  }
+
+  impersonate(testUser: TestUser): void {
+    this.impersonatingId.set(testUser.id);
+    this.errorMessage.set(null);
+    this.auth.impersonateTestUser(testUser.id).subscribe({
+      next: () => {
+        this.impersonatingId.set(null);
+        this.router.navigateByUrl('/onboarding');
+      },
+      error: (err) => {
+        this.impersonatingId.set(null);
+        this.errorMessage.set(err?.error || 'Anmeldung als Test-Retter fehlgeschlagen.');
+      },
+    });
+  }
+
+  async deleteTestUser(testUser: TestUser): Promise<void> {
+    const ok = await this.confirm.ask({
+      title: 'Test-Retter löschen',
+      message: `Test-Retter ${testUser.firstName} ${testUser.lastName} (${testUser.email}) wirklich löschen? Alle Buchungen und Daten werden entfernt.`,
+      confirmLabel: 'Löschen',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.testUsers.delete(testUser.id).subscribe({
+      next: () => {
+        this.successMessage.set('Test-Retter gelöscht.');
+        this.loadTestUsers();
+        this.loadPendingUsers();
+        this.refresh();
+      },
+      error: (err) => this.errorMessage.set(err?.error || 'Löschen fehlgeschlagen.'),
+    });
   }
 
   private loadPendingUsers(): void {

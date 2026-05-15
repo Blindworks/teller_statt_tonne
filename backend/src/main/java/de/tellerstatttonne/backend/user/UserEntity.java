@@ -95,6 +95,9 @@ public class UserEntity {
     @Column(name = "test_pickup_completed_at")
     private Instant testPickupCompletedAt;
 
+    @Column(name = "is_test_user", nullable = false)
+    private boolean testUser = false;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "user_tag",
@@ -172,6 +175,8 @@ public class UserEntity {
     public void setAgreementUploadedAt(Instant agreementUploadedAt) { this.agreementUploadedAt = agreementUploadedAt; }
     public Instant getTestPickupCompletedAt() { return testPickupCompletedAt; }
     public void setTestPickupCompletedAt(Instant testPickupCompletedAt) { this.testPickupCompletedAt = testPickupCompletedAt; }
+    public boolean isTestUser() { return testUser; }
+    public void setTestUser(boolean testUser) { this.testUser = testUser; }
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
     public Instant getCreatedAt() { return createdAt; }

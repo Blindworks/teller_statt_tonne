@@ -129,6 +129,10 @@ public class AuthService {
         return UserMapper.toDto(entity);
     }
 
+    public AuthResponse issueTokens(UserEntity user) {
+        return buildAuthResponse(user);
+    }
+
     private AuthResponse buildAuthResponse(UserEntity user) {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = generateRefreshToken();

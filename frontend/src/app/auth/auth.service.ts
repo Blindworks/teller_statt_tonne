@@ -7,6 +7,8 @@ import { PermissionsService } from './permissions.service';
 
 const ACCESS_KEY = 'tst.access';
 const REFRESH_KEY = 'tst.refresh';
+const ADMIN_BACKUP_ACCESS_KEY = 'tst.admin_access';
+const ADMIN_BACKUP_REFRESH_KEY = 'tst.admin_refresh';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -17,10 +19,12 @@ export class AuthService {
   private readonly accessTokenSignal = signal<string | null>(this.readStorage(ACCESS_KEY));
   private readonly refreshTokenSignal = signal<string | null>(this.readStorage(REFRESH_KEY));
   private readonly currentUserSignal = signal<User | null>(null);
+  private readonly impersonatingSignal = signal<boolean>(this.readStorage(ADMIN_BACKUP_ACCESS_KEY) !== null);
   private refreshInFlight: Observable<AuthResponse | null> | null = null;
 
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
+  readonly isImpersonating = this.impersonatingSignal.asReadonly();
 
   constructor() {
     if (this.accessTokenSignal()) {
@@ -128,6 +132,44 @@ export class AuthService {
     return this.http.post<void>(`${this.baseUrl}/reset-password`, { token, newPassword });
   }
 
+  impersonateTestUser(testUserId: number): Observable<AuthResponse> {
+    const currentAccess = this.accessTokenSignal();
+    const currentRefresh = this.refreshTokenSignal();
+    if (!currentAccess || !currentRefresh) {
+      return throwError(() => new Error('Kein aktiver Admin-Login.'));
+    }
+    return this.http
+      .post<AuthResponse>(`${environment.apiBaseUrl}/api/admin/test-users/${testUserId}/impersonate`, {})
+      .pipe(
+        tap((res) => {
+          this.writeStorage(ADMIN_BACKUP_ACCESS_KEY, currentAccess);
+          this.writeStorage(ADMIN_BACKUP_REFRESH_KEY, currentRefresh);
+          this.impersonatingSignal.set(true);
+          this.handleAuthResponse(res);
+        }),
+      );
+  }
+
+  endImpersonation(): boolean {
+    const access = this.readStorage(ADMIN_BACKUP_ACCESS_KEY);
+    const refresh = this.readStorage(ADMIN_BACKUP_REFRESH_KEY);
+    if (!access || !refresh) {
+      return false;
+    }
+    this.writeStorage(ADMIN_BACKUP_ACCESS_KEY, null);
+    this.writeStorage(ADMIN_BACKUP_REFRESH_KEY, null);
+    this.accessTokenSignal.set(access);
+    this.refreshTokenSignal.set(refresh);
+    this.writeStorage(ACCESS_KEY, access);
+    this.writeStorage(REFRESH_KEY, refresh);
+    this.impersonatingSignal.set(false);
+    this.permissions.clear();
+    this.me().subscribe(() => {
+      this.permissions.load().subscribe();
+    });
+    return true;
+  }
+
   logout(): Observable<void> {
     const refreshToken = this.refreshTokenSignal();
     this.clearTokens();
@@ -155,6 +197,9 @@ export class AuthService {
     this.currentUserSignal.set(null);
     this.writeStorage(ACCESS_KEY, null);
     this.writeStorage(REFRESH_KEY, null);
+    this.writeStorage(ADMIN_BACKUP_ACCESS_KEY, null);
+    this.writeStorage(ADMIN_BACKUP_REFRESH_KEY, null);
+    this.impersonatingSignal.set(false);
     this.permissions.clear();
   }
 

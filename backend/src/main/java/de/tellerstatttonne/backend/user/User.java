@@ -22,12 +22,13 @@ public record User(
     boolean hasPassword,
     List<String> tags,
     Instant agreementUploadedAt,
-    Instant testPickupCompletedAt
+    Instant testPickupCompletedAt,
+    boolean testUser
 ) {
     public User withId(Long newId) {
         return new User(newId, email, roles, firstName, lastName, phone,
             street, postalCode, city, country,
             photoUrl, onlineStatus, status, introductionCompletedAt, hygieneApproved, hasPassword, tags,
-            agreementUploadedAt, testPickupCompletedAt);
+            agreementUploadedAt, testPickupCompletedAt, testUser);
     }
 }

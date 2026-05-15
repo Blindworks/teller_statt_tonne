@@ -16,6 +16,7 @@ export interface IntroductionBookingInfo {
   firstName: string | null;
   lastName: string | null;
   email: string | null;
+  testUser: boolean;
 }
 
 export interface IntroductionSlot {

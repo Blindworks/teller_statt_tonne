@@ -3,6 +3,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { UserProfileDialogComponent } from './users/user-profile-dialog/user-profile-dialog.component';
 import { StoreDetailDialogComponent } from './stores/store-detail-dialog/store-detail-dialog.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
+import { ImpersonationBannerComponent } from './auth/impersonation-banner/impersonation-banner';
 import { APP_VERSION } from './version';
 
 @Component({
@@ -13,6 +14,7 @@ import { APP_VERSION } from './version';
     UserProfileDialogComponent,
     StoreDetailDialogComponent,
     ConfirmDialogComponent,
+    ImpersonationBannerComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

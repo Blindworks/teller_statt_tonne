@@ -30,6 +30,7 @@ export interface User {
   tags: string[];
   agreementUploadedAt: string | null;
   testPickupCompletedAt: string | null;
+  testUser: boolean;
 }
 
 export const ONLINE_STATUS_LABELS: Record<OnlineStatus, string> = {
@@ -71,6 +72,7 @@ export function emptyUser(defaultRole: RoleName = 'RETTER'): User {
     tags: [],
     agreementUploadedAt: null,
     testPickupCompletedAt: null,
+    testUser: false,
   };
 }
 
