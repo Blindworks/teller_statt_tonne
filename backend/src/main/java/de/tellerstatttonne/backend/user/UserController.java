@@ -106,6 +106,12 @@ public class UserController {
         return ResponseEntity.ok(service.reactivate(id));
     }
 
+    @PostMapping("/{id}/force-activate")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
+    public ResponseEntity<User> forceActivate(@PathVariable Long id) {
+        return ResponseEntity.ok(service.forceActivate(id));
+    }
+
     @PostMapping("/{id}/leave")
     public ResponseEntity<User> leave(@PathVariable Long id, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

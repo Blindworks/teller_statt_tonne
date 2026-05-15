@@ -74,6 +74,10 @@ export class UserService {
     return this.http.post<User>(`${this.baseUrl}/${id}/reactivate`, {});
   }
 
+  forceActivate(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/force-activate`, {});
+  }
+
   leave(id: number): Observable<User> {
     return this.http.post<User>(`${this.baseUrl}/${id}/leave`, {});
   }

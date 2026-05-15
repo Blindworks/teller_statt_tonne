@@ -236,6 +236,19 @@ public class UserService {
         });
     }
 
+    public User forceActivate(Long id) {
+        UserEntity entity = requireUser(id);
+        UserEntity.Status before = entity.getStatus();
+        if (before != UserEntity.Status.PENDING) {
+            throw new IllegalStateException(
+                "Direkt-Aktivierung nur aus Status PENDING moeglich (aktuell: " + before + ")");
+        }
+        entity.setStatus(UserEntity.Status.ACTIVE);
+        UserEntity saved = repository.save(entity);
+        logStatusEvent(saved, before, "manuell aktiviert (Bypass Onboarding)");
+        return toDto(saved);
+    }
+
     private boolean promoteToActiveIfReady(UserEntity entity) {
         if (entity.getStatus() != UserEntity.Status.PENDING) return false;
         if (entity.getIntroductionCompletedAt() == null) return false;

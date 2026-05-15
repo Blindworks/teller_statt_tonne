@@ -227,6 +227,22 @@ export class UserEditComponent {
     this.runTransition(this.service.reactivate(id), 'Reaktivieren fehlgeschlagen.');
   }
 
+  async forceActivateUser(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'Direkt auf aktiv setzen',
+      message:
+        'Achtung: Damit überspringst du das gesamte Onboarding (Einführung, Hygienezertifikat, '
+        + 'Rettervereinbarung, Test-Pickup). Nur in begründeten Ausnahmefällen verwenden — '
+        + 'der Vorgang wird im System-Log dokumentiert.',
+      confirmLabel: 'Aktivieren',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.runTransition(this.service.forceActivate(id), 'Aktivieren fehlgeschlagen.');
+  }
+
   async leaveUser(): Promise<void> {
     const id = this.userId();
     if (!id) return;
