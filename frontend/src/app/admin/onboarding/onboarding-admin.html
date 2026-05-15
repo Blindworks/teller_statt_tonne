@@ -75,28 +75,97 @@
       } @else if (slots().length === 0) {
         <p class="text-sm text-on-surface-variant">Noch keine Termine angelegt.</p>
       } @else {
-        <ul class="divide-y divide-outline-variant">
+        <ul class="grid gap-3">
           @for (slot of slots(); track slot.id) {
-            <li class="py-3 flex items-center justify-between gap-4">
-              <div class="text-sm text-on-surface">
-                <strong class="font-semibold">{{ slot.date | date: 'EEE, dd.MM.yyyy' }}</strong>
-                <span class="text-on-surface-variant">
-                  · {{ slot.startTime }}–{{ slot.endTime }}
-                </span>
-                @if (slot.location) {
-                  <span class="text-on-surface-variant"> · {{ slot.location }}</span>
-                }
-                <span class="ml-2 inline-block text-xs text-on-surface-variant">
-                  {{ slot.bookedCount }} / {{ slot.capacity }} belegt
-                </span>
-              </div>
+            <li class="rounded-xl border border-outline-variant bg-surface overflow-hidden">
               <button
                 type="button"
-                (click)="deleteSlot(slot)"
-                class="px-3 py-1.5 rounded-full text-xs font-bold text-error hover:bg-error/10"
+                (click)="toggleExpanded(slot.id)"
+                class="w-full flex items-center gap-4 px-4 py-3 text-left hover:bg-surface-container-low transition-colors"
               >
-                Löschen
+                <span
+                  class="material-symbols-outlined text-on-surface-variant transition-transform"
+                  [class.rotate-90]="isExpanded(slot.id)"
+                >chevron_right</span>
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-semibold text-on-surface">
+                    {{ slot.date | date: 'EEE, dd.MM.yyyy' }}
+                    <span class="font-normal text-on-surface-variant">
+                      · {{ slot.startTime }}–{{ slot.endTime }}
+                    </span>
+                    @if (slot.location) {
+                      <span class="font-normal text-on-surface-variant"> · {{ slot.location }}</span>
+                    }
+                  </div>
+                  @if (slot.bookings.length > 0) {
+                    <div class="mt-1.5 flex flex-wrap gap-1.5">
+                      @for (b of slot.bookings; track b.bookingId) {
+                        <span class="inline-flex items-center gap-1.5 pl-1 pr-2.5 py-0.5 rounded-full bg-primary/10 text-on-surface text-xs">
+                          <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">
+                            {{ initials(b) }}
+                          </span>
+                          {{ b.firstName }} {{ b.lastName }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <div class="mt-1 text-xs text-on-surface-variant italic">
+                      Noch keine Buchungen
+                    </div>
+                  }
+                </div>
+                <span
+                  class="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold"
+                  [class.bg-primary]="slot.bookedCount >= slot.capacity"
+                  [class.text-on-primary]="slot.bookedCount >= slot.capacity"
+                  [class.bg-surface-container-high]="slot.bookedCount < slot.capacity"
+                  [class.text-on-surface-variant]="slot.bookedCount < slot.capacity"
+                >
+                  {{ slot.bookedCount }} / {{ slot.capacity }}
+                </span>
+                <span
+                  role="button"
+                  (click)="$event.stopPropagation(); deleteSlot(slot)"
+                  class="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold text-error hover:bg-error/10 cursor-pointer"
+                >
+                  Löschen
+                </span>
               </button>
+              @if (isExpanded(slot.id)) {
+                <div class="border-t border-outline-variant px-4 py-3 bg-surface-container-lowest">
+                  @if (slot.notes) {
+                    <p class="text-xs text-on-surface-variant italic mb-3">{{ slot.notes }}</p>
+                  }
+                  @if (slot.bookings.length === 0) {
+                    <p class="text-sm text-on-surface-variant">Keine Bucher.</p>
+                  } @else {
+                    <ul class="grid gap-2">
+                      @for (b of slot.bookings; track b.bookingId) {
+                        <li class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-surface-container-low">
+                          <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary text-sm font-bold shrink-0">
+                            {{ initials(b) }}
+                          </span>
+                          <div class="flex-1 min-w-0">
+                            <div class="text-sm font-medium text-on-surface truncate">
+                              {{ fullName(b) }}
+                            </div>
+                            @if (b.email) {
+                              <div class="text-xs text-on-surface-variant truncate">{{ b.email }}</div>
+                            }
+                          </div>
+                          <button
+                            type="button"
+                            (click)="cancelBooking(slot, b)"
+                            class="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold text-error hover:bg-error/10"
+                          >
+                            Stornieren
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              }
             </li>
           }
         </ul>

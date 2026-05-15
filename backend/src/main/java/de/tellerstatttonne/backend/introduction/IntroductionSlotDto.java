@@ -2,6 +2,7 @@ package de.tellerstatttonne.backend.introduction;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public record IntroductionSlotDto(
     Long id,
@@ -12,5 +13,6 @@ public record IntroductionSlotDto(
     int capacity,
     int bookedCount,
     String notes,
-    boolean bookedByMe
+    boolean bookedByMe,
+    List<IntroductionBookingInfoDto> bookings
 ) {}

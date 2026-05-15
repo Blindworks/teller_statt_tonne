@@ -5,8 +5,12 @@ import de.tellerstatttonne.backend.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,14 +37,14 @@ public class IntroductionSlotService {
         Optional<IntroductionBookingEntity> myBooking =
             bookingRepository.findByUserIdAndCancelledAtIsNull(currentUserId);
         return slots.stream()
-            .map(s -> toDto(s, myBooking.map(IntroductionBookingEntity::getSlotId).orElse(null)))
+            .map(s -> toDto(s, myBooking.map(IntroductionBookingEntity::getSlotId).orElse(null), false))
             .toList();
     }
 
     @Transactional(readOnly = true)
     public List<IntroductionSlotDto> listAll() {
         return slotRepository.findAllByOrderByDateDescStartTimeDesc().stream()
-            .map(s -> toDto(s, null))
+            .map(s -> toDto(s, null, true))
             .toList();
     }
 
@@ -49,7 +53,7 @@ public class IntroductionSlotService {
         IntroductionSlotEntity slot = new IntroductionSlotEntity();
         applyRequest(slot, req);
         slot.setCreatedByUserId(creatorId);
-        return toDto(slotRepository.save(slot), null);
+        return toDto(slotRepository.save(slot), null, false);
     }
 
     public IntroductionSlotDto update(Long id, IntroductionSlotRequest req) {
@@ -57,7 +61,7 @@ public class IntroductionSlotService {
         IntroductionSlotEntity slot = slotRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("slot not found: " + id));
         applyRequest(slot, req);
-        return toDto(slotRepository.save(slot), null);
+        return toDto(slotRepository.save(slot), null, false);
     }
 
     public void delete(Long id) {
@@ -84,7 +88,7 @@ public class IntroductionSlotService {
         booking.setSlotId(slotId);
         booking.setUserId(userId);
         bookingRepository.save(booking);
-        return toDto(slot, slotId);
+        return toDto(slot, slotId, false);
     }
 
     public void cancelBooking(Long bookingId, Long currentUserId, boolean isAdmin) {
@@ -141,12 +145,38 @@ public class IntroductionSlotService {
         slot.setNotes(req.notes());
     }
 
-    private IntroductionSlotDto toDto(IntroductionSlotEntity s, Long myBookedSlotId) {
+    private IntroductionSlotDto toDto(IntroductionSlotEntity s, Long myBookedSlotId, boolean includeBookings) {
         long booked = bookingRepository.countBySlotIdAndCancelledAtIsNull(s.getId());
+        List<IntroductionBookingInfoDto> bookings = includeBookings
+            ? loadBookingInfos(s.getId())
+            : List.of();
         return new IntroductionSlotDto(
             s.getId(), s.getDate(), s.getStartTime(), s.getEndTime(),
             s.getLocation(), s.getCapacity(), (int) booked, s.getNotes(),
-            myBookedSlotId != null && myBookedSlotId.equals(s.getId())
+            myBookedSlotId != null && myBookedSlotId.equals(s.getId()),
+            bookings
         );
+    }
+
+    private List<IntroductionBookingInfoDto> loadBookingInfos(Long slotId) {
+        List<IntroductionBookingEntity> active =
+            bookingRepository.findBySlotIdAndCancelledAtIsNull(slotId);
+        if (active.isEmpty()) {
+            return List.of();
+        }
+        List<Long> userIds = active.stream().map(IntroductionBookingEntity::getUserId).toList();
+        Map<Long, UserEntity> usersById = userRepository.findAllById(userIds).stream()
+            .collect(Collectors.toMap(UserEntity::getId, Function.identity()));
+        return active.stream()
+            .sorted(Comparator.comparing(IntroductionBookingEntity::getBookedAt,
+                Comparator.nullsLast(Comparator.naturalOrder())))
+            .map(b -> {
+                UserEntity u = usersById.get(b.getUserId());
+                String first = u != null ? u.getFirstName() : null;
+                String last = u != null ? u.getLastName() : null;
+                String mail = u != null ? u.getEmail() : null;
+                return new IntroductionBookingInfoDto(b.getId(), b.getUserId(), first, last, mail);
+            })
+            .toList();
     }
 }

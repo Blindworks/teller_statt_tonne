@@ -9,6 +9,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- `IntroductionSlotDto` enthält neues Feld `bookings: List<IntroductionBookingInfoDto>` (bookingId, userId, firstName, lastName, email). Nur der Admin-Endpoint `GET /api/introduction-slots` befüllt die Liste; `/available` und Buchungs-Response liefern eine leere Liste, damit fremde Bucher nicht an Retter geleakt werden.
 - Verfallsdatum für Hygienezertifikate. Neue Spalte `expiry_date` (NOT NULL) auf `hygiene_certificate` (Migration `028-hygiene-certificate-expiry.xml`); Backfill berechnet `issued_date + 12 Monate` für Bestandsdatensätze. Beim Upload berechnet `HygieneCertificateService` `expiryDate = issuedDate + hygiene.validity_months` (Default 12) aus den neuen Systemeinstellungen.
 - Versionierung statt Überschreiben: Unique-Constraint `uq_hygiene_certificate_user` entfernt; jeder Upload erzeugt eine neue Zeile. Älteste PENDING desselben Nutzers wird auf den neuen Status `REPLACED` gesetzt. Lookups via `findFirstByUser_IdOrderByCreatedAtDesc` (neueste) bzw. `findFirstByUser_IdAndStatusOrderByExpiryDateDesc(APPROVED)` (effektive Gültigkeit).
 - Systemweite Konfiguration: neue Tabelle `system_setting` (Migration `027-system-setting.xml`) mit `setting_key` (PK), `setting_value`, `updated_at`, `updated_by_user_id`. Initial-Seed `hygiene.validity_months=12`, `hygiene.warning_days_before=30`. Neue Endpoints `GET /api/admin/settings` und `PUT /api/admin/settings/{key}` (Rolle `ADMINISTRATOR`).

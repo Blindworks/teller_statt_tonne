@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Admin-Onboarding (`/teamleitung/onboarding`): Kennenlern-Termine als aufklappbare Karten mit Bucher-Chips (Initialen-Avatar + Name). Im aufgeklappten Bereich erscheinen E-Mail und ein Storno-Button pro Bucher; Stornieren läuft über den bestehenden `ConfirmDialogService`.
+
 ### Removed
 
 - Button „Einführung bestätigen“ im User-Edit-Menü entfernt; die Bestätigung läuft jetzt ausschließlich über das Admin-Onboarding (`/admin/onboarding`). Die Statuszeile mit Häkchen + Datum bleibt erhalten. Methode `confirmIntroduction()` in `user-edit.ts` entfällt; Service-Methode `markIntroductionCompleted` bleibt verfügbar.

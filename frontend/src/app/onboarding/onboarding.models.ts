@@ -10,6 +10,14 @@ export interface OnboardingStatus {
   introductionSlotId: number | null;
 }
 
+export interface IntroductionBookingInfo {
+  bookingId: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+}
+
 export interface IntroductionSlot {
   id: number;
   date: string;
@@ -20,6 +28,7 @@ export interface IntroductionSlot {
   bookedCount: number;
   notes: string | null;
   bookedByMe: boolean;
+  bookings: IntroductionBookingInfo[];
 }
 
 export interface IntroductionSlotRequest {

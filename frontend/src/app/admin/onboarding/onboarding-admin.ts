@@ -6,7 +6,11 @@ import { ConfirmDialogService } from '../../shared/confirm-dialog/confirm-dialog
 import { UserService } from '../../users/user.service';
 import { User } from '../../users/user.model';
 import { OnboardingService } from '../../onboarding/onboarding.service';
-import { IntroductionSlot, OnboardingStatus } from '../../onboarding/onboarding.models';
+import {
+  IntroductionBookingInfo,
+  IntroductionSlot,
+  OnboardingStatus,
+} from '../../onboarding/onboarding.models';
 
 type SlotForm = FormGroup<{
   date: FormControl<string>;
@@ -36,6 +40,54 @@ export class OnboardingAdminComponent implements OnInit {
   readonly creating = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
+  readonly expandedSlotIds = signal<ReadonlySet<number>>(new Set());
+
+  isExpanded(slotId: number): boolean {
+    return this.expandedSlotIds().has(slotId);
+  }
+
+  toggleExpanded(slotId: number): void {
+    this.expandedSlotIds.update((current) => {
+      const next = new Set(current);
+      if (next.has(slotId)) {
+        next.delete(slotId);
+      } else {
+        next.add(slotId);
+      }
+      return next;
+    });
+  }
+
+  initials(booking: IntroductionBookingInfo): string {
+    const first = (booking.firstName ?? '').trim();
+    const last = (booking.lastName ?? '').trim();
+    const a = first.charAt(0);
+    const b = last.charAt(0);
+    const result = `${a}${b}`.toUpperCase();
+    return result || (booking.email?.charAt(0).toUpperCase() ?? '?');
+  }
+
+  fullName(booking: IntroductionBookingInfo): string {
+    const name = `${booking.firstName ?? ''} ${booking.lastName ?? ''}`.trim();
+    return name || (booking.email ?? 'Unbekannt');
+  }
+
+  async cancelBooking(slot: IntroductionSlot, booking: IntroductionBookingInfo): Promise<void> {
+    const ok = await this.confirm.ask({
+      title: 'Buchung stornieren',
+      message: `Buchung von ${this.fullName(booking)} für den Termin am ${slot.date} wirklich stornieren?`,
+      confirmLabel: 'Stornieren',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.onboarding.cancelBooking(booking.bookingId).subscribe({
+      next: () => {
+        this.successMessage.set('Buchung storniert.');
+        this.refresh();
+      },
+      error: (err) => this.errorMessage.set(err?.error || 'Stornieren fehlgeschlagen.'),
+    });
+  }
 
   readonly slotForm: SlotForm = this.fb.group({
     date: this.fb.nonNullable.control('', Validators.required),
