@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Aktion „Direkt auf aktiv setzen“ im User-Edit (`/admin/users/:id` und `/teamleitung/users/:id`) für Onboarding-User. Button erscheint nur bei `status === 'PENDING'`, öffnet einen `ConfirmDialog` mit Warnung (Onboarding-Schritte werden übersprungen, Vorgang wird im SystemLog dokumentiert) und ruft `POST /api/users/{id}/force-activate` über `UserService.forceActivate(id)`. Ausnahmeflow für Admin/Teamleiter, falls ein Retter ausnahmsweise ohne reguläres Onboarding aktiviert werden muss.
+
 ### Changed
 
 - Menüpunkt „Quiz“ aus Hauptnavigation (Sidebar + mobiles „Mehr“-Sheet) entfernt und als Karte in das Teamleitung-Dashboard (`/teamleitung`) verschoben. Sichtbarkeit weiterhin über Feature `nav.quiz-admin` gesteuert.

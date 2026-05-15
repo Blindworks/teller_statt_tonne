@@ -75,6 +75,7 @@ public class PartnerController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@partnerAccess.canManagePartner(#id, authentication)")
     public ResponseEntity<Partner> update(@PathVariable Long id, @RequestBody Partner partner) {
         return service.update(id, partner)
             .map(ResponseEntity::ok)
@@ -82,6 +83,7 @@ public class PartnerController {
     }
 
     @PostMapping("/{id}/logo")
+    @PreAuthorize("@partnerAccess.canManagePartner(#id, authentication)")
     public ResponseEntity<Partner> uploadLogo(
         @PathVariable Long id,
         @RequestPart("file") MultipartFile file
@@ -97,6 +99,7 @@ public class PartnerController {
     }
 
     @PostMapping("/{id}/geocode")
+    @PreAuthorize("@partnerAccess.canManagePartner(#id, authentication)")
     public ResponseEntity<Partner> regeocode(@PathVariable Long id) {
         return service.regeocode(id)
             .map(ResponseEntity::ok)

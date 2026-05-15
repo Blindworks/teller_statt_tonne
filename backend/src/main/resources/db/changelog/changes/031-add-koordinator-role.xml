@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="031-seed-koordinator-role" author="teller-statt-tonne">
+        <sql>
+            INSERT INTO role (name, label, description, sort_order, enabled, created_at, updated_at)
+            VALUES ('KOORDINATOR', 'Betriebskoordinator',
+                'Koordiniert die Abl&#228;ufe eines zugewiesenen Betriebs (Retter-Zuordnung, Slots, Stammdaten).',
+                25, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

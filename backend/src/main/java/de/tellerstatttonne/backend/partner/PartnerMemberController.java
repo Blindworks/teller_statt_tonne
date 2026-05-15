@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/partners/{partnerId}/members")
-@PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")
+@PreAuthorize("@partnerAccess.canManagePartner(#partnerId, authentication)")
 public class PartnerMemberController {
 
     private final PartnerMemberService service;
@@ -36,6 +36,7 @@ public class PartnerMemberController {
         return switch (service.assign(partnerId, memberId)) {
             case OK -> ResponseEntity.noContent().build();
             case PARTNER_NOT_FOUND, MEMBER_NOT_FOUND -> ResponseEntity.notFound().build();
+            case FORBIDDEN -> ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
         };
     }
 
@@ -47,6 +48,7 @@ public class PartnerMemberController {
         return switch (service.unassign(partnerId, memberId)) {
             case OK -> ResponseEntity.noContent().build();
             case PARTNER_NOT_FOUND, MEMBER_NOT_FOUND -> ResponseEntity.notFound().build();
+            case FORBIDDEN -> ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
         };
     }
 }

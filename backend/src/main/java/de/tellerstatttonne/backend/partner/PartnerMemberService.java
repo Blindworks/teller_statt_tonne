@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,15 +74,23 @@ public class PartnerMemberService {
             return AssignResult.MEMBER_NOT_FOUND;
         }
         PartnerEntity partner = partnerOpt.get();
-        Set<UserEntity> members = partner.getMembers();
         UserEntity user = userOpt.get();
+        boolean coordinator = user.hasRole("KOORDINATOR");
+        if (coordinator && !callerIsAdminOrTeamleiter()) {
+            return AssignResult.FORBIDDEN;
+        }
+        Set<UserEntity> members = partner.getMembers();
         boolean added = members.add(user);
         if (added) {
             partnerRepository.save(partner);
-            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.STORE_MEMBER_ASSIGNED)
+            SystemLogEventType type = coordinator
+                ? SystemLogEventType.STORE_COORDINATOR_ASSIGNED
+                : SystemLogEventType.STORE_MEMBER_ASSIGNED;
+            String label = coordinator ? "Koordinator " : "Nutzer ";
+            eventPublisher.publishEvent(SystemLogEvent.of(type)
                 .actorUserId(currentActorId())
                 .target("PARTNER", partner.getId())
-                .message("Nutzer " + user.getEmail() + " dem Betrieb " + partner.getName() + " zugeordnet")
+                .message(label + user.getEmail() + " dem Betrieb " + partner.getName() + " zugeordnet")
                 .build());
         }
         return AssignResult.OK;
@@ -92,11 +102,35 @@ public class PartnerMemberService {
             return AssignResult.PARTNER_NOT_FOUND;
         }
         PartnerEntity partner = partnerOpt.get();
-        boolean removed = partner.getMembers().removeIf(m -> userId.equals(m.getId()));
-        if (removed) {
-            partnerRepository.save(partner);
+        Optional<UserEntity> targetOpt = partner.getMembers().stream()
+            .filter(m -> userId.equals(m.getId()))
+            .findFirst();
+        if (targetOpt.isEmpty()) {
+            return AssignResult.OK;
+        }
+        UserEntity target = targetOpt.get();
+        boolean coordinator = target.hasRole("KOORDINATOR");
+        if (coordinator && !callerIsAdminOrTeamleiter()) {
+            return AssignResult.FORBIDDEN;
+        }
+        partner.getMembers().remove(target);
+        partnerRepository.save(partner);
+        if (coordinator) {
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.STORE_COORDINATOR_UNASSIGNED)
+                .actorUserId(currentActorId())
+                .target("PARTNER", partner.getId())
+                .message("Koordinator " + target.getEmail() + " vom Betrieb " + partner.getName() + " entfernt")
+                .build());
         }
         return AssignResult.OK;
+    }
+
+    private static boolean callerIsAdminOrTeamleiter() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) return false;
+        return auth.getAuthorities().stream().anyMatch(a ->
+            "ROLE_ADMINISTRATOR".equals(a.getAuthority())
+                || "ROLE_TEAMLEITER".equals(a.getAuthority()));
     }
 
     private StoreMember toDto(UserEntity u, MemberPickupStats stats) {
@@ -116,5 +150,5 @@ public class PartnerMemberService {
         );
     }
 
-    public enum AssignResult { OK, PARTNER_NOT_FOUND, MEMBER_NOT_FOUND }
+    public enum AssignResult { OK, PARTNER_NOT_FOUND, MEMBER_NOT_FOUND, FORBIDDEN }
 }

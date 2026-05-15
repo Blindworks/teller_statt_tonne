@@ -39,6 +39,7 @@ export class StoreMembersComponent {
   readonly loadError = signal<string | null>(null);
   readonly allMembers = signal<User[]>([]);
   readonly assignDialogOpen = signal(false);
+  readonly assignDialogRole = signal<'RETTER' | 'KOORDINATOR'>('RETTER');
 
   categoryIcon(id: number | null): string {
     return this.categoryRegistry.iconForId(id);
@@ -60,10 +61,27 @@ export class StoreMembersComponent {
     );
   });
 
+  readonly coordinators = computed(() =>
+    this.filteredMembers().filter((m) => m.roles.includes('KOORDINATOR')),
+  );
+
+  readonly retter = computed(() =>
+    this.filteredMembers().filter((m) => !m.roles.includes('KOORDINATOR')),
+  );
+
   readonly assignableMembers = computed(() => {
     const assigned = new Set(this.members().map((m) => m.id));
-    return this.allMembers().filter((m) => m.id && !assigned.has(m.id));
+    const role = this.assignDialogRole();
+    return this.allMembers().filter((m) => {
+      if (!m.id || assigned.has(m.id)) return false;
+      const isCoordinator = m.roles?.includes('KOORDINATOR');
+      return role === 'KOORDINATOR' ? isCoordinator : !isCoordinator;
+    });
   });
+
+  readonly assignDialogTitle = computed(() =>
+    this.assignDialogRole() === 'KOORDINATOR' ? 'Koordinator zuweisen' : 'Retter zuweisen',
+  );
 
   constructor() {
     this.loadStores();
@@ -83,7 +101,8 @@ export class StoreMembersComponent {
     this.filterTerm.set(value);
   }
 
-  openAssignDialog(): void {
+  openAssignDialog(role: 'RETTER' | 'KOORDINATOR' = 'RETTER'): void {
+    this.assignDialogRole.set(role);
     this.assignDialogOpen.set(true);
   }
 

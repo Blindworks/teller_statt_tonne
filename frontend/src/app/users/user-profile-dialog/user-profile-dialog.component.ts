@@ -103,6 +103,8 @@ export class UserProfileDialogComponent {
         return 'bg-error-container text-on-error-container';
       case 'TEAMLEITER':
         return 'bg-tertiary-container text-on-tertiary-fixed';
+      case 'KOORDINATOR':
+        return 'bg-secondary-container text-on-secondary-container';
       case 'RETTER':
         return 'bg-primary-container text-on-primary-container';
       case 'NEW_MEMBER':

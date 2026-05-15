@@ -102,42 +102,113 @@
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          (click)="openAssignDialog()"
-          class="bg-primary text-on-primary flex items-center gap-2 px-8 py-4 rounded-full font-bold hover:bg-primary-dim transition-all active:scale-95 shadow-lg shadow-primary/10"
+        <div
+          class="flex items-center px-4 py-2 bg-surface-container-high rounded-full"
         >
-          <span class="material-symbols-outlined">person_add</span>
-          Mitglied zuweisen
-        </button>
+          <span class="material-symbols-outlined text-on-surface-variant mr-2 text-sm"
+            >search</span
+          >
+          <input
+            type="text"
+            placeholder="Filtern…"
+            [ngModel]="filterTerm()"
+            (ngModelChange)="onFilterChange($event)"
+            class="bg-transparent border-none focus:ring-0 text-sm w-32 placeholder:text-on-surface-variant/50 outline-none"
+          />
+        </div>
       </div>
 
       <div class="grid grid-cols-1 gap-10">
-        <!-- Mitglieder-Grid -->
+        <!-- Koordinatoren-Sektion -->
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary">supervisor_account</span>
+              Koordinatoren
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @for (member of coordinators(); track member.id) {
+              <div
+                class="bg-surface-container-low p-4 rounded-xl flex items-center gap-4 border border-transparent hover:border-secondary/30 transition-all"
+              >
+                <button
+                  type="button"
+                  (click)="openProfile(member.id)"
+                  [attr.aria-label]="'Profil von ' + member.firstName + ' ' + member.lastName"
+                  class="relative cursor-pointer"
+                >
+                  @if (member.photoUrl) {
+                    <img
+                      [src]="member.photoUrl | photoUrl"
+                      [alt]="member.firstName + ' ' + member.lastName"
+                      class="w-14 h-14 rounded-full object-cover"
+                    />
+                  } @else {
+                    <div
+                      class="w-14 h-14 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold"
+                    >
+                      {{ initials(member) }}
+                    </div>
+                  }
+                  <div
+                    class="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-surface-container-low"
+                    [class]="onlineDotClass(member.onlineStatus)"
+                  ></div>
+                </button>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-bold text-on-surface truncate">
+                    {{ member.firstName }} {{ member.lastName }}
+                  </h4>
+                  <p class="text-[10px] text-secondary font-bold uppercase tracking-wider">
+                    Betriebskoordinator
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  (click)="removeMember(member.id)"
+                  title="Zuweisung entfernen"
+                  class="text-on-surface-variant hover:text-error p-2 rounded-full hover:bg-error-container/10 transition-all"
+                >
+                  <span class="material-symbols-outlined text-lg">close</span>
+                </button>
+              </div>
+            }
+
+            <button
+              type="button"
+              (click)="openAssignDialog('KOORDINATOR')"
+              class="border-2 border-dashed border-outline-variant p-4 rounded-xl flex items-center justify-center gap-4 hover:bg-surface-container-high transition-all cursor-pointer group"
+            >
+              <span
+                class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
+                >add_circle</span
+              >
+              <span class="text-sm font-bold text-on-surface-variant"
+                >Koordinator hinzufügen</span
+              >
+            </button>
+          </div>
+
+          @if (coordinators().length === 0) {
+            <p class="text-sm text-on-surface-variant text-center py-4 mt-2">
+              Diesem Betrieb ist noch kein Koordinator zugewiesen.
+            </p>
+          }
+        </div>
+
+        <!-- Retter-Sektion -->
         <div>
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-xl font-bold text-on-surface flex items-center gap-2">
               <span class="material-symbols-outlined text-primary">volunteer_activism</span>
-              Mitglieder
+              Retter
             </h3>
-            <div
-              class="flex items-center px-4 py-2 bg-surface-container-high rounded-full"
-            >
-              <span class="material-symbols-outlined text-on-surface-variant mr-2 text-sm"
-                >search</span
-              >
-              <input
-                type="text"
-                placeholder="Filtern…"
-                [ngModel]="filterTerm()"
-                (ngModelChange)="onFilterChange($event)"
-                class="bg-transparent border-none focus:ring-0 text-sm w-32 placeholder:text-on-surface-variant/50 outline-none"
-              />
-            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @for (member of filteredMembers(); track member.id) {
+            @for (member of retter(); track member.id) {
               <div
                 class="bg-surface-container-low p-4 rounded-xl flex items-center gap-4 border border-transparent hover:border-primary/20 transition-all"
               >
@@ -186,7 +257,7 @@
 
             <button
               type="button"
-              (click)="openAssignDialog()"
+              (click)="openAssignDialog('RETTER')"
               class="border-2 border-dashed border-outline-variant p-4 rounded-xl flex items-center justify-center gap-4 hover:bg-surface-container-high transition-all cursor-pointer group"
             >
               <span
@@ -194,16 +265,14 @@
                 >add_circle</span
               >
               <span class="text-sm font-bold text-on-surface-variant"
-                >Mitglied hinzufügen</span
+                >Retter hinzufügen</span
               >
             </button>
           </div>
 
-          @if (members().length === 0) {
-            <p
-              class="text-sm text-on-surface-variant text-center py-8 col-span-full"
-            >
-              Diesem Betrieb sind noch keine Mitglieder zugewiesen.
+          @if (retter().length === 0) {
+            <p class="text-sm text-on-surface-variant text-center py-4 mt-2">
+              Diesem Betrieb sind noch keine Retter zugewiesen.
             </p>
           }
         </div>
@@ -221,6 +290,7 @@
 @if (assignDialogOpen() && selectedStore(); as partner) {
   <app-assign-member-dialog
     [partnerName]="partner.name"
+    [title]="assignDialogTitle()"
     [members]="assignableMembers()"
     (assign)="onAssignMember($event)"
     (close)="closeAssignDialog()"

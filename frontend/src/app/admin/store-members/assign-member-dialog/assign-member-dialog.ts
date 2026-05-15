@@ -19,6 +19,7 @@ import { PhotoUrlPipe } from '../../../users/photo-url.pipe';
 })
 export class AssignMemberDialogComponent {
   @Input({ required: true }) partnerName = '';
+  @Input() title = 'Mitglied zuweisen';
   @Input({ required: true }) set members(value: User[]) {
     this._members.set(value);
   }

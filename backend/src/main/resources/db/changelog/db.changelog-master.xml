@@ -35,5 +35,6 @@
     <include file="db/changelog/changes/028-hygiene-certificate-expiry.xml"/>
     <include file="db/changelog/changes/029-user-test-flag.xml"/>
     <include file="db/changelog/changes/030-ticket.xml"/>
+    <include file="db/changelog/changes/031-add-koordinator-role.xml"/>
 
 </databaseChangeLog>

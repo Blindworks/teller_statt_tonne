@@ -7,6 +7,15 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Direkt-Aktivierung von Onboarding-Usern für Admins/Teamleiter. Neuer Endpoint `POST /api/users/{id}/force-activate` (`@PreAuthorize("hasAnyRole('ADMINISTRATOR','TEAMLEITER')")`) ruft `UserService.forceActivate(id)` auf: prüft `status == PENDING` (sonst HTTP 409 mit deutscher Meldung), setzt den Status auf `ACTIVE` ohne die regulären Onboarding-Gates zu erzwingen (`introductionCompletedAt`, Hygienezertifikat, `agreementUploadedAt`, `testPickupCompletedAt`, vollständiges Profil bleiben unverändert) und schreibt einen `USER_STATUS_CHANGED`-SystemLog-Eintrag mit Description „manuell aktiviert (Bypass Onboarding)“ für den Audit-Trail. Gedacht als Ausnahmeflow für Sonderfälle (Pilot-Retter, Datenmigration, Sondergenehmigung).
+- Neue Rolle `KOORDINATOR` (UI: „Betriebskoordinator“, Sort-Order 25). Migration `031-add-koordinator-role.xml`. Wird einem Betrieb wie ein Retter über `partner_user` zugeordnet, hat aber zusätzlich betriebsspezifische Schreibrechte am eigenen Betrieb.
+- Neuer Authorization-Helper `PartnerAccessGuard` (`@Component("partnerAccess")`): `canManagePartner(partnerId, authentication)` ist `true` für `ADMINISTRATOR`/`TEAMLEITER` global und für `KOORDINATOR` nur dann, wenn der User in `partner_user` für die `partnerId` eingetragen ist. Wird via SpEL in `@PreAuthorize("@partnerAccess.canManagePartner(#id, authentication)")` aufgerufen.
+- `PartnerMemberController` (`GET/PUT/DELETE /api/partners/{partnerId}/members[/{memberId}]`) und mutierende `PartnerController`-Endpoints (`PUT /api/partners/{id}`, `POST /api/partners/{id}/logo`, `POST /api/partners/{id}/geocode`) nutzen jetzt den `PartnerAccessGuard` statt der globalen `hasAnyRole('ADMINISTRATOR','TEAMLEITER')`-Regel. Ein Koordinator kann damit die Stammdaten seines eigenen Betriebs editieren und Retter zuordnen/entfernen.
+- `PartnerMemberService.assign/unassign` lehnen das Zuordnen oder Entfernen eines Users mit `KOORDINATOR`-Rolle für Nicht-Admin/Teamleiter-Aufrufer ab (neuer Result `FORBIDDEN`, Controller liefert HTTP 403). Ein Koordinator darf also keine weiteren Koordinatoren bestellen, aber Retter verwalten.
+- Neue SystemLog-Event-Typen `STORE_COORDINATOR_ASSIGNED` / `STORE_COORDINATOR_UNASSIGNED` (`SystemLogCategory.ADMIN_ACTION`, `INFO`).
+
 ### Changed
 
 - Upload-Limit für Bilder von 5 MB auf 25 MB pro Datei erhöht (`spring.servlet.multipart.max-file-size=25MB`, `max-request-size=30MB`, `ImageStorageService.MAX_BYTES`). Größere Uploads liefern jetzt sauber HTTP 413 mit deutscher Fehlermeldung statt 500: neuer `MaxUploadSizeExceededException`-Handler im `GlobalExceptionHandler` (DEBUG-Log, kein `UNHANDLED_EXCEPTION`-SystemLog).
