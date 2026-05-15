@@ -9,11 +9,13 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Letzte englische UI-Texte (Dashboard-Hero, Active-Community-Card, Sidebar-Tagline „The Living Pantry" → „Gemeinsam Lebensmittel retten") auf Deutsch umgestellt – App ist jetzt durchgängig deutsch.
 - Hygienezertifikat-Upload (Onboarding-Schritt 1 und Profilseite): klarer Abstand zwischen Beschreibungstext und Upload-Formular (`mt-6`), zusätzliche vertikale Luft zwischen den Feldern (`space-y-5`) sowie eine dünne Trennlinie über dem „Zertifikat hochladen“-Button.
 - Onboarding-Schritt 4 „Rettervereinbarung“: Button „PDF öffnen“ entfernt (redundant zum Download); mehr Abstand zwischen Beschreibungstext und Aktions-Buttons (`margin-top: 20px` auf `.agreement-actions`).
 
 ### Fixed
 
+- Admin-Seiten (`/admin`, `/admin/roles`, `/admin/roles/new|:id`, `/admin/permissions`, `/admin/system-log`): Der fixierte Shell-Header überdeckte Inhalte/Action-Buttons oben rechts. Section-Container an das Muster der übrigen Admin-Listen (`pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen`, Role-Form behält `max-w-3xl`) angeglichen.
 - Download „Rettervereinbarung herunterladen“ im Onboarding lieferte aufgrund des Service-Worker-Navigations-Fallbacks die Angular-`index.html` (~39 KB `.htm`) statt der PDF. `ngsw-config.json` deckt jetzt `/assets/**` und die Endung `pdf` in der `assets`-Gruppe ab.
 
 ### Added
