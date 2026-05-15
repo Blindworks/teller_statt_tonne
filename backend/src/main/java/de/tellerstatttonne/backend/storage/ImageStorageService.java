@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ImageStorageService {
 
-    private static final long MAX_BYTES = 5L * 1024 * 1024;
+    private static final long MAX_BYTES = 25L * 1024 * 1024;
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif");
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
         "image/jpeg", "image/png", "image/webp", "image/gif"
@@ -39,7 +39,7 @@ public class ImageStorageService {
             throw new IllegalArgumentException("file is required");
         }
         if (file.getSize() > MAX_BYTES) {
-            throw new IllegalArgumentException("file too large (max 5 MB)");
+            throw new IllegalArgumentException("Datei zu groß (max. 25 MB).");
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {

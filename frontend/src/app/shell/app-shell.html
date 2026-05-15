@@ -169,6 +169,20 @@
         Quiz
       </a>
     }
+    @if (canSeeTickets()) {
+      <a
+        routerLink="/tickets"
+        routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+        #ticketsLink="routerLinkActive"
+        class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+        [class.text-on-surface]="!ticketsLink.isActive"
+        [class.hover:bg-surface-container]="!ticketsLink.isActive"
+        [class.hover:translate-x-1]="!ticketsLink.isActive"
+      >
+        <span class="material-symbols-outlined">bug_report</span>
+        Tickets
+      </a>
+    }
   </nav>
 </aside>
 
@@ -405,6 +419,19 @@
         >
           <span class="material-symbols-outlined">quiz</span>
           Quiz
+        </a>
+      }
+      @if (canSeeTickets()) {
+        <a
+          routerLink="/tickets"
+          (click)="closeMore()"
+          routerLinkActive="text-primary"
+          #ticketsSheet="routerLinkActive"
+          class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+          [class.text-on-surface]="!ticketsSheet.isActive"
+        >
+          <span class="material-symbols-outlined">bug_report</span>
+          Tickets
         </a>
       }
       <div class="border-t border-outline-variant/20 my-2"></div>

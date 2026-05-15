@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="030-create-ticket" author="teller-statt-tonne">
+        <createTable tableName="ticket">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(8000)"/>
+            <column name="category" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(16)" defaultValue="OPEN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="ticket" baseColumnNames="created_by_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_ticket_created_by" onDelete="RESTRICT"/>
+        <createIndex tableName="ticket" indexName="idx_ticket_status">
+            <column name="status"/>
+        </createIndex>
+        <createIndex tableName="ticket" indexName="idx_ticket_created_by">
+            <column name="created_by_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="030-create-ticket-attachment" author="teller-statt-tonne">
+        <createTable tableName="ticket_attachment">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ticket_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="original_filename" type="VARCHAR(255)"/>
+            <column name="uploaded_by_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uploaded_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="ticket_attachment" baseColumnNames="ticket_id"
+                                 referencedTableName="ticket" referencedColumnNames="id"
+                                 constraintName="fk_ticket_attachment_ticket" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="ticket_attachment" baseColumnNames="uploaded_by_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_ticket_attachment_user" onDelete="RESTRICT"/>
+        <createIndex tableName="ticket_attachment" indexName="idx_ticket_attachment_ticket">
+            <column name="ticket_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="030-create-ticket-comment" author="teller-statt-tonne">
+        <createTable tableName="ticket_comment">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ticket_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="VARCHAR(8000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="ticket_comment" baseColumnNames="ticket_id"
+                                 referencedTableName="ticket" referencedColumnNames="id"
+                                 constraintName="fk_ticket_comment_ticket" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="ticket_comment" baseColumnNames="author_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_ticket_comment_author" onDelete="RESTRICT"/>
+        <createIndex tableName="ticket_comment" indexName="idx_ticket_comment_ticket">
+            <column name="ticket_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="030-seed-ticket-features" author="teller-statt-tonne">
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('nav.tickets', 'Men&#252;: Tickets', 'Top-Level-Men&#252;punkt &#8222;Tickets&#8220; (Bug- und Feature-Meldungen).', 'Navigation', 95, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+        <sql>INSERT INTO feature (feature_key, label, description, category, sort_order, created_at, updated_at) VALUES ('tickets.admin', 'Aktion: Tickets verwalten', 'Status &#228;ndern, fremde Tickets/Kommentare l&#246;schen.', 'Aktionen', 310, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)</sql>
+
+        <sql>
+            INSERT INTO role_feature (role_id, feature_id)
+            SELECT r.id, f.id FROM role r JOIN feature f ON f.feature_key = 'nav.tickets'
+            WHERE r.name IN ('TEAMLEITER','RETTER','NEW_MEMBER')
+        </sql>
+        <!-- ADMINISTRATOR sieht alles ueber Service-Logik, aber wir vergeben tickets.admin explizit zusaetzlich. -->
+        <sql>
+            INSERT INTO role_feature (role_id, feature_id)
+            SELECT r.id, f.id FROM role r JOIN feature f ON f.feature_key IN ('nav.tickets','tickets.admin')
+            WHERE r.name = 'ADMINISTRATOR'
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

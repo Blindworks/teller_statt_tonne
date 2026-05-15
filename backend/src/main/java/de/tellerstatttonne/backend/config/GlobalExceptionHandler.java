@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * Fängt unerwartete Exceptions, die nicht von den Controller-lokalen Handlern abgedeckt werden,
@@ -44,6 +46,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Void> handleClientDisconnect(AsyncRequestNotUsableException ex, HttpServletRequest request) {
         log.debug("Async-Client für {} getrennt: {}", request.getRequestURI(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    /**
+     * Erwartetes Client-Problem: Upload größer als das konfigurierte Multipart-Limit.
+     * Kein ERROR-Log, kein SystemLog-Eintrag — Antwort 413 mit verständlicher Meldung fürs Frontend.
+     */
+    /**
+     * Statische Ressource (z. B. /favicon.ico, /uploads/...) nicht gefunden:
+     * Regulärer 404, kein ERROR-Log und kein SystemLog-Eintrag.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Void> handleNoResource(NoResourceFoundException ex, HttpServletRequest request) {
+        log.debug("Statische Ressource nicht gefunden: {} {}", request.getMethod(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<String> handleMaxUploadSize(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        log.debug("Upload-Limit überschritten in {}: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+            .body("Datei zu groß. Bitte ein kleineres Bild wählen (max. 25 MB).");
     }
 
     @ExceptionHandler(Exception.class)

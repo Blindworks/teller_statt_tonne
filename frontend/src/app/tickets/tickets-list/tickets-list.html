@@ -1,0 +1,151 @@
+<section class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <header class="flex items-start justify-between gap-4 mb-8 flex-wrap">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface">Tickets</h1>
+      <p class="text-sm text-on-surface-variant mt-2">
+        Bugs melden und Feature-Wünsche einreichen. Alle eingeloggten Nutzer:innen sehen die Liste,
+        nur Admins ändern den Status.
+      </p>
+    </div>
+    <a
+      routerLink="/tickets/new"
+      class="inline-flex items-center gap-2 rounded-full bg-primary text-on-primary px-5 py-2.5 text-sm font-bold shadow hover:shadow-lg transition-all"
+    >
+      <span class="material-symbols-outlined text-base">add</span>
+      Neues Ticket
+    </a>
+  </header>
+
+  <div class="mb-6 flex flex-wrap gap-3">
+    <div class="inline-flex rounded-full bg-surface-container p-1 text-sm font-bold">
+      <button
+        type="button"
+        (click)="setStatus('ALL')"
+        class="rounded-full px-4 py-1.5 transition-colors"
+        [class.bg-primary]="statusFilter() === 'ALL'"
+        [class.text-on-primary]="statusFilter() === 'ALL'"
+        [class.text-on-surface-variant]="statusFilter() !== 'ALL'"
+      >
+        Alle Status
+      </button>
+      @for (s of statuses; track s) {
+        <button
+          type="button"
+          (click)="setStatus(s)"
+          class="rounded-full px-4 py-1.5 transition-colors"
+          [class.bg-primary]="statusFilter() === s"
+          [class.text-on-primary]="statusFilter() === s"
+          [class.text-on-surface-variant]="statusFilter() !== s"
+        >
+          {{ statusLabel(s) }}
+        </button>
+      }
+    </div>
+
+    <div class="inline-flex rounded-full bg-surface-container p-1 text-sm font-bold">
+      <button
+        type="button"
+        (click)="setCategory('ALL')"
+        class="rounded-full px-4 py-1.5 transition-colors"
+        [class.bg-primary]="categoryFilter() === 'ALL'"
+        [class.text-on-primary]="categoryFilter() === 'ALL'"
+        [class.text-on-surface-variant]="categoryFilter() !== 'ALL'"
+      >
+        Alle Typen
+      </button>
+      @for (c of categories; track c) {
+        <button
+          type="button"
+          (click)="setCategory(c)"
+          class="rounded-full px-4 py-1.5 transition-colors"
+          [class.bg-primary]="categoryFilter() === c"
+          [class.text-on-primary]="categoryFilter() === c"
+          [class.text-on-surface-variant]="categoryFilter() !== c"
+        >
+          {{ categoryLabel(c) }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loadError()) {
+    <p class="mb-4 rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm">
+      {{ loadError() }}
+    </p>
+  }
+
+  <div
+    class="bg-surface-container-lowest rounded-2xl shadow-[0_20px_50px_rgba(48,52,40,0.04)] overflow-hidden"
+  >
+    <table class="w-full text-sm">
+      <thead class="bg-surface-container">
+        <tr class="text-left text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+          <th class="px-6 py-3">Titel</th>
+          <th class="px-6 py-3">Typ</th>
+          <th class="px-6 py-3">Status</th>
+          <th class="px-6 py-3">Ersteller</th>
+          <th class="px-6 py-3">Aktualisiert</th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filtered(); track item.id) {
+          <tr class="border-t border-outline-variant/20 hover:bg-surface-container-low/50">
+            <td class="px-6 py-4 font-semibold">
+              <a [routerLink]="['/tickets', item.id]" class="hover:text-primary">
+                {{ item.title }}
+              </a>
+              <div class="text-xs text-on-surface-variant mt-1 flex gap-3">
+                @if (item.commentCount > 0) {
+                  <span class="inline-flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">chat</span>
+                    {{ item.commentCount }}
+                  </span>
+                }
+                @if (item.attachmentCount > 0) {
+                  <span class="inline-flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">attach_file</span>
+                    {{ item.attachmentCount }}
+                  </span>
+                }
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span
+                class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold"
+                [class]="categoryBadgeClass(item.category)"
+              >
+                {{ categoryLabel(item.category) }}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <span
+                class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold"
+                [class]="statusBadgeClass(item.status)"
+              >
+                {{ statusLabel(item.status) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-on-surface-variant">{{ item.createdByName }}</td>
+            <td class="px-6 py-4 text-on-surface-variant">{{ formatDate(item.updatedAt) }}</td>
+            <td class="px-6 py-4 text-right">
+              <a
+                [routerLink]="['/tickets', item.id]"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"
+                title="Öffnen"
+              >
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+              </a>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="px-6 py-12 text-center text-on-surface-variant">
+              Keine Tickets gefunden.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

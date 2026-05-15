@@ -60,6 +60,7 @@ export class AppShellComponent {
     this.perms.features().has('nav.distribution-points'),
   );
   readonly canSeeTeamleitung = computed(() => this.perms.features().has('nav.planner'));
+  readonly canSeeTickets = computed(() => this.perms.features().has('nav.tickets'));
 
   constructor() {
     this.router.events.subscribe((e) => {

@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private static final String[] PUBLIC_SUBDIRS = {"logos", "photos"};
+    private static final String[] PUBLIC_SUBDIRS = {"logos", "photos", "tickets"};
 
     private final String uploadsDir;
 

@@ -328,6 +328,21 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./quiz/admin/quiz-attempts').then((m) => m.QuizAttemptsComponent),
       },
+      {
+        path: 'tickets',
+        loadComponent: () =>
+          import('./tickets/tickets-list/tickets-list').then((m) => m.TicketsListComponent),
+      },
+      {
+        path: 'tickets/new',
+        loadComponent: () =>
+          import('./tickets/ticket-form/ticket-form').then((m) => m.TicketFormComponent),
+      },
+      {
+        path: 'tickets/:id',
+        loadComponent: () =>
+          import('./tickets/ticket-form/ticket-form').then((m) => m.TicketFormComponent),
+      },
     ],
   },
 ];
