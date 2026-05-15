@@ -93,7 +93,7 @@
           </button>
         </div>
       } @else {
-        <form [formGroup]="uploadForm" (ngSubmit)="submit()" class="space-y-4">
+        <form [formGroup]="uploadForm" (ngSubmit)="submit()" class="space-y-5 mt-6">
           @if (certificate()?.status === 'REJECTED') {
             <p class="text-xs text-on-surface-variant">
               Lade ein korrigiertes Zertifikat hoch.
@@ -133,7 +133,7 @@
             </div>
           }
 
-          <div class="flex flex-wrap gap-3 items-center">
+          <div class="flex flex-wrap gap-3 items-center pt-5 mt-2 border-t border-outline-variant">
             <button
               type="submit"
               [disabled]="uploading() || !selectedFile() || uploadForm.invalid"

@@ -7,6 +7,11 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Changed
+
+- Hygienezertifikat-Upload (Onboarding-Schritt 1 und Profilseite): klarer Abstand zwischen Beschreibungstext und Upload-Formular (`mt-6`), zusätzliche vertikale Luft zwischen den Feldern (`space-y-5`) sowie eine dünne Trennlinie über dem „Zertifikat hochladen“-Button.
+- Onboarding-Schritt 4 „Rettervereinbarung“: Button „PDF öffnen“ entfernt (redundant zum Download); mehr Abstand zwischen Beschreibungstext und Aktions-Buttons (`margin-top: 20px` auf `.agreement-actions`).
+
 ### Fixed
 
 - Download „Rettervereinbarung herunterladen“ im Onboarding lieferte aufgrund des Service-Worker-Navigations-Fallbacks die Angular-`index.html` (~39 KB `.htm`) statt der PDF. `ngsw-config.json` deckt jetzt `/assets/**` und die Endung `pdf` in der `assets`-Gruppe ab.
