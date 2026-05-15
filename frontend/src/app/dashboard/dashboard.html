@@ -200,20 +200,19 @@
         type="button"
         (click)="nextPickup && openSlot(nextPickup)"
         [disabled]="!nextPickup"
-        class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-6 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
+        class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col gap-5 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
       >
-        <div class="flex justify-between items-start gap-2">
-          <span
-            class="w-12 h-12 inline-flex items-center justify-center bg-primary-container text-on-primary-container rounded-full"
-          >
-            <span class="material-symbols-outlined">schedule</span>
-          </span>
+        <header class="flex items-center justify-between gap-2">
+          <h2 class="text-lg font-extrabold text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">schedule</span>
+            Nächster Pickup
+          </h2>
           @if (nextPickup) {
-            <span class="text-primary text-xs font-bold text-right">
+            <span class="text-xs font-bold text-primary">
               {{ nextPickup.dateLabel }} · {{ nextPickup.startTime }}
             </span>
           }
-        </div>
+        </header>
         <div>
           @if (countdown) {
             @if (countdown.isPast) {
@@ -227,12 +226,12 @@
                 <span>{{ countdown.minutes }}m</span>
               </p>
             }
-            <p class="text-on-surface-variant text-sm font-medium truncate">
+            <p class="text-on-surface-variant text-sm font-medium truncate mt-1">
               {{ nextPickup!.partnerName }}
             </p>
           } @else {
             <p class="text-4xl font-black text-on-surface">–</p>
-            <p class="text-on-surface-variant text-sm font-medium">Kein anstehender Pickup</p>
+            <p class="text-on-surface-variant text-sm font-medium mt-1">Kein anstehender Pickup</p>
           }
         </div>
       </button>
@@ -243,19 +242,13 @@
           type="button"
           (click)="nextFree && openSlot(nextFree)"
           [disabled]="!nextFree"
-          class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-4 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
+          class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col gap-5 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
         >
-          <p
-            class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant"
-          >
-            Nächster freier Slot
-          </p>
-          <div class="flex justify-between items-start gap-2">
-            <span
-              class="w-12 h-12 inline-flex items-center justify-center bg-tertiary-container text-on-tertiary-container rounded-full"
-            >
-              <span class="material-symbols-outlined">volunteer_activism</span>
-            </span>
+          <header class="flex items-center justify-between gap-2">
+            <h2 class="text-lg font-extrabold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-tertiary">volunteer_activism</span>
+              Nächster freier Slot
+            </h2>
             @if (nextFree) {
               <span
                 class="px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container text-[11px] font-bold"
@@ -265,18 +258,18 @@
             } @else {
               <span class="text-tertiary text-xs font-bold">Spontan retten</span>
             }
-          </div>
+          </header>
           <div>
             @if (nextFree) {
               <p class="text-3xl font-black text-on-surface">
                 {{ nextFree.dateLabel }} {{ nextFree.startTime }}
               </p>
-              <p class="text-on-surface-variant text-sm font-medium truncate">
+              <p class="text-on-surface-variant text-sm font-medium truncate mt-1">
                 {{ nextFree.partnerName }}
               </p>
             } @else {
               <p class="text-3xl font-black text-on-surface">–</p>
-              <p class="text-on-surface-variant text-sm font-medium">
+              <p class="text-on-surface-variant text-sm font-medium mt-1">
                 Aktuell keine freien Slots in deinen Betrieben
               </p>
             }
@@ -284,24 +277,18 @@
         </button>
       } @else if (isAdminOrAmbassador()) {
         <div
-          class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-4"
+          class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col gap-5"
         >
-          <p
-            class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant"
-          >
-            Offene Slots heute
-          </p>
-          <div class="flex justify-between items-start">
-            <span
-              class="w-12 h-12 inline-flex items-center justify-center bg-tertiary-container text-on-tertiary-container rounded-full"
-            >
-              <span class="material-symbols-outlined">schedule</span>
-            </span>
-            <span class="text-tertiary text-xs font-bold">Heute</span>
-          </div>
+          <header class="flex items-center justify-between gap-2">
+            <h2 class="text-lg font-extrabold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-tertiary">schedule</span>
+              Offene Slots heute
+            </h2>
+            <span class="text-xs font-bold text-tertiary">Heute</span>
+          </header>
           <div>
             <p class="text-4xl font-black text-on-surface">{{ todayOpenSlotsCount() }}</p>
-            <p class="text-on-surface-variant text-sm font-medium">Slots heute mit freiem Platz</p>
+            <p class="text-on-surface-variant text-sm font-medium mt-1">Slots heute mit freiem Platz</p>
           </div>
         </div>
       }

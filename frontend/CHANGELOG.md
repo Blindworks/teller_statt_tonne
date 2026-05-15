@@ -14,6 +14,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Dashboard-Sidebar: Status-Kacheln „Nächster Pickup“, „Nächster freier Slot“ und „Offene Slots heute“ bekommen analog zur Kachel „Kommende Termine“ eine Header-Zeile mit farbigem Material-Icon, fettem Titel und optionalem Status-Badge rechts; die zuvor mittig platzierten Icon-Kreise entfallen.
 - Menüpunkt „Quiz“ aus Hauptnavigation (Sidebar + mobiles „Mehr“-Sheet) entfernt und als Karte in das Teamleitung-Dashboard (`/teamleitung`) verschoben. Sichtbarkeit weiterhin über Feature `nav.quiz-admin` gesteuert.
 
 ### Added
