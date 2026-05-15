@@ -1,0 +1,203 @@
+<section class="pt-24 pb-32 md:pb-16 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <a
+    routerLink="/termine"
+    class="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary mb-6"
+  >
+    <span class="material-symbols-outlined text-base">arrow_back</span>
+    Zur Übersicht
+  </a>
+
+  <header class="mb-10">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface">
+      {{ id() === null ? 'Neuer Termin' : 'Termin bearbeiten' }}
+    </h1>
+    <p class="text-sm text-on-surface-variant mt-2">
+      Lege fest, wann der Termin stattfindet, was passiert und wer ihn sehen soll.
+    </p>
+  </header>
+
+  @if (loadError()) {
+    <p class="rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm mb-4">
+      {{ loadError() }}
+    </p>
+  }
+  @if (saveError()) {
+    <p class="rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm mb-4">
+      {{ saveError() }}
+    </p>
+  }
+
+  <form
+    (submit)="$event.preventDefault(); save()"
+    class="bg-surface-container-lowest rounded-3xl shadow-[0_20px_50px_rgba(48,52,40,0.04)]"
+  >
+    <!-- Abschnitt: Grunddaten -->
+    <section class="p-8 md:p-12 border-b border-outline-variant/20">
+      <header class="mb-10">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-primary mb-2">Wann & wo</h2>
+        <p class="text-sm text-on-surface-variant">Termin, Zeit und Ort bzw. Online-Link.</p>
+      </header>
+
+      <div class="space-y-8">
+        <div>
+          <label class="block text-sm font-bold text-on-surface mb-2">Titel *</label>
+          <input
+            type="text"
+            [value]="model().title"
+            (input)="updateField('title', $any($event.target).value)"
+            maxlength="200"
+            required
+            placeholder="z. B. Teamsitzung Mai"
+            class="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
+          />
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-bold text-on-surface mb-2">Beginn *</label>
+            <input
+              type="datetime-local"
+              [value]="startLocal()"
+              (input)="startLocal.set($any($event.target).value)"
+              required
+              class="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-on-surface mb-2">Ende *</label>
+            <input
+              type="datetime-local"
+              [value]="endLocal()"
+              (input)="endLocal.set($any($event.target).value)"
+              required
+              class="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-on-surface mb-2">Ort oder Online-Link</label>
+          <input
+            type="text"
+            [value]="model().location ?? ''"
+            (input)="updateField('location', $any($event.target).value)"
+            placeholder="Adresse oder URL (z. B. https://meet…)"
+            class="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
+          />
+          <p class="mt-2 text-xs text-on-surface-variant">
+            Beginnt der Eintrag mit „http(s)://", wird er auf der öffentlichen Seite als Link
+            dargestellt.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Abschnitt: Inhalt -->
+    <section class="p-8 md:p-12 border-b border-outline-variant/20">
+      <header class="mb-10">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-primary mb-2">Inhalt</h2>
+        <p class="text-sm text-on-surface-variant">Was Teilnehmende vor dem Termin wissen sollten.</p>
+      </header>
+
+      <div class="space-y-8">
+        <div>
+          <label class="block text-sm font-bold text-on-surface mb-2">Beschreibung</label>
+          <textarea
+            rows="6"
+            [value]="model().description ?? ''"
+            (input)="updateField('description', $any($event.target).value)"
+            placeholder="Worum geht es? Agenda, Hinweise, Mitbringen …"
+            class="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all resize-y"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-on-surface mb-2">
+            Anhang / Link
+            <span class="font-normal text-on-surface-variant">(optional)</span>
+          </label>
+          <input
+            type="url"
+            [value]="model().attachmentUrl ?? ''"
+            (input)="updateField('attachmentUrl', $any($event.target).value)"
+            placeholder="https://…"
+            class="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Abschnitt: Sichtbarkeit -->
+    <section class="p-8 md:p-12">
+      <header class="mb-10">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-primary mb-2">Sichtbarkeit</h2>
+        <p class="text-sm text-on-surface-variant">Wer den Termin in der Übersicht sehen darf.</p>
+      </header>
+
+      <div class="space-y-8">
+        <div>
+          <p class="block text-sm font-bold text-on-surface mb-3">Rollen</p>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            @for (role of roles(); track role.id) {
+              <label
+                class="flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer transition-all"
+                [class.border-primary]="isRoleSelected(role.id)"
+                [class.bg-primary-container/30]="isRoleSelected(role.id)"
+                [class.border-outline-variant]="!isRoleSelected(role.id)"
+                [class.hover:bg-surface-container]="!isRoleSelected(role.id)"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="isRoleSelected(role.id)"
+                  (change)="toggleRole(role.id, $any($event.target).checked)"
+                  class="accent-primary w-4 h-4"
+                />
+                <span class="text-sm font-medium">{{ role.label || role.name }}</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <label
+          class="flex items-start gap-4 rounded-xl border px-5 py-4 cursor-pointer transition-all"
+          [class.border-tertiary]="model().isPublic"
+          [class.bg-tertiary-container/30]="model().isPublic"
+          [class.border-outline-variant]="!model().isPublic"
+          [class.hover:bg-surface-container]="!model().isPublic"
+        >
+          <input
+            type="checkbox"
+            [checked]="model().isPublic"
+            (change)="updateField('isPublic', $any($event.target).checked)"
+            class="accent-tertiary w-5 h-5 mt-0.5"
+          />
+          <span class="flex-1">
+            <span class="block text-sm font-bold text-on-surface">Öffentlich auf der Startseite</span>
+            <span class="block text-xs text-on-surface-variant mt-1">
+              Wenn aktiv, erscheint dieser Termin zusätzlich für nicht eingeloggte Besucher auf der
+              Landingpage.
+            </span>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Aktionen -->
+    <div
+      class="flex justify-end gap-3 px-8 md:px-12 py-6 bg-surface-container-low/40 rounded-b-3xl border-t border-outline-variant/20"
+    >
+      <a
+        routerLink="/termine"
+        class="rounded-full px-6 py-2.5 text-sm font-bold text-on-surface hover:bg-surface-container transition-colors"
+        >Abbrechen</a
+      >
+      <button
+        type="submit"
+        [disabled]="busy()"
+        class="rounded-full bg-primary text-on-primary px-8 py-2.5 text-sm font-bold shadow hover:shadow-lg disabled:opacity-50 transition-all"
+      >
+        Speichern
+      </button>
+    </div>
+  </form>
+</section>

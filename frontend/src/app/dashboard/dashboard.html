@@ -192,14 +192,15 @@
     </div>
 
     <!-- News Feed -->
-    <div class="space-y-6">
+    <div class="space-y-5">
+      <app-upcoming-appointments-widget />
       @let nextPickup = nextOwnPickup();
       @let countdown = nextPickupCountdown();
       <button
         type="button"
         (click)="nextPickup && openSlot(nextPickup)"
         [disabled]="!nextPickup"
-        class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-6 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
+        class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-6 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
       >
         <div class="flex justify-between items-start gap-2">
           <span
@@ -242,7 +243,7 @@
           type="button"
           (click)="nextFree && openSlot(nextFree)"
           [disabled]="!nextFree"
-          class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-4 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
+          class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-4 text-left w-full enabled:hover:bg-surface-container-low transition-colors disabled:cursor-default"
         >
           <p
             class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant"
@@ -283,7 +284,7 @@
         </button>
       } @else if (isAdminOrAmbassador()) {
         <div
-          class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-4"
+          class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] flex flex-col justify-between gap-4"
         >
           <p
             class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant"
@@ -306,7 +307,7 @@
       }
 
       <h3 class="text-2xl font-extrabold text-on-surface tracking-tight mb-2">Community News</h3>
-      <div class="bg-surface-container-high/50 p-6 rounded-lg space-y-6">
+      <div class="bg-surface-container-high/50 p-6 rounded-2xl space-y-6">
         @for (item of news; track item.title) {
           <div
             class="relative pl-8 before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:rounded-full"
@@ -329,7 +330,7 @@
       </div>
 
       <!-- Active Community Card -->
-      <div class="bg-primary p-6 rounded-xl text-on-primary">
+      <div class="bg-primary p-6 rounded-2xl text-on-primary">
         <div class="flex items-center gap-4 mb-4">
           <div class="flex -space-x-3">
             @for (avatar of activeAvatars; track avatar) {

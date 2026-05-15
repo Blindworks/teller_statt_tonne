@@ -59,6 +59,24 @@
       <span class="material-symbols-outlined">event</span>
       Sonderabholungen
     </a>
+    <a
+      routerLink="/termine"
+      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+      #termineLink="routerLinkActive"
+      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+      [class.text-on-surface]="!termineLink.isActive"
+      [class.hover:bg-surface-container]="!termineLink.isActive"
+      [class.hover:translate-x-1]="!termineLink.isActive"
+    >
+      <span class="material-symbols-outlined">event_note</span>
+      <span class="flex-1">Termine</span>
+      @if (appointmentsUnread() > 0) {
+        <span
+          class="inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-error text-on-error text-[10px] font-bold px-1.5"
+          >{{ appointmentsUnread() }}</span
+        >
+      }
+    </a>
     @if (canSeeDistributionPoints()) {
       <a
         routerLink="/admin/distribution-points"
@@ -227,6 +245,37 @@
     </div>
   </div>
 </header>
+
+@if (bannerVisible()) {
+  <div
+    class="fixed top-20 right-6 md:right-10 z-[1130] max-w-sm bg-primary-container text-on-primary-container rounded-2xl shadow-2xl ring-1 ring-primary/20 p-4 flex items-start gap-3"
+  >
+    <span class="material-symbols-outlined text-primary">event_note</span>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-bold">
+        @if (bannerCount() === 1) {
+          Du hast 1 neuen Termin
+        } @else {
+          Du hast {{ bannerCount() }} neue Termine
+        }
+      </p>
+      <a
+        routerLink="/termine"
+        (click)="dismissAppointmentsBanner()"
+        class="text-xs font-bold text-primary hover:underline"
+        >Zu den Terminen</a
+      >
+    </div>
+    <button
+      type="button"
+      (click)="dismissAppointmentsBanner()"
+      class="rounded-full p-1 hover:bg-primary/10"
+      title="Schließen"
+    >
+      <span class="material-symbols-outlined text-base">close</span>
+    </button>
+  </div>
+}
 
 <router-outlet />
 
@@ -407,6 +456,23 @@
           Tickets
         </a>
       }
+      <a
+        routerLink="/termine"
+        (click)="closeMore()"
+        routerLinkActive="text-primary"
+        #termineSheet="routerLinkActive"
+        class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+        [class.text-on-surface]="!termineSheet.isActive"
+      >
+        <span class="material-symbols-outlined">event_note</span>
+        <span class="flex-1">Termine</span>
+        @if (appointmentsUnread() > 0) {
+          <span
+            class="inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-error text-on-error text-[10px] font-bold px-1.5"
+            >{{ appointmentsUnread() }}</span
+          >
+        }
+      </a>
       <div class="border-t border-outline-variant/20 my-2"></div>
       <a
         routerLink="/profile"

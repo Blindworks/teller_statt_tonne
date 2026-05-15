@@ -13,6 +13,7 @@ import { AuthService } from '../auth/auth.service';
 import { PermissionsService } from '../auth/permissions.service';
 import { NotificationBellComponent } from '../notifications/notification-bell/notification-bell';
 import { NotificationService } from '../notifications/notification.service';
+import { AppointmentService } from '../appointments/appointment.service';
 import { resolvePhotoUrl } from '../users/photo-url';
 
 @Component({
@@ -28,8 +29,12 @@ export class AppShellComponent {
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly notifications = inject(NotificationService);
+  private readonly appointments = inject(AppointmentService);
 
   readonly currentUser = this.auth.currentUser;
+  readonly appointmentsUnread = this.appointments.unreadCount;
+  readonly bannerVisible = signal(false);
+  readonly bannerCount = signal(0);
   readonly showShell = computed(() => this.auth.isAuthenticated());
 
   readonly photoSrc = computed(() => resolvePhotoUrl(this.currentUser()?.photoUrl ?? null));
@@ -79,10 +84,24 @@ export class AppShellComponent {
       if (this.auth.isAuthenticated()) {
         this.notifications.connect();
         this.notifications.load().subscribe();
+        this.appointments.refreshUnreadCount().subscribe({
+          next: ({ count }) => {
+            if (count > 0 && !this.bannerVisible()) {
+              this.bannerCount.set(count);
+              this.bannerVisible.set(true);
+            }
+          },
+        });
       } else {
         this.notifications.disconnect();
+        this.appointments.resetUnread();
+        this.bannerVisible.set(false);
       }
     });
+  }
+
+  dismissAppointmentsBanner(): void {
+    this.bannerVisible.set(false);
   }
 
   toggleMenu(): void {

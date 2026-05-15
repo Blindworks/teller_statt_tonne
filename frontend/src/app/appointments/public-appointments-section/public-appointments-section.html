@@ -1,0 +1,40 @@
+@if (items().length > 0) {
+  <section class="py-12 px-6 max-w-screen-xl mx-auto">
+    <h2 class="text-2xl md:text-3xl font-extrabold text-on-surface mb-6 text-center">
+      Kommende Termine
+    </h2>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (item of items(); track item.id) {
+        <article
+          class="bg-surface-container-lowest rounded-2xl shadow-[0_8px_24px_rgba(48,52,40,0.05)] p-5"
+        >
+          <h3 class="font-bold text-on-surface mb-2">{{ item.title }}</h3>
+          <p class="text-sm text-on-surface-variant mb-2">{{ rangeOf(item) }}</p>
+          @if (item.location) {
+            @if (isUrl(item.location)) {
+              <a
+                [href]="item.location"
+                target="_blank"
+                rel="noopener"
+                class="text-sm text-primary hover:underline inline-flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-sm">link</span>
+                Online-Link
+              </a>
+            } @else {
+              <p class="text-sm text-on-surface-variant flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">place</span>
+                {{ item.location }}
+              </p>
+            }
+          }
+          @if (item.description) {
+            <p class="text-sm text-on-surface mt-3 whitespace-pre-line line-clamp-3">
+              {{ item.description }}
+            </p>
+          }
+        </article>
+      }
+    </div>
+  </section>
+}

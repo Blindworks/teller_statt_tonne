@@ -1,0 +1,154 @@
+<section class="pt-24 pb-32 md:pb-12 px-6 md:pl-80 md:pr-12 max-w-screen-2xl mx-auto min-h-screen">
+  <header class="flex items-start justify-between gap-4 mb-8 flex-wrap">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-on-surface">Termine</h1>
+      <p class="text-sm text-on-surface-variant mt-2">
+        Ankündigungen, Meetings und Schulungen – sichtbar je nach Rolle.
+      </p>
+    </div>
+    @if (canCreate()) {
+      <a
+        routerLink="/termine/neu"
+        class="inline-flex items-center gap-2 rounded-full bg-primary text-on-primary px-5 py-2.5 text-sm font-bold shadow hover:shadow-lg transition-all"
+      >
+        <span class="material-symbols-outlined text-base">add</span>
+        Neuer Termin
+      </a>
+    }
+  </header>
+
+  <div class="mb-6 inline-flex rounded-full bg-surface-container p-1 text-sm font-bold">
+    <button
+      type="button"
+      (click)="setScope('upcoming')"
+      class="rounded-full px-4 py-1.5 transition-colors"
+      [class.bg-primary]="scope() === 'upcoming'"
+      [class.text-on-primary]="scope() === 'upcoming'"
+      [class.text-on-surface-variant]="scope() !== 'upcoming'"
+    >
+      Kommend
+    </button>
+    <button
+      type="button"
+      (click)="setScope('past')"
+      class="rounded-full px-4 py-1.5 transition-colors"
+      [class.bg-primary]="scope() === 'past'"
+      [class.text-on-primary]="scope() === 'past'"
+      [class.text-on-surface-variant]="scope() !== 'past'"
+    >
+      Vergangen
+    </button>
+  </div>
+
+  @if (loadError()) {
+    <p class="mb-4 rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm">
+      {{ loadError() }}
+    </p>
+  }
+  @if (actionError()) {
+    <p class="mb-4 rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm">
+      {{ actionError() }}
+    </p>
+  }
+
+  <div class="space-y-3">
+    @for (item of items(); track item.id) {
+      <a
+        [routerLink]="['/termine', item.id]"
+        class="block bg-surface-container-lowest rounded-2xl shadow-[0_8px_24px_rgba(48,52,40,0.04)] hover:shadow-[0_20px_50px_rgba(48,52,40,0.08)] transition-all p-5"
+      >
+        <div class="flex items-start gap-4">
+          <span
+            class="material-symbols-outlined text-primary text-2xl"
+            [class.opacity-50]="item.read"
+            >event_note</span
+          >
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-bold text-on-surface text-base truncate">{{ item.title }}</h3>
+              @if (!item.read && scope() === 'upcoming') {
+                <span
+                  class="rounded-full bg-primary text-on-primary text-[10px] uppercase tracking-wider font-bold px-2 py-0.5"
+                  >Neu</span
+                >
+              }
+              @if (item.isPublic) {
+                <span
+                  class="rounded-full bg-tertiary-container text-on-tertiary-container text-[10px] uppercase tracking-wider font-bold px-2 py-0.5"
+                  >Öffentlich</span
+                >
+              }
+            </div>
+            <p class="text-sm text-on-surface-variant mt-1">{{ rangeOf(item) }}</p>
+            @if (item.location) {
+              <p class="text-sm text-on-surface-variant mt-0.5">
+                <span class="material-symbols-outlined align-middle text-sm">place</span>
+                {{ item.location }}
+              </p>
+            }
+            <p class="text-xs text-on-surface-variant mt-2 italic">
+              Für: {{ rolesLabel(item) }}
+            </p>
+          </div>
+          @if (item.canEdit) {
+            <div class="flex items-center gap-1">
+              <a
+                [routerLink]="['/termine', item.id, 'bearbeiten']"
+                (click)="$event.stopPropagation()"
+                class="rounded-full p-2 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"
+                title="Bearbeiten"
+              >
+                <span class="material-symbols-outlined text-base">edit</span>
+              </a>
+              <button
+                type="button"
+                (click)="askDelete(item.id); $event.preventDefault(); $event.stopPropagation()"
+                class="rounded-full p-2 text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-colors"
+                title="Löschen"
+              >
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          }
+        </div>
+      </a>
+    } @empty {
+      <div class="bg-surface-container-lowest rounded-2xl p-12 text-center text-on-surface-variant">
+        Keine Termine vorhanden.
+      </div>
+    }
+  </div>
+</section>
+
+@if (confirmDeleteId() !== null) {
+  <div
+    class="fixed inset-0 bg-black/40 z-[1110] flex items-center justify-center p-4"
+    (click)="cancelDelete()"
+  >
+    <div
+      class="bg-surface rounded-2xl shadow-2xl max-w-md w-full p-6"
+      (click)="$event.stopPropagation()"
+    >
+      <h3 class="text-lg font-bold text-on-surface mb-2">Termin wirklich löschen?</h3>
+      <p class="text-sm text-on-surface-variant">Dieser Schritt kann nicht rückgängig gemacht werden.</p>
+      <div class="flex justify-end gap-3 mt-6">
+        <button
+          type="button"
+          (click)="cancelDelete()"
+          [disabled]="busy()"
+          class="rounded-full px-5 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
+        >
+          Abbrechen
+        </button>
+        <button
+          type="button"
+          (click)="confirmDelete()"
+          [disabled]="busy()"
+          class="rounded-full bg-error text-on-error px-5 py-2 text-sm font-bold disabled:opacity-50"
+        >
+          Löschen
+        </button>
+      </div>
+    </div>
+  </div>
+}

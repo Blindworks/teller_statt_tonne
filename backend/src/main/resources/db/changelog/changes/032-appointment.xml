@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="032-create-appointment" author="teller-statt-tonne">
+        <createTable tableName="appointment">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(4000)"/>
+            <column name="start_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location" type="VARCHAR(500)"/>
+            <column name="attachment_url" type="VARCHAR(1024)"/>
+            <column name="is_public" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="appointment" indexName="idx_appointment_end_time">
+            <column name="end_time"/>
+        </createIndex>
+        <createIndex tableName="appointment" indexName="idx_appointment_is_public">
+            <column name="is_public"/>
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="appointment" baseColumnNames="created_by_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_appointment_created_by"/>
+    </changeSet>
+
+    <changeSet id="032-create-appointment-role" author="teller-statt-tonne">
+        <createTable tableName="appointment_role">
+            <column name="appointment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="appointment_role" columnNames="appointment_id, role_id"
+                       constraintName="pk_appointment_role"/>
+        <addForeignKeyConstraint baseTableName="appointment_role" baseColumnNames="appointment_id"
+                                 referencedTableName="appointment" referencedColumnNames="id"
+                                 constraintName="fk_appointment_role_appointment" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="appointment_role" baseColumnNames="role_id"
+                                 referencedTableName="role" referencedColumnNames="id"
+                                 constraintName="fk_appointment_role_role" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="032-create-appointment-read" author="teller-statt-tonne">
+        <createTable tableName="appointment_read">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="appointment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="read_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="appointment_read"
+                             columnNames="appointment_id, user_id"
+                             constraintName="uk_appointment_read_user"/>
+        <addForeignKeyConstraint baseTableName="appointment_read" baseColumnNames="appointment_id"
+                                 referencedTableName="appointment" referencedColumnNames="id"
+                                 constraintName="fk_appointment_read_appointment" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="appointment_read" baseColumnNames="user_id"
+                                 referencedTableName="app_user" referencedColumnNames="id"
+                                 constraintName="fk_appointment_read_user" onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -17,6 +17,7 @@ import { Role } from '../users/user.model';
 import { UserProfileDialogService } from '../users/user-profile-dialog/user-profile-dialog.service';
 import { DaySlot } from './day-slot.model';
 import { DashboardService } from './dashboard.service';
+import { UpcomingAppointmentsWidgetComponent } from '../appointments/upcoming-appointments-widget/upcoming-appointments-widget';
 
 interface NewsItem {
   type: 'event' | 'milestone' | 'maintenance';
@@ -62,7 +63,7 @@ const UNASSIGN_CUTOFF_MS = 2 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgTemplateOutlet, RouterLink, PhotoUrlPipe],
+  imports: [NgTemplateOutlet, RouterLink, PhotoUrlPipe, UpcomingAppointmentsWidgetComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

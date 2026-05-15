@@ -1,0 +1,37 @@
+<section
+  class="bg-surface-container-lowest rounded-2xl shadow-[0_4px_20px_rgba(48,52,40,0.04)] p-6"
+>
+  <header class="flex items-center justify-between mb-5">
+    <h2 class="text-lg font-extrabold text-on-surface flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">event_note</span>
+      Kommende Termine
+    </h2>
+    <a routerLink="/termine" class="text-xs font-bold text-primary hover:underline">Alle ansehen</a>
+  </header>
+
+  @if (items().length > 0) {
+    <ul class="space-y-1">
+      @for (item of items(); track item.id) {
+        <li>
+          <a
+            [routerLink]="['/termine', item.id]"
+            class="-mx-3 block rounded-lg hover:bg-surface-container px-3 py-2.5 transition-colors"
+          >
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-on-surface text-sm truncate">{{ item.title }}</span>
+              @if (!item.read) {
+                <span
+                  class="rounded-full bg-primary text-on-primary text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5"
+                  >Neu</span
+                >
+              }
+            </div>
+            <p class="text-xs text-on-surface-variant mt-1">{{ rangeOf(item) }}</p>
+          </a>
+        </li>
+      }
+    </ul>
+  } @else if (loaded()) {
+    <p class="text-sm text-on-surface-variant">Keine kommenden Termine.</p>
+  }
+</section>

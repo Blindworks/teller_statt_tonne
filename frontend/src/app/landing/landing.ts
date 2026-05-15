@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { PublicAppointmentsSectionComponent } from '../appointments/public-appointments-section/public-appointments-section';
 
 type IconId = 'leaf' | 'hands' | 'heart' | 'group' | 'basket' | 'truck' | 'bulb';
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink],
+  imports: [RouterLink, PublicAppointmentsSectionComponent],
   templateUrl: './landing.html',
   styleUrl: './landing.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
