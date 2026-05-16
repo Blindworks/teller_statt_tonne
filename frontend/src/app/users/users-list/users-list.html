@@ -82,8 +82,9 @@
         class="relative bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-6 shadow-[0_20px_50px_rgba(48,52,40,0.04)] hover:shadow-xl transition-all duration-500 group"
         [class.border-l-8]="primaryRole(user) === 'NEW_MEMBER'"
         [class.border-secondary]="primaryRole(user) === 'NEW_MEMBER'"
-        [class.border-2]="user.status === 'LOCKED'"
+        [class.border-2]="user.status === 'LOCKED' || user.status === 'PAUSED'"
         [class.border-error]="user.status === 'LOCKED'"
+        [class.border-tertiary]="user.status === 'PAUSED'"
       >
         @if (user.status === 'LOCKED') {
           <span
@@ -92,6 +93,14 @@
             title="Gesperrt"
           >
             <span class="material-symbols-outlined text-xl">lock</span>
+          </span>
+        } @else if (user.status === 'PAUSED') {
+          <span
+            class="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-md"
+            [attr.aria-label]="'Nutzer pausiert'"
+            title="Pausiert"
+          >
+            <span class="material-symbols-outlined text-xl">pause</span>
           </span>
         }
         <div class="flex justify-between items-start">
