@@ -97,16 +97,47 @@
                 <p class="text-sm text-on-surface whitespace-pre-line">{{ p.pickupProcedure }}</p>
               </div>
             }
+            @if (p.retterContact.name || p.retterContact.email || p.retterContact.phone) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">contact_phone</span>
+                  Ansprechpartner
+                </div>
+                <div class="space-y-1">
+                  @if (p.retterContact.name) {
+                    <p class="text-sm font-bold text-on-surface">{{ p.retterContact.name }}</p>
+                  }
+                  @if (p.retterContact.email) {
+                    <a
+                      [href]="'mailto:' + p.retterContact.email"
+                      class="text-sm text-primary hover:underline flex items-center gap-1"
+                    >
+                      <span class="material-symbols-outlined text-base">mail</span>
+                      {{ p.retterContact.email }}
+                    </a>
+                  }
+                  @if (p.retterContact.phone) {
+                    <a
+                      [href]="'tel:' + p.retterContact.phone"
+                      class="text-sm text-primary hover:underline flex items-center gap-1"
+                    >
+                      <span class="material-symbols-outlined text-base">call</span>
+                      {{ p.retterContact.phone }}
+                    </a>
+                  }
+                </div>
+              </div>
+            }
             @if (p.onSiteContactNote) {
               <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
                 <div class="flex items-center gap-2 mb-2 text-primary font-bold">
                   <span class="material-symbols-outlined">person</span>
-                  Ansprechpartner
+                  Hinweis zum Ansprechpartner
                 </div>
                 <p class="text-sm text-on-surface">{{ p.onSiteContactNote }}</p>
               </div>
             }
-            @if (!p.parkingInfo && !p.accessInstructions && !p.pickupProcedure && !p.onSiteContactNote) {
+            @if (!p.parkingInfo && !p.accessInstructions && !p.pickupProcedure && !p.onSiteContactNote && !p.retterContact.name && !p.retterContact.email && !p.retterContact.phone) {
               <div class="text-sm text-on-surface-variant italic">
                 Keine besonderen Hinweise hinterlegt.
               </div>

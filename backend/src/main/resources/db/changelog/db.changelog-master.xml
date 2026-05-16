@@ -38,5 +38,6 @@
     <include file="db/changelog/changes/031-add-koordinator-role.xml"/>
     <include file="db/changelog/changes/032-appointment.xml"/>
     <include file="db/changelog/changes/033-drop-features.xml"/>
+    <include file="db/changelog/changes/034-partner-retter-contact.xml"/>
 
 </databaseChangeLog>

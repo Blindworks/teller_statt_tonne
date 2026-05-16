@@ -18,6 +18,9 @@ final class PartnerMapper {
             e.getContact() == null
                 ? new Partner.Contact(null, null, null)
                 : new Partner.Contact(e.getContact().getName(), e.getContact().getEmail(), e.getContact().getPhone()),
+            e.getRetterContact() == null
+                ? new Partner.Contact(null, null, null)
+                : new Partner.Contact(e.getRetterContact().getName(), e.getRetterContact().getEmail(), e.getRetterContact().getPhone()),
             e.getPickupSlots() == null
                 ? List.of()
                 : e.getPickupSlots().stream()
@@ -62,6 +65,16 @@ final class PartnerMapper {
             contact.setPhone(src.contact().phone());
         }
         target.setContact(contact);
+
+        PartnerEntity.ContactEmbeddable retterContact = target.getRetterContact() != null
+            ? target.getRetterContact()
+            : new PartnerEntity.ContactEmbeddable();
+        if (src.retterContact() != null) {
+            retterContact.setName(src.retterContact().name());
+            retterContact.setEmail(src.retterContact().email());
+            retterContact.setPhone(src.retterContact().phone());
+        }
+        target.setRetterContact(retterContact);
 
         target.getPickupSlots().clear();
         if (src.pickupSlots() != null) {

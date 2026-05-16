@@ -129,7 +129,7 @@ public class PartnerService {
             .toList();
         return new Partner(
             p.id(), p.name(), p.categoryId(), p.street(), p.postalCode(), p.city(),
-            p.logoUrl(), p.contact(), enriched, p.status(), p.latitude(), p.longitude(),
+            p.logoUrl(), p.contact(), p.retterContact(), enriched, p.status(), p.latitude(), p.longitude(),
             p.parkingInfo(), p.accessInstructions(), p.pickupProcedure(), p.onSiteContactNote(),
             p.preferredFoodCategoryIds()
         );

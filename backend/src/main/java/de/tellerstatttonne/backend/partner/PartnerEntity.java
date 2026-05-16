@@ -1,6 +1,8 @@
 package de.tellerstatttonne.backend.partner;
 
 import de.tellerstatttonne.backend.user.UserEntity;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -70,6 +72,14 @@ public class PartnerEntity {
     @Embedded
     private ContactEmbeddable contact = new ContactEmbeddable();
 
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "name",  column = @Column(name = "retter_contact_name")),
+        @AttributeOverride(name = "email", column = @Column(name = "retter_contact_email")),
+        @AttributeOverride(name = "phone", column = @Column(name = "retter_contact_phone", length = 64))
+    })
+    private ContactEmbeddable retterContact = new ContactEmbeddable();
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "partner_pickup_slot",
@@ -110,6 +120,8 @@ public class PartnerEntity {
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
     public ContactEmbeddable getContact() { return contact; }
     public void setContact(ContactEmbeddable contact) { this.contact = contact; }
+    public ContactEmbeddable getRetterContact() { return retterContact; }
+    public void setRetterContact(ContactEmbeddable retterContact) { this.retterContact = retterContact; }
     public List<PickupSlotEmbeddable> getPickupSlots() { return pickupSlots; }
     public void setPickupSlots(List<PickupSlotEmbeddable> pickupSlots) { this.pickupSlots = pickupSlots; }
     public Partner.Status getStatus() { return status; }

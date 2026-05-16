@@ -54,6 +54,11 @@ type PartnerForm = FormGroup<{
     email: FormControl<string>;
     phone: FormControl<string>;
   }>;
+  retterContact: FormGroup<{
+    name: FormControl<string>;
+    email: FormControl<string>;
+    phone: FormControl<string>;
+  }>;
   pickupSlots: FormArray<SlotForm>;
   status: FormControl<Status>;
   parkingInfo: FormControl<string>;
@@ -140,6 +145,7 @@ export class PartnerEditComponent {
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.errorMessage.set(this.buildValidationErrorMessage());
       return;
     }
     const payload = this.toPartner();
@@ -178,6 +184,11 @@ export class PartnerEditComponent {
       city: this.fb.nonNullable.control(defaults.city),
       logoUrl: this.fb.nonNullable.control(''),
       contact: this.fb.group({
+        name: this.fb.nonNullable.control(''),
+        email: this.fb.nonNullable.control('', Validators.email),
+        phone: this.fb.nonNullable.control(''),
+      }),
+      retterContact: this.fb.group({
         name: this.fb.nonNullable.control(''),
         email: this.fb.nonNullable.control('', Validators.email),
         phone: this.fb.nonNullable.control(''),
@@ -341,7 +352,16 @@ export class PartnerEditComponent {
       postalCode: partner.postalCode,
       city: partner.city,
       logoUrl: partner.logoUrl ?? '',
-      contact: partner.contact,
+      contact: {
+        name: partner.contact?.name ?? '',
+        email: partner.contact?.email ?? '',
+        phone: partner.contact?.phone ?? '',
+      },
+      retterContact: {
+        name: partner.retterContact?.name ?? '',
+        email: partner.retterContact?.email ?? '',
+        phone: partner.retterContact?.phone ?? '',
+      },
       status: partner.status,
       parkingInfo: partner.parkingInfo ?? '',
       accessInstructions: partner.accessInstructions ?? '',
@@ -376,6 +396,37 @@ export class PartnerEditComponent {
     return a === b;
   }
 
+  private buildValidationErrorMessage(): string {
+    const issues: string[] = [];
+    const c = this.form.controls;
+
+    if (c.name.invalid) issues.push('Name fehlt');
+    if (c.categoryId.invalid) issues.push('Kategorie fehlt');
+
+    const contactEmail = c.contact.controls.email;
+    if (contactEmail.errors?.['email']) {
+      issues.push('E-Mail Hauptansprechpartner ist ungültig');
+    }
+    const retterEmail = c.retterContact.controls.email;
+    if (retterEmail.errors?.['email']) {
+      issues.push('E-Mail Ansprechpartner für Retter ist ungültig');
+    }
+
+    this.slots.controls.forEach((slot, idx) => {
+      if (slot.controls.capacity.invalid) {
+        issues.push(`Kapazität in Abholzeit ${idx + 1} ist ungültig`);
+      }
+      if (slot.controls.expectedKg.invalid) {
+        issues.push(`Erwartete kg in Abholzeit ${idx + 1} sind ungültig`);
+      }
+    });
+
+    if (issues.length === 0) {
+      return 'Bitte die rot markierten Felder prüfen.';
+    }
+    return 'Speichern nicht möglich: ' + issues.join(' · ');
+  }
+
   private toPartner(): Partner {
     const raw = this.form.getRawValue();
     return {
@@ -387,6 +438,7 @@ export class PartnerEditComponent {
       city: raw.city,
       logoUrl: raw.logoUrl?.trim() ? raw.logoUrl.trim() : null,
       contact: raw.contact,
+      retterContact: raw.retterContact,
       pickupSlots: raw.pickupSlots.map((s) => ({
         weekday: s.weekday,
         startTime: s.startTime,

@@ -12,6 +12,7 @@ public record Partner(
     String city,
     String logoUrl,
     Contact contact,
+    Contact retterContact,
     List<PickupSlot> pickupSlots,
     Status status,
     Double latitude,
@@ -62,13 +63,13 @@ public record Partner(
         String logoUrl, Contact contact, List<PickupSlot> pickupSlots, Status status,
         Double latitude, Double longitude
     ) {
-        this(id, name, categoryId, street, postalCode, city, logoUrl, contact, pickupSlots,
+        this(id, name, categoryId, street, postalCode, city, logoUrl, contact, null, pickupSlots,
             status, latitude, longitude, null, null, null, null, List.of());
     }
 
     public Partner withId(Long newId) {
         return new Partner(newId, name, categoryId, street, postalCode, city, logoUrl,
-            contact, pickupSlots, status, latitude, longitude,
+            contact, retterContact, pickupSlots, status, latitude, longitude,
             parkingInfo, accessInstructions, pickupProcedure, onSiteContactNote, preferredFoodCategoryIds);
     }
 }

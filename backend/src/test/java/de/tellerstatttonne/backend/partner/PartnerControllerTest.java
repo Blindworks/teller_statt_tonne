@@ -274,6 +274,45 @@ class PartnerControllerTest {
     }
 
     @Test
+    void retterContactRoundTrip() {
+        Partner payload = new Partner(
+            null, "Bio-Markt Retterzeit", bakeryId,
+            "Hauptstr. 1", "10115", "Berlin", null,
+            new Partner.Contact("Hauptkontakt", "haupt@example.de", "+49 30 1"),
+            new Partner.Contact("Retter-Kontakt", "retter@example.de", "+49 30 2"),
+            List.of(),
+            Partner.Status.KOOPERIERT, null, null,
+            null, null, null, null, List.of()
+        );
+        Partner created = controller.create(payload).getBody();
+        assertThat(created).isNotNull();
+        assertThat(created.retterContact()).isNotNull();
+        assertThat(created.retterContact().name()).isEqualTo("Retter-Kontakt");
+        assertThat(created.retterContact().email()).isEqualTo("retter@example.de");
+        assertThat(created.retterContact().phone()).isEqualTo("+49 30 2");
+
+        Partner fetched = controller.get(created.id()).getBody();
+        assertThat(fetched).isNotNull();
+        assertThat(fetched.retterContact().name()).isEqualTo("Retter-Kontakt");
+        assertThat(fetched.contact().name()).isEqualTo("Hauptkontakt");
+
+        Partner updatePayload = new Partner(
+            created.id(), created.name(), created.categoryId(), created.street(),
+            created.postalCode(), created.city(), created.logoUrl(),
+            created.contact(),
+            new Partner.Contact("Neuer Retter-Kontakt", "neu@example.de", "+49 30 9"),
+            created.pickupSlots(),
+            created.status(), null, null,
+            null, null, null, null, List.of()
+        );
+        Partner updated = controller.update(created.id(), updatePayload).getBody();
+        assertThat(updated).isNotNull();
+        assertThat(updated.retterContact().name()).isEqualTo("Neuer Retter-Kontakt");
+        assertThat(updated.retterContact().email()).isEqualTo("neu@example.de");
+        assertThat(updated.contact().name()).isEqualTo("Hauptkontakt");
+    }
+
+    @Test
     void updateMissingReturns404() {
         Partner partner = new Partner(999L, "X", cafeId, "s", "p", "c",
             null, new Partner.Contact("a", "b", "c"), List.of(), Partner.Status.KOOPERIERT, null, null);

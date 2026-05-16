@@ -40,6 +40,7 @@ export interface Partner {
   city: string;
   logoUrl: string | null;
   contact: Contact;
+  retterContact: Contact;
   pickupSlots: PickupSlot[];
   status: Status;
   latitude: number | null;
@@ -91,6 +92,7 @@ export function emptyPartner(): Partner {
     city: '',
     logoUrl: null,
     contact: { name: '', email: '', phone: '' },
+    retterContact: { name: '', email: '', phone: '' },
     pickupSlots: [],
     status: 'KEIN_KONTAKT',
     latitude: null,
