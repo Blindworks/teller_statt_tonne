@@ -1,4 +1,4 @@
-<main class="min-h-screen bg-surface pb-32">
+<main class="min-h-screen bg-surface pb-32 pt-24 md:pl-80">
   @if (loading()) {
     <div class="flex items-center justify-center min-h-[60vh] text-on-surface-variant">
       Lädt …
@@ -17,7 +17,7 @@
     </div>
   } @else {
     <!-- Header / Stepper -->
-    <header class="sticky top-0 z-10 bg-surface/95 backdrop-blur border-b border-outline-variant px-4 py-4 shadow-sm">
+    <header class="sticky top-24 z-10 bg-surface/95 backdrop-blur border-b border-outline-variant px-4 py-4 shadow-sm">
       <div class="max-w-3xl mx-auto flex items-center gap-3">
         <button
           type="button"

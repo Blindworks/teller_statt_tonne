@@ -35,18 +35,34 @@
       <span class="material-symbols-outlined">storefront</span>
       Betriebe
     </a>
-    <a
-      routerLink="/map"
-      routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
-      #mapLink="routerLinkActive"
-      class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
-      [class.text-on-surface]="!mapLink.isActive"
-      [class.hover:bg-surface-container]="!mapLink.isActive"
-      [class.hover:translate-x-1]="!mapLink.isActive"
-    >
-      <span class="material-symbols-outlined">map</span>
-      Karte
-    </a>
+    <div class="ml-6 pl-3 border-l-2 border-outline-variant/30 space-y-2">
+      <a
+        routerLink="/map"
+        routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+        #mapLink="routerLinkActive"
+        class="flex items-center gap-4 rounded-full pl-4 pr-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+        [class.text-on-surface]="!mapLink.isActive"
+        [class.hover:bg-surface-container]="!mapLink.isActive"
+        [class.hover:translate-x-1]="!mapLink.isActive"
+      >
+        <span class="material-symbols-outlined">map</span>
+        Karte
+      </a>
+      @if (canSeeStoreMembers()) {
+        <a
+          routerLink="/admin/store-members"
+          routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
+          #storeMembersLink="routerLinkActive"
+          class="flex items-center gap-4 rounded-full pl-4 pr-6 py-3 font-headline font-medium text-sm transition-all duration-300"
+          [class.text-on-surface]="!storeMembersLink.isActive"
+          [class.hover:bg-surface-container]="!storeMembersLink.isActive"
+          [class.hover:translate-x-1]="!storeMembersLink.isActive"
+        >
+          <span class="material-symbols-outlined">groups</span>
+          Mitglieder ↔ Betriebe
+        </a>
+      }
+    </div>
     <a
       routerLink="/events"
       routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
@@ -129,20 +145,6 @@
       >
         <span class="material-symbols-outlined">group</span>
         Benutzer
-      </a>
-    }
-    @if (canSeeStoreMembers()) {
-      <a
-        routerLink="/admin/store-members"
-        routerLinkActive="bg-gradient-to-r from-primary to-primary-container text-white shadow-lg shadow-green-900/20"
-        #storeMembersLink="routerLinkActive"
-        class="flex items-center gap-4 rounded-full px-6 py-3 font-headline font-medium text-sm transition-all duration-300"
-        [class.text-on-surface]="!storeMembersLink.isActive"
-        [class.hover:bg-surface-container]="!storeMembersLink.isActive"
-        [class.hover:translate-x-1]="!storeMembersLink.isActive"
-      >
-        <span class="material-symbols-outlined">groups</span>
-        Mitglieder ↔ Betriebe
       </a>
     }
     @if (canSeeTeamleitung()) {

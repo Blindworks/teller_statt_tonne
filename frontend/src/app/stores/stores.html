@@ -157,9 +157,11 @@
         (click)="openDetail(partner)"
         (keydown.enter)="openDetail(partner)"
         (keydown.space)="openDetail(partner); $event.preventDefault()"
-        role="button"
-        tabindex="0"
-        class="bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-6 flex flex-col justify-between group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        [attr.role]="canOpenDetail(partner) ? 'button' : null"
+        [attr.tabindex]="canOpenDetail(partner) ? 0 : null"
+        class="bg-surface-container-low transition-all duration-300 rounded-xl p-6 flex flex-col justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        [class.hover:bg-surface-container-lowest]="canOpenDetail(partner)"
+        [class.cursor-pointer]="canOpenDetail(partner)"
       >
         <div class="flex justify-between items-start mb-6">
           <div
@@ -173,7 +175,7 @@
               }}</span>
             }
           </div>
-          <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
+          <div class="flex items-center gap-2">
             @if (partner.status === 'KOOPERIERT') {
               <span
                 class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary-container"
@@ -188,6 +190,7 @@
             @if (!isRetter()) {
               <a
                 [routerLink]="['/stores/edit', partner.id]"
+                (click)="$event.stopPropagation()"
                 class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-primary-container text-on-surface-variant hover:text-on-primary-container transition-colors"
                 aria-label="Betrieb bearbeiten"
               >
@@ -259,7 +262,7 @@
               {{ assignedRettersCount(partner) }} Retter
             </span>
           </span>
-          <span class="font-medium">{{ partner.contact.name }}</span>
+          <span class="font-medium">{{ partner.contact?.name }}</span>
         </div>
       </div>
     }

@@ -7,8 +7,14 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Betriebsdetails-Dialog auf `/stores` ist für Retter nur noch für **eigene** Betriebe öffnen — bei nicht zugewiesenen Betrieben ist die Karte für Retter nicht mehr klickbar (kein `role=button`, kein `tabindex`, kein `cursor-pointer`, kein Hover-Wechsel; Klick/Keyboard-Event wird in `openDetail()` zusätzlich ignoriert). Für Admin/Teamleiter/Koordinator und für eigene Betriebe von Rettern bleibt das Verhalten unverändert. Neuer Helper `canOpenDetail(partner)` in `stores.ts`. Zusätzlich defensiv gemacht: `partner.contact?.name` in `stores.html`, `activeSlots`/`inactiveSlots` im `StoreDetailDialogComponent` tolerieren `pickupSlots == null`, und das `stopPropagation` der Status-Box wurde gezielt auf den Edit-Link verschoben (Bewerben-Button hat es bereits im Handler).
+- Pickup-Run-Screen (`/pickups/:pickupId/run`): Stepper-Kopf und „Hinweise zum Betrieb“-Überschrift waren vom fixierten App-Header verdeckt. Das `<main>` bekommt jetzt `pt-24 md:pl-80` (analog Dashboard), und der interne Sticky-Stepper-Header dockt mit `top-24` unter dem App-Header an.
+
 ### Changed
 
+- Sidebar-Navigation um eine Ebene erweitert: „Karte“ und „Mitglieder ↔ Betriebe“ erscheinen jetzt als eingerückte Sub-Items direkt unter „Betriebe“ (visuell durch eine linke vertikale Linie gruppiert). Mobile Bottom-Nav und „Mehr“-Sheet bleiben unverändert.
 - Navigations-Eintrag „Benutzer“ (`/users`) ist für Retter nicht mehr sichtbar — weder in der Desktop-Sidebar noch im mobilen „Mehr“-Bottom-Sheet. Neue `canSeeUsers`-Sichtbarkeit in `app-shell.ts` prüft auf ADMINISTRATOR/TEAMLEITER/KOORDINATOR (analog zu `canSeeStoreMembers`). Im „Mehr“-Sheet wurde die bisherige `isPlanner`-Kopplung in zwei unabhängige Bedingungen aufgeteilt (`canSeeUsers` für Benutzer, `!isPlanner` für Abholung-Planer).
 
 ### Removed

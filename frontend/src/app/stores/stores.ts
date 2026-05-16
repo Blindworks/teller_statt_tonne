@@ -186,7 +186,13 @@ export class StoresComponent {
     return this.memberCounts()[partner.id] ?? 0;
   }
 
+  canOpenDetail(partner: Partner): boolean {
+    if (!this.isRetter()) return true;
+    return partner.id != null && this.isMyMember(partner.id);
+  }
+
   openDetail(partner: Partner): void {
+    if (!this.canOpenDetail(partner)) return;
     this.detailDialog.open(partner);
   }
 

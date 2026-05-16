@@ -65,7 +65,7 @@ export class StoreDetailDialogComponent implements AfterViewInit, OnDestroy {
   readonly activeSlots = computed<PickupSlot[]>(() => {
     const p = this.partner();
     if (!p) return [];
-    return [...p.pickupSlots]
+    return [...(p.pickupSlots ?? [])]
       .filter((s) => s.active)
       .sort(this.compareSlots);
   });
@@ -73,7 +73,7 @@ export class StoreDetailDialogComponent implements AfterViewInit, OnDestroy {
   readonly inactiveSlots = computed<PickupSlot[]>(() => {
     const p = this.partner();
     if (!p) return [];
-    return [...p.pickupSlots]
+    return [...(p.pickupSlots ?? [])]
       .filter((s) => !s.active)
       .sort(this.compareSlots);
   });
