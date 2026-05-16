@@ -20,6 +20,7 @@ const PUBLIC_ROUTE_PREFIXES = [
   '/impressum',
   '/datenschutz',
   '/quiz',
+  '/verify',
 ];
 
 function isOnPublicRoute(): boolean {
