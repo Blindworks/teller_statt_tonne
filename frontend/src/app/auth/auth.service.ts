@@ -91,6 +91,13 @@ export class AuthService {
         tap((res) => this.applySession(res)),
         catchError((err) => {
           if (err?.status === 401 || err?.status === 403) {
+            if (err?.error === 'Account locked') {
+              try {
+                sessionStorage.setItem('tst.lockReason', 'locked');
+              } catch {
+                /* sessionStorage unavailable — ignore */
+              }
+            }
             this.clearTokens();
             return of(null);
           }

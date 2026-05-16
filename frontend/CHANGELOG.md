@@ -16,6 +16,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
   - **In Onboarding zurücksetzen** — sichtbar in `ACTIVE`/`LOCKED`/`PAUSED`. Bestätigt über `ConfirmDialogService`, ruft `POST /api/users/{id}/reset-to-onboarding` auf. Onboarding-Timestamps und Hygienezertifikat bleiben erhalten.
 - Status `LOCKED` mit Label „Gesperrt" in `UserStatus`, `USER_STATUSES`, `USER_STATUS_LABELS` und im Lifecycle-Stepper. `statusBadgeClass` rendert `LOCKED` im Error-Container-Farbschema. „Austreten" und „Entfernen" sind zusätzlich aus dem Status `LOCKED` heraus erreichbar.
 - `UserService.lock(id)`, `unlock(id)`, `resetToOnboarding(id)` als HTTP-Wrapper für die neuen Backend-Endpoints.
+- Login-Screen zeigt für gesperrte Nutzer eine spezifische Fehlermeldung: „Dein Konto ist gesperrt. Bitte wende dich an einen Administrator." Direkter Login-Versuch eines `LOCKED`-Nutzers erkennt den Backend-Body `Account locked`. Wird ein eingeloggter Nutzer während einer Session gesperrt, scheitert der Token-Refresh in `AuthService.refresh` mit demselben Body — die Komponente persistiert `tst.lockReason=locked` in `sessionStorage`, der Login-Screen liest und löscht das Flag im Konstruktor und zeigt dieselbe Meldung. So beginnen gesperrte Nutzer nicht mehr fälschlich ein Passwort-Reset.
 
 ### Fixed
 

@@ -24,6 +24,20 @@ export class LoginComponent {
   readonly submitting = signal(false);
   readonly error = signal<string | null>(null);
 
+  private static readonly LOCKED_MESSAGE =
+    'Dein Konto ist gesperrt. Bitte wende dich an einen Administrator.';
+
+  constructor() {
+    try {
+      if (sessionStorage.getItem('tst.lockReason') === 'locked') {
+        this.error.set(LoginComponent.LOCKED_MESSAGE);
+        sessionStorage.removeItem('tst.lockReason');
+      }
+    } catch {
+      /* sessionStorage unavailable — ignore */
+    }
+  }
+
   submit(): void {
     if (this.form.invalid || this.submitting()) return;
     this.submitting.set(true);
@@ -35,9 +49,13 @@ export class LoginComponent {
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard';
         this.router.navigateByUrl(returnUrl);
       },
-      error: () => {
+      error: (err) => {
         this.submitting.set(false);
-        this.error.set('E-Mail oder Passwort ist falsch.');
+        if (err?.error === 'Account locked') {
+          this.error.set(LoginComponent.LOCKED_MESSAGE);
+        } else {
+          this.error.set('E-Mail oder Passwort ist falsch.');
+        }
       },
     });
   }

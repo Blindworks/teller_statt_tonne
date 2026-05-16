@@ -19,7 +19,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 ### Changed
 
 - Login (`AuthService.login`) und Token-Refresh (`AuthService.refresh`) lehnen Nutzer mit Status `LOCKED` ab und werfen `BadCredentialsException("Account locked")`. Fehlversuch wird als `LOGIN_FAILED` mit Begründung „Nutzer ist gesperrt" geloggt.
-- `JwtAuthenticationFilter` lädt nach Token-Validierung den Status des Nutzers nach (`UserRepository.findById`). Bei `LOCKED` wird der `SecurityContext` geleert und die Antwort sofort mit HTTP 401 + Response-Header `X-Reason: account_locked` abgebrochen — bestehende Tokens gesperrter Nutzer werden damit für alle authenticated Endpoints unbrauchbar.
+- `JwtAuthenticationFilter` lädt nach Token-Validierung den Status des Nutzers nach (`UserRepository.findById`). Bei `LOCKED` wird der `SecurityContext` geleert und die Antwort sofort mit HTTP 401 + Response-Header `X-Reason: account_locked` und Body `Account locked` abgebrochen — bestehende Tokens gesperrter Nutzer werden damit für alle authenticated Endpoints unbrauchbar; der einheitliche Response-Body erlaubt dem Frontend, gesperrte Konten gezielt von „falsches Passwort" zu unterscheiden.
 
 ### Fixed
 

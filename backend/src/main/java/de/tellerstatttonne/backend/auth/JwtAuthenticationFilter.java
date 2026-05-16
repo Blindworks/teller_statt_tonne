@@ -58,6 +58,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.clearContext();
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setHeader("X-Reason", "account_locked");
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write("Account locked");
                     return;
                 }
                 List<SimpleGrantedAuthority> authorities = extractAuthorities(claims);
