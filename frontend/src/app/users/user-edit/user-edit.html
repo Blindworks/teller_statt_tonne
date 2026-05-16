@@ -275,7 +275,40 @@
                   Reaktivieren
                 </button>
               }
-              @if (cu.status === 'PENDING' || cu.status === 'ACTIVE' || cu.status === 'PAUSED') {
+              @if (isAdmin() && (cu.status === 'PENDING' || cu.status === 'ACTIVE' || cu.status === 'PAUSED')) {
+                <button
+                  type="button"
+                  [disabled]="transitioning()"
+                  (click)="lockUser()"
+                  class="bg-error-container text-on-error-container px-5 py-2 rounded-full text-sm font-bold shadow-md hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">lock</span>
+                  Sperren
+                </button>
+              }
+              @if (isAdmin() && cu.status === 'LOCKED') {
+                <button
+                  type="button"
+                  [disabled]="transitioning()"
+                  (click)="unlockUser()"
+                  class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold shadow-md shadow-primary/20 hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">lock_open</span>
+                  Entsperren
+                </button>
+              }
+              @if (isAdmin() && (cu.status === 'ACTIVE' || cu.status === 'LOCKED' || cu.status === 'PAUSED')) {
+                <button
+                  type="button"
+                  [disabled]="transitioning()"
+                  (click)="resetToOnboardingUser()"
+                  class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full text-sm font-bold shadow-md hover:brightness-95 active:scale-95 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-base">restart_alt</span>
+                  In Onboarding zurücksetzen
+                </button>
+              }
+              @if (cu.status === 'PENDING' || cu.status === 'ACTIVE' || cu.status === 'PAUSED' || cu.status === 'LOCKED') {
                 <button
                   type="button"
                   [disabled]="transitioning()"

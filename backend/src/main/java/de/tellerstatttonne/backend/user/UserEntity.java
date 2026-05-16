@@ -32,7 +32,7 @@ public class UserEntity {
 
     public enum OnlineStatus { ONLINE, AWAY, ON_BREAK, OFFLINE }
 
-    public enum Status { PENDING, ACTIVE, PAUSED, LEFT, REMOVED }
+    public enum Status { PENDING, ACTIVE, LOCKED, PAUSED, LEFT, REMOVED }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

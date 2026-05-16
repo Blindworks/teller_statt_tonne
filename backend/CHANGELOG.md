@@ -7,6 +7,20 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Zweiter Ansprechpartner pro Betrieb speziell für Retter (`Partner.retterContact` mit Name / E-Mail / Telefon). Persistenz als zweites `@Embedded ContactEmbeddable` auf `PartnerEntity` mit `@AttributeOverrides` auf die neuen Spalten `partner.retter_contact_name`, `partner.retter_contact_email`, `partner.retter_contact_phone` (Liquibase-Migration `034-partner-retter-contact.xml`). Felder werden vom `PartnerMapper` in beide Richtungen ge­mappt; der bestehende `Hauptansprechpartner` (`contact`) bleibt unverändert und wird Rettern nach wie vor nicht angezeigt.
+- Administratives Sperren und Onboarding-Reset für Nutzer. Neuer Status `LOCKED` (zwischen `ACTIVE` und `PAUSED` im Enum `UserEntity.Status`) und drei neue Endpoints (`@PreAuthorize("hasRole('ADMINISTRATOR')")`, Teamleiter sind explizit ausgenommen):
+  - `POST /api/users/{id}/lock` — setzt Status `LOCKED` aus `PENDING`/`ACTIVE`/`PAUSED` (sonst HTTP 409). Loggt `USER_STATUS_CHANGED` mit Beschreibung „gesperrt".
+  - `POST /api/users/{id}/unlock` — nur aus `LOCKED`, setzt zurück auf `ACTIVE` („entsperrt").
+  - `POST /api/users/{id}/reset-to-onboarding` — setzt Status `PENDING` aus `ACTIVE`/`LOCKED`/`PAUSED`. Onboarding-Timestamps (`introductionCompletedAt`, `agreementUploadedAt`, `testPickupCompletedAt`) und Hygienezertifikat bleiben unverändert.
+- `UserService.remove(...)` akzeptiert jetzt zusätzlich den Ausgangsstatus `LOCKED` als gültigen Vorgänger für `REMOVED`.
+
+### Changed
+
+- Login (`AuthService.login`) und Token-Refresh (`AuthService.refresh`) lehnen Nutzer mit Status `LOCKED` ab und werfen `BadCredentialsException("Account locked")`. Fehlversuch wird als `LOGIN_FAILED` mit Begründung „Nutzer ist gesperrt" geloggt.
+- `JwtAuthenticationFilter` lädt nach Token-Validierung den Status des Nutzers nach (`UserRepository.findById`). Bei `LOCKED` wird der `SecurityContext` geleert und die Antwort sofort mit HTTP 401 + Response-Header `X-Reason: account_locked` abgebrochen — bestehende Tokens gesperrter Nutzer werden damit für alle authenticated Endpoints unbrauchbar.
+
 ### Fixed
 
 - Administratoren und Teamleitungen können Abholungen wieder starten/durchführen. `PickupRunController` war auf `@PreAuthorize("hasRole('RETTER')")` beschränkt und lieferte für Admin/Teamleiter HTTP 403 (Access Denied), obwohl der `PickupSignupController` diesen Rollen die Eintragung als Helfer erlaubt und die fachliche Zuordnungsprüfung (`PickupRunService.startOrResume` → `NOT_ASSIGNED`) ohnehin bereits unabhängig von der Rolle greift. Rollen-Gate auf `@PreAuthorize("hasAnyRole('RETTER','ADMINISTRATOR','TEAMLEITER')")` erweitert, identisch zum Signup-Controller.

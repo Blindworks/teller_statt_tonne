@@ -68,6 +68,14 @@ public class AuthService {
                 .build());
             throw new BadCredentialsException("Invalid credentials");
         }
+        if (user.getStatus() == UserEntity.Status.LOCKED) {
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.LOGIN_FAILED)
+                .actor(user.getId(), user.getEmail())
+                .target("USER", user.getId())
+                .message("Login fehlgeschlagen: Nutzer ist gesperrt")
+                .build());
+            throw new BadCredentialsException("Account locked");
+        }
         AuthResponse response = buildAuthResponse(user);
         eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.LOGIN_SUCCESS)
             .actor(user.getId(), user.getEmail())
@@ -86,6 +94,9 @@ public class AuthService {
         }
         UserEntity user = userRepository.findById(stored.getUserId())
             .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
+        if (user.getStatus() == UserEntity.Status.LOCKED) {
+            throw new BadCredentialsException("Account locked");
+        }
 
         int deleted = refreshTokenRepository.deleteByIdAndRevokedFalse(stored.getId());
         if (deleted == 0) {

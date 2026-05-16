@@ -63,6 +63,7 @@ export class UserEditComponent {
   readonly lifecycleSteps: Array<{ status: UserStatus }> = [
     { status: 'PENDING' },
     { status: 'ACTIVE' },
+    { status: 'LOCKED' },
     { status: 'PAUSED' },
     { status: 'LEFT' },
     { status: 'REMOVED' },
@@ -203,6 +204,7 @@ export class UserEditComponent {
         return 'bg-surface-container-high text-on-surface-variant';
       case 'PAUSED':
         return 'bg-tertiary-container text-on-tertiary-container';
+      case 'LOCKED':
       case 'LEFT':
       case 'REMOVED':
         return 'bg-error-container text-on-error-container';
@@ -254,6 +256,46 @@ export class UserEditComponent {
     });
     if (!ok) return;
     this.runTransition(this.service.leave(id), 'Austritt fehlgeschlagen.');
+  }
+
+  async lockUser(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'Nutzer sperren',
+      message:
+        'Den Nutzer sperren? Er kann sich nicht mehr einloggen und bestehende Sessions werden '
+        + 'sofort ungültig. Die Sperre bleibt bestehen, bis ein Administrator sie wieder aufhebt.',
+      confirmLabel: 'Sperren',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.runTransition(this.service.lock(id), 'Sperren fehlgeschlagen.');
+  }
+
+  async unlockUser(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    this.runTransition(this.service.unlock(id), 'Entsperren fehlgeschlagen.');
+  }
+
+  async resetToOnboardingUser(): Promise<void> {
+    const id = this.userId();
+    if (!id) return;
+    const ok = await this.confirmDialog.ask({
+      title: 'In Onboarding zurücksetzen',
+      message:
+        'Den Nutzer in den Onboarding-Status zurücksetzen? Der Nutzer wird wieder im '
+        + 'Onboarding-Modus geführt, bisherige Onboarding-Daten (Einführung, Hygienezertifikat, '
+        + 'Vereinbarung, Test-Abholung) bleiben jedoch erhalten.',
+      confirmLabel: 'Zurücksetzen',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    this.runTransition(
+      this.service.resetToOnboarding(id),
+      'Zurücksetzen in Onboarding fehlgeschlagen.',
+    );
   }
 
   async removeUser(): Promise<void> {

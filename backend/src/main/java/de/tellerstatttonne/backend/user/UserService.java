@@ -283,14 +283,33 @@ public class UserService {
 
     public User markLeft(Long id) {
         return changeStatus(id, UserEntity.Status.LEFT,
-            EnumSet.of(UserEntity.Status.PENDING, UserEntity.Status.ACTIVE, UserEntity.Status.PAUSED),
+            EnumSet.of(UserEntity.Status.PENDING, UserEntity.Status.ACTIVE, UserEntity.Status.PAUSED,
+                UserEntity.Status.LOCKED),
             "ausgetreten");
     }
 
     public User remove(Long id) {
         return changeStatus(id, UserEntity.Status.REMOVED,
-            EnumSet.of(UserEntity.Status.PENDING, UserEntity.Status.ACTIVE, UserEntity.Status.PAUSED),
+            EnumSet.of(UserEntity.Status.PENDING, UserEntity.Status.ACTIVE, UserEntity.Status.PAUSED,
+                UserEntity.Status.LOCKED),
             "entfernt");
+    }
+
+    public User lock(Long id) {
+        return changeStatus(id, UserEntity.Status.LOCKED,
+            EnumSet.of(UserEntity.Status.PENDING, UserEntity.Status.ACTIVE, UserEntity.Status.PAUSED),
+            "gesperrt");
+    }
+
+    public User unlock(Long id) {
+        return changeStatus(id, UserEntity.Status.ACTIVE,
+            EnumSet.of(UserEntity.Status.LOCKED), "entsperrt");
+    }
+
+    public User resetToOnboarding(Long id) {
+        return changeStatus(id, UserEntity.Status.PENDING,
+            EnumSet.of(UserEntity.Status.ACTIVE, UserEntity.Status.LOCKED, UserEntity.Status.PAUSED),
+            "in Onboarding zurueckgesetzt");
     }
 
     private User changeStatus(Long id, UserEntity.Status target,

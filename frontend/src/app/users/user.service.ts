@@ -86,6 +86,18 @@ export class UserService {
     return this.http.post<User>(`${this.baseUrl}/${id}/remove`, {});
   }
 
+  lock(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/lock`, {});
+  }
+
+  unlock(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/unlock`, {});
+  }
+
+  resetToOnboarding(id: number): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/${id}/reset-to-onboarding`, {});
+  }
+
   uploadPhoto(id: number, file: File): Observable<User> {
     const form = new FormData();
     form.append('file', file);

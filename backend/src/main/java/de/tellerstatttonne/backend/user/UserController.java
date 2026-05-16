@@ -129,6 +129,24 @@ public class UserController {
         return ResponseEntity.ok(service.remove(id));
     }
 
+    @PostMapping("/{id}/lock")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public ResponseEntity<User> lock(@PathVariable Long id) {
+        return ResponseEntity.ok(service.lock(id));
+    }
+
+    @PostMapping("/{id}/unlock")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public ResponseEntity<User> unlock(@PathVariable Long id) {
+        return ResponseEntity.ok(service.unlock(id));
+    }
+
+    @PostMapping("/{id}/reset-to-onboarding")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public ResponseEntity<User> resetToOnboarding(@PathVariable Long id) {
+        return ResponseEntity.ok(service.resetToOnboarding(id));
+    }
+
     public record SelfProfileRequest(String phone, String street, String postalCode, String city, String country) {}
 
     @PutMapping("/{id}/self-profile")

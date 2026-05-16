@@ -1,5 +1,7 @@
 package de.tellerstatttonne.backend.auth;
 
+import de.tellerstatttonne.backend.user.UserEntity;
+import de.tellerstatttonne.backend.user.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -22,9 +24,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository) {
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -50,6 +54,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtService.parse(token);
                 String userId = claims.getSubject();
+                if (isLocked(userId)) {
+                    SecurityContextHolder.clearContext();
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setHeader("X-Reason", "account_locked");
+                    return;
+                }
                 List<SimpleGrantedAuthority> authorities = extractAuthorities(claims);
                 UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userId, null, authorities);
@@ -60,6 +70,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private boolean isLocked(String userId) {
+        try {
+            Long id = Long.parseLong(userId);
+            return userRepository.findById(id)
+                .map(u -> u.getStatus() == UserEntity.Status.LOCKED)
+                .orElse(false);
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private List<SimpleGrantedAuthority> extractAuthorities(Claims claims) {

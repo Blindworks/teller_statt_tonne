@@ -7,6 +7,16 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Eigener „Ansprechpartner für Retter“ pro Betrieb (Name, E-Mail, Telefon). Erfassung im Betrieb-Bearbeiten-Formular (`partner-edit`) als neuer Abschnitt unter dem Hauptansprechpartner mit gleicher Form-Struktur (`retterContact`-FormGroup, E-Mail-Validator). Anzeige für Retter im Betriebsdetails-Dialog (`store-detail-dialog`) und im Pickup-Run „Hinweise zum Betrieb“ (`/pickups/:id/run`, Schritt 1): Name, klickbarer `mailto:`-Link und `tel:`-Link. Bedingt eingeblendet — der Block erscheint nur, wenn mindestens ein Feld gefüllt ist. `onSiteContactNote` bleibt als ergänzende Freitext-Notiz erhalten (Label im Pickup-Run umbenannt auf „Hinweis zum Ansprechpartner“). `Partner.retterContact` ist Pflichtfeld im Model (`Contact`-Interface wiederverwendet); `emptyPartner()` initialisiert leeren Kontakt.
+- Administrative Aktionen zum Sperren und zum Zurücksetzen in den Onboarding-Status in der Nutzer-Detailansicht (`user-edit`). Drei neue Aktions-Buttons im Abschnitt „Mitgliedsstatus" (nur sichtbar für `ADMINISTRATOR`):
+  - **Sperren** — sichtbar in den Status `PENDING`/`ACTIVE`/`PAUSED`. Bestätigt über `ConfirmDialogService` (kein `window.confirm`), ruft `POST /api/users/{id}/lock` auf. Der Nutzer kann sich danach nicht mehr einloggen und bestehende Sessions werden sofort ungültig.
+  - **Entsperren** — sichtbar im Status `LOCKED`, ruft `POST /api/users/{id}/unlock` auf (zurück nach `ACTIVE`).
+  - **In Onboarding zurücksetzen** — sichtbar in `ACTIVE`/`LOCKED`/`PAUSED`. Bestätigt über `ConfirmDialogService`, ruft `POST /api/users/{id}/reset-to-onboarding` auf. Onboarding-Timestamps und Hygienezertifikat bleiben erhalten.
+- Status `LOCKED` mit Label „Gesperrt" in `UserStatus`, `USER_STATUSES`, `USER_STATUS_LABELS` und im Lifecycle-Stepper. `statusBadgeClass` rendert `LOCKED` im Error-Container-Farbschema. „Austreten" und „Entfernen" sind zusätzlich aus dem Status `LOCKED` heraus erreichbar.
+- `UserService.lock(id)`, `unlock(id)`, `resetToOnboarding(id)` als HTTP-Wrapper für die neuen Backend-Endpoints.
+
 ### Fixed
 
 - Betriebsdetails-Dialog auf `/stores` ist für Retter nur noch für **eigene** Betriebe öffnen — bei nicht zugewiesenen Betrieben ist die Karte für Retter nicht mehr klickbar (kein `role=button`, kein `tabindex`, kein `cursor-pointer`, kein Hover-Wechsel; Klick/Keyboard-Event wird in `openDetail()` zusätzlich ignoriert). Für Admin/Teamleiter/Koordinator und für eigene Betriebe von Rettern bleibt das Verhalten unverändert. Neuer Helper `canOpenDetail(partner)` in `stores.ts`. Zusätzlich defensiv gemacht: `partner.contact?.name` in `stores.html`, `activeSlots`/`inactiveSlots` im `StoreDetailDialogComponent` tolerieren `pickupSlots == null`, und das `stopPropagation` der Status-Box wurde gezielt auf den Edit-Link verschoben (Bewerben-Button hat es bereits im Handler).
