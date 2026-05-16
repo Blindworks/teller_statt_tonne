@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/pickups/{pickupId}/run")
-@PreAuthorize("hasRole('RETTER')")
+@PreAuthorize("hasAnyRole('RETTER','ADMINISTRATOR','TEAMLEITER')")
 public class PickupRunController {
 
     public record AddItemRequest(Long foodCategoryId, String customLabel) {}

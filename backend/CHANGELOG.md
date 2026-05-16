@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Administratoren und Teamleitungen können Abholungen wieder starten/durchführen. `PickupRunController` war auf `@PreAuthorize("hasRole('RETTER')")` beschränkt und lieferte für Admin/Teamleiter HTTP 403 (Access Denied), obwohl der `PickupSignupController` diesen Rollen die Eintragung als Helfer erlaubt und die fachliche Zuordnungsprüfung (`PickupRunService.startOrResume` → `NOT_ASSIGNED`) ohnehin bereits unabhängig von der Rolle greift. Rollen-Gate auf `@PreAuthorize("hasAnyRole('RETTER','ADMINISTRATOR','TEAMLEITER')")` erweitert, identisch zum Signup-Controller.
+
 ### Removed
 
 - Datenbankgestütztes Feature-/Berechtigungs-Modell vollständig entfernt. Tabellen `feature` und `role_feature` werden via Migration `033-drop-features.xml` gedroppt (CASCADE auf `role_feature` durch bestehende FKs). Komplettes Backend-Paket `de.tellerstatttonne.backend.feature` (11 Klassen inkl. `FeatureController`, `FeatureService`, `FeatureEntity`, `RoleFeatureEntity`, …) entfernt. Endpoints `GET/POST/PUT/DELETE /api/features/**`, `GET/PUT /api/roles/{id}/features` und `GET /api/me/features` existieren nicht mehr (HTTP 404). Berechtigungen werden ab sofort ausschließlich programmatisch im Frontend über Rollen-Guards geprüft — die Rollen liefert weiterhin `/api/auth/me` über das `roles`-Feld auf `User`.
