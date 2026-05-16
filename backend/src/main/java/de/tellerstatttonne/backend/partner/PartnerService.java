@@ -69,8 +69,8 @@ public class PartnerService {
         STATUS_LABELS.put(Partner.Status.VERHANDLUNGEN_LAUFEN, "Verhandlungen laufen");
         STATUS_LABELS.put(Partner.Status.WILL_NICHT_KOOPERIEREN, "Will nicht kooperieren");
         STATUS_LABELS.put(Partner.Status.KOOPERIERT, "Kooperiert mit uns");
-        STATUS_LABELS.put(Partner.Status.KOOPERIERT_FOODSHARING, "Kooperiert mit Foodsharing");
-        STATUS_LABELS.put(Partner.Status.SPENDET_AN_TAFEL, "Spendet an Tafel etc.");
+        STATUS_LABELS.put(Partner.Status.KOOPERIERT_FOODSHARING, "Wird alternativ berettet");
+        STATUS_LABELS.put(Partner.Status.SPENDET_AN_TAFEL, "spendet Gemeinnützig");
         STATUS_LABELS.put(Partner.Status.EXISTIERT_NICHT_MEHR, "Existiert nicht mehr");
     }
 

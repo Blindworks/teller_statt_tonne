@@ -67,8 +67,8 @@ export const STATUS_LABELS: Record<Status, string> = {
   VERHANDLUNGEN_LAUFEN: 'Verhandlungen laufen',
   WILL_NICHT_KOOPERIEREN: 'Will nicht kooperieren',
   KOOPERIERT: 'Kooperiert mit uns',
-  KOOPERIERT_FOODSHARING: 'Kooperiert mit Foodsharing',
-  SPENDET_AN_TAFEL: 'Spendet an Tafel etc.',
+  KOOPERIERT_FOODSHARING: 'Wird alternativ berettet',
+  SPENDET_AN_TAFEL: 'spendet Gemeinnützig',
   EXISTIERT_NICHT_MEHR: 'Existiert nicht mehr',
 };
 

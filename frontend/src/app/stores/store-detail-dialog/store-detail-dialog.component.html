@@ -40,16 +40,31 @@
               {{ categoryLabel(p.categoryId) }}
             </p>
             <div class="mt-2">
-              @if (p.status === 'KOOPERIERT') {
-                <span
-                  class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary-container"
-                  >{{ statusLabels[p.status] }}</span
-                >
-              } @else {
-                <span
-                  class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-surface-container-high text-on-surface-variant"
-                  >{{ statusLabels[p.status] }}</span
-                >
+              @switch (p.status) {
+                @case ('KOOPERIERT') {
+                  <span
+                    class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary-container"
+                    >{{ statusLabels[p.status] }}</span
+                  >
+                }
+                @case ('SPENDET_AN_TAFEL') {
+                  <span
+                    class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-error-container text-on-error-container"
+                    >{{ statusLabels[p.status] }}</span
+                  >
+                }
+                @case ('KOOPERIERT_FOODSHARING') {
+                  <span
+                    class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container"
+                    >{{ statusLabels[p.status] }}</span
+                  >
+                }
+                @default {
+                  <span
+                    class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-surface-container-high text-on-surface-variant"
+                    >{{ statusLabels[p.status] }}</span
+                  >
+                }
               }
             </div>
           </div>
