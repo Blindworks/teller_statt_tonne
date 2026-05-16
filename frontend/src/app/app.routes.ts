@@ -53,6 +53,11 @@ export const routes: Routes = [
       import('./legal/privacy/privacy').then((m) => m.PrivacyComponent),
   },
   {
+    path: 'verify/:token',
+    loadComponent: () =>
+      import('./verify/verify-rescuer.component').then((m) => m.VerifyRescuerComponent),
+  },
+  {
     path: 'onboarding',
     canActivate: [authGuard, onboardingRequiredGuard],
     loadComponent: () =>
@@ -148,6 +153,12 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () => import('./profile/profile').then((m) => m.ProfileComponent),
+      },
+      {
+        path: 'ausweis',
+        canActivate: [roleGuard('RETTER', 'ADMINISTRATOR', 'TEAMLEITER')],
+        loadComponent: () =>
+          import('./rescuer-card/rescuer-card.component').then((m) => m.RescuerCardComponent),
       },
       {
         path: 'statistik',

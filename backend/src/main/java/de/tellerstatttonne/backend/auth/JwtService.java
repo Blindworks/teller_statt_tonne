@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
+    public static final String PURPOSE_RESCUER_CARD = "rescuer-card";
+    public static final Duration RESCUER_CARD_TTL = Duration.ofSeconds(90);
+
     private final SecretKey key;
     private final Duration accessTtl;
 
@@ -40,6 +43,25 @@ public class JwtService {
             .expiration(Date.from(now.plus(accessTtl)))
             .signWith(key)
             .compact();
+    }
+
+    public String issueRescuerCardToken(Long userId) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+            .subject(String.valueOf(userId))
+            .claim("purpose", PURPOSE_RESCUER_CARD)
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(now.plus(RESCUER_CARD_TTL)))
+            .signWith(key)
+            .compact();
+    }
+
+    public Claims parseRescuerCardToken(String token) {
+        Claims claims = parse(token);
+        if (!PURPOSE_RESCUER_CARD.equals(claims.get("purpose", String.class))) {
+            throw new io.jsonwebtoken.JwtException("wrong token purpose");
+        }
+        return claims;
     }
 
     public Claims parse(String token) {

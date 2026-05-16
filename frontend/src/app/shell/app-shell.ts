@@ -73,6 +73,9 @@ export class AppShellComponent {
     hasAnyRole(this.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR'),
   );
   readonly canSeeTickets = computed(() => this.auth.isAuthenticated());
+  readonly canSeeRescuerCard = computed(() =>
+    hasAnyRole(this.currentUser(), 'RETTER', 'ADMINISTRATOR', 'TEAMLEITER'),
+  );
 
   constructor() {
     this.router.events.subscribe((e) => {

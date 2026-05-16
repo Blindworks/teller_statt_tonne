@@ -53,6 +53,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(BEARER_PREFIX.length());
             try {
                 Claims claims = jwtService.parse(token);
+                String purpose = claims.get("purpose", String.class);
+                if (purpose != null) {
+                    // Spezial-Tokens (z.B. Retter-Ausweis) duerfen nicht als Login-Session genutzt werden.
+                    SecurityContextHolder.clearContext();
+                    chain.doFilter(request, response);
+                    return;
+                }
                 String userId = claims.getSubject();
                 if (isLocked(userId)) {
                     SecurityContextHolder.clearContext();

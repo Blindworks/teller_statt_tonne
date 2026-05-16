@@ -236,6 +236,16 @@
             <span class="material-symbols-outlined text-base">person</span>
             Mein Profil
           </a>
+          @if (canSeeRescuerCard()) {
+            <a
+              routerLink="/ausweis"
+              (click)="closeMenu()"
+              class="flex items-center gap-3 px-5 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-colors"
+            >
+              <span class="material-symbols-outlined text-base">badge</span>
+              Mein Ausweis
+            </a>
+          }
           <button
             type="button"
             (click)="logout()"
@@ -479,6 +489,19 @@
         }
       </a>
       <div class="border-t border-outline-variant/20 my-2"></div>
+      @if (canSeeRescuerCard()) {
+        <a
+          routerLink="/ausweis"
+          (click)="closeMore()"
+          routerLinkActive="text-primary"
+          #ausweisSheet="routerLinkActive"
+          class="flex items-center gap-4 px-6 py-3 text-sm font-semibold hover:bg-surface-container-low transition-colors"
+          [class.text-on-surface]="!ausweisSheet.isActive"
+        >
+          <span class="material-symbols-outlined">badge</span>
+          Mein Ausweis
+        </a>
+      }
       <a
         routerLink="/profile"
         (click)="closeMore()"

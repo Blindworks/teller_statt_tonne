@@ -1,0 +1,130 @@
+<div class="min-h-screen bg-surface-container-low pt-24 pb-24 md:pb-6 md:pl-80 px-4 flex flex-col items-center">
+  <div class="w-full max-w-md flex flex-col gap-4">
+    @if (loading()) {
+      <div class="text-center text-on-surface-variant py-12">Ausweis wird geladen ...</div>
+    } @else if (error()) {
+      <div class="rounded-2xl bg-error-container text-on-error-container p-6 text-center">
+        <p class="font-bold mb-3">{{ error() }}</p>
+        <button
+          type="button"
+          (click)="reload()"
+          class="rounded-full bg-error text-on-error px-5 py-2 text-sm font-bold"
+        >
+          Erneut versuchen
+        </button>
+      </div>
+    } @else if (context(); as c) {
+      <!-- Ausweis-Karte -->
+      <div
+        class="relative aspect-[2/3] w-full rounded-3xl overflow-hidden shadow-2xl"
+        [class.opacity-70]="!hygieneValid()"
+      >
+        <!-- Hintergrundkacheln (Orange/Weiss) -->
+        <div class="absolute inset-0 grid grid-cols-2 grid-rows-2">
+          <div class="bg-[#f5a623]"></div>
+          <div class="bg-white"></div>
+          <div class="bg-white"></div>
+          <div class="bg-[#f5a623]"></div>
+        </div>
+
+        <!-- Inhalt -->
+        <div class="relative h-full w-full grid grid-cols-2 grid-rows-2">
+          <!-- Oben links: Logo + Name -->
+          <div class="p-4 flex flex-col">
+            <img
+              src="/icons/icon-192.png"
+              alt="Teller statt Tonne"
+              class="w-36 h-36 rounded-md bg-white p-1 object-contain"
+              onerror="this.style.display='none'"
+            />
+            <div class="mt-auto">
+              <p class="text-white text-3xl font-extrabold leading-tight drop-shadow-sm">
+                {{ c.firstName }}
+              </p>
+              <p class="text-white text-3xl font-extrabold leading-tight drop-shadow-sm">
+                {{ c.lastName }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Oben rechts: QR + Infos -->
+          <div class="p-3 flex flex-col gap-2 text-on-surface text-[11px] leading-tight min-h-0">
+            <div class="bg-white rounded-md p-1 self-center">
+              <canvas #qrCanvas class="block w-20 h-20"></canvas>
+            </div>
+            @if (hygieneValid() && hygieneExpiryFormatted()) {
+              <div>
+                <p class="text-on-surface-variant">Hygiene-Zertifikat</p>
+                <p class="font-bold">gültig bis {{ hygieneExpiryFormatted() }}</p>
+              </div>
+            } @else {
+              <div class="bg-error text-on-error rounded-md px-2 py-1 text-center font-extrabold">
+                NICHT GÜLTIG
+              </div>
+            }
+            @if (partnerLabel()) {
+              <div>
+                <p class="text-on-surface-variant">
+                  {{ pickupActive() ? 'Aktuell bei' : 'Nächster Einsatz' }}
+                </p>
+                <p class="font-bold">{{ partnerLabel() }}</p>
+              </div>
+            } @else {
+              <div>
+                <p class="text-on-surface-variant">Abholbetrieb</p>
+                <p class="font-bold italic text-on-surface-variant">Kein Einsatz heute</p>
+              </div>
+            }
+            @if (memberSinceFormatted()) {
+              <div>
+                <p class="text-on-surface-variant">Retter seit</p>
+                <p class="font-bold">{{ memberSinceFormatted() }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Unten links: Vertikales Label -->
+          <div class="p-2 flex items-center justify-center">
+            <p
+              class="text-on-surface font-extrabold text-3xl tracking-tight"
+              style="writing-mode: vertical-rl; transform: rotate(180deg);"
+            >
+              Retter-Ausweis
+            </p>
+          </div>
+
+          <!-- Unten rechts: Foto -->
+          <div class="overflow-hidden">
+            @if (photoSrc()) {
+              <img [src]="photoSrc()" alt="Foto" class="w-full h-full object-cover" />
+            } @else {
+              <div
+                class="w-full h-full bg-primary-container text-on-primary-container flex items-center justify-center text-5xl font-bold"
+              >
+                {{ c.firstName[0] }}{{ c.lastName[0] }}
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Live-Uhr unter der Karte -->
+      <div
+        class="rounded-2xl bg-surface shadow-lg px-6 py-4 flex items-center justify-between"
+      >
+        <div>
+          <p class="text-xs text-on-surface-variant uppercase tracking-wider">Aktuelle Uhrzeit</p>
+          <p class="text-3xl font-extrabold text-on-surface">
+            <app-live-clock />
+          </p>
+        </div>
+        <span class="material-symbols-outlined text-primary text-4xl">verified</span>
+      </div>
+
+      <p class="text-xs text-on-surface-variant text-center leading-relaxed px-4">
+        QR-Code aktualisiert sich alle 30 Sekunden. Ein Screenshot reicht nicht zum Ausweisen —
+        die Uhrzeit muss live laufen und der Code muss scannbar sein.
+      </p>
+    }
+  </div>
+</div>
