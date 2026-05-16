@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Removed
+
+- Datenbankgestütztes Feature-/Berechtigungs-Modell vollständig entfernt. Tabellen `feature` und `role_feature` werden via Migration `033-drop-features.xml` gedroppt (CASCADE auf `role_feature` durch bestehende FKs). Komplettes Backend-Paket `de.tellerstatttonne.backend.feature` (11 Klassen inkl. `FeatureController`, `FeatureService`, `FeatureEntity`, `RoleFeatureEntity`, …) entfernt. Endpoints `GET/POST/PUT/DELETE /api/features/**`, `GET/PUT /api/roles/{id}/features` und `GET /api/me/features` existieren nicht mehr (HTTP 404). Berechtigungen werden ab sofort ausschließlich programmatisch im Frontend über Rollen-Guards geprüft — die Rollen liefert weiterhin `/api/auth/me` über das `roles`-Feld auf `User`.
+
 ### Added
 
 - Überlappungsprüfung beim Anlegen von Abholterminen in Sonderabholungen: `PickupService.create(...)` lehnt einen neuen Event-Pickup ab, wenn sich das Zeitfenster `[startTime, endTime)` am gleichen Datum mit einem bestehenden Pickup desselben Events überschneidet (aneinandergrenzende Termine, z. B. 10:00–12:00 und 12:00–13:00, sind weiterhin erlaubt). Neue Repository-Query `PickupRepository.existsEventPickupOverlap(...)`. Der Service wirft `IllegalStateException`; neuer `@ExceptionHandler(IllegalStateException.class)` im `PickupController` liefert HTTP 409 mit deutscher Klartext-Meldung („Für diese Sonderabholung existiert am … bereits ein Termin im Zeitraum …–… Uhr."). Partner-Pickups bleiben unberührt.

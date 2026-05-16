@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
-import { PermissionsService } from '../../auth/permissions.service';
 import { ConfirmDialogService } from '../../shared/confirm-dialog/confirm-dialog.service';
+import { hasAnyRole } from '../../users/user.model';
 import { resolvePhotoUrl } from '../../users/photo-url';
 import { TicketService } from '../ticket.service';
 import {
@@ -36,7 +36,6 @@ export class TicketFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly service = inject(TicketService);
   private readonly auth = inject(AuthService);
-  private readonly perms = inject(PermissionsService);
   private readonly confirm = inject(ConfirmDialogService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -57,7 +56,9 @@ export class TicketFormComponent {
 
   readonly currentUserId = computed(() => this.auth.currentUser()?.id ?? null);
 
-  readonly isAdmin = computed(() => this.perms.features().has('tickets.admin'));
+  readonly isAdmin = computed(() =>
+    hasAnyRole(this.auth.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER'),
+  );
 
   readonly isOwner = computed(() => {
     const t = this.ticket();

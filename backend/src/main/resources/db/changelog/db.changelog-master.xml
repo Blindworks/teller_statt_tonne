@@ -37,5 +37,6 @@
     <include file="db/changelog/changes/030-ticket.xml"/>
     <include file="db/changelog/changes/031-add-koordinator-role.xml"/>
     <include file="db/changelog/changes/032-appointment.xml"/>
+    <include file="db/changelog/changes/033-drop-features.xml"/>
 
 </databaseChangeLog>

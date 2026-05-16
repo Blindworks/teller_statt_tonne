@@ -10,10 +10,10 @@ import {
 } from '@angular/core';
 import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-import { PermissionsService } from '../auth/permissions.service';
 import { NotificationBellComponent } from '../notifications/notification-bell/notification-bell';
 import { NotificationService } from '../notifications/notification.service';
 import { AppointmentService } from '../appointments/appointment.service';
+import { hasAnyRole } from '../users/user.model';
 import { resolvePhotoUrl } from '../users/photo-url';
 
 @Component({
@@ -25,7 +25,6 @@ import { resolvePhotoUrl } from '../users/photo-url';
 })
 export class AppShellComponent {
   private readonly auth = inject(AuthService);
-  private readonly perms = inject(PermissionsService);
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly notifications = inject(NotificationService);
@@ -56,15 +55,21 @@ export class AppShellComponent {
   readonly menuOpen = signal(false);
   readonly moreOpen = signal(false);
 
-  // Reaktive Feature-Checks — abhängig vom PermissionsService-Signal.
-  readonly isPlanner = computed(() => this.perms.features().has('nav.planner'));
-  readonly isAdmin = computed(() => this.perms.features().has('nav.admin'));
-  readonly canSeeStoreMembers = computed(() => this.perms.features().has('nav.store-members'));
-  readonly canSeeDistributionPoints = computed(() =>
-    this.perms.features().has('nav.distribution-points'),
+  // Rollenbasierte Sichtbarkeit der Navigation.
+  readonly isPlanner = computed(() =>
+    hasAnyRole(this.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR', 'RETTER'),
   );
-  readonly canSeeTeamleitung = computed(() => this.perms.features().has('nav.planner'));
-  readonly canSeeTickets = computed(() => this.perms.features().has('nav.tickets'));
+  readonly isAdmin = computed(() => hasAnyRole(this.currentUser(), 'ADMINISTRATOR'));
+  readonly canSeeStoreMembers = computed(() =>
+    hasAnyRole(this.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR'),
+  );
+  readonly canSeeDistributionPoints = computed(() =>
+    hasAnyRole(this.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR'),
+  );
+  readonly canSeeTeamleitung = computed(() =>
+    hasAnyRole(this.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR'),
+  );
+  readonly canSeeTickets = computed(() => this.auth.isAuthenticated());
 
   constructor() {
     this.router.events.subscribe((e) => {

@@ -7,6 +7,22 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Removed
+
+- Dynamisches Berechtigungs-/Feature-Modell vollständig entfernt. Die Dateien `permissions.service.ts`, `feature.guard.ts`, das gesamte Admin-Verzeichnis `admin/permissions/` (Permissions-Matrix, Feature-Form, Feature-Service/Model) sowie die Admin-Karte „Berechtigungen“ und die Route `/admin/permissions` sind weg. `PermissionsService`-Aufrufe in `AuthService`, `AppShellComponent`, `AdminDashboardComponent`, `TeamleiterDashboardComponent` und `TicketFormComponent` entfernt — die initiale `/api/me/features`-HTTP-Last beim Login/Refresh entfällt.
+
+### Added
+
+- Neuer Route-Guard `roleGuard(...rolesAllowed)` (`auth/role.guard.ts`) ersetzt den bisherigen `featureGuard`: prüft `User.roles` direkt gegen eine fixe Liste erlaubter Rollen, await’t beim Page-Reload einmalig `AuthService.ensureUserLoaded()` und redirected auf `/dashboard`. Mapping in `app.routes.ts` jetzt hartkodiert: `route.planner` → ADMINISTRATOR/TEAMLEITER/KOORDINATOR, `route.planner.view` → ADMINISTRATOR/TEAMLEITER/KOORDINATOR/RETTER, `route.user.edit` & `route.quiz.admin` → ADMINISTRATOR/TEAMLEITER, `route.admin` → ADMINISTRATOR.
+- KOORDINATOR-Rolle erhält im neuen Mapping Planungs-Schreibrechte sowie Sichtbarkeit von „Retter im Betrieb“ und „Verteilerplätze“ (zwischen RETTER und TEAMLEITER). Kein User-/Quiz-/Admin-Zugriff.
+- Helper `hasAnyRole(user, ...roles)` in `users/user.model.ts`.
+- `AuthService.ensureUserLoaded(): Promise<User|null>` cached die erste `/api/auth/me`-Antwort nach App-Start für den `roleGuard`.
+
+### Fixed
+
+- Beim Userwechsel im selben Tab (z. B. Admin → Logout → Retter-Login) wurden in der Sidebar kurzzeitig Menüpunkte des vorherigen Users (Administration, Teamleitung, Verteilerplätze, Mitglieder ↔ Betriebe, Tickets, Statistik, Abholung-Planer) angezeigt – sie verschwanden erst nach einem Browser-Reload. Ursachen: (1) `AuthService.login/refresh/impersonateTestUser` lösten `permissions.load()` „fire-and-forget“ aus und navigierten weiter, bevor die Features des neuen Users vom Backend zurück waren; (2) eine ggf. noch laufende `/api/me/features`-Response des vorherigen Users konnte nach `permissions.clear()` das Signal mit alten Features überschreiben (`tap(set => featuresSignal.set(set))`). Fix: Login/Refresh/Impersonation warten jetzt per `switchMap` auf `permissions.load()`, bevor sie die Auth-Response emittieren; `PermissionsService.load()` ignoriert Antworten veralteter Aufrufe über eine monoton steigende Sequenznummer, die in `clear()` mit-inkrementiert wird.
+- Menüpunkt „Teamleitung“ ist für Retter nicht mehr sichtbar. Die Sichtbarkeit (`canSeeTeamleitung` in `app-shell.ts`) prüft jetzt das Feature `route.planner` (nur Teamleiter/Admin) statt `nav.planner` (auch Retter, da diese „Abholung-Planer“ und „Statistik“ sehen).
+
 ### Added
 
 - Neuer Menüpunkt „Termine” (`/termine`) für Ankündigungen, Meetings und Schulungen mit Rollen-Targeting. Neues Modul `src/app/appointments/` mit Liste (`appointments-list`, Filter Kommend/Vergangen, „Neu”-Markierung für ungelesene), Detailansicht (`appointment-detail`, markiert automatisch als gelesen), Formular (`appointment-form`, nur Admin/Teamleiter – Titel, Start/Ende, Ort oder Online-Link, Beschreibung, Anhang-Link, Multi-Select Rollen, Checkbox „Öffentlich auf Startseite”) und Lösch-Dialog (eigene Komponente, kein `window.confirm`). Bearbeiten/Löschen nur durch Ersteller oder Administrator (server- und clientseitig). Sidebar-Menüpunkt mit Badge für ungelesene Termine und Toast-Banner nach Login bei `unreadCount > 0`. Dashboard-Widget „Kommende Termine” (nächste 5) rechts in der News-Spalte. Öffentliche Section „Kommende Termine” auf der Landing-Page (ruft `/api/public/appointments` anonym; URL-`location` wird als Online-Link gerendert). Neuer Service `AppointmentService` mit `unreadCount`-Signal (lädt nach Login, refresht nach `markRead`).

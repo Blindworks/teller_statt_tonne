@@ -83,3 +83,11 @@ export function primaryRole(user: { roles: RoleName[] } | null | undefined): Rol
 export function hasRole(user: { roles: RoleName[] } | null | undefined, role: RoleName): boolean {
   return !!user?.roles?.includes(role);
 }
+
+export function hasAnyRole(
+  user: { roles: RoleName[] } | null | undefined,
+  ...roles: RoleName[]
+): boolean {
+  if (!user?.roles?.length) return false;
+  return roles.some((r) => user.roles.includes(r));
+}

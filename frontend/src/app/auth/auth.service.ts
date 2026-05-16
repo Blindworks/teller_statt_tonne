@@ -1,9 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, finalize, of, shareReplay, tap, throwError } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  finalize,
+  firstValueFrom,
+  of,
+  shareReplay,
+  tap,
+  throwError,
+} from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthResponse, User } from './auth.models';
-import { PermissionsService } from './permissions.service';
 
 const ACCESS_KEY = 'tst.access';
 const REFRESH_KEY = 'tst.refresh';
@@ -13,7 +21,6 @@ const ADMIN_BACKUP_REFRESH_KEY = 'tst.admin_refresh';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly permissions = inject(PermissionsService);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/auth`;
 
   private readonly accessTokenSignal = signal<string | null>(this.readStorage(ACCESS_KEY));
@@ -21,6 +28,7 @@ export class AuthService {
   private readonly currentUserSignal = signal<User | null>(null);
   private readonly impersonatingSignal = signal<boolean>(this.readStorage(ADMIN_BACKUP_ACCESS_KEY) !== null);
   private refreshInFlight: Observable<AuthResponse | null> | null = null;
+  private meInFlight: Promise<User | null> | null = null;
 
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
@@ -28,11 +36,7 @@ export class AuthService {
 
   constructor() {
     if (this.accessTokenSignal()) {
-      this.me().subscribe((user) => {
-        if (user) {
-          this.permissions.load().subscribe();
-        }
-      });
+      void this.ensureUserLoaded();
     }
   }
 
@@ -70,7 +74,7 @@ export class AuthService {
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/login`, { email, password })
-      .pipe(tap((res) => this.handleAuthResponse(res)));
+      .pipe(tap((res) => this.applySession(res)));
   }
 
   refresh(): Observable<AuthResponse | null> {
@@ -84,7 +88,7 @@ export class AuthService {
     this.refreshInFlight = this.http
       .post<AuthResponse>(`${this.baseUrl}/refresh`, { refreshToken })
       .pipe(
-        tap((res) => this.handleAuthResponse(res)),
+        tap((res) => this.applySession(res)),
         catchError((err) => {
           if (err?.status === 401 || err?.status === 403) {
             this.clearTokens();
@@ -110,6 +114,21 @@ export class AuthService {
         return of(null);
       }),
     );
+  }
+
+  /**
+   * Liefert den aktuellen User. Beim ersten Aufruf nach App-Start (Token vorhanden, User noch nicht geladen)
+   * wartet die Methode auf die `/me`-Antwort. Folgende Aufrufe sind synchron via Signal.
+   */
+  ensureUserLoaded(): Promise<User | null> {
+    const current = this.currentUserSignal();
+    if (current) return Promise.resolve(current);
+    if (!this.accessTokenSignal()) return Promise.resolve(null);
+    if (this.meInFlight) return this.meInFlight;
+    this.meInFlight = firstValueFrom(this.me()).finally(() => {
+      this.meInFlight = null;
+    });
+    return this.meInFlight;
   }
 
   reloadCurrentUser(): Observable<User | null> {
@@ -145,7 +164,7 @@ export class AuthService {
           this.writeStorage(ADMIN_BACKUP_ACCESS_KEY, currentAccess);
           this.writeStorage(ADMIN_BACKUP_REFRESH_KEY, currentRefresh);
           this.impersonatingSignal.set(true);
-          this.handleAuthResponse(res);
+          this.applySession(res);
         }),
       );
   }
@@ -163,10 +182,8 @@ export class AuthService {
     this.writeStorage(ACCESS_KEY, access);
     this.writeStorage(REFRESH_KEY, refresh);
     this.impersonatingSignal.set(false);
-    this.permissions.clear();
-    this.me().subscribe(() => {
-      this.permissions.load().subscribe();
-    });
+    this.currentUserSignal.set(null);
+    void this.ensureUserLoaded();
     return true;
   }
 
@@ -181,14 +198,12 @@ export class AuthService {
     );
   }
 
-  private handleAuthResponse(res: AuthResponse): void {
+  private applySession(res: AuthResponse): void {
     this.accessTokenSignal.set(res.accessToken);
     this.refreshTokenSignal.set(res.refreshToken);
     this.currentUserSignal.set(res.user);
     this.writeStorage(ACCESS_KEY, res.accessToken);
     this.writeStorage(REFRESH_KEY, res.refreshToken);
-    this.permissions.clear();
-    this.permissions.load().subscribe();
   }
 
   private clearTokens(): void {
@@ -200,7 +215,6 @@ export class AuthService {
     this.writeStorage(ADMIN_BACKUP_ACCESS_KEY, null);
     this.writeStorage(ADMIN_BACKUP_REFRESH_KEY, null);
     this.impersonatingSignal.set(false);
-    this.permissions.clear();
   }
 
   private readStorage(key: string): string | null {

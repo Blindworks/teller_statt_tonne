@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PermissionsService } from '../../auth/permissions.service';
+import { AuthService } from '../../auth/auth.service';
+import { hasAnyRole } from '../../users/user.model';
 
 interface DashboardCard {
   title: string;
@@ -16,7 +17,7 @@ interface DashboardCard {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamleiterDashboardComponent {
-  private readonly perms = inject(PermissionsService);
+  private readonly auth = inject(AuthService);
 
   readonly cards = computed<DashboardCard[]>(() => {
     const list: DashboardCard[] = [
@@ -40,7 +41,7 @@ export class TeamleiterDashboardComponent {
         link: '/teamleitung/zertifikate',
       },
     ];
-    if (this.perms.features().has('nav.quiz-admin')) {
+    if (hasAnyRole(this.auth.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER')) {
       list.push({
         title: 'Quiz',
         description: 'Quiz-Fragen, Kategorien und Versuche verwalten.',

@@ -3,15 +3,15 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { StoresComponent } from './stores/stores';
 import { AppShellComponent } from './shell/app-shell';
 import { authGuard } from './auth/auth.guard';
-import { featureGuard } from './auth/feature.guard';
+import { roleGuard } from './auth/role.guard';
 import { onboardingCompletedGuard, onboardingRequiredGuard } from './auth/onboarding.guard';
 import { landingGuard } from './landing/landing.guard';
 
-const plannerEdit = featureGuard('route.planner');
-const plannerView = featureGuard('route.planner.view');
-const userEdit = featureGuard('route.user.edit');
-const quizAdmin = featureGuard('route.quiz.admin');
-const adminArea = featureGuard('route.admin');
+const plannerEdit = roleGuard('ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR');
+const plannerView = roleGuard('ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR', 'RETTER');
+const userEdit = roleGuard('ADMINISTRATOR', 'TEAMLEITER');
+const quizAdmin = roleGuard('ADMINISTRATOR', 'TEAMLEITER');
+const adminArea = roleGuard('ADMINISTRATOR');
 
 export const routes: Routes = [
   {
@@ -186,14 +186,6 @@ export const routes: Routes = [
         canActivate: [adminArea],
         loadComponent: () =>
           import('./admin/roles/role-form/role-form').then((m) => m.RoleFormComponent),
-      },
-      {
-        path: 'admin/permissions',
-        canActivate: [featureGuard('route.admin.permissions')],
-        loadComponent: () =>
-          import('./admin/permissions/permissions-matrix/permissions-matrix').then(
-            (m) => m.PermissionsMatrixComponent,
-          ),
       },
       {
         path: 'admin/distribution-points',
