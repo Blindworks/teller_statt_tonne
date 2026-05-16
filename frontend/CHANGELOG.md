@@ -7,6 +7,10 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Changed
+
+- Navigations-Eintrag „Benutzer“ (`/users`) ist für Retter nicht mehr sichtbar — weder in der Desktop-Sidebar noch im mobilen „Mehr“-Bottom-Sheet. Neue `canSeeUsers`-Sichtbarkeit in `app-shell.ts` prüft auf ADMINISTRATOR/TEAMLEITER/KOORDINATOR (analog zu `canSeeStoreMembers`). Im „Mehr“-Sheet wurde die bisherige `isPlanner`-Kopplung in zwei unabhängige Bedingungen aufgeteilt (`canSeeUsers` für Benutzer, `!isPlanner` für Abholung-Planer).
+
 ### Removed
 
 - Dynamisches Berechtigungs-/Feature-Modell vollständig entfernt. Die Dateien `permissions.service.ts`, `feature.guard.ts`, das gesamte Admin-Verzeichnis `admin/permissions/` (Permissions-Matrix, Feature-Form, Feature-Service/Model) sowie die Admin-Karte „Berechtigungen“ und die Route `/admin/permissions` sind weg. `PermissionsService`-Aufrufe in `AuthService`, `AppShellComponent`, `AdminDashboardComponent`, `TeamleiterDashboardComponent` und `TicketFormComponent` entfernt — die initiale `/api/me/features`-HTTP-Last beim Login/Refresh entfällt.

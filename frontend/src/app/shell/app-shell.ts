@@ -60,6 +60,9 @@ export class AppShellComponent {
     hasAnyRole(this.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR', 'RETTER'),
   );
   readonly isAdmin = computed(() => hasAnyRole(this.currentUser(), 'ADMINISTRATOR'));
+  readonly canSeeUsers = computed(() =>
+    hasAnyRole(this.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR'),
+  );
   readonly canSeeStoreMembers = computed(() =>
     hasAnyRole(this.currentUser(), 'ADMINISTRATOR', 'TEAMLEITER', 'KOORDINATOR'),
   );
