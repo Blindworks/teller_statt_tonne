@@ -79,10 +79,21 @@
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
     @for (user of users(); track user.id) {
       <div
-        class="bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-6 shadow-[0_20px_50px_rgba(48,52,40,0.04)] hover:shadow-xl transition-all duration-500 group"
+        class="relative bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-6 shadow-[0_20px_50px_rgba(48,52,40,0.04)] hover:shadow-xl transition-all duration-500 group"
         [class.border-l-8]="primaryRole(user) === 'NEW_MEMBER'"
         [class.border-secondary]="primaryRole(user) === 'NEW_MEMBER'"
+        [class.border-2]="user.status === 'LOCKED'"
+        [class.border-error]="user.status === 'LOCKED'"
       >
+        @if (user.status === 'LOCKED') {
+          <span
+            class="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-error text-on-error flex items-center justify-center shadow-md"
+            [attr.aria-label]="'Nutzer gesperrt'"
+            title="Gesperrt"
+          >
+            <span class="material-symbols-outlined text-xl">lock</span>
+          </span>
+        }
         <div class="flex justify-between items-start">
           <button
             type="button"
