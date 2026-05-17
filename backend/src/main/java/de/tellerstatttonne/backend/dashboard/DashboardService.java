@@ -51,13 +51,13 @@ public class DashboardService {
         List<DaySlot> result = new ArrayList<>();
 
         for (Pickup p : pickups) {
-            if (isRetter && p.eventId() == null && !allowedPartnerIds.contains(p.partnerId())) continue;
+            if (isRetter && p.specialPickupId() == null && !allowedPartnerIds.contains(p.partnerId())) continue;
             boolean assigned = p.assignments() != null && p.assignments().stream()
                 .anyMatch(a -> currentUserId.equals(a.memberId()));
             result.add(new DaySlot(
                 p.id(), p.partnerId(), p.partnerName(), p.partnerCategoryId(),
                 p.partnerStreet(), p.partnerCity(), p.partnerLogoUrl(),
-                p.eventId(), p.eventName(), p.eventLogoUrl(),
+                p.specialPickupId(), p.specialPickupName(), p.specialPickupLogoUrl(),
                 p.date(), p.startTime(), p.endTime(),
                 p.capacity(), p.assignments() == null ? List.of() : p.assignments(),
                 false, assigned
@@ -67,7 +67,7 @@ public class DashboardService {
         result.sort(Comparator
             .comparing(DaySlot::date, Comparator.nullsLast(LocalDate::compareTo))
             .thenComparing(DaySlot::startTime, Comparator.nullsLast(String::compareTo))
-            .thenComparing((DaySlot s) -> s.partnerName() != null ? s.partnerName() : s.eventName(),
+            .thenComparing((DaySlot s) -> s.partnerName() != null ? s.partnerName() : s.specialPickupName(),
                 Comparator.nullsLast(String::compareTo)));
         return result;
     }

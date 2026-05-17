@@ -85,21 +85,27 @@ export const routes: Routes = [
         loadComponent: () => import('./map/map').then((m) => m.MapComponent),
       },
       {
-        path: 'events',
+        path: 'special-pickups',
         loadComponent: () =>
-          import('./events/events-list/events-list').then((m) => m.EventsListComponent),
+          import('./special-pickups/special-pickups-list/special-pickups-list').then(
+            (m) => m.SpecialPickupsListComponent,
+          ),
       },
       {
-        path: 'events/new',
+        path: 'special-pickups/new',
         canActivate: [plannerEdit],
         loadComponent: () =>
-          import('./events/event-form/event-form').then((m) => m.EventFormComponent),
+          import('./special-pickups/special-pickup-form/special-pickup-form').then(
+            (m) => m.SpecialPickupFormComponent,
+          ),
       },
       {
-        path: 'events/:id',
+        path: 'special-pickups/:id',
         canActivate: [plannerEdit],
         loadComponent: () =>
-          import('./events/event-form/event-form').then((m) => m.EventFormComponent),
+          import('./special-pickups/special-pickup-form/special-pickup-form').then(
+            (m) => m.SpecialPickupFormComponent,
+          ),
       },
       {
         path: 'pickups',

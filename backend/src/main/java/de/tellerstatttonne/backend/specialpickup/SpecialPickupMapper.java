@@ -1,17 +1,17 @@
-package de.tellerstatttonne.backend.event;
+package de.tellerstatttonne.backend.specialpickup;
 
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 
-final class EventMapper {
+final class SpecialPickupMapper {
 
-    private EventMapper() {}
+    private SpecialPickupMapper() {}
 
-    static Event toDto(EventEntity e) {
+    static SpecialPickup toDto(SpecialPickupEntity e) {
         PartnerEntity.ContactEmbeddable c = e.getContact();
-        Event.Contact contact = c == null
-            ? new Event.Contact(null, null, null)
-            : new Event.Contact(c.getName(), c.getEmail(), c.getPhone());
-        return new Event(
+        SpecialPickup.Contact contact = c == null
+            ? new SpecialPickup.Contact(null, null, null)
+            : new SpecialPickup.Contact(c.getName(), c.getEmail(), c.getPhone());
+        return new SpecialPickup(
             e.getId(),
             e.getName(),
             e.getDescription(),
@@ -27,7 +27,7 @@ final class EventMapper {
         );
     }
 
-    static void applyScalarFields(EventEntity target, Event src) {
+    static void applyScalarFields(SpecialPickupEntity target, SpecialPickup src) {
         target.setName(src.name());
         target.setDescription(src.description());
         target.setStartDate(src.startDate());

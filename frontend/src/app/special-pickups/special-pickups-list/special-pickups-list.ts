@@ -1,26 +1,26 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EventService } from '../event.service';
-import { CharityEvent, EventScope } from '../event.model';
+import { SpecialPickupService } from '../special-pickup.service';
+import { SpecialPickup, SpecialPickupScope } from '../special-pickup.model';
 import { AuthService } from '../../auth/auth.service';
 
 @Component({
-  selector: 'app-events-list',
+  selector: 'app-special-pickups-list',
   imports: [RouterLink],
-  templateUrl: './events-list.html',
+  templateUrl: './special-pickups-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventsListComponent {
-  private readonly service = inject(EventService);
+export class SpecialPickupsListComponent {
+  private readonly service = inject(SpecialPickupService);
   private readonly auth = inject(AuthService);
 
-  readonly items = signal<CharityEvent[]>([]);
+  readonly items = signal<SpecialPickup[]>([]);
   readonly loadError = signal<string | null>(null);
   readonly actionError = signal<string | null>(null);
   readonly confirmDeleteId = signal<number | null>(null);
   readonly busy = signal(false);
-  readonly scope = signal<EventScope>('active');
+  readonly scope = signal<SpecialPickupScope>('active');
 
   readonly canManage = computed(() => {
     const roles = this.auth.currentUser()?.roles ?? [];
@@ -44,18 +44,18 @@ export class EventsListComponent {
       });
   }
 
-  setScope(scope: EventScope): void {
+  setScope(scope: SpecialPickupScope): void {
     if (this.scope() === scope) return;
     this.scope.set(scope);
     this.reload();
   }
 
-  locationOf(item: CharityEvent): string {
+  locationOf(item: SpecialPickup): string {
     const parts = [item.postalCode, item.city].filter((p): p is string => !!p && p.trim().length > 0);
     return parts.length ? parts.join(' ') : '–';
   }
 
-  periodOf(item: CharityEvent): string {
+  periodOf(item: SpecialPickup): string {
     if (item.startDate === item.endDate) return item.startDate;
     return `${item.startDate} – ${item.endDate}`;
   }

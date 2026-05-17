@@ -39,7 +39,7 @@ interface DisplaySlot {
   pickupId: number | null;
   partnerId: number;
   partnerName: string;
-  isEvent: boolean;
+  isSpecialPickup: boolean;
   location: string;
   time: string;
   date: string;
@@ -300,12 +300,12 @@ export class DashboardComponent {
   }
 
   private toDisplay(s: DaySlot, idx: number, now: number): DisplaySlot {
-    const isEvent = s.eventId != null;
+    const isSpecial = s.specialPickupId != null;
     const category = this.categoryRegistry.byId(s.partnerCategoryId);
-    const categoryIcon = isEvent ? 'celebration' : (category?.icon ?? 'storefront');
+    const categoryIcon = isSpecial ? 'celebration' : (category?.icon ?? 'storefront');
     const categoryLabel = category?.label ?? 'Pickup';
-    const displayName = isEvent ? (s.eventName ?? 'Sonderabholung') : s.partnerName;
-    const displayLogoUrl = isEvent ? s.eventLogoUrl : s.partnerLogoUrl;
+    const displayName = isSpecial ? (s.specialPickupName ?? 'Sonderabholung') : s.partnerName;
+    const displayLogoUrl = isSpecial ? s.specialPickupLogoUrl : s.partnerLogoUrl;
 
     const location = [s.partnerStreet, s.partnerCity].filter((x) => !!x).join(', ');
     const assignments = s.assignments ?? [];
@@ -329,14 +329,14 @@ export class DashboardComponent {
       pickupId: s.pickupId,
       partnerId: s.partnerId,
       partnerName: displayName,
-      isEvent,
+      isSpecialPickup: isSpecial,
       location: location || '—',
       time: `${s.startTime} – ${s.endTime}`,
       date: s.date,
       startTime: s.startTime,
       endTime: s.endTime,
       dateLabel: this.formatDateLabel(s.date),
-      badgeLabel: s.isTemplate ? 'Slot frei' : isEvent ? 'Sonderabholung' : categoryLabel,
+      badgeLabel: s.isTemplate ? 'Slot frei' : isSpecial ? 'Sonderabholung' : categoryLabel,
       isTemplate: s.isTemplate,
       categoryIcon,
       logoUrl: displayLogoUrl,

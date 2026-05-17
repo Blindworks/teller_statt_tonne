@@ -8,8 +8,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { EventService } from '../event.service';
-import { CharityEvent } from '../event.model';
+import { SpecialPickupService } from '../special-pickup.service';
+import { SpecialPickup } from '../special-pickup.model';
 import { PickupService } from '../../pickups/pickup.service';
 import { Pickup, emptyPickup } from '../../pickups/pickup.model';
 import {
@@ -18,7 +18,7 @@ import {
 } from '../../partners/location-picker/location-picker-dialog';
 import { PartnerService } from '../../partners/partner.service';
 
-type EventForm = FormGroup<{
+type SpecialPickupForm = FormGroup<{
   name: FormControl<string>;
   description: FormControl<string>;
   startDate: FormControl<string>;
@@ -32,14 +32,14 @@ type EventForm = FormGroup<{
 }>;
 
 @Component({
-  selector: 'app-event-form',
+  selector: 'app-special-pickup-form',
   imports: [ReactiveFormsModule, RouterLink, LocationPickerDialogComponent, DecimalPipe],
-  templateUrl: './event-form.html',
+  templateUrl: './special-pickup-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventFormComponent {
+export class SpecialPickupFormComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly service = inject(EventService);
+  private readonly service = inject(SpecialPickupService);
   private readonly pickupService = inject(PickupService);
   private readonly partnerService = inject(PartnerService);
   private readonly route = inject(ActivatedRoute);
@@ -72,7 +72,7 @@ export class EventFormComponent {
     capacity: this.fb.nonNullable.control(2, [Validators.required, Validators.min(1)]),
   });
 
-  readonly form: EventForm = this.fb.group({
+  readonly form: SpecialPickupForm = this.fb.group({
     name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(255)]),
     description: this.fb.nonNullable.control(''),
     startDate: this.fb.nonNullable.control('', [Validators.required]),
@@ -100,14 +100,14 @@ export class EventFormComponent {
     }
   }
 
-  private reloadPickups(item: CharityEvent): void {
+  private reloadPickups(item: SpecialPickup): void {
     if (item.id == null) return;
     this.slotForm.patchValue({ date: item.startDate });
     this.pickupService.list(item.startDate, item.endDate).subscribe({
       next: (list) => {
         this.pickups.set(
           list
-            .filter((p) => p.eventId === item.id)
+            .filter((p) => p.specialPickupId === item.id)
             .sort((a, b) =>
               a.date === b.date ? a.startTime.localeCompare(b.startTime) : a.date.localeCompare(b.date),
             ),
@@ -143,7 +143,7 @@ export class EventFormComponent {
     const payload: Pickup = {
       ...emptyPickup(),
       partnerId: null,
-      eventId: id,
+      specialPickupId: id,
       date: raw.date,
       startTime: raw.startTime,
       endTime: raw.endTime,
@@ -181,7 +181,7 @@ export class EventFormComponent {
     });
   }
 
-  private patchForm(item: CharityEvent): void {
+  private patchForm(item: SpecialPickup): void {
     this.form.patchValue({
       name: item.name,
       description: item.description ?? '',
@@ -276,7 +276,7 @@ export class EventFormComponent {
       );
       return;
     }
-    const payload: CharityEvent = {
+    const payload: SpecialPickup = {
       id: this.itemId(),
       name: raw.name.trim(),
       description: raw.description.trim() || null,
@@ -303,7 +303,7 @@ export class EventFormComponent {
     obs.subscribe({
       next: () => {
         this.saving.set(false);
-        this.router.navigate(['/events']);
+        this.router.navigate(['/special-pickups']);
       },
       error: (err) => {
         this.saving.set(false);
@@ -327,9 +327,9 @@ export class EventFormComponent {
     }
     this.uploadingLogo.set(true);
     this.service.uploadLogo(id, file).subscribe({
-      next: (event) => {
+      next: (item) => {
         this.uploadingLogo.set(false);
-        this.logoUrl.set(event.logoUrl);
+        this.logoUrl.set(item.logoUrl);
         input.value = '';
       },
       error: () => {

@@ -7,6 +7,17 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** Umbenennung des bisherigen `Event`-Konzepts auf `SpecialPickup` (Sonderabholung), damit der Begriff „Event" für künftige echte Veranstaltungen frei wird. Betroffen:
+  - Java-Package `de.tellerstatttonne.backend.event` → `de.tellerstatttonne.backend.specialpickup`; Klassen `Event`/`EventEntity`/`EventRepository`/`EventService`/`EventMapper`/`EventController` → `SpecialPickup*`.
+  - REST-Endpoint `/api/events` → `/api/special-pickups` (alle Verben).
+  - DB-Tabelle `event` → `special_pickup`, Spalte `pickup.event_id` → `pickup.special_pickup_id`, FK `fk_pickup_event` → `fk_pickup_special_pickup`, Index `idx_event_end_date` → `idx_special_pickup_end_date`, CHECK `ck_pickup_parent_xor` aktualisiert. Liquibase-Migration `038-rename-event-to-special-pickup.xml` (rename-only, keine Datenverluste).
+  - DTO-Felder `Pickup.eventId/eventName/eventLogoUrl` → `specialPickupId/specialPickupName/specialPickupLogoUrl`; gleiche Umbenennung auf `DaySlot`.
+  - `SystemLogEventType.EVENT_CREATED/UPDATED/DELETED` → `SPECIAL_PICKUP_*`; Logging-Target-String `"EVENT"` → `"SPECIAL_PICKUP"`.
+  - Image-Storage-Unterordner `event-logos` → `special-pickup-logos`.
+  - `PickupRepository.existsEventPickupOverlap(...)` → `existsSpecialPickupOverlap(...)`.
+
 ### Added
 
 - Vier zusätzliche Freitext-Hinweise für Retter pro Betrieb: `deliveryNoteInfo` (Lieferschein), `depositInfo` (Pfand), `wasteDisposalInfo` (Müllentsorgung) und `materialInfo` (Material). Persistenz als neue `VARCHAR(4000)`-Spalten `partner.delivery_note_info`, `partner.deposit_info`, `partner.waste_disposal_info`, `partner.material_info` (Liquibase-Migration `037-partner-retter-hints-extra.xml`). Felder werden vom `PartnerMapper` in beide Richtungen gemappt und über den bestehenden `PUT /api/partners/{id}` gespeichert.

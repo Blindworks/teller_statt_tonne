@@ -32,8 +32,8 @@ import {
   DistributionPoint,
   WEEKDAY_LABELS,
 } from '../admin/distribution-points/distribution-point.model';
-import { EventService } from '../events/event.service';
-import { CharityEvent } from '../events/event.model';
+import { SpecialPickupService } from '../special-pickups/special-pickup.service';
+import { SpecialPickup } from '../special-pickups/special-pickup.model';
 
 type DayFilter = 'ALL' | Weekday;
 
@@ -50,7 +50,7 @@ const DEFAULT_ZOOM = 13;
 export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly service = inject(PartnerService);
   private readonly distributionPointService = inject(DistributionPointService);
-  private readonly eventService = inject(EventService);
+  private readonly specialPickupService = inject(SpecialPickupService);
   private readonly auth = inject(AuthService);
   private readonly detailDialog = inject(StoreDetailDialogService);
   private readonly categoryRegistry = inject(PartnerCategoryRegistry);
@@ -60,7 +60,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   readonly partners = signal<Partner[]>([]);
   readonly distributionPoints = signal<DistributionPoint[]>([]);
-  readonly events = signal<CharityEvent[]>([]);
+  readonly specialPickups = signal<SpecialPickup[]>([]);
   readonly loadError = signal<string | null>(null);
 
   readonly selectedCategories = signal<Set<number>>(new Set());
@@ -68,7 +68,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   readonly activeOnly = signal(false);
   readonly selectedDay = signal<DayFilter>('ALL');
   readonly showDistributionPoints = signal(true);
-  readonly showEvents = signal(true);
+  readonly showSpecialPickups = signal(true);
 
   readonly weekdays = WEEKDAYS;
   readonly allCategories = this.categoryRegistry.categories;
@@ -104,9 +104,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return this.distributionPoints().filter((dp) => dp.latitude != null && dp.longitude != null);
   });
 
-  readonly filteredEvents = computed(() => {
-    if (!this.showEvents()) return [];
-    return this.events().filter((ev) => ev.latitude != null && ev.longitude != null);
+  readonly filteredSpecialPickups = computed(() => {
+    if (!this.showSpecialPickups()) return [];
+    return this.specialPickups().filter((sp) => sp.latitude != null && sp.longitude != null);
   });
 
   private map?: L.Map;
@@ -129,10 +129,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       });
     }
 
-    this.eventService.list('active').subscribe({
-      next: (list) => this.events.set(list),
+    this.specialPickupService.list('active').subscribe({
+      next: (list) => this.specialPickups.set(list),
       error: () => {
-        // Veranstaltungen sind optional auf der Karte — Fehler still ignorieren
+        // Sonderabholungen sind optional auf der Karte — Fehler still ignorieren
       },
     });
 
@@ -149,7 +149,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     effect(() => {
       this.filteredPartners();
       this.filteredDistributionPoints();
-      this.filteredEvents();
+      this.filteredSpecialPickups();
       this.selectedDay();
       if (this.map) {
         this.redraw();
@@ -205,8 +205,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.showDistributionPoints.update((v) => !v);
   }
 
-  toggleEvents(): void {
-    this.showEvents.update((v) => !v);
+  toggleSpecialPickups(): void {
+    this.showSpecialPickups.update((v) => !v);
   }
 
   canSeeDistributionPoints(): boolean {
@@ -264,15 +264,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
     dpMarkers.forEach((m) => this.cluster!.addLayer(m));
 
-    const eventMarkers: L.Marker[] = [];
-    for (const ev of this.filteredEvents()) {
-      const marker = L.marker([ev.latitude!, ev.longitude!], {
+    const specialPickupMarkers: L.Marker[] = [];
+    for (const sp of this.filteredSpecialPickups()) {
+      const marker = L.marker([sp.latitude!, sp.longitude!], {
         icon: buildEventMarkerIcon(),
       });
-      marker.bindPopup(this.buildEventPopup(ev));
-      eventMarkers.push(marker);
+      marker.bindPopup(this.buildSpecialPickupPopup(sp));
+      specialPickupMarkers.push(marker);
     }
-    eventMarkers.forEach((m) => this.cluster!.addLayer(m));
+    specialPickupMarkers.forEach((m) => this.cluster!.addLayer(m));
 
     if (day !== 'ALL' && ordered.length >= 2) {
       const latlngs: L.LatLngTuple[] = ordered.map((p) => [p.latitude!, p.longitude!]);
@@ -290,7 +290,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       ...this.filteredDistributionPoints().map(
         (dp) => [dp.latitude!, dp.longitude!] as L.LatLngTuple,
       ),
-      ...this.filteredEvents().map((ev) => [ev.latitude!, ev.longitude!] as L.LatLngTuple),
+      ...this.filteredSpecialPickups().map((sp) => [sp.latitude!, sp.longitude!] as L.LatLngTuple),
     ];
     if (allPoints.length > 0) {
       const bounds = L.latLngBounds(allPoints);
@@ -330,24 +330,24 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     `;
   }
 
-  private buildEventPopup(ev: CharityEvent): string {
+  private buildSpecialPickupPopup(sp: SpecialPickup): string {
     const escape = (s: string) =>
       s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const addressLine = [ev.street, [ev.postalCode, ev.city].filter((p) => !!p).join(' ').trim()]
+    const addressLine = [sp.street, [sp.postalCode, sp.city].filter((p) => !!p).join(' ').trim()]
       .filter((p) => !!p && p.trim())
       .map((p) => escape(p!.trim()))
       .join(', ');
     const period =
-      ev.startDate === ev.endDate
-        ? escape(ev.startDate)
-        : `${escape(ev.startDate)} – ${escape(ev.endDate)}`;
+      sp.startDate === sp.endDate
+        ? escape(sp.startDate)
+        : `${escape(sp.startDate)} – ${escape(sp.endDate)}`;
     const isPlanner = this.canSeeDistributionPoints();
     const editLink = isPlanner
-      ? `<a class="map-popup__link" href="/events/${ev.id}">Bearbeiten →</a>`
+      ? `<a class="map-popup__link" href="/special-pickups/${sp.id}">Bearbeiten →</a>`
       : '';
     return `
       <div class="map-popup">
-        <div class="map-popup__title">${escape(ev.name)} <span class="map-popup__badge map-popup__badge--active">Sonderabholung</span></div>
+        <div class="map-popup__title">${escape(sp.name)} <span class="map-popup__badge map-popup__badge--active">Sonderabholung</span></div>
         <div class="map-popup__category">${period}</div>
         ${addressLine ? `<div class="map-popup__address">${addressLine}</div>` : ''}
         ${editLink}

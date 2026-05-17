@@ -14,9 +14,9 @@ export interface Pickup {
   partnerStreet: string | null;
   partnerCity: string | null;
   partnerLogoUrl: string | null;
-  eventId: number | null;
-  eventName: string | null;
-  eventLogoUrl: string | null;
+  specialPickupId: number | null;
+  specialPickupName: string | null;
+  specialPickupLogoUrl: string | null;
   date: string;
   startTime: string;
   endTime: string;
@@ -43,9 +43,9 @@ export function emptyPickup(): Pickup {
     partnerStreet: null,
     partnerCity: null,
     partnerLogoUrl: null,
-    eventId: null,
-    eventName: null,
-    eventLogoUrl: null,
+    specialPickupId: null,
+    specialPickupName: null,
+    specialPickupLogoUrl: null,
     date: new Date().toISOString().slice(0, 10),
     startTime: '18:00',
     endTime: '18:30',

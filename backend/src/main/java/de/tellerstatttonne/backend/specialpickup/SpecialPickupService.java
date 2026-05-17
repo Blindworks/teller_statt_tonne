@@ -1,4 +1,4 @@
-package de.tellerstatttonne.backend.event;
+package de.tellerstatttonne.backend.specialpickup;
 
 import de.tellerstatttonne.backend.auth.CurrentUser;
 import de.tellerstatttonne.backend.partner.GeocodingService;
@@ -14,57 +14,57 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class EventService {
+public class SpecialPickupService {
 
     public enum Scope { ACTIVE, PAST, ALL }
 
-    private final EventRepository repository;
+    private final SpecialPickupRepository repository;
     private final GeocodingService geocodingService;
     private final ApplicationEventPublisher eventPublisher;
 
-    public EventService(EventRepository repository,
-                        GeocodingService geocodingService,
-                        ApplicationEventPublisher eventPublisher) {
+    public SpecialPickupService(SpecialPickupRepository repository,
+                                GeocodingService geocodingService,
+                                ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
         this.geocodingService = geocodingService;
         this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
-    public List<Event> findAll(Scope scope) {
+    public List<SpecialPickup> findAll(Scope scope) {
         LocalDate today = LocalDate.now();
-        List<EventEntity> entities = switch (scope) {
+        List<SpecialPickupEntity> entities = switch (scope) {
             case ACTIVE -> repository.findByEndDateGreaterThanEqualOrderByStartDateAsc(today);
             case PAST -> repository.findByEndDateLessThanOrderByStartDateDesc(today);
             case ALL -> repository.findAll();
         };
-        return entities.stream().map(EventMapper::toDto).toList();
+        return entities.stream().map(SpecialPickupMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
-    public Optional<Event> findById(Long id) {
-        return repository.findById(id).map(EventMapper::toDto);
+    public Optional<SpecialPickup> findById(Long id) {
+        return repository.findById(id).map(SpecialPickupMapper::toDto);
     }
 
-    public Event create(Event dto) {
+    public SpecialPickup create(SpecialPickup dto) {
         validate(dto);
-        EventEntity entity = new EventEntity();
-        EventMapper.applyScalarFields(entity, dto);
+        SpecialPickupEntity entity = new SpecialPickupEntity();
+        SpecialPickupMapper.applyScalarFields(entity, dto);
         if (!hasCoordinates(dto)) {
             applyGeocoding(entity);
         }
-        EventEntity saved = repository.save(entity);
+        SpecialPickupEntity saved = repository.save(entity);
 
-        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.EVENT_CREATED)
+        eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.SPECIAL_PICKUP_CREATED)
             .actorUserId(currentActorId())
-            .target("EVENT", saved.getId())
-            .message("Veranstaltung angelegt: " + saved.getName())
+            .target("SPECIAL_PICKUP", saved.getId())
+            .message("Sonderabholung angelegt: " + saved.getName())
             .build());
 
-        return EventMapper.toDto(saved);
+        return SpecialPickupMapper.toDto(saved);
     }
 
-    public Optional<Event> update(Long id, Event dto) {
+    public Optional<SpecialPickup> update(Long id, SpecialPickup dto) {
         return repository.findById(id).map(entity -> {
             validate(dto);
             boolean addressChanged =
@@ -72,20 +72,20 @@ public class EventService {
                 || !equal(entity.getPostalCode(), dto.postalCode())
                 || !equal(entity.getCity(), dto.city());
 
-            EventMapper.applyScalarFields(entity, dto);
+            SpecialPickupMapper.applyScalarFields(entity, dto);
             if (!hasCoordinates(dto)
                 && (addressChanged || entity.getLatitude() == null || entity.getLongitude() == null)) {
                 applyGeocoding(entity);
             }
-            EventEntity saved = repository.save(entity);
+            SpecialPickupEntity saved = repository.save(entity);
 
-            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.EVENT_UPDATED)
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.SPECIAL_PICKUP_UPDATED)
                 .actorUserId(currentActorId())
-                .target("EVENT", saved.getId())
-                .message("Veranstaltung aktualisiert: " + saved.getName())
+                .target("SPECIAL_PICKUP", saved.getId())
+                .message("Sonderabholung aktualisiert: " + saved.getName())
                 .build());
 
-            return EventMapper.toDto(saved);
+            return SpecialPickupMapper.toDto(saved);
         });
     }
 
@@ -93,10 +93,10 @@ public class EventService {
         return repository.findById(id).map(entity -> {
             String name = entity.getName();
             repository.delete(entity);
-            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.EVENT_DELETED)
+            eventPublisher.publishEvent(SystemLogEvent.of(SystemLogEventType.SPECIAL_PICKUP_DELETED)
                 .actorUserId(currentActorId())
-                .target("EVENT", id)
-                .message("Veranstaltung gelöscht: " + name)
+                .target("SPECIAL_PICKUP", id)
+                .message("Sonderabholung gelöscht: " + name)
                 .build());
             return true;
         }).orElse(false);
@@ -104,17 +104,17 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public Optional<String> findLogoUrl(Long id) {
-        return repository.findById(id).map(EventEntity::getLogoUrl);
+        return repository.findById(id).map(SpecialPickupEntity::getLogoUrl);
     }
 
-    public Optional<Event> updateLogoUrl(Long id, String logoUrl) {
+    public Optional<SpecialPickup> updateLogoUrl(Long id, String logoUrl) {
         return repository.findById(id).map(entity -> {
             entity.setLogoUrl(logoUrl);
-            return EventMapper.toDto(repository.save(entity));
+            return SpecialPickupMapper.toDto(repository.save(entity));
         });
     }
 
-    private void applyGeocoding(EventEntity entity) {
+    private void applyGeocoding(SpecialPickupEntity entity) {
         Optional<Coordinates> coords = geocodingService.geocode(
             entity.getStreet(), entity.getPostalCode(), entity.getCity());
         coords.ifPresent(c -> {
@@ -123,7 +123,7 @@ public class EventService {
         });
     }
 
-    private void validate(Event dto) {
+    private void validate(SpecialPickup dto) {
         if (dto.name() == null || dto.name().isBlank()) {
             throw new IllegalArgumentException("name ist erforderlich");
         }
@@ -143,7 +143,7 @@ public class EventService {
         }
     }
 
-    private static boolean hasCoordinates(Event dto) {
+    private static boolean hasCoordinates(SpecialPickup dto) {
         return dto.latitude() != null && dto.longitude() != null;
     }
 

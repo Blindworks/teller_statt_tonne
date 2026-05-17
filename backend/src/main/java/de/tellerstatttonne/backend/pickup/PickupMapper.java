@@ -1,7 +1,7 @@
 package de.tellerstatttonne.backend.pickup;
 
-import de.tellerstatttonne.backend.event.EventEntity;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
+import de.tellerstatttonne.backend.specialpickup.SpecialPickupEntity;
 import de.tellerstatttonne.backend.user.User;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ final class PickupMapper {
 
     static Pickup toDto(PickupEntity e, Map<Long, User> usersById) {
         PartnerEntity partner = e.getPartner();
-        EventEntity event = e.getEvent();
+        SpecialPickupEntity specialPickup = e.getSpecialPickup();
         List<Pickup.Assignment> assignments = e.getAssignments() == null
             ? List.of()
             : e.getAssignments().stream().map(a -> {
@@ -35,9 +35,9 @@ final class PickupMapper {
             partner != null ? partner.getStreet() : null,
             partner != null ? partner.getCity() : null,
             partner != null ? partner.getLogoUrl() : null,
-            event != null ? event.getId() : null,
-            event != null ? event.getName() : null,
-            event != null ? event.getLogoUrl() : null,
+            specialPickup != null ? specialPickup.getId() : null,
+            specialPickup != null ? specialPickup.getName() : null,
+            specialPickup != null ? specialPickup.getLogoUrl() : null,
             e.getDate(),
             e.getStartTime(),
             e.getEndTime(),
@@ -50,9 +50,9 @@ final class PickupMapper {
         );
     }
 
-    static void applyToEntity(PickupEntity target, Pickup src, PartnerEntity partner, EventEntity event) {
+    static void applyToEntity(PickupEntity target, Pickup src, PartnerEntity partner, SpecialPickupEntity specialPickup) {
         target.setPartner(partner);
-        target.setEvent(event);
+        target.setSpecialPickup(specialPickup);
         target.setDate(src.date());
         target.setStartTime(src.startTime());
         target.setEndTime(src.endTime());

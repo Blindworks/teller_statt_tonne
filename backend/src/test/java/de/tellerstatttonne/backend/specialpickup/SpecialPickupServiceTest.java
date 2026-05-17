@@ -1,4 +1,4 @@
-package de.tellerstatttonne.backend.event;
+package de.tellerstatttonne.backend.specialpickup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class EventServiceTest {
+class SpecialPickupServiceTest {
 
-    @Autowired private EventService service;
-    @Autowired private EventRepository repository;
+    @Autowired private SpecialPickupService service;
+    @Autowired private SpecialPickupRepository repository;
 
     @BeforeEach
     void clean() {
@@ -24,11 +24,11 @@ class EventServiceTest {
     }
 
     @Test
-    void createPersistsEvent() {
+    void createPersistsSpecialPickup() {
         LocalDate today = LocalDate.now();
-        Event dto = sample("Sommerfest", today, today.plusDays(2));
+        SpecialPickup dto = sample("Sommerfest", today, today.plusDays(2));
 
-        Event created = service.create(dto);
+        SpecialPickup created = service.create(dto);
 
         assertThat(created.id()).isNotNull();
         assertThat(created.name()).isEqualTo("Sommerfest");
@@ -40,7 +40,7 @@ class EventServiceTest {
     @Test
     void rejectsEndBeforeStart() {
         LocalDate today = LocalDate.now();
-        Event bad = sample("Bad", today.plusDays(2), today);
+        SpecialPickup bad = sample("Bad", today.plusDays(2), today);
         assertThatThrownBy(() -> service.create(bad))
             .isInstanceOf(IllegalArgumentException.class);
     }
@@ -48,7 +48,7 @@ class EventServiceTest {
     @Test
     void rejectsBlankName() {
         LocalDate today = LocalDate.now();
-        Event bad = sample("", today, today);
+        SpecialPickup bad = sample("", today, today);
         assertThatThrownBy(() -> service.create(bad))
             .isInstanceOf(IllegalArgumentException.class);
     }
@@ -60,19 +60,19 @@ class EventServiceTest {
         service.create(sample("Today", today, today));
         service.create(sample("Future", today.plusDays(3), today.plusDays(5)));
 
-        List<Event> active = service.findAll(EventService.Scope.ACTIVE);
-        List<Event> past = service.findAll(EventService.Scope.PAST);
-        List<Event> all = service.findAll(EventService.Scope.ALL);
+        List<SpecialPickup> active = service.findAll(SpecialPickupService.Scope.ACTIVE);
+        List<SpecialPickup> past = service.findAll(SpecialPickupService.Scope.PAST);
+        List<SpecialPickup> all = service.findAll(SpecialPickupService.Scope.ALL);
 
-        assertThat(active).extracting(Event::name).containsExactlyInAnyOrder("Today", "Future");
-        assertThat(past).extracting(Event::name).containsExactly("Past");
+        assertThat(active).extracting(SpecialPickup::name).containsExactlyInAnyOrder("Today", "Future");
+        assertThat(past).extracting(SpecialPickup::name).containsExactly("Past");
         assertThat(all).hasSize(3);
     }
 
     @Test
     void deleteRemoves() {
         LocalDate today = LocalDate.now();
-        Event created = service.create(sample("X", today, today));
+        SpecialPickup created = service.create(sample("X", today, today));
         assertThat(service.delete(created.id())).isTrue();
         assertThat(service.findById(created.id())).isEmpty();
     }
@@ -80,9 +80,9 @@ class EventServiceTest {
     @Test
     void updateAppliesChanges() {
         LocalDate today = LocalDate.now();
-        Event created = service.create(sample("X", today, today));
-        Event updated = service.update(created.id(),
-            new Event(null, "Y", "Beschreibung", today, today.plusDays(1),
+        SpecialPickup created = service.create(sample("X", today, today));
+        SpecialPickup updated = service.update(created.id(),
+            new SpecialPickup(null, "Y", "Beschreibung", today, today.plusDays(1),
                 null, null, "Berlin", null, null, null, null)).orElseThrow();
         assertThat(updated.name()).isEqualTo("Y");
         assertThat(updated.endDate()).isEqualTo(today.plusDays(1));
@@ -91,8 +91,8 @@ class EventServiceTest {
     @Test
     void rejectsMissingLocation() {
         LocalDate today = LocalDate.now();
-        Event bad = new Event(null, "Ohne Ort", null, today, today,
-            null, null, null, null, null, null, new Event.Contact(null, null, null));
+        SpecialPickup bad = new SpecialPickup(null, "Ohne Ort", null, today, today,
+            null, null, null, null, null, null, new SpecialPickup.Contact(null, null, null));
         assertThatThrownBy(() -> service.create(bad))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Lokalität");
@@ -101,9 +101,9 @@ class EventServiceTest {
     @Test
     void acceptsCoordinatesOnlyAsLocation() {
         LocalDate today = LocalDate.now();
-        Event dto = new Event(null, "Pin-only", null, today, today,
-            null, null, null, 50.18, 8.74, null, new Event.Contact(null, null, null));
-        Event created = service.create(dto);
+        SpecialPickup dto = new SpecialPickup(null, "Pin-only", null, today, today,
+            null, null, null, 50.18, 8.74, null, new SpecialPickup.Contact(null, null, null));
+        SpecialPickup created = service.create(dto);
         assertThat(created.latitude()).isEqualTo(50.18);
         assertThat(created.longitude()).isEqualTo(8.74);
     }
@@ -111,20 +111,20 @@ class EventServiceTest {
     @Test
     void respectsCoordinatesFromDtoOnUpdate() {
         LocalDate today = LocalDate.now();
-        Event created = service.create(sample("Mit Adresse", today, today));
-        Event withPin = new Event(created.id(), created.name(), created.description(),
+        SpecialPickup created = service.create(sample("Mit Adresse", today, today));
+        SpecialPickup withPin = new SpecialPickup(created.id(), created.name(), created.description(),
             created.startDate(), created.endDate(),
             created.street(), created.postalCode(), created.city(),
             12.34, 56.78, created.logoUrl(), created.contact());
-        Event updated = service.update(created.id(), withPin).orElseThrow();
+        SpecialPickup updated = service.update(created.id(), withPin).orElseThrow();
         assertThat(updated.latitude()).isEqualTo(12.34);
         assertThat(updated.longitude()).isEqualTo(56.78);
     }
 
-    private static Event sample(String name, LocalDate start, LocalDate end) {
-        return new Event(null, name, null, start, end,
+    private static SpecialPickup sample(String name, LocalDate start, LocalDate end) {
+        return new SpecialPickup(null, name, null, start, end,
             "Hauptstraße 1", "10115", "Berlin",
             null, null, null,
-            new Event.Contact(null, null, null));
+            new SpecialPickup.Contact(null, null, null));
     }
 }

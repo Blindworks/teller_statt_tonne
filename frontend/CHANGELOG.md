@@ -7,6 +7,15 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** Umbenennung des bisherigen `Event`-Konzepts auf `SpecialPickup` (Sonderabholung), damit der Begriff „Event" für künftige echte Veranstaltungen frei wird:
+  - Modul-Ordner `src/app/events/` → `src/app/special-pickups/`; Komponenten `EventsListComponent`/`EventFormComponent` → `SpecialPickupsListComponent`/`SpecialPickupFormComponent`; Service `EventService` → `SpecialPickupService`; Modell `CharityEvent`/`EventContact`/`EventScope`/`emptyEvent()` → `SpecialPickup`/`SpecialPickupContact`/`SpecialPickupScope`/`emptySpecialPickup()`.
+  - Routen `/events`, `/events/new`, `/events/:id` → `/special-pickups`, `/special-pickups/new`, `/special-pickups/:id` (Sidebar-Eintrag „Sonderabholungen" zeigt jetzt auf die neuen Routen).
+  - Pickup-Modell-Felder `eventId/eventName/eventLogoUrl` → `specialPickupId/specialPickupName/specialPickupLogoUrl`; gleiche Umbenennung auf `DaySlot`.
+  - Map-Layer: Toggle und Filter `showEvents` → `showSpecialPickups`, Popup-Edit-Link zeigt auf `/special-pickups/:id`.
+  - Backend-Calls zeigen jetzt auf `/api/special-pickups`.
+
 ### Added
 
 - Vier zusätzliche Hinweisfelder im Betrieb-Bearbeiten-Formular (`partner-edit`) unter „Hinweise für Retter": Lieferschein, Pfand, Müllentsorgung und Material. Alle als mehrzeilige Freitext-Textareas analog zu den bestehenden Feldern, eingefügt zwischen „Vorgehensweise vor Ort" und „Ansprechpartner vor Ort". Werte werden bei leerem Inhalt als `null` gespeichert. Anzeige für Retter zusätzlich im Abhol-Wizard (`pickup-run`, Hinweis-Karten mit Icons `receipt_long`, `recycling`, `delete`, `inventory_2`) und im Betriebsdetails-Dialog (`store-detail-dialog`, Hinweisliste mit denselben Icons). `Partner`-Model um `deliveryNoteInfo`, `depositInfo`, `wasteDisposalInfo` und `materialInfo` (jeweils `string | null`) erweitert; `emptyPartner()` initialisiert mit `null`.

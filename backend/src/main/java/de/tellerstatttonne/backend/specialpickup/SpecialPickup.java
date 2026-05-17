@@ -1,8 +1,8 @@
-package de.tellerstatttonne.backend.event;
+package de.tellerstatttonne.backend.specialpickup;
 
 import java.time.LocalDate;
 
-public record Event(
+public record SpecialPickup(
     Long id,
     String name,
     String description,

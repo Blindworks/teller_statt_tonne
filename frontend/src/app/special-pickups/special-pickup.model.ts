@@ -1,10 +1,10 @@
-export interface EventContact {
+export interface SpecialPickupContact {
   name: string | null;
   email: string | null;
   phone: string | null;
 }
 
-export interface CharityEvent {
+export interface SpecialPickup {
   id: number | null;
   name: string;
   description: string | null;
@@ -16,10 +16,10 @@ export interface CharityEvent {
   latitude: number | null;
   longitude: number | null;
   logoUrl: string | null;
-  contact: EventContact;
+  contact: SpecialPickupContact;
 }
 
-export function emptyEvent(): CharityEvent {
+export function emptySpecialPickup(): SpecialPickup {
   return {
     id: null,
     name: '',
@@ -36,4 +36,4 @@ export function emptyEvent(): CharityEvent {
   };
 }
 
-export type EventScope = 'active' | 'past' | 'all';
+export type SpecialPickupScope = 'active' | 'past' | 'all';

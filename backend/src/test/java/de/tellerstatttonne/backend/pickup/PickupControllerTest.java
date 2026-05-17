@@ -32,7 +32,7 @@ class PickupControllerTest {
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
     @Autowired private de.tellerstatttonne.backend.partnercategory.PartnerCategoryRepository partnerCategoryRepository;
-    @Autowired private de.tellerstatttonne.backend.event.EventRepository eventRepository;
+    @Autowired private de.tellerstatttonne.backend.specialpickup.SpecialPickupRepository specialPickupRepository;
 
     private Long partnerId;
     private Long memberId;
@@ -162,20 +162,20 @@ class PickupControllerTest {
     }
 
     @Test
-    void rejectsOverlappingEventPickup() {
-        de.tellerstatttonne.backend.event.EventEntity event =
-            new de.tellerstatttonne.backend.event.EventEntity();
-        event.setName("Stadtfest");
-        event.setStartDate(LocalDate.of(2026, 5, 1));
-        event.setEndDate(LocalDate.of(2026, 5, 1));
-        event.setStreet("Festplatz 1");
-        event.setPostalCode("10115");
-        event.setCity("Berlin");
-        Long eventId = eventRepository.save(event).getId();
+    void rejectsOverlappingSpecialPickup() {
+        de.tellerstatttonne.backend.specialpickup.SpecialPickupEntity specialPickup =
+            new de.tellerstatttonne.backend.specialpickup.SpecialPickupEntity();
+        specialPickup.setName("Stadtfest");
+        specialPickup.setStartDate(LocalDate.of(2026, 5, 1));
+        specialPickup.setEndDate(LocalDate.of(2026, 5, 1));
+        specialPickup.setStreet("Festplatz 1");
+        specialPickup.setPostalCode("10115");
+        specialPickup.setCity("Berlin");
+        Long specialPickupId = specialPickupRepository.save(specialPickup).getId();
 
         Pickup first = new Pickup(
             null, null, null, null, null, null, null,
-            eventId, "Stadtfest", null,
+            specialPickupId, "Stadtfest", null,
             LocalDate.of(2026, 5, 1), "10:00", "12:00",
             Pickup.Status.SCHEDULED, 2, List.of(), null, null
         );
@@ -183,7 +183,7 @@ class PickupControllerTest {
 
         Pickup overlapping = new Pickup(
             null, null, null, null, null, null, null,
-            eventId, "Stadtfest", null,
+            specialPickupId, "Stadtfest", null,
             LocalDate.of(2026, 5, 1), "11:00", "13:00",
             Pickup.Status.SCHEDULED, 1, List.of(), null, null
         );
@@ -193,7 +193,7 @@ class PickupControllerTest {
 
         Pickup adjacent = new Pickup(
             null, null, null, null, null, null, null,
-            eventId, "Stadtfest", null,
+            specialPickupId, "Stadtfest", null,
             LocalDate.of(2026, 5, 1), "12:00", "13:00",
             Pickup.Status.SCHEDULED, 1, List.of(), null, null
         );

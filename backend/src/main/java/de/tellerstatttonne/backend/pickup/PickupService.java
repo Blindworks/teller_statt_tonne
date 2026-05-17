@@ -1,12 +1,12 @@
 package de.tellerstatttonne.backend.pickup;
 
 import de.tellerstatttonne.backend.auth.CurrentUser;
-import de.tellerstatttonne.backend.event.EventEntity;
-import de.tellerstatttonne.backend.event.EventRepository;
 import de.tellerstatttonne.backend.notification.event.PickupStatusChangedEvent;
 import de.tellerstatttonne.backend.partner.Partner;
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import de.tellerstatttonne.backend.partner.PartnerRepository;
+import de.tellerstatttonne.backend.specialpickup.SpecialPickupEntity;
+import de.tellerstatttonne.backend.specialpickup.SpecialPickupRepository;
 import de.tellerstatttonne.backend.user.User;
 import de.tellerstatttonne.backend.user.UserEntity;
 import de.tellerstatttonne.backend.user.UserRepository;
@@ -32,20 +32,20 @@ public class PickupService {
 
     private final PickupRepository repository;
     private final PartnerRepository partnerRepository;
-    private final EventRepository eventRepository;
+    private final SpecialPickupRepository specialPickupRepository;
     private final UserRepository userRepository;
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
 
     public PickupService(PickupRepository repository,
                          PartnerRepository partnerRepository,
-                         EventRepository eventRepository,
+                         SpecialPickupRepository specialPickupRepository,
                          UserRepository userRepository,
                          UserService userService,
                          ApplicationEventPublisher eventPublisher) {
         this.repository = repository;
         this.partnerRepository = partnerRepository;
-        this.eventRepository = eventRepository;
+        this.specialPickupRepository = specialPickupRepository;
         this.userRepository = userRepository;
         this.userService = userService;
         this.eventPublisher = eventPublisher;
@@ -82,7 +82,7 @@ public class PickupService {
 
     private static boolean isAllowed(PickupEntity e, Optional<Set<Long>> filter) {
         if (filter.isEmpty()) return true;
-        if (e.getEvent() != null) return true;
+        if (e.getSpecialPickup() != null) return true;
         return e.getPartner() != null && filter.get().contains(e.getPartner().getId());
     }
 
@@ -112,11 +112,11 @@ public class PickupService {
     public Pickup create(Pickup pickup) {
         validate(pickup);
         PartnerEntity partner = null;
-        EventEntity event = null;
-        if (pickup.eventId() != null) {
-            event = loadEvent(pickup.eventId());
-            if (repository.existsEventPickupOverlap(
-                    pickup.eventId(), pickup.date(), pickup.startTime(), pickup.endTime())) {
+        SpecialPickupEntity specialPickup = null;
+        if (pickup.specialPickupId() != null) {
+            specialPickup = loadSpecialPickup(pickup.specialPickupId());
+            if (repository.existsSpecialPickupOverlap(
+                    pickup.specialPickupId(), pickup.date(), pickup.startTime(), pickup.endTime())) {
                 throw new IllegalStateException(
                     "Für diese Sonderabholung existiert am " + pickup.date()
                         + " bereits ein Termin im Zeitraum "
@@ -130,7 +130,7 @@ public class PickupService {
             }
         }
         PickupEntity entity = new PickupEntity();
-        PickupMapper.applyToEntity(entity, pickup, partner, event);
+        PickupMapper.applyToEntity(entity, pickup, partner, specialPickup);
         if (entity.getSavedKg() == null && partner != null) {
             entity.setSavedKg(resolveSlotExpectedKg(partner, pickup));
         }
@@ -158,8 +158,8 @@ public class PickupService {
     };
 
     public List<Pickup> createSeries(Pickup template, LocalDate until) {
-        if (template.eventId() != null) {
-            throw new IllegalArgumentException("series creation is not supported for event pickups");
+        if (template.specialPickupId() != null) {
+            throw new IllegalArgumentException("series creation is not supported for special pickups");
         }
         if (template.date() == null) {
             throw new IllegalArgumentException("date is required");
@@ -191,14 +191,14 @@ public class PickupService {
         return repository.findById(id).map(entity -> {
             validate(pickup);
             PartnerEntity partner = null;
-            EventEntity event = null;
-            if (pickup.eventId() != null) {
-                event = loadEvent(pickup.eventId());
+            SpecialPickupEntity specialPickup = null;
+            if (pickup.specialPickupId() != null) {
+                specialPickup = loadSpecialPickup(pickup.specialPickupId());
             } else {
                 partner = loadPartner(pickup.partnerId());
             }
             Pickup.Status oldStatus = entity.getStatus();
-            PickupMapper.applyToEntity(entity, pickup, partner, event);
+            PickupMapper.applyToEntity(entity, pickup, partner, specialPickup);
             PickupEntity saved = repository.save(entity);
             Pickup.Status newStatus = saved.getStatus();
             if (oldStatus != newStatus) {
@@ -254,14 +254,14 @@ public class PickupService {
             .orElseThrow(() -> new IllegalArgumentException("partner not found: " + partnerId));
     }
 
-    private EventEntity loadEvent(Long eventId) {
-        return eventRepository.findById(eventId)
-            .orElseThrow(() -> new IllegalArgumentException("event not found: " + eventId));
+    private SpecialPickupEntity loadSpecialPickup(Long specialPickupId) {
+        return specialPickupRepository.findById(specialPickupId)
+            .orElseThrow(() -> new IllegalArgumentException("special pickup not found: " + specialPickupId));
     }
 
     private void validate(Pickup pickup) {
-        if ((pickup.partnerId() == null) == (pickup.eventId() == null)) {
-            throw new IllegalArgumentException("exactly one of partnerId or eventId must be set");
+        if ((pickup.partnerId() == null) == (pickup.specialPickupId() == null)) {
+            throw new IllegalArgumentException("exactly one of partnerId or specialPickupId must be set");
         }
         if (pickup.date() == null) {
             throw new IllegalArgumentException("date is required");

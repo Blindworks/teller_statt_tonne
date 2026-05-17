@@ -1,4 +1,4 @@
-package de.tellerstatttonne.backend.event;
+package de.tellerstatttonne.backend.specialpickup;
 
 import de.tellerstatttonne.backend.partner.PartnerEntity;
 import jakarta.persistence.Column;
@@ -14,8 +14,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "event")
-public class EventEntity {
+@Table(name = "special_pickup")
+public class SpecialPickupEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

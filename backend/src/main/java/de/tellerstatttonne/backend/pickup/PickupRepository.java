@@ -29,13 +29,13 @@ public interface PickupRepository extends JpaRepository<PickupEntity, Long> {
     @Query("""
         select case when count(p) > 0 then true else false end
         from PickupEntity p
-        where p.event.id = :eventId
+        where p.specialPickup.id = :specialPickupId
           and p.date = :date
           and p.startTime < :endTime
           and p.endTime > :startTime
         """)
-    boolean existsEventPickupOverlap(
-        @Param("eventId") Long eventId,
+    boolean existsSpecialPickupOverlap(
+        @Param("specialPickupId") Long specialPickupId,
         @Param("date") LocalDate date,
         @Param("startTime") String startTime,
         @Param("endTime") String endTime);

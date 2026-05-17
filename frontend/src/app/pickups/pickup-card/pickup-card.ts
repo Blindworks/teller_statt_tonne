@@ -58,23 +58,23 @@ export class PickupCardComponent {
     return Math.max(0, p.capacity - p.assignments.length);
   });
 
-  readonly isEvent = computed(() => this.pickup().eventId != null);
+  readonly isSpecialPickup = computed(() => this.pickup().specialPickupId != null);
 
   readonly chipClasses = computed(() => {
-    if (this.isEvent()) return 'text-on-primary bg-primary';
+    if (this.isSpecialPickup()) return 'text-on-primary bg-primary';
     const c = this.categoryRegistry.byId(this.pickup().partnerCategoryId);
     return chipClass(c?.code ?? null);
   });
 
   readonly chipLabel = computed(() => {
-    if (this.isEvent()) return 'Sonderabholung';
+    if (this.isSpecialPickup()) return 'Sonderabholung';
     const c = this.categoryRegistry.byId(this.pickup().partnerCategoryId);
     return c?.label ?? 'Partner';
   });
 
   readonly displayTitle = computed(() => {
     const p = this.pickup();
-    if (p.eventId != null) return p.eventName ?? 'Sonderabholung';
+    if (p.specialPickupId != null) return p.specialPickupName ?? 'Sonderabholung';
     return p.partnerName ?? 'Unbekannt';
   });
 

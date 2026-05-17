@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="038-drop-pickup-parent-xor" author="teller-statt-tonne">
+        <sql>
+            ALTER TABLE pickup DROP CONSTRAINT ck_pickup_parent_xor
+        </sql>
+        <rollback>
+            ALTER TABLE pickup
+            ADD CONSTRAINT ck_pickup_parent_xor
+            CHECK ((partner_id IS NOT NULL AND event_id IS NULL)
+                OR (partner_id IS NULL AND event_id IS NOT NULL))
+        </rollback>
+    </changeSet>
+
+    <changeSet id="038-drop-pickup-event-fk" author="teller-statt-tonne">
+        <dropForeignKeyConstraint baseTableName="pickup" constraintName="fk_pickup_event"/>
+    </changeSet>
+
+    <changeSet id="038-drop-event-index" author="teller-statt-tonne">
+        <dropIndex tableName="event" indexName="idx_event_end_date"/>
+    </changeSet>
+
+    <changeSet id="038-rename-event-table" author="teller-statt-tonne">
+        <renameTable oldTableName="event" newTableName="special_pickup"/>
+    </changeSet>
+
+    <changeSet id="038-rename-pickup-event-id-column" author="teller-statt-tonne">
+        <renameColumn tableName="pickup" oldColumnName="event_id" newColumnName="special_pickup_id"
+                      columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="038-create-special-pickup-index" author="teller-statt-tonne">
+        <createIndex tableName="special_pickup" indexName="idx_special_pickup_end_date">
+            <column name="end_date"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="038-add-pickup-special-pickup-fk" author="teller-statt-tonne">
+        <addForeignKeyConstraint baseTableName="pickup" baseColumnNames="special_pickup_id"
+                                 referencedTableName="special_pickup" referencedColumnNames="id"
+                                 constraintName="fk_pickup_special_pickup" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="038-recreate-pickup-parent-xor" author="teller-statt-tonne">
+        <sql>
+            ALTER TABLE pickup
+            ADD CONSTRAINT ck_pickup_parent_xor
+            CHECK ((partner_id IS NOT NULL AND special_pickup_id IS NULL)
+                OR (partner_id IS NULL AND special_pickup_id IS NOT NULL))
+        </sql>
+        <rollback>
+            ALTER TABLE pickup DROP CONSTRAINT ck_pickup_parent_xor
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
