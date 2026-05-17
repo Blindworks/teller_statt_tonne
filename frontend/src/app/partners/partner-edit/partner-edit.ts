@@ -65,6 +65,12 @@ type PartnerForm = FormGroup<{
   accessInstructions: FormControl<string>;
   pickupProcedure: FormControl<string>;
   onSiteContactNote: FormControl<string>;
+  deliveryNoteInfo: FormControl<string>;
+  depositInfo: FormControl<string>;
+  wasteDisposalInfo: FormControl<string>;
+  materialInfo: FormControl<string>;
+  liabilityWaiverSigned: FormControl<boolean>;
+  liabilityWaiverSignedOn: FormControl<string | null>;
 }>;
 
 @Component({
@@ -123,6 +129,19 @@ export class PartnerEditComponent {
         });
       },
     });
+    const waiverDate = this.form.controls.liabilityWaiverSignedOn;
+    this.form.controls.liabilityWaiverSigned.valueChanges.subscribe((signed) => {
+      if (signed) {
+        waiverDate.enable({ emitEvent: false });
+      } else {
+        waiverDate.setValue(null, { emitEvent: false });
+        waiverDate.disable({ emitEvent: false });
+      }
+    });
+    if (!this.form.controls.liabilityWaiverSigned.value) {
+      waiverDate.disable({ emitEvent: false });
+    }
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       const id = Number(idParam);
@@ -199,6 +218,12 @@ export class PartnerEditComponent {
       accessInstructions: this.fb.nonNullable.control(''),
       pickupProcedure: this.fb.nonNullable.control(''),
       onSiteContactNote: this.fb.nonNullable.control(''),
+      deliveryNoteInfo: this.fb.nonNullable.control(''),
+      depositInfo: this.fb.nonNullable.control(''),
+      wasteDisposalInfo: this.fb.nonNullable.control(''),
+      materialInfo: this.fb.nonNullable.control(''),
+      liabilityWaiverSigned: this.fb.nonNullable.control(false),
+      liabilityWaiverSignedOn: this.fb.control<string | null>(null),
     });
   }
 
@@ -367,6 +392,12 @@ export class PartnerEditComponent {
       accessInstructions: partner.accessInstructions ?? '',
       pickupProcedure: partner.pickupProcedure ?? '',
       onSiteContactNote: partner.onSiteContactNote ?? '',
+      deliveryNoteInfo: partner.deliveryNoteInfo ?? '',
+      depositInfo: partner.depositInfo ?? '',
+      wasteDisposalInfo: partner.wasteDisposalInfo ?? '',
+      materialInfo: partner.materialInfo ?? '',
+      liabilityWaiverSigned: partner.liabilityWaiverSigned ?? false,
+      liabilityWaiverSignedOn: partner.liabilityWaiverSignedOn ?? null,
     });
     this.preferredFoodCategoryIds.set(partner.preferredFoodCategoryIds ?? []);
     this.slots.clear();
@@ -454,7 +485,15 @@ export class PartnerEditComponent {
       accessInstructions: raw.accessInstructions?.trim() ? raw.accessInstructions.trim() : null,
       pickupProcedure: raw.pickupProcedure?.trim() ? raw.pickupProcedure.trim() : null,
       onSiteContactNote: raw.onSiteContactNote?.trim() ? raw.onSiteContactNote.trim() : null,
+      deliveryNoteInfo: raw.deliveryNoteInfo?.trim() ? raw.deliveryNoteInfo.trim() : null,
+      depositInfo: raw.depositInfo?.trim() ? raw.depositInfo.trim() : null,
+      wasteDisposalInfo: raw.wasteDisposalInfo?.trim() ? raw.wasteDisposalInfo.trim() : null,
+      materialInfo: raw.materialInfo?.trim() ? raw.materialInfo.trim() : null,
       preferredFoodCategoryIds: this.preferredFoodCategoryIds(),
+      liabilityWaiverSigned: raw.liabilityWaiverSigned,
+      liabilityWaiverSignedOn: raw.liabilityWaiverSigned
+        ? (raw.liabilityWaiverSignedOn?.trim() ? raw.liabilityWaiverSignedOn.trim() : null)
+        : null,
     };
   }
 

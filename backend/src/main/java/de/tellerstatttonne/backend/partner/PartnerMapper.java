@@ -35,11 +35,17 @@ final class PartnerMapper {
             e.getAccessInstructions(),
             e.getPickupProcedure(),
             e.getOnSiteContactNote(),
+            e.getDeliveryNoteInfo(),
+            e.getDepositInfo(),
+            e.getWasteDisposalInfo(),
+            e.getMaterialInfo(),
             e.getPreferredFoodCategories() == null
                 ? List.of()
                 : e.getPreferredFoodCategories().stream()
                     .map(PartnerEntity.PreferredFoodCategoryEmbeddable::getFoodCategoryId)
-                    .toList()
+                    .toList(),
+            e.isLiabilityWaiverSigned(),
+            e.getLiabilityWaiverSignedOn()
         );
     }
 
@@ -55,6 +61,12 @@ final class PartnerMapper {
         target.setAccessInstructions(src.accessInstructions());
         target.setPickupProcedure(src.pickupProcedure());
         target.setOnSiteContactNote(src.onSiteContactNote());
+        target.setDeliveryNoteInfo(src.deliveryNoteInfo());
+        target.setDepositInfo(src.depositInfo());
+        target.setWasteDisposalInfo(src.wasteDisposalInfo());
+        target.setMaterialInfo(src.materialInfo());
+        target.setLiabilityWaiverSigned(src.liabilityWaiverSigned());
+        target.setLiabilityWaiverSignedOn(src.liabilityWaiverSigned() ? src.liabilityWaiverSignedOn() : null);
 
         PartnerEntity.ContactEmbeddable contact = target.getContact() != null
             ? target.getContact()

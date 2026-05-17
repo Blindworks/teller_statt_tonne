@@ -49,7 +49,13 @@ export interface Partner {
   accessInstructions: string | null;
   pickupProcedure: string | null;
   onSiteContactNote: string | null;
+  deliveryNoteInfo: string | null;
+  depositInfo: string | null;
+  wasteDisposalInfo: string | null;
+  materialInfo: string | null;
   preferredFoodCategoryIds: number[];
+  liabilityWaiverSigned: boolean;
+  liabilityWaiverSignedOn: string | null;
 }
 
 export const WEEKDAYS: ReadonlyArray<{ value: Weekday; label: string }> = [
@@ -101,6 +107,12 @@ export function emptyPartner(): Partner {
     accessInstructions: null,
     pickupProcedure: null,
     onSiteContactNote: null,
+    deliveryNoteInfo: null,
+    depositInfo: null,
+    wasteDisposalInfo: null,
+    materialInfo: null,
     preferredFoodCategoryIds: [],
+    liabilityWaiverSigned: false,
+    liabilityWaiverSignedOn: null,
   };
 }

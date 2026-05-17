@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="037-partner-retter-hints-extra" author="teller-statt-tonne">
+        <addColumn tableName="partner">
+            <column name="delivery_note_info" type="CLOB"/>
+            <column name="deposit_info" type="CLOB"/>
+            <column name="waste_disposal_info" type="CLOB"/>
+            <column name="material_info" type="CLOB"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -229,7 +229,7 @@
           </section>
         }
 
-        @if (p.parkingInfo || p.accessInstructions || p.pickupProcedure || p.onSiteContactNote) {
+        @if (p.parkingInfo || p.accessInstructions || p.pickupProcedure || p.deliveryNoteInfo || p.depositInfo || p.wasteDisposalInfo || p.materialInfo || p.onSiteContactNote) {
           <section class="mt-6">
             <h5
               class="text-xs uppercase tracking-wider text-on-surface-variant font-bold mb-2"
@@ -266,6 +266,50 @@
                     <p class="text-sm font-bold text-on-surface">Vorgehen</p>
                     <p class="text-sm text-on-surface-variant whitespace-pre-line break-words">
                       {{ p.pickupProcedure }}
+                    </p>
+                  </div>
+                </li>
+              }
+              @if (p.deliveryNoteInfo) {
+                <li class="flex items-start gap-3 px-4 py-3 rounded-lg bg-surface-container-low">
+                  <span class="material-symbols-outlined text-primary">receipt_long</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-on-surface">Lieferschein</p>
+                    <p class="text-sm text-on-surface-variant whitespace-pre-line break-words">
+                      {{ p.deliveryNoteInfo }}
+                    </p>
+                  </div>
+                </li>
+              }
+              @if (p.depositInfo) {
+                <li class="flex items-start gap-3 px-4 py-3 rounded-lg bg-surface-container-low">
+                  <span class="material-symbols-outlined text-primary">recycling</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-on-surface">Pfand</p>
+                    <p class="text-sm text-on-surface-variant whitespace-pre-line break-words">
+                      {{ p.depositInfo }}
+                    </p>
+                  </div>
+                </li>
+              }
+              @if (p.wasteDisposalInfo) {
+                <li class="flex items-start gap-3 px-4 py-3 rounded-lg bg-surface-container-low">
+                  <span class="material-symbols-outlined text-primary">delete</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-on-surface">Müllentsorgung</p>
+                    <p class="text-sm text-on-surface-variant whitespace-pre-line break-words">
+                      {{ p.wasteDisposalInfo }}
+                    </p>
+                  </div>
+                </li>
+              }
+              @if (p.materialInfo) {
+                <li class="flex items-start gap-3 px-4 py-3 rounded-lg bg-surface-container-low">
+                  <span class="material-symbols-outlined text-primary">inventory_2</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-on-surface">Material</p>
+                    <p class="text-sm text-on-surface-variant whitespace-pre-line break-words">
+                      {{ p.materialInfo }}
                     </p>
                   </div>
                 </li>

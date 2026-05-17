@@ -131,7 +131,8 @@ public class PartnerService {
             p.id(), p.name(), p.categoryId(), p.street(), p.postalCode(), p.city(),
             p.logoUrl(), p.contact(), p.retterContact(), enriched, p.status(), p.latitude(), p.longitude(),
             p.parkingInfo(), p.accessInstructions(), p.pickupProcedure(), p.onSiteContactNote(),
-            p.preferredFoodCategoryIds()
+            p.deliveryNoteInfo(), p.depositInfo(), p.wasteDisposalInfo(), p.materialInfo(),
+            p.preferredFoodCategoryIds(), p.liabilityWaiverSigned(), p.liabilityWaiverSignedOn()
         );
     }
 

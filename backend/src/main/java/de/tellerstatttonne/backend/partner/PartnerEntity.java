@@ -16,10 +16,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,6 +64,22 @@ public class PartnerEntity {
     @Column(name = "on_site_contact_note", length = 500)
     private String onSiteContactNote;
 
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR)
+    @Column(name = "delivery_note_info", columnDefinition = "LONGTEXT")
+    private String deliveryNoteInfo;
+
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR)
+    @Column(name = "deposit_info", columnDefinition = "LONGTEXT")
+    private String depositInfo;
+
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR)
+    @Column(name = "waste_disposal_info", columnDefinition = "LONGTEXT")
+    private String wasteDisposalInfo;
+
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR)
+    @Column(name = "material_info", columnDefinition = "LONGTEXT")
+    private String materialInfo;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
         name = "partner_food_category",
@@ -95,6 +114,12 @@ public class PartnerEntity {
     private Double latitude;
 
     private Double longitude;
+
+    @Column(name = "liability_waiver_signed", nullable = false)
+    private boolean liabilityWaiverSigned = false;
+
+    @Column(name = "liability_waiver_signed_on")
+    private LocalDate liabilityWaiverSignedOn;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -140,8 +165,20 @@ public class PartnerEntity {
     public void setPickupProcedure(String pickupProcedure) { this.pickupProcedure = pickupProcedure; }
     public String getOnSiteContactNote() { return onSiteContactNote; }
     public void setOnSiteContactNote(String onSiteContactNote) { this.onSiteContactNote = onSiteContactNote; }
+    public String getDeliveryNoteInfo() { return deliveryNoteInfo; }
+    public void setDeliveryNoteInfo(String deliveryNoteInfo) { this.deliveryNoteInfo = deliveryNoteInfo; }
+    public String getDepositInfo() { return depositInfo; }
+    public void setDepositInfo(String depositInfo) { this.depositInfo = depositInfo; }
+    public String getWasteDisposalInfo() { return wasteDisposalInfo; }
+    public void setWasteDisposalInfo(String wasteDisposalInfo) { this.wasteDisposalInfo = wasteDisposalInfo; }
+    public String getMaterialInfo() { return materialInfo; }
+    public void setMaterialInfo(String materialInfo) { this.materialInfo = materialInfo; }
     public List<PreferredFoodCategoryEmbeddable> getPreferredFoodCategories() { return preferredFoodCategories; }
     public void setPreferredFoodCategories(List<PreferredFoodCategoryEmbeddable> preferredFoodCategories) { this.preferredFoodCategories = preferredFoodCategories; }
+    public boolean isLiabilityWaiverSigned() { return liabilityWaiverSigned; }
+    public void setLiabilityWaiverSigned(boolean liabilityWaiverSigned) { this.liabilityWaiverSigned = liabilityWaiverSigned; }
+    public LocalDate getLiabilityWaiverSignedOn() { return liabilityWaiverSignedOn; }
+    public void setLiabilityWaiverSignedOn(LocalDate liabilityWaiverSignedOn) { this.liabilityWaiverSignedOn = liabilityWaiverSignedOn; }
 
     @Embeddable
     public static class PreferredFoodCategoryEmbeddable {

@@ -97,6 +97,42 @@
                 <p class="text-sm text-on-surface whitespace-pre-line">{{ p.pickupProcedure }}</p>
               </div>
             }
+            @if (p.deliveryNoteInfo) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">receipt_long</span>
+                  Lieferschein
+                </div>
+                <p class="text-sm text-on-surface whitespace-pre-line">{{ p.deliveryNoteInfo }}</p>
+              </div>
+            }
+            @if (p.depositInfo) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">recycling</span>
+                  Pfand
+                </div>
+                <p class="text-sm text-on-surface whitespace-pre-line">{{ p.depositInfo }}</p>
+              </div>
+            }
+            @if (p.wasteDisposalInfo) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">delete</span>
+                  Müllentsorgung
+                </div>
+                <p class="text-sm text-on-surface whitespace-pre-line">{{ p.wasteDisposalInfo }}</p>
+              </div>
+            }
+            @if (p.materialInfo) {
+              <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
+                <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                  <span class="material-symbols-outlined">inventory_2</span>
+                  Material
+                </div>
+                <p class="text-sm text-on-surface whitespace-pre-line">{{ p.materialInfo }}</p>
+              </div>
+            }
             @if (p.retterContact.name || p.retterContact.email || p.retterContact.phone) {
               <div class="bg-surface-container-low rounded-2xl shadow p-5 mb-3">
                 <div class="flex items-center gap-2 mb-2 text-primary font-bold">
@@ -137,7 +173,7 @@
                 <p class="text-sm text-on-surface">{{ p.onSiteContactNote }}</p>
               </div>
             }
-            @if (!p.parkingInfo && !p.accessInstructions && !p.pickupProcedure && !p.onSiteContactNote && !p.retterContact.name && !p.retterContact.email && !p.retterContact.phone) {
+            @if (!p.parkingInfo && !p.accessInstructions && !p.pickupProcedure && !p.deliveryNoteInfo && !p.depositInfo && !p.wasteDisposalInfo && !p.materialInfo && !p.onSiteContactNote && !p.retterContact.name && !p.retterContact.email && !p.retterContact.phone) {
               <div class="text-sm text-on-surface-variant italic">
                 Keine besonderen Hinweise hinterlegt.
               </div>

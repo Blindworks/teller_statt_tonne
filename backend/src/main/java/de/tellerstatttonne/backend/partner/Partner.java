@@ -1,6 +1,7 @@
 package de.tellerstatttonne.backend.partner;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public record Partner(
@@ -21,7 +22,13 @@ public record Partner(
     String accessInstructions,
     String pickupProcedure,
     String onSiteContactNote,
-    List<Long> preferredFoodCategoryIds
+    String deliveryNoteInfo,
+    String depositInfo,
+    String wasteDisposalInfo,
+    String materialInfo,
+    List<Long> preferredFoodCategoryIds,
+    boolean liabilityWaiverSigned,
+    LocalDate liabilityWaiverSignedOn
 ) {
     public enum Status {
         KEIN_KONTAKT,
@@ -64,12 +71,30 @@ public record Partner(
         Double latitude, Double longitude
     ) {
         this(id, name, categoryId, street, postalCode, city, logoUrl, contact, null, pickupSlots,
-            status, latitude, longitude, null, null, null, null, List.of());
+            status, latitude, longitude, null, null, null, null,
+            null, null, null, null,
+            List.of(), false, null);
+    }
+
+    public Partner(
+        Long id, String name, Long categoryId, String street, String postalCode, String city,
+        String logoUrl, Contact contact, Contact retterContact, List<PickupSlot> pickupSlots,
+        Status status, Double latitude, Double longitude,
+        String parkingInfo, String accessInstructions, String pickupProcedure,
+        String onSiteContactNote, List<Long> preferredFoodCategoryIds
+    ) {
+        this(id, name, categoryId, street, postalCode, city, logoUrl, contact, retterContact,
+            pickupSlots, status, latitude, longitude, parkingInfo, accessInstructions,
+            pickupProcedure, onSiteContactNote,
+            null, null, null, null,
+            preferredFoodCategoryIds, false, null);
     }
 
     public Partner withId(Long newId) {
         return new Partner(newId, name, categoryId, street, postalCode, city, logoUrl,
             contact, retterContact, pickupSlots, status, latitude, longitude,
-            parkingInfo, accessInstructions, pickupProcedure, onSiteContactNote, preferredFoodCategoryIds);
+            parkingInfo, accessInstructions, pickupProcedure, onSiteContactNote,
+            deliveryNoteInfo, depositInfo, wasteDisposalInfo, materialInfo,
+            preferredFoodCategoryIds, liabilityWaiverSigned, liabilityWaiverSignedOn);
     }
 }
